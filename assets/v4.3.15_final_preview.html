@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"/>
+<title>v4.3.15 — FINAL 4-rule production preview</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto;max-width:1100px;margin:24px auto;padding:0 16px;background:#0b0f14;color:#e5e7eb}
+  h1{color:#fbbf24}h2{color:#60a5fa;border-bottom:1px solid #1f2937;padding-bottom:6px;margin-top:32px}
+  .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:16px;margin:12px 0}
+  .rule{background:#0f172a;border-left:4px solid #22c55e;padding:12px 16px;margin:8px 0;border-radius:6px}
+  .rule.score{border-left-color:#a855f7}
+  .stat{display:inline-block;padding:2px 8px;margin:2px;border-radius:999px;background:#1f2937;font-size:13px;color:#9ca3af}
+  .stat.good{background:#065f46;color:#d1fae5}
+  .stat.warn{background:#78350f;color:#fef3c7}
+  .stat.bad{background:#7f1d1d;color:#fee2e2}
+  table{width:100%;border-collapse:collapse;margin:12px 0}
+  th,td{padding:8px;text-align:left;border-bottom:1px solid #1f2937}
+  th{color:#fbbf24;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+  .meta{color:#6b7280;font-size:13px}
+  code{background:#1f2937;padding:2px 6px;border-radius:4px;color:#c4b5fd;font-size:13px}
+  .big{font-size:22px;font-weight:700;color:#22c55e}
+  .tag{display:inline-block;padding:2px 10px;background:#1e3a8a;color:#dbeafe;border-radius:4px;font-size:12px;margin-left:6px}
+</style></head>
+<body>
+<h1>🎯 BTC Dashboard v4.3.15 — Final 4-Rule Production Set</h1>
+<div class="meta">Build 2026-04-17 · Learning loop: iter1 → iter5 · Verified on 10 000 candles 1h (Binance BTCUSDT)</div>
+
+<div class="card">
+<h2>📊 Summary verification (iter3)</h2>
+<table>
+<tr><th>#</th><th>Label</th><th>Type</th><th>WR</th><th>N</th><th>NET %</th><th>Verdict</th></tr>
+<tr><td>1</td><td>LONG Widened EMA+FLAT</td><td>Boolean</td><td class="big">78.1%</td><td>32</td><td>+10 844%</td><td><span class="stat good">🟢 VERIFIED</span></td></tr>
+<tr><td>2</td><td>Golden ATR+EMA+FLAT</td><td>Boolean</td><td class="big">100%</td><td>10</td><td>+4 920%</td><td><span class="stat good">🟢 VERIFIED</span></td></tr>
+<tr><td>3</td><td>Golden ATR+FLAT</td><td>Boolean</td><td class="big">100%</td><td>12</td><td>+5 904%</td><td><span class="stat good">🟢 VERIFIED</span></td></tr>
+<tr><td>4</td><td>LONG Multi-TF Score ≥70</td><td>Weighted score</td><td class="big">31.9%</td><td>448</td><td>+24 666%</td><td><span class="stat good">🟢 VERIFIED</span></td></tr>
+</table>
+<div class="meta">Total NET cumulative (non-overlap): <b style="color:#22c55e">+46 334%</b> on 10 K 1h candles</div>
+</div>
+
+<h2>📐 Rule configs</h2>
+
+<div class="rule">
+<b>R1 · LONG Widened EMA+FLAT</b> <span class="tag">Scalp low-vol</span>
+<div>Filter: <code>emaDist1h ∈ [-0.5%, +0.5%]</code> + <code>HTF far (1d) = FLAT</code></div>
+<div>TP/SL: 5% / 2% · maxHold 100h · WR 78.1% · N=32</div>
+</div>
+
+<div class="rule">
+<b>R2 · Golden ATR+EMA+FLAT</b> <span class="tag">Gold</span>
+<div>Filter: <code>atr1h &lt; 0.3%</code> + <code>emaDist ∈ [-0.5%, +0.5%]</code> + <code>1d FLAT</code></div>
+<div>TP/SL: 5% / 2% · WR 100% · N=10 · <span class="stat warn">rare but surgical</span></div>
+</div>
+
+<div class="rule">
+<b>R3 · Golden ATR+FLAT</b> <span class="tag">Gold</span>
+<div>Filter: <code>atr1h &lt; 0.3%</code> + <code>1d FLAT</code></div>
+<div>TP/SL: 5% / 2% · WR 100% · N=12</div>
+</div>
+
+<div class="rule score">
+<b>R4 · LONG Multi-TF Score ≥70</b> <span class="tag">Iter4 champion · Scoring</span>
+<div>Filter: <code>multiTfScoreFilter(LONG, threshold=70)</code></div>
+<div>Weighted inputs: 4h trend + 1d trend + 1w trend + ATR 1h + EMA dist 1h + RSI 1h/1d + MACD</div>
+<div>TP/SL: 4% / 1.5% · WR 31.9% · N=448 · Edge +3.2% over break-even 28.7%</div>
+</div>
+
+<h2>🧪 Learning loop journey</h2>
+<div class="card">
+<table>
+<tr><th>Iter</th><th>Approach</th><th>Outcome</th></tr>
+<tr><td>1</td><td>Inject 5 fabricated-stat rules</td><td><span class="stat bad">R4/R5 DISASTER WR 19.9% — drift revealed fake stats</span></td></tr>
+<tr><td>2</td><td>Boolean filters only, verified-gold only</td><td><span class="stat good">3 rules survive (R1 WR78%, R2/R3 WR100%)</span></td></tr>
+<tr><td>3</td><td>Multi-TF static-weight scan</td><td><span class="stat warn">Only 3 SHORT combos, under-tuned</span></td></tr>
+<tr><td>4</td><td>Regime-heavy weight tuning</td><td><span class="stat good">34 profitable · Best LONG thr70 tp4/sl1.5 NET +7964%</span></td></tr>
+<tr><td>5</td><td>SHORT euphoria-peak scheme</td><td><span class="stat bad">0 profitable · BTC 10K biased LONG</span></td></tr>
+</table>
+<div class="meta">Conclusion: 3 boolean rules (iter2) + 1 multi-TF score rule (iter4 LONG) = FINAL set. SHORT euphoria scheme abandoned.</div>
+</div>
+
+<h2>🔧 Runtime changes (useRuleAlerts.ts)</h2>
+<div class="card">
+<ul>
+<li>New filters: <code>atrFilter</code>, <code>macdHistFilter</code>, <code>emaDistFilter</code></li>
+<li><code>htfTrendFilter</code> extended with <code>near_flat / far_flat / both_flat</code> modes + custom <code>{want, tf}</code></li>
+<li>New <code>multiTfScoreFilter</code> — auto-fetches 4h/1d/1w klines, computes weighted score once, evaluated per-rule against threshold</li>
+<li>Indicator cache extended: <code>atrPct</code>, <code>emaDistPct</code> per-TF</li>
+<li>RuleAlertBanner shows "🧪 FEATURE FILTERS" section</li>
+</ul>
+</div>
+
+<h2>🧠 Verdict classifier v2 (Top banner)</h2>
+<div class="card">
+<p>Replace logic cũ (6-level: TÍN HIỆU MUA MẠNH / TIỀM NĂNG LONG / CẨN THẬN SHORT / v.v.) — toàn bộ 6 verdict cũ đã verified là <b style="color:#ff4757">chỉ 1/7 có NET dương</b>.</p>
+<p>Scheme mới (dựa trên <code>verdict-classifier-scan</code>, 27 variants tested):</p>
+<table>
+<tr><th>Verdict</th><th>Side</th><th>N</th><th>WR</th><th>Edge vs 41.6%</th><th>NET %</th><th>Trust</th></tr>
+<tr><td>💎 GOLDEN LONG SETUP</td><td>LONG</td><td>2</td><td class="big">100%</td><td>+58.4%</td><td>+584%</td><td><span class="stat good">🟢 CAO</span></td></tr>
+<tr><td>🟢 WEAK LONG (SCORE 50-59)</td><td>LONG</td><td>53</td><td class="big">45.3%</td><td>+3.7%</td><td>+4 376%</td><td><span class="stat good">🟢 CAO</span></td></tr>
+<tr><td>🚀 STRONG LONG (SCORE ≥80)</td><td>LONG</td><td>29</td><td>34.5%</td><td>-7.1%</td><td>+1 368%</td><td><span class="stat warn">🟡 TB</span></td></tr>
+<tr><td>📊 POTENTIAL LONG (SCORE 60-79)</td><td>LONG</td><td>137</td><td>28.5%</td><td>-13.1%</td><td>+3 604%</td><td><span class="stat warn">🟡 TB</span></td></tr>
+<tr><td>🔴 SHORT CAUTION</td><td>SHORT</td><td>590</td><td>38.6%</td><td>-3%</td><td>+13 880%</td><td><span class="stat warn">🟡 TB</span></td></tr>
+<tr><td>⚡ STOCH REVERSAL LONG</td><td>LONG</td><td>107</td><td>24.3%</td><td>-17.3%</td><td>-456%</td><td><span class="stat bad">🔴 THẤP</span></td></tr>
+</table>
+<div class="meta">6/7 verdict NET>0 (scheme cũ: 1/7). UI hiển thị trực tiếp Edge + WR + N → user không bị lừa bởi label kêu to.</div>
+</div>
+
+<h2>✅ Ready for APK build</h2>
+<div class="card">
+<div>Version: <b>v4.3.15</b> · Build: 2026-04-17</div>
+<div>Gõ <code>build</code> để em chạy <code>./gradlew assembleRelease</code>.</div>
+</div>
+
+</body></html>

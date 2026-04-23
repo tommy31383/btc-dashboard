@@ -1,0 +1,26 @@
+{
+  "label": "MyRule#4c — 15m LONG + 1H momentum + RSI>=50 + StochK>=40 + TP1.5/SL0.75",
+  "tfKey": "15m",
+  "forceSide": "LONG",
+  "config": {
+    "leverage": 100,
+    "targetPct": 1.5,
+    "stopPct": 0.75,
+    "maxHoldBars": 60,
+    "minScore": 1,
+    "stochOSLevel": 95,
+    "stochOBLevel": 5,
+    "rsiOSLevel": 70,
+    "rsiOBLevel": 10,
+    "requiredConditions": ["stochExtreme", "rsiExtreme"],
+    "forceSide": "LONG",
+    "htfFilters": [
+      { "type": "rsi",        "tf": "1h", "op": ">=", "value": 50 },
+      { "type": "stochRange", "tf": "1h", "kMin": 40 },
+      { "type": "slope",   "tf": "1h", "indicator": "rsi",    "direction": "rising", "lookback": 3 },
+      { "type": "slope",   "tf": "1h", "indicator": "stochK", "direction": "rising", "lookback": 3 },
+      { "type": "compare", "tf": "1h", "left": "rsi", "op": ">", "right": "stochK" }
+    ]
+  },
+  "note": "Combo: 1H RSI>=50 + StochK>=40 + rising slopes + RSI>StochK. TP/SL đổi về 1.5/0.75 (sweet spot từ Rule#3 sweep)."
+}

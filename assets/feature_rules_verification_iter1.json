@@ -1,0 +1,308 @@
+{
+  "generatedAt": "2026-04-20T01:59:51.016Z",
+  "version": "v4.3.15-iter1",
+  "results": [
+    {
+      "rank": 1,
+      "label": "Golden MACD+EMA+FLAT",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "macdHist": {
+            "op": "between",
+            "min": 0,
+            "max": 50
+          },
+          "emaDist": {
+            "op": "between",
+            "min": -0.5,
+            "max": 0.5
+          },
+          "htf": {
+            "mode": "far_flat"
+          }
+        }
+      },
+      "saved": {
+        "winRate": 95.2,
+        "trades": 62,
+        "netPnL": 28604
+      },
+      "fresh": {
+        "trades": 8,
+        "wins": 3,
+        "losses": 5,
+        "timeouts": 0,
+        "winRate": 37.5,
+        "netPnL": 436,
+        "avgHold": 26.3
+      },
+      "drift": {
+        "wr": -57.7,
+        "n": -54
+      },
+      "accuracy": 39.4,
+      "skipFilter": 9831,
+      "lossAnalysis": {
+        "avgLossRSI4h": 50.9,
+        "avgWinRSI4h": 54.9,
+        "lossBy4hTrend": {
+          "DOWN": 2,
+          "FLAT": 3
+        },
+        "winBy4hTrend": {
+          "UP": 3
+        },
+        "lossBy1dTrend": {
+          "FLAT": 5
+        }
+      },
+      "suggestions": [
+        "⚠️ N=8 quá ít, relax filter hoặc lấy thêm data"
+      ]
+    },
+    {
+      "rank": 2,
+      "label": "Golden ATR+EMA+FLAT",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "atr": {
+            "op": "<",
+            "value": 0.3
+          },
+          "emaDist": {
+            "op": "between",
+            "min": -0.5,
+            "max": 0.5
+          },
+          "htf": {
+            "mode": "far_flat"
+          }
+        }
+      },
+      "saved": {
+        "winRate": 93.1,
+        "trades": 58,
+        "netPnL": 25736
+      },
+      "fresh": {
+        "trades": 10,
+        "wins": 10,
+        "losses": 0,
+        "timeouts": 0,
+        "winRate": 100,
+        "netPnL": 4920,
+        "avgHold": 55
+      },
+      "drift": {
+        "wr": 6.9,
+        "n": -48
+      },
+      "accuracy": 92.6,
+      "skipFilter": 9829,
+      "lossAnalysis": {
+        "avgLossRSI4h": null,
+        "avgWinRSI4h": 52.5,
+        "lossBy4hTrend": {},
+        "winBy4hTrend": {
+          "UP": 8,
+          "FLAT": 2
+        },
+        "lossBy1dTrend": {}
+      },
+      "suggestions": [
+        "⚠️ N=10 quá ít, relax filter hoặc lấy thêm data"
+      ]
+    },
+    {
+      "rank": 3,
+      "label": "Golden ATR+FLAT",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "atr": {
+            "op": "<",
+            "value": 0.3
+          },
+          "htf": {
+            "mode": "far_flat"
+          }
+        }
+      },
+      "saved": {
+        "winRate": 81,
+        "trades": 124,
+        "netPnL": 44208
+      },
+      "fresh": {
+        "trades": 12,
+        "wins": 12,
+        "losses": 0,
+        "timeouts": 0,
+        "winRate": 100,
+        "netPnL": 5904,
+        "avgHold": 50.4
+      },
+      "drift": {
+        "wr": 19,
+        "n": -112
+      },
+      "accuracy": 76.5,
+      "skipFilter": 9827,
+      "lossAnalysis": {
+        "avgLossRSI4h": null,
+        "avgWinRSI4h": 50.9,
+        "lossBy4hTrend": {},
+        "winBy4hTrend": {
+          "UP": 8,
+          "FLAT": 4
+        },
+        "lossBy1dTrend": {}
+      },
+      "suggestions": [
+        "⚠️ N=12 quá ít, relax filter hoặc lấy thêm data"
+      ]
+    },
+    {
+      "rank": 4,
+      "label": "Golden SHORT scalp EMA+ATR+UP",
+      "side": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "atr": {
+            "op": "<",
+            "value": 0.3
+          },
+          "emaDist": {
+            "op": "between",
+            "min": -0.5,
+            "max": 0.5
+          },
+          "htf": {
+            "mode": {
+              "want": "UP",
+              "tf": "far"
+            }
+          }
+        }
+      },
+      "saved": {
+        "winRate": 86.7,
+        "trades": 45,
+        "netPnL": 16140
+      },
+      "fresh": {
+        "trades": 282,
+        "wins": 56,
+        "losses": 113,
+        "timeouts": 113,
+        "winRate": 19.9,
+        "netPnL": 3144,
+        "avgHold": 79
+      },
+      "drift": {
+        "wr": -66.8,
+        "n": 237
+      },
+      "accuracy": 22.9,
+      "skipFilter": 9557,
+      "lossAnalysis": {
+        "avgLossRSI4h": 54.5,
+        "avgWinRSI4h": 49.6,
+        "lossBy4hTrend": {
+          "UP": 98,
+          "DOWN": 2,
+          "FLAT": 13
+        },
+        "winBy4hTrend": {
+          "FLAT": 14,
+          "DOWN": 8,
+          "UP": 34
+        },
+        "lossBy1dTrend": {
+          "UP": 113
+        }
+      },
+      "suggestions": [
+        "💡 87% loss xảy ra khi 4h trend = UP → nếu khác rule intent, thêm filter loại"
+      ]
+    },
+    {
+      "rank": 5,
+      "label": "SHORT Overheated RSI+EMA+UP",
+      "side": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "emaDist": {
+            "op": ">",
+            "value": 2
+          },
+          "htf": {
+            "mode": {
+              "want": "UP",
+              "tf": "far"
+            }
+          }
+        }
+      },
+      "saved": {
+        "winRate": 78,
+        "trades": 67,
+        "netPnL": 21564
+      },
+      "fresh": {
+        "trades": 246,
+        "wins": 47,
+        "losses": 168,
+        "timeouts": 31,
+        "winRate": 19.1,
+        "netPnL": -12068,
+        "avgHold": 45.2
+      },
+      "drift": {
+        "wr": -58.9,
+        "n": 179
+      },
+      "accuracy": 24.5,
+      "skipFilter": 9593,
+      "lossAnalysis": {
+        "avgLossRSI4h": 75.8,
+        "avgWinRSI4h": 71.4,
+        "lossBy4hTrend": {
+          "UP": 168
+        },
+        "winBy4hTrend": {
+          "UP": 46,
+          "FLAT": 1
+        },
+        "lossBy1dTrend": {
+          "UP": 168
+        }
+      },
+      "suggestions": [
+        "💡 100% loss xảy ra khi 4h trend = UP → nếu khác rule intent, thêm filter loại"
+      ]
+    }
+  ]
+}

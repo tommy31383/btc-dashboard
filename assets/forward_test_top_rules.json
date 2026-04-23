@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "candles": 20000,
+    "tp": 5,
+    "sl": 2,
+    "maxHold": 100,
+    "fee": 0.05,
+    "generatedAt": "2026-04-22T09:44:51.109Z"
+  },
+  "regime": {
+    "up": 9090,
+    "down": 8022,
+    "flat": 2688
+  },
+  "rules": {
+    "R1": {
+      "pred": "macd:0..50 + ema:±0.5% + htf:FLAT",
+      "claimWR": 95.2,
+      "metrics": {
+        "n": 405,
+        "wins": 195,
+        "losses": 127,
+        "to": 83,
+        "wr": 64.94,
+        "sumPnl": 787.3,
+        "avgWin": 4.03,
+        "avgLoss": -1.91,
+        "pf": 3.9,
+        "exp": 1.944
+      }
+    },
+    "R2": {
+      "pred": "macd:0..50 + atr:<0.3% + htf:FLAT",
+      "claimWR": 94.1,
+      "metrics": {
+        "n": 181,
+        "wins": 70,
+        "losses": 52,
+        "to": 59,
+        "wr": 67.4,
+        "sumPnl": 311.97,
+        "avgWin": 3.46,
+        "avgLoss": -1.87,
+        "pf": 3.82,
+        "exp": 1.724
+      }
+    },
+    "R3": {
+      "pred": "ema:±0.5% + atr:<0.3% + htf:FLAT",
+      "claimWR": 93.1,
+      "metrics": {
+        "n": 323,
+        "wins": 94,
+        "losses": 116,
+        "to": 113,
+        "wr": 60.37,
+        "sumPnl": 392.91,
+        "avgWin": 3.28,
+        "avgLoss": -1.93,
+        "pf": 2.59,
+        "exp": 1.216
+      }
+    },
+    "ALL3": {
+      "pred": "macd:0..50 + ema:±0.5% + atr:<0.3% + htf:FLAT",
+      "metrics": {
+        "n": 163,
+        "wins": 65,
+        "losses": 40,
+        "to": 58,
+        "wr": 71.78,
+        "sumPnl": 313.29,
+        "avgWin": 3.4,
+        "avgLoss": -1.84,
+        "pf": 4.69,
+        "exp": 1.922
+      }
+    }
+  }
+}

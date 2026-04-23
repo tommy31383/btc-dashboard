@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>v4.3.20 — TRADES tab FINAL (Risk Radar + 20K lesson data)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: {
+      bg: "#131313", card: "#1c1b1b", cardAlt: "#201f1f", surface: "#0e0e0e",
+      border: "#514439", borderSoft: "#2a2a2a",
+      text: "#e5e2e1", text2: "#d6c3b4", dim: "#9f8e80", fade: "#514439",
+      primaryContainer: "#ffb874", onPrimary: "#4b2800",
+      tertiary: "#b5ebff", green: "#10b981", red: "#ffb4ab", bitcoin: "#F7931A"
+    },
+    fontFamily: {
+      head: ["Space Grotesk","sans-serif"], body: ["Inter","sans-serif"], mono: ["JetBrains Mono","monospace"]
+    }
+  }}}
+</script>
+<style>
+  body { font-family: "Inter", sans-serif; background:#0a0a0a; color:#e5e2e1; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .phone { width:390px; background:#131313; min-height:900px; box-shadow:0 30px 80px rgba(0,0,0,.6); border-radius:2px; overflow:hidden; }
+</style>
+</head>
+<body class="antialiased p-10">
+
+<div class="max-w-[440px] mx-auto">
+  <div class="text-center mb-4 font-head text-xs tracking-[0.3em] text-dim uppercase">v4.3.20 · TRADES tab · Risk Radar FINAL (data scan 20K)</div>
+
+  <div class="phone">
+
+    <!-- TopAppBar -->
+    <header class="h-14 flex items-center justify-between px-4 bg-bg border-b border-borderSoft">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primaryContainer text-[20px]">currency_bitcoin</span>
+        <h1 class="font-head font-bold text-[13px] tracking-[0.25em] text-primaryContainer uppercase">BTC DASH</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-dim text-[20px]">notifications</span>
+        <span class="material-symbols-outlined text-dim text-[20px]">settings</span>
+      </div>
+    </header>
+
+    <main class="px-3 py-3 space-y-2.5">
+
+      <!-- Tab chip -->
+      <div class="flex items-center pl-0.5">
+        <span class="px-2.5 py-0.5 bg-primaryContainer text-onPrimary font-head font-extrabold text-[10px] tracking-[0.2em]">TRADES</span>
+        <span class="text-dim font-mono text-[10px] ml-2">· Risk + Rules + Safety Check</span>
+      </div>
+
+      <!-- 1. RISK SCORE HERO -->
+      <section class="bg-card pl-[18px] pr-3.5 py-3.5 rounded-sm" style="border-left: 4px solid #F7931A;">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-head font-bold text-[10px] tracking-[0.2em] text-text2">▼ RISK RADAR · 20K LESSON</span>
+          <span class="font-mono text-[9px] text-dim">2.7Y scan</span>
+        </div>
+        <div class="flex flex-col items-center mt-2.5 mb-3">
+          <span class="font-head font-bold text-[9px] tracking-[0.2em] text-dim">RISK SCORE</span>
+          <span class="font-head font-bold text-[56px] leading-[60px] text-primaryContainer">72</span>
+          <span class="font-mono font-bold text-[11px] tracking-[0.2em] text-dim mt-0.5">/ 100</span>
+          <div class="mt-2 px-3 py-0.5 rounded-full border" style="border-color:#10b98155;background:#10b98115;">
+            <span class="font-head font-extrabold text-[10px] tracking-[0.2em] text-green">PREFER LONG</span>
+          </div>
+        </div>
+        <div class="flex border-t border-border pt-2.5">
+          <div class="flex-1 flex flex-col items-center">
+            <span class="font-head font-bold text-[9px] tracking-[0.15em] text-dim mb-1">LONG SAFE</span>
+            <span class="font-mono font-extrabold text-[16px] text-green">4<span class="text-dim text-[11px] font-semibold">/5</span></span>
+          </div>
+          <div class="flex-1 flex flex-col items-center border-x border-borderSoft">
+            <span class="font-head font-bold text-[9px] tracking-[0.15em] text-dim mb-1">SHORT SAFE</span>
+            <span class="font-mono font-extrabold text-[16px] text-red">1<span class="text-dim text-[11px] font-semibold">/3</span></span>
+          </div>
+          <div class="flex-1 flex flex-col items-center">
+            <span class="font-head font-bold text-[9px] tracking-[0.15em] text-dim mb-1">FIRING</span>
+            <span class="font-mono font-extrabold text-[16px] text-bitcoin">2<span class="text-dim text-[11px] font-semibold">/6</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. GOLDEN OPPORTUNITIES -->
+      <section class="bg-card pl-4 pr-3 py-3 rounded-sm" style="border-left:4px solid #ffb874;">
+        <div class="flex items-center justify-between">
+          <span class="font-head font-bold text-[12px] tracking-[0.2em] text-primaryContainer">💎 GOLDEN OPPORTUNITIES</span>
+          <span class="font-mono text-[9px] text-dim">2 firing</span>
+        </div>
+        <p class="text-dim text-[10px] font-body mt-1 mb-2">Rule đỉnh từ scan TP+5/SL-2 · all ✓ = vào lệnh ngay</p>
+
+        <!-- Firing gold card -->
+        <div class="rounded-sm pl-3 pr-2.5 py-2.5 mb-1.5" style="background:#F7931A15;border-left:4px solid #F7931A;">
+          <div class="flex items-center mb-1">
+            <span class="font-head font-extrabold text-[10px] tracking-[0.15em] text-green min-w-[40px]">LONG</span>
+            <span class="text-text font-body font-bold text-[12px] flex-1">HTF-UP + RSI&lt;35 + ATR&lt;0.3%</span>
+            <span class="px-1.5 py-px border rounded-sm" style="border-color:#ffb87455;background:#ffb87410;">
+              <span class="text-primaryContainer font-mono text-[9px] font-bold">WR 72%</span>
+            </span>
+          </div>
+          <div class="text-dim font-mono text-[10px] mb-1.5">TP+5%/SL-2% · <span class="text-bitcoin font-bold">3/3 conditions</span></div>
+          <div class="flex items-center py-0.5"><span class="text-green w-3.5 font-extrabold">✓</span><span class="text-text font-body text-[11px] ml-1 flex-1">HTF 4h = UP</span><span class="text-green font-mono text-[10px] font-bold">UP</span></div>
+          <div class="flex items-center py-0.5"><span class="text-green w-3.5 font-extrabold">✓</span><span class="text-text font-body text-[11px] ml-1 flex-1">RSI 1h &lt; 35</span><span class="text-green font-mono text-[10px] font-bold">28.4</span></div>
+          <div class="flex items-center py-0.5"><span class="text-green w-3.5 font-extrabold">✓</span><span class="text-text font-body text-[11px] ml-1 flex-1">ATR 1h &lt; 0.3%</span><span class="text-green font-mono text-[10px] font-bold">0.21%</span></div>
+          <div class="mt-2 py-1.5 rounded-sm border flex items-center justify-center" style="background:#F7931A20;border-color:#F7931A55;">
+            <span class="text-bitcoin font-head font-extrabold text-[11px] tracking-[0.15em]">🔥 FIRING NOW — LONG SIGNAL LIVE</span>
+          </div>
+        </div>
+
+        <!-- Watching card -->
+        <div class="rounded-sm pl-3 pr-2.5 py-2.5 mb-1.5 bg-cardAlt" style="border-left:3px solid #ffb4ab;">
+          <div class="flex items-center mb-1">
+            <span class="font-head font-extrabold text-[10px] tracking-[0.15em] text-red min-w-[40px]">SHORT</span>
+            <span class="text-text font-body font-bold text-[12px] flex-1">RSI&gt;75 + MACD↓ + EMA+2%</span>
+            <span class="px-1.5 py-px border rounded-sm" style="border-color:#ffb87455;background:#ffb87410;">
+              <span class="text-primaryContainer font-mono text-[9px] font-bold">WR 68%</span>
+            </span>
+          </div>
+          <div class="text-dim font-mono text-[10px] mb-1.5">TP+5%/SL-2% · <span class="text-text2 font-bold">1/3 conditions</span></div>
+          <div class="flex items-center py-0.5"><span class="text-dim w-3.5 font-extrabold">·</span><span class="text-dim font-body text-[11px] ml-1 flex-1">RSI 1h &gt; 75</span><span class="text-dim font-mono text-[10px] font-bold">62.1</span></div>
+          <div class="flex items-center py-0.5"><span class="text-dim w-3.5 font-extrabold">·</span><span class="text-dim font-body text-[11px] ml-1 flex-1">MACD bearish</span><span class="text-dim font-mono text-[10px] font-bold">+12.3</span></div>
+          <div class="flex items-center py-0.5"><span class="text-green w-3.5 font-extrabold">✓</span><span class="text-text font-body text-[11px] ml-1 flex-1">EMA50 Δ &gt; +2%</span><span class="text-green font-mono text-[10px] font-bold">+2.4%</span></div>
+        </div>
+      </section>
+
+      <!-- 3. LONG CHECKLIST -->
+      <section class="bg-card pl-4 pr-3 py-3 rounded-sm" style="border-left:4px solid #10b981;">
+        <div class="flex items-center justify-between">
+          <span class="font-head font-bold text-[12px] tracking-[0.2em] text-green">⇧ LONG CHECKLIST</span>
+          <span class="font-mono text-[9px] text-dim">1/5 bad</span>
+        </div>
+        <p class="text-dim text-[10px] font-body mt-1 mb-2">⚠️ 1 dấu hiệu xấu đang xuất hiện — cân nhắc kỹ</p>
+        <div class="space-y-1">
+          <div class="flex items-center bg-cardAlt rounded-sm pl-3 pr-2.5 py-2" style="border-left:3px solid #ffb4ab;">
+            <div class="flex-1">
+              <div class="text-text font-body font-bold text-[12px]">RSI 1h overextended &gt; 72</div>
+              <div class="text-dim font-mono text-[10px] mt-px">momentum exhaustion · WR 34%</div>
+            </div>
+            <div class="px-1.5 py-0.5 rounded-sm border" style="background:#ffb4ab20;border-color:#ffb4ab55;">
+              <span class="text-red font-head font-extrabold text-[9px] tracking-[0.12em]">HIGH</span>
+            </div>
+          </div>
+          <div class="flex items-center bg-cardAlt rounded-sm pl-3 pr-2.5 py-2 opacity-55" style="border-left:3px solid #ffb874;">
+            <div class="flex-1">
+              <div class="text-dim font-body font-bold text-[12px]">ATR expansion 1.4×</div>
+              <div class="text-dim font-mono text-[10px] mt-px">volatility climbing · WR 48%</div>
+            </div>
+            <div class="px-1.5 py-0.5 rounded-sm border" style="background:#ffb87420;border-color:#ffb87455;">
+              <span class="text-primaryContainer font-head font-extrabold text-[9px] tracking-[0.12em]">MED</span>
+            </div>
+          </div>
+          <div class="flex items-center bg-cardAlt rounded-sm pl-3 pr-2.5 py-2 opacity-55" style="border-left:3px solid #10b981;">
+            <div class="flex-1">
+              <div class="text-dim font-body font-bold text-[12px]">Volume divergence</div>
+              <div class="text-dim font-mono text-[10px] mt-px">accumulation signal · WR 58%</div>
+            </div>
+            <div class="px-1.5 py-0.5 rounded-sm border" style="background:#10b98120;border-color:#10b98155;">
+              <span class="text-green font-head font-extrabold text-[9px] tracking-[0.12em]">LOW</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. SHORT CHECKLIST -->
+      <section class="bg-card pl-4 pr-3 py-3 rounded-sm" style="border-left:4px solid #ffb4ab;">
+        <div class="flex items-center justify-between">
+          <span class="font-head font-bold text-[12px] tracking-[0.2em] text-red">⇩ SHORT CHECKLIST</span>
+          <span class="font-mono text-[9px] text-dim">2/3 bad</span>
+        </div>
+        <p class="text-dim text-[10px] font-body mt-1 mb-2">⚠️ 2 dấu hiệu xấu đang xuất hiện — cân nhắc kỹ</p>
+        <div class="space-y-1">
+          <div class="flex items-center bg-cardAlt rounded-sm pl-3 pr-2.5 py-2" style="border-left:3px solid #ffb4ab;">
+            <div class="flex-1">
+              <div class="text-text font-body font-bold text-[12px]">HTF 4h = UP (trend ngược)</div>
+              <div class="text-dim font-mono text-[10px] mt-px">trend conflict · WR 22%</div>
+            </div>
+            <div class="px-1.5 py-0.5 rounded-sm border" style="background:#ffb4ab20;border-color:#ffb4ab55;">
+              <span class="text-red font-head font-extrabold text-[9px] tracking-[0.12em]">HIGH</span>
+            </div>
+          </div>
+          <div class="flex items-center bg-cardAlt rounded-sm pl-3 pr-2.5 py-2" style="border-left:3px solid #ffb874;">
+            <div class="flex-1">
+              <div class="text-text font-body font-bold text-[12px]">EMA50 +2.4% (xa trên)</div>
+              <div class="text-dim font-mono text-[10px] mt-px">pullback zone · WR 42%</div>
+            </div>
+            <div class="px-1.5 py-0.5 rounded-sm border" style="background:#ffb87420;border-color:#ffb87455;">
+              <span class="text-primaryContainer font-head font-extrabold text-[9px] tracking-[0.12em]">MED</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. LIVE SNAPSHOT -->
+      <section class="bg-card pl-4 pr-3 py-3 rounded-sm" style="border-left:4px solid #b5ebff;">
+        <div class="flex items-center justify-between">
+          <span class="font-head font-bold text-[12px] tracking-[0.2em] text-tertiary">📡 LIVE SNAPSHOT</span>
+          <span class="font-mono text-[9px] text-dim">raw · live</span>
+        </div>
+        <div class="mt-2 bg-surface rounded-sm border border-borderSoft px-2.5 py-1">
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">1h RSI</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">62.1</span>
+            <span class="text-green font-body italic text-[10px] ml-2.5 flex-1">strong · lean BUY</span>
+          </div>
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">1h MACD H</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">+12.3</span>
+            <span class="text-green font-body italic text-[10px] ml-2.5 flex-1">bull momentum</span>
+          </div>
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">1h ATR%</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">0.21%</span>
+            <span class="text-bitcoin font-body italic text-[10px] ml-2.5 flex-1">rất thấp · golden zone</span>
+          </div>
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">4h ATR%</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">0.45%</span>
+            <span class="text-text font-body italic text-[10px] ml-2.5 flex-1">bình thường</span>
+          </div>
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">15m ATR%</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">0.12%</span>
+            <span class="text-bitcoin font-body italic text-[10px] ml-2.5 flex-1">rất thấp · golden zone</span>
+          </div>
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">1h EMA50Δ</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">+0.8%</span>
+            <span class="text-green font-body italic text-[10px] ml-2.5 flex-1">xa vừa · trên EMA</span>
+          </div>
+          <div class="flex items-center py-1.5 border-b border-borderSoft">
+            <span class="text-dim font-mono text-[10px] w-20">4h EMA50Δ</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">+2.4%</span>
+            <span class="text-primaryContainer font-body italic text-[10px] ml-2.5 flex-1">xa quá · coi chừng pullback</span>
+          </div>
+          <div class="flex items-center py-1.5">
+            <span class="text-dim font-mono text-[10px] w-20">HTF 4h</span>
+            <span class="text-text font-mono font-bold text-[11px] min-w-[60px] text-right">UP</span>
+            <span class="text-green font-body italic text-[10px] ml-2.5 flex-1">trend UP rõ</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BottomNav (TRADES active) -->
+    <nav class="h-16 flex justify-around items-center px-2 bg-card border-t border-borderSoft">
+      <a class="flex flex-col items-center text-dim pt-0.5" style="border-top:2px solid transparent;">
+        <span class="material-symbols-outlined text-[22px]">radar</span>
+        <span class="font-head font-semibold text-[10px] tracking-[0.15em] mt-0.5">RADAR</span>
+      </a>
+      <a class="flex flex-col items-center text-primaryContainer flex-1 h-full justify-center bg-[#2a2a2a]" style="border-top:2px solid #F7931A;">
+        <span class="material-symbols-outlined text-[22px]">swap_horiz</span>
+        <span class="font-head font-semibold text-[10px] tracking-[0.15em] mt-0.5">TRADES</span>
+      </a>
+      <a class="flex flex-col items-center text-dim pt-0.5" style="border-top:2px solid transparent;">
+        <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+        <span class="font-head font-semibold text-[10px] tracking-[0.15em] mt-0.5">ASSETS</span>
+      </a>
+      <a class="flex flex-col items-center text-dim pt-0.5" style="border-top:2px solid transparent;">
+        <span class="material-symbols-outlined text-[22px]">person</span>
+        <span class="font-head font-semibold text-[10px] tracking-[0.15em] mt-0.5">PROFILE</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <div class="mt-4 text-center font-mono text-[10px] text-dim">
+    ✅ typecheck 0 errors · 5 sections · data scan 20K entries giữ nguyên
+  </div>
+</div>
+
+</body></html>

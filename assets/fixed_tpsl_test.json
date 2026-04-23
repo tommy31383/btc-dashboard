@@ -1,0 +1,5804 @@
+{
+  "generatedAt": "2026-04-22T11:29:31.031Z",
+  "summary": {
+    "fixed_tp": 3,
+    "fixed_sl": 5,
+    "rr": 0.6,
+    "total": 92,
+    "withEntries": 91,
+    "wr60plus": 15,
+    "wr70plus": 0,
+    "netPositive": 70,
+    "netNegative": 14
+  },
+  "results": [
+    {
+      "tfKey": "5m",
+      "rank": 1,
+      "label": "SHORT rank1",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 34.1,
+        "netPnL": 346,
+        "trades": 433
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 440,
+        "wins": 10,
+        "losses": 4,
+        "timeouts": 426,
+        "winRate": 2.3,
+        "netPnL": -2520,
+        "expectancy": -5.73,
+        "pf": 1.5
+      },
+      "entryCount": 440
+    },
+    {
+      "tfKey": "5m",
+      "rank": 2,
+      "label": "SHORT rank2",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 47.1,
+        "netPnL": 580,
+        "trades": 30
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 51,
+        "wins": 0,
+        "losses": 0,
+        "timeouts": 51,
+        "winRate": 0,
+        "netPnL": -408,
+        "expectancy": -8,
+        "pf": 0
+      },
+      "entryCount": 51
+    },
+    {
+      "tfKey": "5m",
+      "rank": 3,
+      "label": "LONG rank3",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 40.2,
+        "netPnL": 536,
+        "trades": 116
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 109,
+        "wins": 5,
+        "losses": 0,
+        "timeouts": 104,
+        "winRate": 4.6,
+        "netPnL": 628,
+        "expectancy": 5.76,
+        "pf": 999
+      },
+      "entryCount": 109
+    },
+    {
+      "tfKey": "5m",
+      "rank": 4,
+      "label": "LONG rank4",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 100,
+        "netPnL": 276,
+        "trades": 56
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 60,
+        "wins": 4,
+        "losses": 0,
+        "timeouts": 56,
+        "winRate": 6.7,
+        "netPnL": 720,
+        "expectancy": 12,
+        "pf": 999
+      },
+      "entryCount": 60
+    },
+    {
+      "tfKey": "5m",
+      "rank": 5,
+      "label": "LONG rank5",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 0.76,
+        "sl": 0.35
+      },
+      "origStats": {
+        "winRate": 46.2,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 6309,
+        "wins": 117,
+        "losses": 0,
+        "timeouts": 6192,
+        "winRate": 1.9,
+        "netPnL": -15372,
+        "expectancy": -2.44,
+        "pf": 999
+      },
+      "entryCount": 6309
+    },
+    {
+      "tfKey": "5m",
+      "rank": 6,
+      "label": "LONG rank6",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 0.76,
+        "sl": 0.35
+      },
+      "origStats": {
+        "winRate": 40,
+        "netPnL": null,
+        "trades": 15
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 6309,
+        "wins": 117,
+        "losses": 0,
+        "timeouts": 6192,
+        "winRate": 1.9,
+        "netPnL": -15372,
+        "expectancy": -2.44,
+        "pf": 999
+      },
+      "entryCount": 6309
+    },
+    {
+      "tfKey": "5m",
+      "rank": 7,
+      "label": "LONG rank7",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 50,
+        "netPnL": 56,
+        "trades": 236
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 252,
+        "wins": 15,
+        "losses": 0,
+        "timeouts": 237,
+        "winRate": 6,
+        "netPnL": 2484,
+        "expectancy": 9.86,
+        "pf": 999
+      },
+      "entryCount": 252
+    },
+    {
+      "tfKey": "5m",
+      "rank": 8,
+      "label": "SHORT rank8",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 29.6,
+        "netPnL": -4194,
+        "trades": 788
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 825,
+        "wins": 14,
+        "losses": 7,
+        "timeouts": 804,
+        "winRate": 1.7,
+        "netPnL": -5900,
+        "expectancy": -7.15,
+        "pf": 1.2
+      },
+      "entryCount": 825
+    },
+    {
+      "tfKey": "15m",
+      "rank": 1,
+      "label": "[SHORT] Div+BB TP+2% SL-1% · WR 41.9% · NET +950%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 41.9,
+        "netPnL": 950,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 2,
+      "label": "[SHORT] Div+BB TP+3% SL-1% · WR 31.6% · NET +850%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 31.6,
+        "netPnL": 850,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 3,
+      "label": "[SHORT] Div+BB TP+3% SL-1.5% · WR 38.8% · NET +550%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 38.8,
+        "netPnL": 550,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 4,
+      "label": "[SHORT] Div+BB TP+10% SL-5% · WR 50% · NET +350%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 10,
+        "sl": 5
+      },
+      "origStats": {
+        "winRate": 3.3,
+        "netPnL": 1012,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 5,
+      "label": "[SHORT] RSI+MACD TP+1% SL-0.5% · WR 43.3% · NET +150%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 43.3,
+        "netPnL": 150,
+        "trades": 30
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 32,
+        "wins": 9,
+        "losses": 1,
+        "timeouts": 22,
+        "winRate": 28.1,
+        "netPnL": 1944,
+        "expectancy": 60.75,
+        "pf": 5.4
+      },
+      "entryCount": 32
+    },
+    {
+      "tfKey": "15m",
+      "rank": 6,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44% · NET +46700%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 44,
+        "netPnL": 46700,
+        "trades": 1825
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 7,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +42330%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 83984,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 137284,
+        "expectancy": 53.79,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 8,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 44.9% · NET +39450%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 76480,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 9,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.3% · NET +38250%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 76480,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 10,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.3% · NET +35880%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 83984,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 137284,
+        "expectancy": 53.79,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 11,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +34460%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 62360,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 78568,
+        "expectancy": 37.34,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 12,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 62360,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 78568,
+        "expectancy": 37.34,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 13,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +34080%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 83984,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 137284,
+        "expectancy": 53.79,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 14,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +29860%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 62360,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 78568,
+        "expectancy": 37.34,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 15,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.7% · NET +29050%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 76480,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 16,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44.1% · NET +5068%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 44.1,
+        "netPnL": 5068,
+        "trades": 1821
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 17,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +4779%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 8398,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 13728,
+        "expectancy": 5.38,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 18,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 45% · NET +4343%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 7648,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 19,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.4% · NET +4223%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 7648,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 20,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.4% · NET +4134%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 8398,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 13728,
+        "expectancy": 5.38,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 21,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +3954%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 8398,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 13728,
+        "expectancy": 5.38,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 22,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +3867%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 6236,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 7857,
+        "expectancy": 3.73,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 23,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +3837%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 6236,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 7857,
+        "expectancy": 3.73,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 24,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +3407%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 6236,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 7857,
+        "expectancy": 3.73,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 25,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.8% · NET +3288%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 7648,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "1h",
+      "rank": 1,
+      "label": "LONG Widened EMA+FLAT",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 78.1,
+        "netPnL": 10844,
+        "trades": 32
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 2,
+      "label": "Golden ATR+EMA+FLAT",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 100,
+        "netPnL": 4920,
+        "trades": 10
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 3,
+      "label": "Golden ATR+FLAT",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 100,
+        "netPnL": 5904,
+        "trades": 12
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 4,
+      "label": "LONG Multi-TF Score ≥70",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 4,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 39.1,
+        "netPnL": 7964,
+        "trades": 92
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 5,
+      "label": "[LONG] RSI+Div TP+10% SL-5% · WR 50% · NET +840%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 10,
+        "sl": 5
+      },
+      "origStats": {
+        "winRate": 50,
+        "netPnL": 840,
+        "trades": 16
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 19,
+        "wins": 9,
+        "losses": 3,
+        "timeouts": 7,
+        "winRate": 47.4,
+        "netPnL": 1048,
+        "expectancy": 55.16,
+        "pf": 1.8
+      },
+      "entryCount": 19
+    },
+    {
+      "tfKey": "1h",
+      "rank": 6,
+      "label": "[SHORT] RSI+Div TP+1% SL-0.5% · WR 55% · NET +450%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 55,
+        "netPnL": 450,
+        "trades": 20
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 24,
+        "wins": 8,
+        "losses": 13,
+        "timeouts": 3,
+        "winRate": 33.3,
+        "netPnL": -4292,
+        "expectancy": -178.83,
+        "pf": 0.37
+      },
+      "entryCount": 24
+    },
+    {
+      "tfKey": "1h",
+      "rank": 7,
+      "label": "[LONG] RSI+Div TP+5% SL-3% · WR 41.7% · NET +240%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 41.7,
+        "netPnL": 240,
+        "trades": 16
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 19,
+        "wins": 9,
+        "losses": 3,
+        "timeouts": 7,
+        "winRate": 47.4,
+        "netPnL": 1048,
+        "expectancy": 55.16,
+        "pf": 1.8
+      },
+      "entryCount": 19
+    },
+    {
+      "tfKey": "1h",
+      "rank": 8,
+      "label": "[LONG] RSI+Div TP+8% SL-3% · WR 30% · NET +140%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 8,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 30,
+        "netPnL": 140,
+        "trades": 16
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 19,
+        "wins": 9,
+        "losses": 3,
+        "timeouts": 7,
+        "winRate": 47.4,
+        "netPnL": 1048,
+        "expectancy": 55.16,
+        "pf": 1.8
+      },
+      "entryCount": 19
+    },
+    {
+      "tfKey": "1h",
+      "rank": 9,
+      "label": "[LONG] RSI+Div TP+5% SL-2.5% · WR 35.7% · NET +90%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2.5
+      },
+      "origStats": {
+        "winRate": 35.7,
+        "netPnL": 90,
+        "trades": 16
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 19,
+        "wins": 9,
+        "losses": 3,
+        "timeouts": 7,
+        "winRate": 47.4,
+        "netPnL": 1048,
+        "expectancy": 55.16,
+        "pf": 1.8
+      },
+      "entryCount": 19
+    },
+    {
+      "tfKey": "1h",
+      "rank": 10,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +30070%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 37.4,
+        "netPnL": 35960,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 35484,
+        "expectancy": 78.5,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 11,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +24980%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 31,
+        "netPnL": 29240,
+        "trades": 1852
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 64648,
+        "expectancy": 36.04,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 12,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +24180%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 37.8,
+        "netPnL": 29580,
+        "trades": 2247
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 90356,
+        "expectancy": 41.2,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 13,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +23930%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 38.6,
+        "netPnL": 28540,
+        "trades": 1852
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 64648,
+        "expectancy": 36.04,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 14,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +22130%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 30,
+        "netPnL": 22130,
+        "trades": 2247
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 90356,
+        "expectancy": 41.2,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 15,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +19970%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 34.7,
+        "netPnL": 26860,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 35484,
+        "expectancy": 78.5,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 16,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +14890%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 36.3,
+        "netPnL": 20984,
+        "trades": 2936
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2851,
+        "wins": 1488,
+        "losses": 673,
+        "timeouts": 690,
+        "winRate": 52.2,
+        "netPnL": 87092,
+        "expectancy": 30.55,
+        "pf": 1.33
+      },
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "1h",
+      "rank": 17,
+      "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +13810%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 36.7,
+        "netPnL": 18092,
+        "trades": 249
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 236,
+        "wins": 115,
+        "losses": 40,
+        "timeouts": 81,
+        "winRate": 48.7,
+        "netPnL": 12612,
+        "expectancy": 53.44,
+        "pf": 1.73
+      },
+      "entryCount": 236
+    },
+    {
+      "tfKey": "1h",
+      "rank": 18,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +11680%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 38.8,
+        "netPnL": 11680,
+        "trades": 1852
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 64648,
+        "expectancy": 36.04,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 19,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 8,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 33.1,
+        "netPnL": 10470,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 35484,
+        "expectancy": 78.5,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 20,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +3098%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 37.4,
+        "netPnL": 3596,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 3548,
+        "expectancy": 7.85,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 21,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +2879%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 31,
+        "netPnL": 2924,
+        "trades": 1851
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 6465,
+        "expectancy": 3.6,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 22,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +2838%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 37.8,
+        "netPnL": 2958,
+        "trades": 2246
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 9036,
+        "expectancy": 4.12,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 23,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +2734%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 38.6,
+        "netPnL": 2854,
+        "trades": 1851
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 6465,
+        "expectancy": 3.6,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 24,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +2673%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 30,
+        "netPnL": 2673,
+        "trades": 2246
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 9036,
+        "expectancy": 4.12,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 25,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +2088%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 34.7,
+        "netPnL": 2686,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 3548,
+        "expectancy": 7.85,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 26,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +2047%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 36.3,
+        "netPnL": 2098,
+        "trades": 2935
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2851,
+        "wins": 1488,
+        "losses": 673,
+        "timeouts": 690,
+        "winRate": 52.2,
+        "netPnL": 8709,
+        "expectancy": 3.05,
+        "pf": 1.33
+      },
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "1h",
+      "rank": 27,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +1549%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 38.8,
+        "netPnL": 1549,
+        "trades": 1851
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 6465,
+        "expectancy": 3.6,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 28,
+      "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +1431%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 36.7,
+        "netPnL": 1809,
+        "trades": 249
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 236,
+        "wins": 115,
+        "losses": 40,
+        "timeouts": 81,
+        "winRate": 48.7,
+        "netPnL": 1261,
+        "expectancy": 5.34,
+        "pf": 1.73
+      },
+      "entryCount": 236
+    },
+    {
+      "tfKey": "1h",
+      "rank": 29,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 28.1,
+        "netPnL": 1252,
+        "trades": 2935
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2851,
+        "wins": 1488,
+        "losses": 673,
+        "timeouts": 690,
+        "winRate": 52.2,
+        "netPnL": 8709,
+        "expectancy": 3.05,
+        "pf": 1.33
+      },
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "1h",
+      "rank": 30,
+      "label": "🥇 Golden LONG QUADRUPLE (MACD+EMA+ATR+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 71.8,
+        "netPnL": 4800,
+        "trades": 163
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 86,
+        "wins": 55,
+        "losses": 4,
+        "timeouts": 27,
+        "winRate": 64,
+        "netPnL": 1381,
+        "expectancy": 16.06,
+        "pf": 8.25
+      },
+      "entryCount": 86
+    },
+    {
+      "tfKey": "1h",
+      "rank": 31,
+      "label": "🥈 Golden LONG TRIPLE (MACD+EMA+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 64.9,
+        "netPnL": 9986,
+        "trades": 405
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 165,
+        "wins": 104,
+        "losses": 21,
+        "timeouts": 40,
+        "winRate": 63,
+        "netPnL": 1938,
+        "expectancy": 11.75,
+        "pf": 2.97
+      },
+      "entryCount": 165
+    },
+    {
+      "tfKey": "1h",
+      "rank": 32,
+      "label": "🥉 Golden LONG TRIPLE (MACD+ATR+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 67.4,
+        "netPnL": 4775,
+        "trades": 181
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 93,
+        "wins": 58,
+        "losses": 4,
+        "timeouts": 31,
+        "winRate": 62.4,
+        "netPnL": 1466,
+        "expectancy": 15.76,
+        "pf": 8.7
+      },
+      "entryCount": 93
+    },
+    {
+      "tfKey": "1h",
+      "rank": 33,
+      "label": "Golden LONG SILENT+CENTER (ATR+EMA+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 60.4,
+        "netPnL": 6932,
+        "trades": 323
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 168,
+        "wins": 88,
+        "losses": 14,
+        "timeouts": 66,
+        "winRate": 52.4,
+        "netPnL": 1806,
+        "expectancy": 10.75,
+        "pf": 3.77
+      },
+      "entryCount": 168
+    },
+    {
+      "tfKey": "1h",
+      "rank": 34,
+      "label": "Golden LONG 1H SILENT (ATR+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 81,
+        "netPnL": 3013,
+        "trades": 84
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 179,
+        "wins": 94,
+        "losses": 14,
+        "timeouts": 71,
+        "winRate": 52.5,
+        "netPnL": 1977,
+        "expectancy": 11.04,
+        "pf": 4.03
+      },
+      "entryCount": 179
+    },
+    {
+      "tfKey": "1h",
+      "rank": 35,
+      "label": "Golden LONG EMA CROSS BULL + SILENT",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 68.3,
+        "netPnL": 2807,
+        "trades": 104
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 46,
+        "wins": 23,
+        "losses": 0,
+        "timeouts": 23,
+        "winRate": 50,
+        "netPnL": 653,
+        "expectancy": 14.2,
+        "pf": 999
+      },
+      "entryCount": 46
+    },
+    {
+      "tfKey": "1h",
+      "rank": 36,
+      "label": "Golden LONG DOJI + MACD BULL",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 63.7,
+        "netPnL": 6163,
+        "trades": 259
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 111,
+        "wins": 70,
+        "losses": 7,
+        "timeouts": 34,
+        "winRate": 63.1,
+        "netPnL": 1661,
+        "expectancy": 14.97,
+        "pf": 6
+      },
+      "entryCount": 111
+    },
+    {
+      "tfKey": "1h",
+      "rank": 37,
+      "label": "Golden LONG BB SQUEEZE + MACD BULL",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 62.3,
+        "netPnL": 8425,
+        "trades": 369
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 155,
+        "wins": 101,
+        "losses": 18,
+        "timeouts": 36,
+        "winRate": 65.2,
+        "netPnL": 2006,
+        "expectancy": 12.94,
+        "pf": 3.37
+      },
+      "entryCount": 155
+    },
+    {
+      "tfKey": "1h",
+      "rank": 38,
+      "label": "🥇 Golden SHORT QUADRUPLE DOWN (EMA+ATR+MACD+DOWN)",
+      "side": "SHORT",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 69.6,
+        "netPnL": 1283,
+        "trades": 46
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 36,
+        "wins": 22,
+        "losses": 11,
+        "timeouts": 3,
+        "winRate": 61.1,
+        "netPnL": 81,
+        "expectancy": 2.26,
+        "pf": 1.2
+      },
+      "entryCount": 36
+    },
+    {
+      "tfKey": "1h",
+      "rank": 39,
+      "label": "🥈 Golden SHORT EMA CROSS BEAR + SILENT",
+      "side": "SHORT",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 64.9,
+        "netPnL": 4291,
+        "trades": 174
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 129,
+        "wins": 60,
+        "losses": 47,
+        "timeouts": 22,
+        "winRate": 46.5,
+        "netPnL": -653,
+        "expectancy": -5.06,
+        "pf": 0.77
+      },
+      "entryCount": 129
+    },
+    {
+      "tfKey": "1h",
+      "rank": 40,
+      "label": "🥉 Golden SHORT MACD BEAR + SILENT",
+      "side": "SHORT",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 62.9,
+        "netPnL": 1440,
+        "trades": 62
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 51,
+        "wins": 28,
+        "losses": 17,
+        "timeouts": 6,
+        "winRate": 54.9,
+        "netPnL": -51,
+        "expectancy": -1,
+        "pf": 0.99
+      },
+      "entryCount": 51
+    },
+    {
+      "tfKey": "4h",
+      "rank": 1,
+      "label": "[REVERSAL 4H LONG] Mọi UP reversal · TP+5% SL-3% · WR 36.1% · NET +1700%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 36.1,
+        "netPnL": 1700,
+        "trades": 1588
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1587,
+        "wins": 939,
+        "losses": 485,
+        "timeouts": 163,
+        "winRate": 59.2,
+        "netPnL": 2650,
+        "expectancy": 1.67,
+        "pf": 1.16
+      },
+      "entryCount": 1587
+    },
+    {
+      "tfKey": "4h",
+      "rank": 2,
+      "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+5% SL-2% · WR 30.3% · NET +983%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 30.3,
+        "netPnL": 983,
+        "trades": 846
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 717,
+        "wins": 418,
+        "losses": 237,
+        "timeouts": 62,
+        "winRate": 58.3,
+        "netPnL": 116,
+        "expectancy": 0.16,
+        "pf": 1.06
+      },
+      "entryCount": 717
+    },
+    {
+      "tfKey": "4h",
+      "rank": 3,
+      "label": "[REVERSAL 4H LONG] UP + trên EMA50 (pullback) · TP+5% SL-3% · WR 35.9% · NET +888%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 38.2,
+        "netPnL": 2524,
+        "trades": 728
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 870,
+        "wins": 521,
+        "losses": 248,
+        "timeouts": 101,
+        "winRate": 59.9,
+        "netPnL": 2534,
+        "expectancy": 2.91,
+        "pf": 1.26
+      },
+      "entryCount": 870
+    },
+    {
+      "tfKey": "4h",
+      "rank": 4,
+      "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+3% SL-1.5% · WR 37.0% · NET +718%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 37,
+        "netPnL": 718,
+        "trades": 846
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 717,
+        "wins": 418,
+        "losses": 237,
+        "timeouts": 62,
+        "winRate": 58.3,
+        "netPnL": 116,
+        "expectancy": 0.16,
+        "pf": 1.06
+      },
+      "entryCount": 717
+    },
+    {
+      "tfKey": "4h",
+      "rank": 5,
+      "label": "LONG rank5",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 62.5,
+        "netPnL": null,
+        "trades": 8
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2961,
+        "wins": 1803,
+        "losses": 888,
+        "timeouts": 270,
+        "winRate": 60.9,
+        "netPnL": 73212,
+        "expectancy": 24.73,
+        "pf": 1.22
+      },
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "4h",
+      "rank": 6,
+      "label": "LONG rank6",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1.5,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 50,
+        "netPnL": null,
+        "trades": 8
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 65,
+        "wins": 33,
+        "losses": 18,
+        "timeouts": 14,
+        "winRate": 50.8,
+        "netPnL": 380,
+        "expectancy": 5.85,
+        "pf": 1.1
+      },
+      "entryCount": 65
+    },
+    {
+      "tfKey": "4h",
+      "rank": 7,
+      "label": "LONG rank7",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 57.1,
+        "netPnL": null,
+        "trades": 14
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2961,
+        "wins": 1803,
+        "losses": 888,
+        "timeouts": 270,
+        "winRate": 60.9,
+        "netPnL": 73212,
+        "expectancy": 24.73,
+        "pf": 1.22
+      },
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "4h",
+      "rank": 8,
+      "label": "LONG rank8",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1.5,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 46.2,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 65,
+        "wins": 33,
+        "losses": 18,
+        "timeouts": 14,
+        "winRate": 50.8,
+        "netPnL": 380,
+        "expectancy": 5.85,
+        "pf": 1.1
+      },
+      "entryCount": 65
+    },
+    {
+      "tfKey": "4h",
+      "rank": 9,
+      "label": "LONG rank9",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1.5,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 43.8,
+        "netPnL": null,
+        "trades": 16
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2961,
+        "wins": 1803,
+        "losses": 888,
+        "timeouts": 270,
+        "winRate": 60.9,
+        "netPnL": 73212,
+        "expectancy": 24.73,
+        "pf": 1.22
+      },
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "1d",
+      "rank": 1,
+      "label": "LONG rank1",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 71.4,
+        "netPnL": null,
+        "trades": 7
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 2,
+      "label": "LONG rank2",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 71.4,
+        "netPnL": null,
+        "trades": 7
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 3,
+      "label": "LONG rank3",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 66.7,
+        "netPnL": null,
+        "trades": 6
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 16,
+        "wins": 7,
+        "losses": 9,
+        "timeouts": 0,
+        "winRate": 43.8,
+        "netPnL": -2528,
+        "expectancy": -158,
+        "pf": 0.47
+      },
+      "entryCount": 16
+    },
+    {
+      "tfKey": "1d",
+      "rank": 4,
+      "label": "LONG rank4",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 71.4,
+        "netPnL": null,
+        "trades": 7
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 5,
+      "label": "LONG rank5",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 66.7,
+        "netPnL": null,
+        "trades": 12
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 6,
+      "label": "LONG rank6",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 62.5,
+        "netPnL": null,
+        "trades": 8
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 16,
+        "wins": 7,
+        "losses": 9,
+        "timeouts": 0,
+        "winRate": 43.8,
+        "netPnL": -2528,
+        "expectancy": -158,
+        "pf": 0.47
+      },
+      "entryCount": 16
+    },
+    {
+      "tfKey": "1d",
+      "rank": 7,
+      "label": "LONG rank7",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 69.2,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 8,
+      "label": "LONG rank8",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 61.5,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1w",
+      "rank": 1,
+      "label": "LONG rank1",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 33.3,
+        "netPnL": null,
+        "trades": 12
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 41,
+        "wins": 19,
+        "losses": 22,
+        "timeouts": 0,
+        "winRate": 46.3,
+        "netPnL": -5628,
+        "expectancy": -137.27,
+        "pf": 0.52
+      },
+      "entryCount": 41
+    },
+    {
+      "tfKey": "1w",
+      "rank": 2,
+      "label": "LONG rank2",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "entryCount": 0,
+      "fresh": null,
+      "note": "no_entries"
+    }
+  ],
+  "ranked": [
+    {
+      "tfKey": "1h",
+      "rank": 37,
+      "label": "Golden LONG BB SQUEEZE + MACD BULL",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 62.3,
+        "netPnL": 8425,
+        "trades": 369
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 155,
+        "wins": 101,
+        "losses": 18,
+        "timeouts": 36,
+        "winRate": 65.2,
+        "netPnL": 2006,
+        "expectancy": 12.94,
+        "pf": 3.37
+      },
+      "entryCount": 155
+    },
+    {
+      "tfKey": "1h",
+      "rank": 30,
+      "label": "🥇 Golden LONG QUADRUPLE (MACD+EMA+ATR+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 71.8,
+        "netPnL": 4800,
+        "trades": 163
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 86,
+        "wins": 55,
+        "losses": 4,
+        "timeouts": 27,
+        "winRate": 64,
+        "netPnL": 1381,
+        "expectancy": 16.06,
+        "pf": 8.25
+      },
+      "entryCount": 86
+    },
+    {
+      "tfKey": "1h",
+      "rank": 36,
+      "label": "Golden LONG DOJI + MACD BULL",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 63.7,
+        "netPnL": 6163,
+        "trades": 259
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 111,
+        "wins": 70,
+        "losses": 7,
+        "timeouts": 34,
+        "winRate": 63.1,
+        "netPnL": 1661,
+        "expectancy": 14.97,
+        "pf": 6
+      },
+      "entryCount": 111
+    },
+    {
+      "tfKey": "1h",
+      "rank": 31,
+      "label": "🥈 Golden LONG TRIPLE (MACD+EMA+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 64.9,
+        "netPnL": 9986,
+        "trades": 405
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 165,
+        "wins": 104,
+        "losses": 21,
+        "timeouts": 40,
+        "winRate": 63,
+        "netPnL": 1938,
+        "expectancy": 11.75,
+        "pf": 2.97
+      },
+      "entryCount": 165
+    },
+    {
+      "tfKey": "1h",
+      "rank": 32,
+      "label": "🥉 Golden LONG TRIPLE (MACD+ATR+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 67.4,
+        "netPnL": 4775,
+        "trades": 181
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 93,
+        "wins": 58,
+        "losses": 4,
+        "timeouts": 31,
+        "winRate": 62.4,
+        "netPnL": 1466,
+        "expectancy": 15.76,
+        "pf": 8.7
+      },
+      "entryCount": 93
+    },
+    {
+      "tfKey": "1h",
+      "rank": 38,
+      "label": "🥇 Golden SHORT QUADRUPLE DOWN (EMA+ATR+MACD+DOWN)",
+      "side": "SHORT",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 69.6,
+        "netPnL": 1283,
+        "trades": 46
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 36,
+        "wins": 22,
+        "losses": 11,
+        "timeouts": 3,
+        "winRate": 61.1,
+        "netPnL": 81,
+        "expectancy": 2.26,
+        "pf": 1.2
+      },
+      "entryCount": 36
+    },
+    {
+      "tfKey": "4h",
+      "rank": 5,
+      "label": "LONG rank5",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 62.5,
+        "netPnL": null,
+        "trades": 8
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2961,
+        "wins": 1803,
+        "losses": 888,
+        "timeouts": 270,
+        "winRate": 60.9,
+        "netPnL": 73212,
+        "expectancy": 24.73,
+        "pf": 1.22
+      },
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "4h",
+      "rank": 7,
+      "label": "LONG rank7",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 57.1,
+        "netPnL": null,
+        "trades": 14
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2961,
+        "wins": 1803,
+        "losses": 888,
+        "timeouts": 270,
+        "winRate": 60.9,
+        "netPnL": 73212,
+        "expectancy": 24.73,
+        "pf": 1.22
+      },
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "4h",
+      "rank": 9,
+      "label": "LONG rank9",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1.5,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 43.8,
+        "netPnL": null,
+        "trades": 16
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2961,
+        "wins": 1803,
+        "losses": 888,
+        "timeouts": 270,
+        "winRate": 60.9,
+        "netPnL": 73212,
+        "expectancy": 24.73,
+        "pf": 1.22
+      },
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "1d",
+      "rank": 1,
+      "label": "LONG rank1",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 71.4,
+        "netPnL": null,
+        "trades": 7
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 2,
+      "label": "LONG rank2",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 71.4,
+        "netPnL": null,
+        "trades": 7
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 4,
+      "label": "LONG rank4",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 71.4,
+        "netPnL": null,
+        "trades": 7
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 5,
+      "label": "LONG rank5",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 66.7,
+        "netPnL": null,
+        "trades": 12
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 7,
+      "label": "LONG rank7",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 69.2,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 8,
+      "label": "LONG rank8",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2.5,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 61.5,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 240,
+        "wins": 145,
+        "losses": 95,
+        "timeouts": 0,
+        "winRate": 60.4,
+        "netPnL": -5920,
+        "expectancy": -24.67,
+        "pf": 0.92
+      },
+      "entryCount": 240
+    },
+    {
+      "tfKey": "4h",
+      "rank": 3,
+      "label": "[REVERSAL 4H LONG] UP + trên EMA50 (pullback) · TP+5% SL-3% · WR 35.9% · NET +888%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 38.2,
+        "netPnL": 2524,
+        "trades": 728
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 870,
+        "wins": 521,
+        "losses": 248,
+        "timeouts": 101,
+        "winRate": 59.9,
+        "netPnL": 2534,
+        "expectancy": 2.91,
+        "pf": 1.26
+      },
+      "entryCount": 870
+    },
+    {
+      "tfKey": "4h",
+      "rank": 1,
+      "label": "[REVERSAL 4H LONG] Mọi UP reversal · TP+5% SL-3% · WR 36.1% · NET +1700%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 36.1,
+        "netPnL": 1700,
+        "trades": 1588
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1587,
+        "wins": 939,
+        "losses": 485,
+        "timeouts": 163,
+        "winRate": 59.2,
+        "netPnL": 2650,
+        "expectancy": 1.67,
+        "pf": 1.16
+      },
+      "entryCount": 1587
+    },
+    {
+      "tfKey": "4h",
+      "rank": 2,
+      "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+5% SL-2% · WR 30.3% · NET +983%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 30.3,
+        "netPnL": 983,
+        "trades": 846
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 717,
+        "wins": 418,
+        "losses": 237,
+        "timeouts": 62,
+        "winRate": 58.3,
+        "netPnL": 116,
+        "expectancy": 0.16,
+        "pf": 1.06
+      },
+      "entryCount": 717
+    },
+    {
+      "tfKey": "4h",
+      "rank": 4,
+      "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+3% SL-1.5% · WR 37.0% · NET +718%",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 37,
+        "netPnL": 718,
+        "trades": 846
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 717,
+        "wins": 418,
+        "losses": 237,
+        "timeouts": 62,
+        "winRate": 58.3,
+        "netPnL": 116,
+        "expectancy": 0.16,
+        "pf": 1.06
+      },
+      "entryCount": 717
+    },
+    {
+      "tfKey": "1h",
+      "rank": 11,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +24980%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 31,
+        "netPnL": 29240,
+        "trades": 1852
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 64648,
+        "expectancy": 36.04,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 13,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +23930%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 38.6,
+        "netPnL": 28540,
+        "trades": 1852
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 64648,
+        "expectancy": 36.04,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 18,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +11680%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 38.8,
+        "netPnL": 11680,
+        "trades": 1852
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 64648,
+        "expectancy": 36.04,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 21,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +2879%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 31,
+        "netPnL": 2924,
+        "trades": 1851
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 6465,
+        "expectancy": 3.6,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 23,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +2734%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 38.6,
+        "netPnL": 2854,
+        "trades": 1851
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 6465,
+        "expectancy": 3.6,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 27,
+      "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +1549%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 38.8,
+        "netPnL": 1549,
+        "trades": 1851
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1794,
+        "wins": 995,
+        "losses": 439,
+        "timeouts": 360,
+        "winRate": 55.5,
+        "netPnL": 6465,
+        "expectancy": 3.6,
+        "pf": 1.36
+      },
+      "entryCount": 1794
+    },
+    {
+      "tfKey": "1h",
+      "rank": 40,
+      "label": "🥉 Golden SHORT MACD BEAR + SILENT",
+      "side": "SHORT",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 62.9,
+        "netPnL": 1440,
+        "trades": 62
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 51,
+        "wins": 28,
+        "losses": 17,
+        "timeouts": 6,
+        "winRate": 54.9,
+        "netPnL": -51,
+        "expectancy": -1,
+        "pf": 0.99
+      },
+      "entryCount": 51
+    },
+    {
+      "tfKey": "1h",
+      "rank": 12,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +24180%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 37.8,
+        "netPnL": 29580,
+        "trades": 2247
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 90356,
+        "expectancy": 41.2,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 14,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +22130%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 30,
+        "netPnL": 22130,
+        "trades": 2247
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 90356,
+        "expectancy": 41.2,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 22,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +2838%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 37.8,
+        "netPnL": 2958,
+        "trades": 2246
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 9036,
+        "expectancy": 4.12,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 24,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +2673%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 30,
+        "netPnL": 2673,
+        "trades": 2246
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2193,
+        "wins": 1178,
+        "losses": 491,
+        "timeouts": 524,
+        "winRate": 53.7,
+        "netPnL": 9036,
+        "expectancy": 4.12,
+        "pf": 1.44
+      },
+      "entryCount": 2193
+    },
+    {
+      "tfKey": "1h",
+      "rank": 34,
+      "label": "Golden LONG 1H SILENT (ATR+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 81,
+        "netPnL": 3013,
+        "trades": 84
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 179,
+        "wins": 94,
+        "losses": 14,
+        "timeouts": 71,
+        "winRate": 52.5,
+        "netPnL": 1977,
+        "expectancy": 11.04,
+        "pf": 4.03
+      },
+      "entryCount": 179
+    },
+    {
+      "tfKey": "1h",
+      "rank": 33,
+      "label": "Golden LONG SILENT+CENTER (ATR+EMA+FLAT)",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 60.4,
+        "netPnL": 6932,
+        "trades": 323
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 168,
+        "wins": 88,
+        "losses": 14,
+        "timeouts": 66,
+        "winRate": 52.4,
+        "netPnL": 1806,
+        "expectancy": 10.75,
+        "pf": 3.77
+      },
+      "entryCount": 168
+    },
+    {
+      "tfKey": "1h",
+      "rank": 16,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +14890%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 36.3,
+        "netPnL": 20984,
+        "trades": 2936
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2851,
+        "wins": 1488,
+        "losses": 673,
+        "timeouts": 690,
+        "winRate": 52.2,
+        "netPnL": 87092,
+        "expectancy": 30.55,
+        "pf": 1.33
+      },
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "1h",
+      "rank": 26,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +2047%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 36.3,
+        "netPnL": 2098,
+        "trades": 2935
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2851,
+        "wins": 1488,
+        "losses": 673,
+        "timeouts": 690,
+        "winRate": 52.2,
+        "netPnL": 8709,
+        "expectancy": 3.05,
+        "pf": 1.33
+      },
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "1h",
+      "rank": 29,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 28.1,
+        "netPnL": 1252,
+        "trades": 2935
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2851,
+        "wins": 1488,
+        "losses": 673,
+        "timeouts": 690,
+        "winRate": 52.2,
+        "netPnL": 8709,
+        "expectancy": 3.05,
+        "pf": 1.33
+      },
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "1h",
+      "rank": 10,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +30070%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 37.4,
+        "netPnL": 35960,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 35484,
+        "expectancy": 78.5,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 15,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +19970%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 34.7,
+        "netPnL": 26860,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 35484,
+        "expectancy": 78.5,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 19,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 8,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 33.1,
+        "netPnL": 10470,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 35484,
+        "expectancy": 78.5,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 20,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +3098%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 37.4,
+        "netPnL": 3596,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 3548,
+        "expectancy": 7.85,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 25,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +2088%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 34.7,
+        "netPnL": 2686,
+        "trades": 453
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 452,
+        "wins": 232,
+        "losses": 61,
+        "timeouts": 159,
+        "winRate": 51.3,
+        "netPnL": 3548,
+        "expectancy": 7.85,
+        "pf": 2.28
+      },
+      "entryCount": 452
+    },
+    {
+      "tfKey": "4h",
+      "rank": 6,
+      "label": "LONG rank6",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1.5,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 50,
+        "netPnL": null,
+        "trades": 8
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 65,
+        "wins": 33,
+        "losses": 18,
+        "timeouts": 14,
+        "winRate": 50.8,
+        "netPnL": 380,
+        "expectancy": 5.85,
+        "pf": 1.1
+      },
+      "entryCount": 65
+    },
+    {
+      "tfKey": "4h",
+      "rank": 8,
+      "label": "LONG rank8",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1.5,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 46.2,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 65,
+        "wins": 33,
+        "losses": 18,
+        "timeouts": 14,
+        "winRate": 50.8,
+        "netPnL": 380,
+        "expectancy": 5.85,
+        "pf": 1.1
+      },
+      "entryCount": 65
+    },
+    {
+      "tfKey": "1h",
+      "rank": 35,
+      "label": "Golden LONG EMA CROSS BULL + SILENT",
+      "side": "LONG",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 68.3,
+        "netPnL": 2807,
+        "trades": 104
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 46,
+        "wins": 23,
+        "losses": 0,
+        "timeouts": 23,
+        "winRate": 50,
+        "netPnL": 653,
+        "expectancy": 14.2,
+        "pf": 999
+      },
+      "entryCount": 46
+    },
+    {
+      "tfKey": "1h",
+      "rank": 17,
+      "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +13810%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 36.7,
+        "netPnL": 18092,
+        "trades": 249
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 236,
+        "wins": 115,
+        "losses": 40,
+        "timeouts": 81,
+        "winRate": 48.7,
+        "netPnL": 12612,
+        "expectancy": 53.44,
+        "pf": 1.73
+      },
+      "entryCount": 236
+    },
+    {
+      "tfKey": "1h",
+      "rank": 28,
+      "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +1431%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 36.7,
+        "netPnL": 1809,
+        "trades": 249
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 236,
+        "wins": 115,
+        "losses": 40,
+        "timeouts": 81,
+        "winRate": 48.7,
+        "netPnL": 1261,
+        "expectancy": 5.34,
+        "pf": 1.73
+      },
+      "entryCount": 236
+    },
+    {
+      "tfKey": "1h",
+      "rank": 39,
+      "label": "🥈 Golden SHORT EMA CROSS BEAR + SILENT",
+      "side": "SHORT",
+      "isGolden": true,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 64.9,
+        "netPnL": 4291,
+        "trades": 174
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 129,
+        "wins": 60,
+        "losses": 47,
+        "timeouts": 22,
+        "winRate": 46.5,
+        "netPnL": -653,
+        "expectancy": -5.06,
+        "pf": 0.77
+      },
+      "entryCount": 129
+    },
+    {
+      "tfKey": "1w",
+      "rank": 1,
+      "label": "LONG rank1",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 33.3,
+        "netPnL": null,
+        "trades": 12
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 41,
+        "wins": 19,
+        "losses": 22,
+        "timeouts": 0,
+        "winRate": 46.3,
+        "netPnL": -5628,
+        "expectancy": -137.27,
+        "pf": 0.52
+      },
+      "entryCount": 41
+    },
+    {
+      "tfKey": "1h",
+      "rank": 1,
+      "label": "LONG Widened EMA+FLAT",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 78.1,
+        "netPnL": 10844,
+        "trades": 32
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 2,
+      "label": "Golden ATR+EMA+FLAT",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 100,
+        "netPnL": 4920,
+        "trades": 10
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 3,
+      "label": "Golden ATR+FLAT",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 100,
+        "netPnL": 5904,
+        "trades": 12
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 4,
+      "label": "LONG Multi-TF Score ≥70",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 4,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 39.1,
+        "netPnL": 7964,
+        "trades": 92
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 9949,
+        "wins": 4476,
+        "losses": 2282,
+        "timeouts": 3191,
+        "winRate": 45,
+        "netPnL": 122208,
+        "expectancy": 12.28,
+        "pf": 1.18
+      },
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "15m",
+      "rank": 6,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44% · NET +46700%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 44,
+        "netPnL": 46700,
+        "trades": 1825
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 8,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 44.9% · NET +39450%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 76480,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 9,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.3% · NET +38250%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 76480,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 15,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.7% · NET +29050%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 76480,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 105680,
+        "expectancy": 58.23,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 16,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44.1% · NET +5068%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 44.1,
+        "netPnL": 5068,
+        "trades": 1821
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 18,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 45% · NET +4343%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 7648,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 19,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.4% · NET +4223%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 7648,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 25,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.8% · NET +3288%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 52.3,
+        "netPnL": 7648,
+        "trades": 1815
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 1815,
+        "wins": 654,
+        "losses": 152,
+        "timeouts": 1009,
+        "winRate": 36,
+        "netPnL": 10568,
+        "expectancy": 5.82,
+        "pf": 2.58
+      },
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 7,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +42330%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 83984,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 137284,
+        "expectancy": 53.79,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 10,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.3% · NET +35880%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 83984,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 137284,
+        "expectancy": 53.79,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 13,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +34080%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 83984,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 137284,
+        "expectancy": 53.79,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 17,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +4779%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 8398,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 13728,
+        "expectancy": 5.38,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 20,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.4% · NET +4134%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 8398,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 13728,
+        "expectancy": 5.38,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 21,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +3954%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48,
+        "netPnL": 8398,
+        "trades": 2552
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2552,
+        "wins": 864,
+        "losses": 203,
+        "timeouts": 1485,
+        "winRate": 33.9,
+        "netPnL": 13728,
+        "expectancy": 5.38,
+        "pf": 2.55
+      },
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 11,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +34460%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 62360,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 78568,
+        "expectancy": 37.34,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 12,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 62360,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 78568,
+        "expectancy": 37.34,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 14,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +29860%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 62360,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 78568,
+        "expectancy": 37.34,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 22,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +3867%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 6236,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 7857,
+        "expectancy": 3.73,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 23,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +3837%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 6236,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 7857,
+        "expectancy": 3.73,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 24,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +3407%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 10,
+      "origCfg": {
+        "tp": 2,
+        "sl": 2
+      },
+      "origStats": {
+        "winRate": 48.4,
+        "netPnL": 6236,
+        "trades": 2105
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 2104,
+        "wins": 688,
+        "losses": 222,
+        "timeouts": 1194,
+        "winRate": 32.7,
+        "netPnL": 7857,
+        "expectancy": 3.73,
+        "pf": 1.86
+      },
+      "entryCount": 2104
+    },
+    {
+      "tfKey": "15m",
+      "rank": 5,
+      "label": "[SHORT] RSI+MACD TP+1% SL-0.5% · WR 43.3% · NET +150%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 43.3,
+        "netPnL": 150,
+        "trades": 30
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 32,
+        "wins": 9,
+        "losses": 1,
+        "timeouts": 22,
+        "winRate": 28.1,
+        "netPnL": 1944,
+        "expectancy": 60.75,
+        "pf": 5.4
+      },
+      "entryCount": 32
+    },
+    {
+      "tfKey": "15m",
+      "rank": 1,
+      "label": "[SHORT] Div+BB TP+2% SL-1% · WR 41.9% · NET +950%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 41.9,
+        "netPnL": 950,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 2,
+      "label": "[SHORT] Div+BB TP+3% SL-1% · WR 31.6% · NET +850%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 31.6,
+        "netPnL": 850,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 3,
+      "label": "[SHORT] Div+BB TP+3% SL-1.5% · WR 38.8% · NET +550%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 3,
+        "sl": 1.5
+      },
+      "origStats": {
+        "winRate": 38.8,
+        "netPnL": 550,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "15m",
+      "rank": 4,
+      "label": "[SHORT] Div+BB TP+10% SL-5% · WR 50% · NET +350%",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 10,
+        "sl": 5
+      },
+      "origStats": {
+        "winRate": 3.3,
+        "netPnL": 1012,
+        "trades": 65
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 67,
+        "wins": 14,
+        "losses": 2,
+        "timeouts": 51,
+        "winRate": 20.9,
+        "netPnL": 2664,
+        "expectancy": 39.76,
+        "pf": 4.2
+      },
+      "entryCount": 67
+    },
+    {
+      "tfKey": "5m",
+      "rank": 4,
+      "label": "LONG rank4",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 100,
+        "netPnL": 276,
+        "trades": 56
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 60,
+        "wins": 4,
+        "losses": 0,
+        "timeouts": 56,
+        "winRate": 6.7,
+        "netPnL": 720,
+        "expectancy": 12,
+        "pf": 999
+      },
+      "entryCount": 60
+    },
+    {
+      "tfKey": "5m",
+      "rank": 7,
+      "label": "LONG rank7",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 5,
+        "sl": 3
+      },
+      "origStats": {
+        "winRate": 50,
+        "netPnL": 56,
+        "trades": 236
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 252,
+        "wins": 15,
+        "losses": 0,
+        "timeouts": 237,
+        "winRate": 6,
+        "netPnL": 2484,
+        "expectancy": 9.86,
+        "pf": 999
+      },
+      "entryCount": 252
+    },
+    {
+      "tfKey": "5m",
+      "rank": 3,
+      "label": "LONG rank3",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 40.2,
+        "netPnL": 536,
+        "trades": 116
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 109,
+        "wins": 5,
+        "losses": 0,
+        "timeouts": 104,
+        "winRate": 4.6,
+        "netPnL": 628,
+        "expectancy": 5.76,
+        "pf": 999
+      },
+      "entryCount": 109
+    },
+    {
+      "tfKey": "5m",
+      "rank": 1,
+      "label": "SHORT rank1",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 34.1,
+        "netPnL": 346,
+        "trades": 433
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 440,
+        "wins": 10,
+        "losses": 4,
+        "timeouts": 426,
+        "winRate": 2.3,
+        "netPnL": -2520,
+        "expectancy": -5.73,
+        "pf": 1.5
+      },
+      "entryCount": 440
+    },
+    {
+      "tfKey": "5m",
+      "rank": 5,
+      "label": "LONG rank5",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 0.76,
+        "sl": 0.35
+      },
+      "origStats": {
+        "winRate": 46.2,
+        "netPnL": null,
+        "trades": 13
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 6309,
+        "wins": 117,
+        "losses": 0,
+        "timeouts": 6192,
+        "winRate": 1.9,
+        "netPnL": -15372,
+        "expectancy": -2.44,
+        "pf": 999
+      },
+      "entryCount": 6309
+    },
+    {
+      "tfKey": "5m",
+      "rank": 6,
+      "label": "LONG rank6",
+      "side": "LONG",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 0.76,
+        "sl": 0.35
+      },
+      "origStats": {
+        "winRate": 40,
+        "netPnL": null,
+        "trades": 15
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 6309,
+        "wins": 117,
+        "losses": 0,
+        "timeouts": 6192,
+        "winRate": 1.9,
+        "netPnL": -15372,
+        "expectancy": -2.44,
+        "pf": 999
+      },
+      "entryCount": 6309
+    },
+    {
+      "tfKey": "5m",
+      "rank": 8,
+      "label": "SHORT rank8",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": true,
+      "lev": 100,
+      "origCfg": {
+        "tp": 1,
+        "sl": 0.5
+      },
+      "origStats": {
+        "winRate": 29.6,
+        "netPnL": -4194,
+        "trades": 788
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 825,
+        "wins": 14,
+        "losses": 7,
+        "timeouts": 804,
+        "winRate": 1.7,
+        "netPnL": -5900,
+        "expectancy": -7.15,
+        "pf": 1.2
+      },
+      "entryCount": 825
+    },
+    {
+      "tfKey": "5m",
+      "rank": 2,
+      "label": "SHORT rank2",
+      "side": "SHORT",
+      "isGolden": false,
+      "isDisabled": false,
+      "lev": 100,
+      "origCfg": {
+        "tp": 2,
+        "sl": 1
+      },
+      "origStats": {
+        "winRate": 47.1,
+        "netPnL": 580,
+        "trades": 30
+      },
+      "fixedTPSL": {
+        "tp": 3,
+        "sl": 5
+      },
+      "fresh": {
+        "trades": 51,
+        "wins": 0,
+        "losses": 0,
+        "timeouts": 51,
+        "winRate": 0,
+        "netPnL": -408,
+        "expectancy": -8,
+        "pf": 0
+      },
+      "entryCount": 51
+    }
+  ]
+}

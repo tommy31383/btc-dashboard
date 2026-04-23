@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>v4.3.20 · RISK RADAR · 10 GOLDENS VERIFIED + L1+L2 ALERT</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#131313; --card:#1c1b1b; --cardAlt:#201f1f; --surface:#0e0e0e;
+  --elevated:#2a2a2a; --highest:#353534;
+  --text:#e5e2e1; --text2:#d6c3b4; --dim:#9f8e80; --fade:#514439;
+  --primaryContainer:#ffb874; --primary:#ffdcc0; --onPrimary:#4b2800;
+  --bitcoinOrange:#F7931A; --tertiary:#b5ebff;
+  --green:#10b981; --red:#ffb4ab;
+  --border:#514439; --borderSoft:#2a2a2a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;padding:20px;max-width:440px;margin:0 auto}
+.caps{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+
+/* ══ SHELL ══ */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--borderSoft);margin:-20px -20px 12px;height:56px}
+.topbar .title{font-family:'Space Grotesk';font-weight:800;color:var(--primaryContainer);letter-spacing:2.5px;font-size:14px}
+.topbar .icons{display:flex;gap:16px;color:var(--dim);font-size:20px}
+
+.bottomnav{display:flex;background:var(--card);border-top:1px solid var(--highest);position:fixed;bottom:0;left:0;right:0;height:64px;max-width:440px;margin:0 auto}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative;cursor:pointer}
+.tab.active{background:var(--elevated);border-top:2px solid var(--bitcoinOrange)}
+.tab .ico{font-size:20px;color:var(--dim)}
+.tab.active .ico{color:var(--primaryContainer)}
+.tab .lbl{font-family:'Space Grotesk';font-weight:500;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.tab.active .lbl{color:var(--primaryContainer)}
+.tab .badge{position:absolute;top:8px;right:30%;min-width:18px;height:18px;border-radius:999px;background:var(--bitcoinOrange);color:var(--onPrimary);font-family:'JetBrains Mono';font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 0 8px var(--bitcoinOrange)}
+
+/* ══ L2 Dashboard banner (mock) ══ */
+.goldenBanner{
+  border-left:4px solid var(--bitcoinOrange);
+  background:linear-gradient(90deg, rgba(247,147,26,0.25) 0%, rgba(247,147,26,0.08) 100%);
+  padding:12px 14px 12px 16px;
+  border-radius:2px;
+  margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  animation:pulseGold 1.8s ease-in-out infinite;
+}
+@keyframes pulseGold{
+  0%,100%{box-shadow:0 0 0 0 rgba(247,147,26,0.4)}
+  50%{box-shadow:0 0 0 8px rgba(247,147,26,0)}
+}
+.goldenBanner .bigFire{font-size:24px}
+.goldenBanner .bText{flex:1}
+.goldenBanner .bTitle{font-family:'Space Grotesk';font-weight:800;color:var(--bitcoinOrange);font-size:12px;letter-spacing:1.5px;text-transform:uppercase}
+.goldenBanner .bSub{font-family:'Inter';font-size:11px;color:var(--text2);margin-top:2px}
+.goldenBanner .bCta{font-family:'Space Grotesk';font-weight:700;color:var(--bitcoinOrange);font-size:10px;letter-spacing:2px;padding:6px 10px;border:1px solid var(--bitcoinOrange);border-radius:2px}
+
+/* ══ Tab chip ══ */
+.tabChipRow{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:0 2px}
+.tabChip{background:var(--highest);border:1px solid var(--border);padding:3px 10px;border-radius:2px}
+.tabChip .t{font-family:'Space Grotesk';font-weight:700;font-size:10px;color:var(--primaryContainer);letter-spacing:2px}
+.tabChipMeta{font-family:'Inter';font-size:10px;color:var(--dim)}
+
+/* ══ Hero ══ */
+.heroCard{background:var(--card);border-left:4px solid var(--bitcoinOrange);padding:14px 14px 14px 18px;border-radius:2px;margin-bottom:10px}
+.heroHeader{display:flex;justify-content:space-between;margin-bottom:6px}
+.heroCaption{font-family:'Space Grotesk';font-weight:700;font-size:10px;color:var(--primaryContainer);letter-spacing:2px}
+.heroSamples{font-family:'JetBrains Mono';font-size:9px;color:var(--dim)}
+.heroScoreWrap{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+.heroScoreLabel{font-family:'Space Grotesk';font-weight:500;font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
+.heroScore{font-family:'Space Grotesk';font-weight:800;font-size:48px;color:var(--text);line-height:1}
+.heroScoreSuffix{font-family:'JetBrains Mono';font-size:12px;color:var(--dim)}
+.pill{padding:3px 10px;border-radius:999px;border:1px solid;font-family:'Space Grotesk';font-weight:800;font-size:10px;letter-spacing:2px;margin-left:auto}
+.pillNeutral{color:var(--tertiary);border-color:#b5ebff55;background:#b5ebff15}
+.pillPreferShort{color:var(--red);border-color:#ffb4ab55;background:#ffb4ab15}
+.heroStatsRow{display:flex;margin-top:12px;border-top:1px solid var(--border);padding-top:10px}
+.heroStatCell{flex:1;text-align:center}
+.heroStatMid{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.heroStatLabel{font-family:'Space Grotesk';font-weight:500;font-size:9px;color:var(--dim);letter-spacing:2px}
+.heroStatVal{font-family:'JetBrains Mono';font-weight:700;font-size:18px;margin-top:4px}
+.heroStatDim{font-size:11px;color:var(--dim)}
+
+/* ══ Section card ══ */
+.sectionCard{background:var(--card);border-left:4px solid var(--primaryContainer);padding:12px 14px 12px 16px;border-radius:2px;margin-bottom:10px}
+.sectionHeader{display:flex;justify-content:space-between;align-items:center}
+.sectionTitle{font-family:'Space Grotesk';font-weight:700;font-size:12px;color:var(--primaryContainer);letter-spacing:2px}
+.sectionMeta{font-family:'JetBrains Mono';font-size:10px;color:var(--dim)}
+.sectionSub{font-family:'Inter';font-size:10.5px;color:var(--dim);margin-top:2px;margin-bottom:10px}
+
+/* ══ Golden card ══ */
+.goldenCard{background:var(--cardAlt);border-left:3px solid var(--green);padding:10px 12px;border-radius:2px;margin-bottom:6px;position:relative}
+.goldenCard.short{border-left-color:var(--red)}
+.goldenCard.firing{
+  border-left-width:4px;border-left-color:var(--bitcoinOrange);
+  background:linear-gradient(90deg, rgba(247,147,26,0.15) 0%, rgba(247,147,26,0.04) 100%);
+  box-shadow:0 0 12px rgba(247,147,26,0.25);
+  animation:fireGlow 2.2s ease-in-out infinite;
+}
+@keyframes fireGlow{
+  0%,100%{box-shadow:0 0 12px rgba(247,147,26,0.25)}
+  50%{box-shadow:0 0 18px rgba(247,147,26,0.55)}
+}
+.goldenHeader{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.goldenSide{font-family:'Space Grotesk';font-weight:800;font-size:10px;letter-spacing:2px}
+.goldenSide.long{color:var(--green)}
+.goldenSide.short{color:var(--red)}
+.goldenTitle{flex:1;font-family:'Inter';font-weight:700;font-size:11.5px;color:var(--text)}
+.goldenWrPill{padding:2px 7px;border:1px solid #ffb87455;background:#ffb87410;border-radius:2px}
+.goldenWrPillText{font-family:'JetBrains Mono';font-weight:700;font-size:9.5px;color:var(--primaryContainer)}
+.goldenMeta{font-family:'Inter';font-size:10px;color:var(--text2);margin-bottom:6px}
+.goldenMeta b{color:var(--text);font-weight:700}
+.goldenMeta b.fire{color:var(--bitcoinOrange)}
+.condList{margin-top:4px}
+.condRow{display:flex;align-items:center;gap:6px;padding:3px 0}
+.condIcon{width:14px;font-family:'JetBrains Mono';font-weight:700;font-size:12px}
+.condIcon.pass{color:var(--green)}
+.condIcon.nopass{color:var(--dim)}
+.condLabel{flex:1;font-family:'Inter';font-size:10.5px}
+.condLabel.pass{color:var(--text)}
+.condLabel.nopass{color:var(--dim)}
+.condLive{font-family:'JetBrains Mono';font-weight:700;font-size:10px}
+.condLive.pass{color:var(--green)}
+.condLive.nopass{color:var(--dim)}
+.fireBadge{margin-top:8px;padding:6px 10px;background:var(--bitcoinOrange);color:var(--onPrimary);border-radius:2px;text-align:center;font-family:'Space Grotesk';font-weight:800;letter-spacing:2px;font-size:10px}
+
+/* Warning card */
+.warnCard{background:var(--cardAlt);border-left:3px solid var(--green);padding:8px 10px;border-radius:2px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.warnCard.danger{border-left-color:var(--red)}
+.warnCard.safe{opacity:0.55}
+.warnCard .wT{flex:1}
+.warnTitle{font-family:'Inter';font-weight:700;font-size:11px;color:var(--text)}
+.warnDetail{font-family:'JetBrains Mono';font-size:9.5px;color:var(--dim);margin-top:1px}
+.warnPill{padding:2px 7px;border-radius:2px;border:1px solid}
+.warnPillText{font-family:'Space Grotesk';font-weight:800;font-size:9px;letter-spacing:1.5px}
+
+/* Snap */
+.snapSection{border-left-color:var(--tertiary)!important}
+.snapSection .sectionTitle{color:var(--tertiary)}
+.snapRow{display:flex;padding:6px 0;border-bottom:1px solid var(--borderSoft);align-items:center;gap:10px}
+.snapLabel{flex:1;font-family:'Space Grotesk';font-weight:500;font-size:10px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase}
+.snapVal{font-family:'JetBrains Mono';font-weight:700;font-size:12px;color:var(--text);min-width:60px;text-align:right}
+.snapHint{font-family:'Inter';font-size:9.5px;min-width:130px;text-align:right}
+
+/* Legend banner */
+.legend{background:var(--cardAlt);border-left:3px solid var(--tertiary);padding:10px 12px;border-radius:2px;margin-bottom:12px;font-family:'Inter';font-size:10.5px;color:var(--dim);line-height:1.5}
+.legend b{color:var(--bitcoinOrange)}
+body{padding-bottom:80px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="title">BTC DASHBOARD</div>
+  <div class="icons">🔔 ⚙</div>
+</div>
+
+<!-- L2 BANNER MOCK (appears on dashboard when ≥1 golden firing) -->
+<div class="goldenBanner">
+  <div class="bigFire">🔥</div>
+  <div class="bText">
+    <div class="bTitle">2 GOLDENS FIRING</div>
+    <div class="bSub">SHORT QUADRUPLE (WR 69.6%) + SHORT EMA CROSS (WR 64.9%) · TP +5%</div>
+  </div>
+  <div class="bCta">VIEW →</div>
+</div>
+
+<div class="legend">
+  <b>🆕 v4.3.20 verified</b> — 10 Golden rules backtested 2.3Y fresh data.
+  7 LONG (🥇 QUADRUPLE WR 71.8% N=163 PF 4.69) + 3 SHORT mới (🥇 WR 69.6% N=46 PF 4.53).
+  Removed G8 SHORT overfit (claim 86.7% → actual 34.4%).
+</div>
+
+<!-- Tab chip -->
+<div class="tabChipRow">
+  <div class="tabChip"><div class="t">TRADES</div></div>
+  <div class="tabChipMeta">· Risk + Rules + Safety Check</div>
+</div>
+
+<!-- 1. HERO -->
+<div class="heroCard">
+  <div class="heroHeader">
+    <div class="heroCaption">▼ RISK RADAR · 20K LESSON</div>
+    <div class="heroSamples">2.3Y verified</div>
+  </div>
+  <div class="heroScoreWrap">
+    <div class="heroScoreLabel">RISK SCORE</div>
+    <div class="heroScore">72</div>
+    <div class="heroScoreSuffix">/ 100</div>
+    <div class="pill pillPreferShort">PREFER SHORT</div>
+  </div>
+  <div class="heroStatsRow">
+    <div class="heroStatCell">
+      <div class="heroStatLabel">LONG SAFE</div>
+      <div class="heroStatVal" style="color:var(--green)">5<span class="heroStatDim">/8</span></div>
+    </div>
+    <div class="heroStatCell heroStatMid">
+      <div class="heroStatLabel">SHORT SAFE</div>
+      <div class="heroStatVal" style="color:var(--red)">3<span class="heroStatDim">/3</span></div>
+    </div>
+    <div class="heroStatCell">
+      <div class="heroStatLabel">FIRING</div>
+      <div class="heroStatVal" style="color:var(--bitcoinOrange)">2<span class="heroStatDim">/10</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. GOLDENS -->
+<div class="sectionCard">
+  <div class="sectionHeader">
+    <div class="sectionTitle">💎 GOLDEN OPPORTUNITIES</div>
+    <div class="sectionMeta">2 firing · 10 watching</div>
+  </div>
+  <div class="sectionSub">Rule verified trên 2.3Y · all ✓ = vào lệnh ngay</div>
+
+  <!-- SHORT #1 FIRING 🔥 -->
+  <div class="goldenCard short firing">
+    <div class="goldenHeader">
+      <div class="goldenSide short">SHORT</div>
+      <div class="goldenTitle">SHORT QUADRUPLE DOWN (🥇)</div>
+      <div class="goldenWrPill"><span class="goldenWrPillText">WR 69.6% · N=46 · PF 4.53</span></div>
+    </div>
+    <div class="goldenMeta">TP +5% / SL -2% · <b class="fire">4/4 conditions</b></div>
+    <div class="condList">
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">EMA20 &lt; EMA50 (1h)</span><span class="condLive pass">BEAR</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">ATR 1h &lt; 0.3%</span><span class="condLive pass">0.27%</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">MACD Hist 1h -50..0</span><span class="condLive pass">-22.3</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">HTF 4h DOWN</span><span class="condLive pass">DOWN</span></div>
+    </div>
+    <div class="fireBadge">🔥 FIRING NOW — SHORT SIGNAL LIVE</div>
+  </div>
+
+  <!-- SHORT #2 FIRING 🔥 -->
+  <div class="goldenCard short firing">
+    <div class="goldenHeader">
+      <div class="goldenSide short">SHORT</div>
+      <div class="goldenTitle">SHORT EMA CROSS BEAR + SILENT</div>
+      <div class="goldenWrPill"><span class="goldenWrPillText">WR 64.9% · N=174 · PF 3.37</span></div>
+    </div>
+    <div class="goldenMeta">TP +5% / SL -2% · <b class="fire">3/3 conditions</b></div>
+    <div class="condList">
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">EMA20 &lt; EMA50 (1h)</span><span class="condLive pass">BEAR</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">ATR 1h &lt; 0.3%</span><span class="condLive pass">0.27%</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">HTF 4h DOWN</span><span class="condLive pass">DOWN</span></div>
+    </div>
+    <div class="fireBadge">🔥 FIRING NOW — SHORT SIGNAL LIVE</div>
+  </div>
+
+  <!-- LONG #1 WATCHING (2/4) -->
+  <div class="goldenCard">
+    <div class="goldenHeader">
+      <div class="goldenSide long">LONG</div>
+      <div class="goldenTitle">LONG QUADRUPLE MEGA (🥇)</div>
+      <div class="goldenWrPill"><span class="goldenWrPillText">WR 71.8% · N=163 · PF 4.69</span></div>
+    </div>
+    <div class="goldenMeta">TP +5% / SL -2% · <b>2/4 conditions</b></div>
+    <div class="condList">
+      <div class="condRow"><span class="condIcon nopass">·</span><span class="condLabel nopass">MACD Hist 1h 0..50</span><span class="condLive nopass">-22.3</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">|EMA50 Δ 1h| &lt; 0.5%</span><span class="condLive pass">-0.28%</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">ATR 1h &lt; 0.3%</span><span class="condLive pass">0.27%</span></div>
+      <div class="condRow"><span class="condIcon nopass">·</span><span class="condLabel nopass">HTF 4h FLAT</span><span class="condLive nopass">DOWN</span></div>
+    </div>
+  </div>
+
+  <!-- LONG #2 WATCHING (2/3) -->
+  <div class="goldenCard">
+    <div class="goldenHeader">
+      <div class="goldenSide long">LONG</div>
+      <div class="goldenTitle">LONG TRIPLE MACD+EMA+FLAT (🥈)</div>
+      <div class="goldenWrPill"><span class="goldenWrPillText">WR 64.9% · N=405 · PF 3.90</span></div>
+    </div>
+    <div class="goldenMeta">TP +5% / SL -2% · <b>1/3 conditions</b></div>
+    <div class="condList">
+      <div class="condRow"><span class="condIcon nopass">·</span><span class="condLabel nopass">MACD Hist 1h 0..50</span><span class="condLive nopass">-22.3</span></div>
+      <div class="condRow"><span class="condIcon pass">✓</span><span class="condLabel pass">|EMA50 Δ 1h| &lt; 0.5%</span><span class="condLive pass">-0.28%</span></div>
+      <div class="condRow"><span class="condIcon nopass">·</span><span class="condLabel nopass">HTF 4h FLAT</span><span class="condLive nopass">DOWN</span></div>
+    </div>
+  </div>
+
+  <!-- Collapsed rest (preview hint) -->
+  <div style="text-align:center;padding:8px;font-family:'Inter';font-size:10px;color:var(--dim)">
+    + 6 more goldens watching (MACD+ATR, SILENT+CENTER, CROSS+SILENT, DOJI+MACD, BB+MACD, SHORT #3) …
+  </div>
+</div>
+
+<!-- 3. LONG CHECKLIST (8 rows) -->
+<div class="sectionCard" style="border-left-color:var(--green)">
+  <div class="sectionHeader">
+    <div class="sectionTitle" style="color:var(--green)">⇧ LONG CHECKLIST</div>
+    <div class="sectionMeta">3/8 bad</div>
+  </div>
+  <div class="sectionSub">⚠️ 3 dấu hiệu xấu — HTF DOWN + overheat + body big</div>
+
+  <div class="warnCard danger"><div class="wT"><div class="warnTitle">HTF 4h DOWN</div><div class="warnDetail">EMA50 Δ = -1.52% · WR WR 15.7%</div></div><div class="warnPill" style="background:#ffb4ab20;border-color:#ffb4ab55"><span class="warnPillText" style="color:var(--red)">HIGH</span></div></div>
+  <div class="warnCard safe"><div class="wT"><div class="warnTitle">Giá 1h xa trên EMA50 (&gt;2%)</div><div class="warnDetail">EMA50 Δ = -0.28% · WR WR 17.4%</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe"><div class="wT"><div class="warnTitle">RSI 1h &lt; 30 (dao rơi)</div><div class="warnDetail">RSI = 48.2 · WR WR 17.6%</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe"><div class="wT"><div class="warnTitle">15m ATR&lt;0.3% (đừng LONG 15m)</div><div class="warnDetail">ATR = 0.32% · WR WR 9.5%</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe"><div class="wT"><div class="warnTitle">MACD 1h Hist &lt; -50 (momentum âm mạnh)</div><div class="warnDetail">MACD Hist = -22.3 · WR WR 21.7%</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe"><div class="wT"><div class="warnTitle">24h momentum &gt; +2% (overheat)</div><div class="warnDetail">Δ24h = -0.82% · WR WR 23.1% (N=268)</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe"><div class="wT"><div class="warnTitle">BB width &gt; 4% (breakout đã xong)</div><div class="warnDetail">BB width = 2.71% · WR WR 31.4% (N=344)</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard danger"><div class="wT"><div class="warnTitle">Nến 1h body &gt; 1% (chạy quá mạnh)</div><div class="warnDetail">body = 1.18% · WR WR 31.8% (N=88)</div></div><div class="warnPill" style="background:#ffb4ab20;border-color:#ffb4ab55"><span class="warnPillText" style="color:var(--red)">HIGH</span></div></div>
+</div>
+
+<!-- 4. SHORT CHECKLIST (3 rows) -->
+<div class="sectionCard" style="border-left-color:var(--red)">
+  <div class="sectionHeader">
+    <div class="sectionTitle" style="color:var(--red)">⇩ SHORT CHECKLIST</div>
+    <div class="sectionMeta">0/3 bad</div>
+  </div>
+  <div class="sectionSub">✅ Zero red flags — SHORT được (HTF DOWN xuôi trend)</div>
+  <div class="warnCard safe" style="border-left-color:var(--green)"><div class="wT"><div class="warnTitle">HTF 4h UP (đừng SHORT chống trend)</div><div class="warnDetail">EMA50 Δ = -1.52% · WR edge -10%</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe" style="border-left-color:var(--green)"><div class="wT"><div class="warnTitle">Giá 1h xa dưới EMA50 (&lt;-2%)</div><div class="warnDetail">EMA50 Δ = -0.28% · WR rebound cao</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+  <div class="warnCard safe" style="border-left-color:var(--green)"><div class="wT"><div class="warnTitle">RSI 1h &gt; 70 (còn momentum)</div><div class="warnDetail">RSI = 48.2 · WR SHORT WR thấp</div></div><div class="warnPill" style="background:#10b98120;border-color:#10b98155"><span class="warnPillText" style="color:var(--green)">LOW</span></div></div>
+</div>
+
+<!-- 5. LIVE SNAPSHOT -->
+<div class="sectionCard snapSection">
+  <div class="sectionHeader">
+    <div class="sectionTitle">📡 LIVE SNAPSHOT</div>
+    <div class="sectionMeta">raw · refresh 60s</div>
+  </div>
+  <div class="snapRow"><div class="snapLabel">RSI 1h</div><div class="snapVal">48.2</div><div class="snapHint" style="color:var(--red)">weak · lean SELL</div></div>
+  <div class="snapRow"><div class="snapLabel">MACD Hist 1h</div><div class="snapVal">-22.3</div><div class="snapHint" style="color:var(--red)">bear momentum</div></div>
+  <div class="snapRow"><div class="snapLabel">ATR 1h</div><div class="snapVal">0.27%</div><div class="snapHint" style="color:var(--bitcoinOrange)">rất thấp · golden zone</div></div>
+  <div class="snapRow"><div class="snapLabel">ATR 15m</div><div class="snapVal">0.32%</div><div class="snapHint" style="color:var(--text)">bình thường</div></div>
+  <div class="snapRow"><div class="snapLabel">ATR 4h</div><div class="snapVal">0.88%</div><div class="snapHint" style="color:var(--text)">bình thường</div></div>
+  <div class="snapRow"><div class="snapLabel">EMA50 Δ 1h</div><div class="snapVal">-0.28%</div><div class="snapHint" style="color:var(--dim)">sát EMA · sideway</div></div>
+  <div class="snapRow"><div class="snapLabel">EMA50 Δ 4h</div><div class="snapVal">-1.52%</div><div class="snapHint" style="color:var(--red)">xa vừa · dưới EMA</div></div>
+  <div class="snapRow"><div class="snapLabel">HTF 4h</div><div class="snapVal">DOWN</div><div class="snapHint" style="color:var(--red)">trend DOWN rõ</div></div>
+</div>
+
+<!-- Bottom nav with badge mock -->
+<div class="bottomnav">
+  <div class="tab"><div class="ico">📡</div><div class="lbl">RADAR</div></div>
+  <div class="tab active"><div class="ico">📈</div><div class="lbl">TRADES</div><div class="badge">2</div></div>
+  <div class="tab"><div class="ico">💼</div><div class="lbl">ASSETS</div></div>
+  <div class="tab"><div class="ico">👤</div><div class="lbl">PROFILE</div></div>
+</div>
+
+</body>
+</html>

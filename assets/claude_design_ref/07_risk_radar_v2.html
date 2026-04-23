@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@100;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#0f131f",
+                        "surface-container-high": "#262a37",
+                        "on-secondary": "#3f008e",
+                        "on-tertiary-container": "#ffd2be",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "secondary": "#d2bbff",
+                        "inverse-surface": "#dfe2f3",
+                        "outline-variant": "#464555",
+                        "on-primary-container": "#dad7ff",
+                        "surface-tint": "#c3c0ff",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#171b28",
+                        "on-secondary-fixed": "#25005a",
+                        "on-surface": "#dfe2f3",
+                        "inverse-on-surface": "#2c303d",
+                        "surface-variant": "#313442",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-surface-variant": "#c7c4d8",
+                        "on-error-container": "#ffdad6",
+                        "error-container": "#93000a",
+                        "tertiary": "#ffb695",
+                        "surface-dim": "#0f131f",
+                        "primary-fixed": "#e2dfff",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "on-error": "#690005",
+                        "on-tertiary": "#571f00",
+                        "inverse-primary": "#4d44e3",
+                        "surface-container": "#1b1f2c",
+                        "primary-container": "#4f46e5",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed": "#0f0069",
+                        "background": "#0f131f",
+                        "surface-container-lowest": "#0a0e1a",
+                        "tertiary-container": "#a44100",
+                        "outline": "#918fa1",
+                        "on-secondary-container": "#c9aeff",
+                        "surface-container-highest": "#313442",
+                        "primary": "#c3c0ff",
+                        "surface-bright": "#353946",
+                        "on-primary": "#1d00a5",
+                        "secondary-container": "#6001d1",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-background": "#dfe2f3",
+                        "secondary-fixed": "#eaddff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "gold": "#ffd700",
+                        "gold-muted": "#b8860b"
+                    },
+                    "fontFamily": {
+                        "headline": ["Be Vietnam Pro"],
+                        "display": ["Be Vietnam Pro"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #0a0e1a; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .radar-glow { box-shadow: 0 0 40px rgba(255, 215, 0, 0.15); }
+        .hairline-border { border: 1px solid rgba(255, 255, 255, 0.06); }
+        .gold-gradient-text { background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface antialiased select-none">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#0a0e1a]/80 backdrop-blur-md border-b border-white/[0.06]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#4f46e5]">terminal</span>
+<h1 class="text-xl font-black tracking-widest text-[#4f46e5] font-['Be_Vietnam_Pro'] tracking-wider uppercase">BTC DASHBOARD</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD46nYGrg2Ed9sRCoVSwgh7v7ilOSUTZJtH-p77NFzonLt12gWRqUIyTC63XBTTnnLhZn8bkBqYmdXNCMKg0SRU9CgHsyDOH1bKc9bGruG539qU5-Hmg4yvWv6EaTD6S2vspyKllt3X4Q-kSf-752IsvTGJcvW6ORdb9qRUJRoZAcNpnIEzIhF2T6zVv6QkjKwvpMkyKuSIUF6Y3HuL2YQEeMbka_Ux3ju5cwntyuZITgpXvCXHpmWmfrzRwxxu7vsIr7YiwPOzSe1F"/>
+</div>
+</header>
+<main class="pt-20 pb-28 px-4 max-w-[390px] mx-auto space-y-6">
+<section class="relative flex flex-col items-center py-8 rounded-3xl bg-surface-container-low hairline-border radar-glow overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 50% 50%, #ffd700 0%, transparent 70%);"></div>
+<div class="relative w-64 h-64 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-2 border-white/5"></div>
+<div class="absolute inset-4 rounded-full border border-white/5"></div>
+<div class="absolute inset-10 rounded-full border border-white/5"></div>
+<div class="absolute inset-0 rounded-full border-t-2 border-gold/40 animate-[spin_4s_linear_infinite]"></div>
+<div class="text-center z-10">
+<div class="text-xs font-bold tracking-[0.2em] text-on-surface-variant uppercase mb-1">Risk Radar</div>
+<div class="text-6xl font-black gold-gradient-text leading-none">62</div>
+<div class="text-sm font-bold tracking-widest text-on-surface-variant mt-1">/ 100 RISK</div>
+<div class="mt-4 px-4 py-1 rounded-full bg-gold/10 border border-gold/20 text-gold text-[10px] font-black tracking-widest uppercase">MODERATE</div>
+</div>
+<div class="absolute w-1 h-32 origin-bottom bottom-1/2 left-1/2 -translate-x-1/2 rotate-[45deg] transition-transform duration-1000">
+<div class="w-full h-full bg-gradient-to-t from-gold to-transparent rounded-full shadow-[0_0_10px_#ffd700]"></div>
+</div>
+</div>
+<div class="grid grid-cols-3 w-full mt-8 border-t border-white/5">
+<div class="py-4 flex flex-col items-center border-r border-white/5">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Confidence</span>
+<span class="text-sm font-bold text-on-surface">78%</span>
+</div>
+<div class="py-4 flex flex-col items-center border-r border-white/5">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Samples</span>
+<span class="text-sm font-bold text-on-surface">312</span>
+</div>
+<div class="py-4 flex flex-col items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Edge</span>
+<span class="text-sm font-bold text-secondary">+4.2%</span>
+</div>
+</div>
+</section>
+<section class="space-y-3">
+<h2 class="text-[11px] font-black tracking-[0.2em] text-on-surface-variant uppercase pl-1">Risk Factors</h2>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container hairline-border">
+<div class="flex flex-col">
+<span class="text-sm font-bold">RSI 4H Overbought (78.4)</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Momentum Overextension</span>
+</div>
+<span class="px-2 py-1 rounded bg-error/10 text-error text-[10px] font-black uppercase">HIGH</span>
+</div>
+<div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container hairline-border">
+<div class="flex flex-col">
+<span class="text-sm font-bold">HTF Misalignment</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Trend structure conflict</span>
+</div>
+<span class="px-2 py-1 rounded bg-error/10 text-error text-[10px] font-black uppercase">HIGH</span>
+</div>
+<div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container hairline-border">
+<div class="flex flex-col">
+<span class="text-sm font-bold">ATR Expansion 1.4x</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Volatility increasing</span>
+</div>
+<span class="px-2 py-1 rounded bg-gold/10 text-gold text-[10px] font-black uppercase">MED</span>
+</div>
+<div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container hairline-border opacity-60">
+<div class="flex flex-col">
+<span class="text-sm font-bold">Volume Divergence</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Accumulation signal</span>
+</div>
+<span class="px-2 py-1 rounded bg-secondary/10 text-secondary text-[10px] font-black uppercase">LOW</span>
+</div>
+</div>
+</section>
+<section class="space-y-3">
+<h2 class="text-[11px] font-black tracking-[0.2em] text-on-surface-variant uppercase pl-1">HTF Alignment Matrix</h2>
+<div class="grid grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">15M</span><span class="material-symbols-outlined text-secondary text-lg">arrow_upward</span><span class="text-[8px] font-black text-secondary mt-1">LONG</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">1H</span><span class="material-symbols-outlined text-secondary text-lg">arrow_upward</span><span class="text-[8px] font-black text-secondary mt-1">LONG</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">4H</span><span class="material-symbols-outlined text-error text-lg">arrow_downward</span><span class="text-[8px] font-black text-error mt-1">SHORT</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">1D</span><span class="material-symbols-outlined text-error text-lg">arrow_downward</span><span class="text-[8px] font-black text-error mt-1">SHORT</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">1W</span><span class="material-symbols-outlined text-secondary text-lg">arrow_upward</span><span class="text-[8px] font-black text-secondary mt-1">LONG</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">1M</span><span class="material-symbols-outlined text-secondary text-lg">arrow_upward</span><span class="text-[8px] font-black text-secondary mt-1">LONG</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">SCORE</span><span class="text-sm font-black gold-gradient-text">6.8</span><span class="text-[8px] font-black text-on-surface-variant mt-1">SYSTEM</span></div>
+<div class="bg-surface-container p-3 flex flex-col items-center"><span class="text-[9px] font-bold text-on-surface-variant mb-1">VERDICT</span><span class="material-symbols-outlined text-gold text-lg">balance</span><span class="text-[8px] font-black text-gold mt-1">NEUTRAL</span></div>
+</div>
+</section>
+<section class="p-5 rounded-3xl bg-surface-container-high hairline-border shadow-2xl space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-xl" style="font-variation-settings: 'FILL' 1;">security</span>
+<h2 class="text-sm font-black tracking-widest uppercase">Position Safety Check</h2>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between"><span class="text-xs text-on-surface-variant">Stop loss defined</span><span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span></div>
+<div class="flex items-center justify-between"><span class="text-xs text-on-surface-variant">Position size</span><span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span></div>
+<div class="flex items-center justify-between"><span class="text-xs text-on-surface-variant">HTF trend</span><span class="material-symbols-outlined text-error text-sm">cancel</span></div>
+<div class="flex items-center justify-between"><span class="text-xs text-on-surface-variant">ATR</span><span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span></div>
+</div>
+<button class="w-full py-4 rounded-2xl bg-error/10 border border-error/20 flex items-center justify-center gap-3 active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-error text-lg">lock</span>
+<span class="text-xs font-black text-error tracking-[0.2em] uppercase">BLOCKED — 1 GATE FAILED</span>
+</button>
+</section>
+<section class="space-y-3">
+<div class="flex justify-between items-end pl-1">
+<h2 class="text-[11px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Historical Risk Trace</h2>
+<span class="text-[9px] font-bold text-on-surface-variant">LAST 24H</span>
+</div>
+<div class="h-24 flex items-end justify-between px-2 gap-1 bg-surface-container-low rounded-2xl p-4 hairline-border">
+<div class="w-2 bg-secondary opacity-20 h-[40%] rounded-t-sm"></div>
+<div class="w-2 bg-secondary opacity-20 h-[55%] rounded-t-sm"></div>
+<div class="w-2 bg-gold h-[70%] rounded-t-sm"></div>
+<div class="w-2 bg-gold h-[85%] rounded-t-sm"></div>
+<div class="w-2 bg-error h-[95%] rounded-t-sm"></div>
+<div class="w-2 bg-error h-[80%] rounded-t-sm"></div>
+<div class="w-2 bg-gold h-[60%] rounded-t-sm"></div>
+<div class="w-2 bg-secondary opacity-20 h-[45%] rounded-t-sm"></div>
+<div class="w-2 bg-secondary opacity-20 h-[30%] rounded-t-sm"></div>
+<div class="w-2 bg-secondary opacity-20 h-[40%] rounded-t-sm"></div>
+<div class="w-2 bg-gold h-[65%] rounded-t-sm"></div>
+<div class="w-2 bg-gold h-[75%] rounded-t-sm"></div>
+<div class="w-2 bg-gold h-[62%] rounded-t-sm shadow-[0_0_8px_#ffd700]"></div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 pb-safe bg-[#171b28]/90 backdrop-blur-lg border-t border-white/[0.06] shadow-[0_-12px_40px_rgba(0,0,0,0.6)] rounded-t-2xl">
+<a class="flex flex-col items-center justify-center text-[#c7c4d8] opacity-60 font-['Be_Vietnam_Pro'] text-[10px] font-medium" href="#"><span class="material-symbols-outlined mb-1">monitoring</span>Market</a>
+<a class="flex flex-col items-center justify-center text-[#4f46e5] bg-[#4f46e5]/10 rounded-xl px-4 py-1 font-['Be_Vietnam_Pro'] text-[10px] font-medium" href="#"><span class="material-symbols-outlined mb-1">radar</span>Radar</a>
+<a class="flex flex-col items-center justify-center text-[#c7c4d8] opacity-60 font-['Be_Vietnam_Pro'] text-[10px] font-medium" href="#"><span class="material-symbols-outlined mb-1">query_stats</span>Insights</a>
+<a class="flex flex-col items-center justify-center text-[#c7c4d8] opacity-60 font-['Be_Vietnam_Pro'] text-[10px] font-medium" href="#"><span class="material-symbols-outlined mb-1">settings</span>Settings</a>
+</nav>
+</body></html>

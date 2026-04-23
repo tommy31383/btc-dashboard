@@ -1,0 +1,225 @@
+{
+  "meta": {
+    "side": "LONG",
+    "candles": 20000,
+    "tp": 5,
+    "sl": 2,
+    "hold": 100,
+    "fee": 0.05,
+    "generatedAt": "2026-04-22T10:16:11.995Z"
+  },
+  "regime": {
+    "up": 9090,
+    "down": 8021,
+    "flat": 2688
+  },
+  "ranks": [
+    {
+      "name": "emaCrossBull + atrLow + htf:FLAT",
+      "n": 104,
+      "wins": 71,
+      "wr": 68.27,
+      "sumPnl": 151.13,
+      "pf": 3.44,
+      "exp": 1.453
+    },
+    {
+      "name": "bodySmall + macdBull + htf:FLAT",
+      "n": 259,
+      "wins": 165,
+      "wr": 63.71,
+      "sumPnl": 462.04,
+      "pf": 3.64,
+      "exp": 1.784
+    },
+    {
+      "name": "bbSqueeze + macdBull + htf:FLAT",
+      "n": 369,
+      "wins": 230,
+      "wr": 62.33,
+      "sumPnl": 661.33,
+      "pf": 3.5,
+      "exp": 1.792
+    },
+    {
+      "name": "bodySmall + atrLow + htf:FLAT",
+      "n": 215,
+      "wins": 132,
+      "wr": 61.4,
+      "sumPnl": 267.54,
+      "pf": 2.74,
+      "exp": 1.244
+    },
+    {
+      "name": "mom24flat + macdBull + htf:FLAT",
+      "n": 270,
+      "wins": 160,
+      "wr": 59.26,
+      "sumPnl": 414.92,
+      "pf": 2.89,
+      "exp": 1.537
+    },
+    {
+      "name": "bbSqueeze + atrLow + htf:FLAT",
+      "n": 342,
+      "wins": 199,
+      "wr": 58.19,
+      "sumPnl": 376.55,
+      "pf": 2.36,
+      "exp": 1.101
+    },
+    {
+      "name": "mom24flat + atrLow + htf:FLAT",
+      "n": 249,
+      "wins": 144,
+      "wr": 57.83,
+      "sumPnl": 263.25,
+      "pf": 2.28,
+      "exp": 1.057
+    },
+    {
+      "name": "volSilent + macdBull + htf:FLAT",
+      "n": 295,
+      "wins": 167,
+      "wr": 56.61,
+      "sumPnl": 443.48,
+      "pf": 2.79,
+      "exp": 1.503
+    },
+    {
+      "name": "volSilent + atrLow + htf:FLAT",
+      "n": 102,
+      "wins": 57,
+      "wr": 55.88,
+      "sumPnl": 78.8,
+      "pf": 1.92,
+      "exp": 0.773
+    },
+    {
+      "name": "bbSqueeze + emaNear + htf:FLAT",
+      "n": 734,
+      "wins": 405,
+      "wr": 55.18,
+      "sumPnl": 883.87,
+      "pf": 2.4,
+      "exp": 1.204
+    },
+    {
+      "name": "bbSqueeze<1.5% + htf:FLAT",
+      "n": 946,
+      "wins": 472,
+      "wr": 49.89,
+      "sumPnl": 854.25,
+      "pf": 1.93,
+      "exp": 0.903
+    },
+    {
+      "name": "ema20<ema50 + htf:FLAT",
+      "n": 1451,
+      "wins": 716,
+      "wr": 49.35,
+      "sumPnl": 1126.86,
+      "pf": 1.77,
+      "exp": 0.777
+    },
+    {
+      "name": "mom24flat + htf:FLAT",
+      "n": 874,
+      "wins": 423,
+      "wr": 48.4,
+      "sumPnl": 691.47,
+      "pf": 1.78,
+      "exp": 0.791
+    },
+    {
+      "name": "bodySmall<0.1% + htf:FLAT",
+      "n": 892,
+      "wins": 416,
+      "wr": 46.64,
+      "sumPnl": 595.15,
+      "pf": 1.65,
+      "exp": 0.667
+    },
+    {
+      "name": "emaCrossBull + macdBull + htf:FLAT",
+      "n": 225,
+      "wins": 100,
+      "wr": 44.44,
+      "sumPnl": 166.23,
+      "pf": 1.69,
+      "exp": 0.739
+    },
+    {
+      "name": "volSilent<0.7 + htf:FLAT",
+      "n": 1184,
+      "wins": 504,
+      "wr": 42.57,
+      "sumPnl": 509.84,
+      "pf": 1.38,
+      "exp": 0.431
+    },
+    {
+      "name": "volSpike>1.5 + htf:FLAT",
+      "n": 399,
+      "wins": 169,
+      "wr": 42.36,
+      "sumPnl": 184.91,
+      "pf": 1.4,
+      "exp": 0.463
+    },
+    {
+      "name": "mom24<-2% + htf:FLAT",
+      "n": 253,
+      "wins": 90,
+      "wr": 35.57,
+      "sumPnl": -20.3,
+      "pf": 0.94,
+      "exp": -0.08
+    },
+    {
+      "name": "mom24<-2% (dip buy) + htf:FLAT",
+      "n": 253,
+      "wins": 90,
+      "wr": 35.57,
+      "sumPnl": -20.3,
+      "pf": 0.94,
+      "exp": -0.08
+    },
+    {
+      "name": "ema20>ema50 + htf:FLAT",
+      "n": 1237,
+      "wins": 438,
+      "wr": 35.41,
+      "sumPnl": 126.84,
+      "pf": 1.08,
+      "exp": 0.103
+    },
+    {
+      "name": "bodyBig>1% + htf:FLAT",
+      "n": 88,
+      "wins": 28,
+      "wr": 31.82,
+      "sumPnl": -8.49,
+      "pf": 0.93,
+      "exp": -0.097
+    },
+    {
+      "name": "bbExpand>4% + htf:FLAT",
+      "n": 344,
+      "wins": 108,
+      "wr": 31.4,
+      "sumPnl": -41.37,
+      "pf": 0.91,
+      "exp": -0.12
+    },
+    {
+      "name": "mom24>+2% + htf:FLAT",
+      "n": 268,
+      "wins": 62,
+      "wr": 23.13,
+      "sumPnl": -155.95,
+      "pf": 0.62,
+      "exp": -0.582
+    }
+  ]
+}

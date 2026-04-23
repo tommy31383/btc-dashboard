@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>BTC Dashboard v4.3.19 — V2 HUD Full App Preview</title>
+<style>
+  :root {
+    --bg: #0a0e1a; --card: #0c111c; --surface: #070b14;
+    --border: #1f2a3d; --border-soft: #141a28; --border-strong: #2a3347;
+    --grid: #141c2b;
+    --text: #d0d4e0; --dim: #6b7488; --fade: #3a4356;
+    --orange: #f7931a; --green: #10b981; --red: #ef4444; --yellow: #f5c93b; --blue: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+    padding: 20px;
+  }
+  .phone {
+    max-width: 420px; margin: 0 auto;
+    background: var(--bg);
+    padding: 16px;
+  }
+  .mini-lbl {
+    font-size: 8px; letter-spacing: 2px; color: var(--dim);
+    font-weight: 800; margin-bottom: 8px;
+  }
+  /* Grid overlay pattern */
+  .grid-bg {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sub-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 10px;
+    position: relative;
+  }
+  /* Corner brackets */
+  .corner { position: absolute; width: 10px; height: 10px; border-color: var(--orange); }
+  .corner.tl { top: 2px; left: 2px; border-top: 1.5px solid; border-left: 1.5px solid; }
+  .corner.tr { top: 2px; right: 2px; border-top: 1.5px solid; border-right: 1.5px solid; }
+  .corner.bl { bottom: 2px; left: 2px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+  .corner.br { bottom: 2px; right: 2px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+  /* Header */
+  .app-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .app-title {
+    color: var(--orange); font-size: 18px; font-weight: 900;
+    letter-spacing: 2px;
+  }
+  .btn-row { display: flex; gap: 8px; }
+  .btn {
+    padding: 8px 12px; height: 36px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); font-family: inherit; font-size: 11px; font-weight: 800;
+    display: flex; align-items: center;
+    border-radius: 0;
+  }
+  .btn.radar { background: rgba(247,147,26,0.13); border-color: var(--orange); color: var(--orange); }
+
+  /* Price header */
+  .price-row { display: flex; justify-content: space-between; align-items: flex-end; }
+  .price-value { font-size: 32px; font-weight: 900; color: var(--text); letter-spacing: -1px; }
+  .price-change { font-size: 13px; font-weight: 800; color: var(--green); margin-top: 4px; }
+  .status-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); margin-right: 4px; border-radius: 50%; }
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); padding: 1px; margin-top: 10px; }
+  .stat-cell { background: var(--surface); padding: 8px 6px; text-align: center; }
+  .stat-lbl { font-size: 8px; letter-spacing: 2px; color: var(--dim); margin-bottom: 3px; }
+  .stat-val { font-size: 12px; font-weight: 800; color: var(--text); }
+
+  /* Rule alert banner */
+  .banner-critical {
+    border: 2px solid var(--red);
+  }
+  .banner-title-critical {
+    color: var(--red); font-weight: 900; font-size: 10px; letter-spacing: 2px;
+    margin-bottom: 8px; text-align: center;
+  }
+  .alert-item {
+    background: var(--surface); border-left: 3px solid var(--red);
+    padding: 8px 10px; margin-bottom: 4px;
+  }
+  .alert-item .title { font-weight: 800; font-size: 11px; color: var(--text); }
+  .alert-item .detail { font-size: 10px; color: var(--dim); margin-top: 2px; }
+
+  /* Rule firing crown */
+  .crown {
+    background: var(--card); border-bottom: 1px solid var(--orange);
+    padding: 10px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .crown-title { color: var(--orange); font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+  .crown-count { color: var(--orange); font-size: 11px; font-weight: 900; }
+
+  /* Stat grid */
+  .sgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); padding: 1px; }
+  .sgrid .cell {
+    background: var(--card); padding: 8px 4px; text-align: center;
+    border-left: 2px solid transparent;
+  }
+  .sgrid .cell.on-fired { border-left-color: var(--red); }
+  .sgrid .cell.on-armed { border-left-color: var(--yellow); }
+  .sgrid .cell.on-blk { border-left-color: var(--dim); }
+  .sgrid .cell .val { font-size: 16px; font-weight: 900; }
+  .sgrid .cell .lbl { font-size: 8px; letter-spacing: 1px; margin-top: 2px; }
+  .c-red { color: var(--red); } .c-yellow { color: var(--yellow); } .c-dim { color: var(--dim); } .c-fade { color: var(--fade); }
+  .c-green { color: var(--green); } .c-orange { color: var(--orange); } .c-blue { color: var(--blue); }
+
+  .hint-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 2px solid var(--yellow);
+    padding: 8px; margin-top: 8px;
+  }
+  .hint-title { color: var(--yellow); font-size: 9px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
+  .hint-line { color: var(--dim); font-size: 10px; line-height: 14px; }
+  .hint-line b { color: var(--yellow); font-weight: 800; }
+
+  /* Feature snapshot 3x2 */
+  .fsgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); padding: 1px; }
+  .fsgrid .fcell {
+    background: var(--card); padding: 10px 6px;
+  }
+  .fcell .hd { display: flex; justify-content: space-between; align-items: center; }
+  .fcell .lbl { font-size: 8px; letter-spacing: 1.5px; color: var(--dim); }
+  .fcell .trend { font-size: 10px; font-weight: 800; }
+  .fcell .val { font-size: 15px; font-weight: 900; color: var(--text); margin-top: 4px; }
+  .fcell .sub { font-size: 9px; color: var(--dim); margin-top: 2px; }
+
+  /* TF tabs full-width */
+  .tftabs { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border); padding: 1px; gap: 1px; margin-bottom: 10px; }
+  .tftabs .t {
+    background: var(--card); color: var(--dim);
+    text-align: center; padding: 9px 0; font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  }
+  .tftabs .t.active { background: var(--orange); color: #1a1206; }
+
+  /* Timeframe table */
+  .tfttitle { color: var(--orange); font-size: 11px; font-weight: 800; letter-spacing: 2px; margin-bottom: 8px; }
+  .tftable { border: 1px solid var(--border); }
+  .tft-row { display: grid; grid-template-columns: 60px 1fr 1fr 1fr 40px; gap: 1px; background: var(--border); padding: 1px; }
+  .tft-head .tft-cell { background: var(--card); color: var(--dim); font-size: 8px; letter-spacing: 1px; padding: 6px; text-align: center; }
+  .tft-cell { background: var(--surface); color: var(--text); font-size: 10px; padding: 6px; text-align: center; }
+  .tft-label { color: var(--orange) !important; font-weight: 800; }
+  .badge-sq { background: var(--surface); border: 1px solid var(--border); padding: 1px 4px; font-size: 9px; border-radius: 0; }
+
+  /* Chart placeholder */
+  .chart-box {
+    background: var(--surface); border: 1px solid var(--border);
+    height: 180px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--dim); font-size: 10px;
+    position: relative;
+  }
+  .chart-lbl {
+    position: absolute; top: 6px; left: 8px;
+    font-size: 8px; letter-spacing: 1.5px; color: var(--dim); font-weight: 800;
+  }
+
+  /* Rule card in TradingRulesPanel */
+  .rule-card {
+    background: var(--card); border: 1px solid var(--border); padding: 10px;
+    margin-bottom: 6px; position: relative;
+  }
+  .rule-card.firing { border-left: 4px solid var(--red); }
+  .rule-card.tracked { border-color: var(--green); }
+  .rule-hd { display: flex; justify-content: space-between; align-items: center; }
+  .rule-name { font-size: 11px; font-weight: 800; color: var(--text); }
+  .rule-wr { font-size: 10px; color: var(--orange); font-weight: 800; }
+  .rule-stats { display: flex; gap: 6px; margin-top: 6px; }
+  .stat-pill {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 2px 6px; font-size: 9px; color: var(--dim);
+  }
+
+  /* Alert log */
+  .alog-item {
+    display: flex; align-items: center;
+    padding: 5px 6px; background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .alog-icon { margin-right: 8px; font-size: 12px; }
+  .alog-msg { flex: 1; font-size: 11px; color: var(--text); }
+  .alog-time { font-size: 9px; color: var(--dim); letter-spacing: 0.5px; }
+
+  /* Footer */
+  .footer { text-align: center; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 16px; }
+  .footer .ln { font-size: 10px; color: var(--dim); margin-bottom: 2px; }
+  .footer .ver { font-size: 9px; color: var(--fade); letter-spacing: 1px; margin-top: 4px; }
+
+  /* Section headline */
+  h2.sect {
+    font-size: 12px; color: var(--orange); letter-spacing: 2px;
+    margin: 32px 0 8px 0; padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <h2 class="sect">▼ 01 · APP HEADER</h2>
+  <div class="app-header">
+    <div class="app-title">BTC DASHBOARD</div>
+    <div class="btn-row">
+      <button class="btn radar">🎯 RADAR</button>
+      <button class="btn">⚙</button>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 02 · PRICE HEADER</h2>
+  <div class="card grid-bg">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="sub-card" style="margin-bottom: 10px;">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="mini-lbl">▼ LAST PRICE · BTC/USDT</div>
+      <div class="price-row">
+        <div>
+          <div class="price-value">95,328.50</div>
+          <div class="price-change">+2.14% · +$1,998</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size:9px; color:var(--dim); letter-spacing:1.5px;"><span class="status-dot"></span>LIVE</div>
+          <svg width="80" height="40" style="margin-top:4px;">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polyline points="0,30 10,25 20,28 30,22 40,18 50,20 60,15 70,10 80,12" stroke="#10b981" fill="url(#g1)" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-lbl">HIGH 24H</div><div class="stat-val c-green">96,100</div></div>
+      <div class="stat-cell"><div class="stat-lbl">LOW 24H</div><div class="stat-val c-red">93,200</div></div>
+      <div class="stat-cell"><div class="stat-lbl">VOL 24H</div><div class="stat-val">18.2K</div></div>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 03 · RULE ALERT BANNER (firing)</h2>
+  <div class="card banner-critical grid-bg">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="crown">
+      <div class="crown-title">🔥 RULE FIRING NOW</div>
+      <div class="crown-count">2 SIGNALS</div>
+    </div>
+    <div class="alert-item">
+      <div class="title c-red">#1 · SHORT TOP · 1h · WR 74%</div>
+      <div class="detail">RSI &gt; 73 · MACD↓ · ATR 1.2% · 3/3 điều kiện ✓ · HTF 4h=DOWN</div>
+    </div>
+    <div class="alert-item" style="border-left-color: var(--green);">
+      <div class="title c-green">#2 · LONG BOUNCE · 15m · WR 68%</div>
+      <div class="detail">RSI &lt; 32 · StochK&lt;5 · EMA50 +0.3% · 3/3 ✓ · HTF 1h=UP</div>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 04 · ALERT BANNER (critical)</h2>
+  <div class="card" style="border:2px solid var(--red);">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="banner-title-critical">⚠ CRITICAL ALERTS · 2</div>
+    <div class="alert-item">
+      <div class="title">⚡ RSI 4h quá mua</div>
+      <div class="detail">RSI = 78.2 · ngưỡng 75</div>
+    </div>
+    <div class="alert-item" style="border-left-color: var(--yellow);">
+      <div class="title">⚡ Phân kỳ bearish 1h</div>
+      <div class="detail">Price HH · RSI LH · tín hiệu đảo chiều</div>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 05 · LIVE FEATURE SNAPSHOT</h2>
+  <div class="card grid-bg">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="mini-lbl">▼ LIVE FEATURE SNAPSHOT · 1H</div>
+    <div class="fsgrid">
+      <div class="fcell"><div class="hd"><div class="lbl">RSI 1H</div><div class="trend c-red">↑</div></div><div class="val">68.4</div><div class="sub">mạnh · nghiêng mua</div></div>
+      <div class="fcell"><div class="hd"><div class="lbl">MACD H</div><div class="trend c-green">↑</div></div><div class="val">+12.3</div><div class="sub">bull momentum</div></div>
+      <div class="fcell"><div class="hd"><div class="lbl">ATR %</div><div class="trend c-yellow">→</div></div><div class="val">0.82%</div><div class="sub">bình thường</div></div>
+      <div class="fcell"><div class="hd"><div class="lbl">EMA DIST</div><div class="trend c-green">↑</div></div><div class="val">+1.2%</div><div class="sub">xa vừa · trên</div></div>
+      <div class="fcell"><div class="hd"><div class="lbl">HTF 4H</div><div class="trend c-green">↑</div></div><div class="val c-green">UP</div><div class="sub">trend UP rõ</div></div>
+      <div class="fcell"><div class="hd"><div class="lbl">HTF 1D</div><div class="trend c-green">↑</div></div><div class="val c-green">UP</div><div class="sub">trend UP rõ</div></div>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 06 · LIVE RULES SUMMARY</h2>
+  <div class="card grid-bg">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="mini-lbl">▼ LIVE RULES SUMMARY · 18 TRACKED</div>
+    <div class="sgrid">
+      <div class="cell on-fired"><div class="val c-red">2</div><div class="lbl c-red">FIRED</div></div>
+      <div class="cell on-armed"><div class="val c-yellow">4</div><div class="lbl c-yellow">ARMED</div></div>
+      <div class="cell on-blk"><div class="val c-dim">6</div><div class="lbl c-dim">HTF BLK</div></div>
+      <div class="cell on-blk"><div class="val c-dim">3</div><div class="lbl c-dim">FEAT BLK</div></div>
+      <div class="cell"><div class="val c-fade">3</div><div class="lbl c-fade">OFF</div></div>
+    </div>
+    <div class="hint-box">
+      <div class="hint-title">▸ WAITING ON:</div>
+      <div class="hint-line">· 4 rule waiting <b>HTF 4h=UP</b></div>
+      <div class="hint-line">· 3 rule waiting <b>RSI &lt; 32</b></div>
+      <div class="hint-line">· 2 rule waiting <b>ATR &lt; 0.5%</b></div>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 07 · TRADING RULES PANEL</h2>
+  <div style="color:var(--orange); font-size:12px; font-weight:800; letter-spacing:2px; margin-bottom:8px;">▼ RULE TRACKER · 18 ACTIVE</div>
+  <div class="tftabs">
+    <div class="t">5M</div><div class="t active">15M</div><div class="t">1H</div><div class="t">4H</div><div class="t">1D</div><div class="t">1W</div><div class="t">1MO</div>
+  </div>
+  <div class="rule-card firing tracked">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="rule-hd"><div class="rule-name">#1 SHORT TOP 1h</div><div class="rule-wr">WR 74%</div></div>
+    <div class="rule-stats"><div class="stat-pill">RSI&gt;73</div><div class="stat-pill">MACD↓</div><div class="stat-pill">ATR 1.2%</div><div class="stat-pill c-red">3/3 ✓</div></div>
+  </div>
+  <div class="rule-card">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="rule-hd"><div class="rule-name">#2 LONG BOUNCE 15m</div><div class="rule-wr">WR 68%</div></div>
+    <div class="rule-stats"><div class="stat-pill">RSI&lt;32</div><div class="stat-pill">StochK&lt;5</div><div class="stat-pill c-yellow">2/3 ✓</div></div>
+  </div>
+
+  <h2 class="sect">▼ 08 · BINANCE CHART</h2>
+  <div style="color:var(--orange); font-size:11px; font-weight:800; letter-spacing:2px; margin-bottom:8px;">▼ CHART · BTC/USDT · 1H</div>
+  <div class="tftabs">
+    <div class="t">5M</div><div class="t">15M</div><div class="t active">1H</div><div class="t">4H</div><div class="t">1D</div><div class="t">1W</div><div class="t">1MO</div>
+  </div>
+  <div class="chart-box">
+    <span class="chart-lbl">▼ CANDLES · 100 BARS</span>
+    [candlestick chart here]
+  </div>
+  <div class="chart-box" style="height:80px;">
+    <span class="chart-lbl">▼ RSI · 14</span>
+    [RSI subchart]
+  </div>
+
+  <h2 class="sect">▼ 09 · TIMEFRAME TABLE</h2>
+  <div class="tfttitle">▼ MULTI-TF SCAN</div>
+  <div class="tftable">
+    <div class="tft-row tft-head">
+      <div class="tft-cell">TF</div><div class="tft-cell">RSI</div><div class="tft-cell">STOCH K</div><div class="tft-cell">STATE</div><div class="tft-cell">▾</div>
+    </div>
+    <div class="tft-row">
+      <div class="tft-cell tft-label">5M</div><div class="tft-cell">52.3</div><div class="tft-cell">48.2</div><div class="tft-cell"><span class="badge-sq">NEUTRAL</span></div><div class="tft-cell c-dim">+</div>
+    </div>
+    <div class="tft-row">
+      <div class="tft-cell tft-label">15M</div><div class="tft-cell c-yellow">72.1</div><div class="tft-cell c-red">95.3</div><div class="tft-cell"><span class="badge-sq c-red">HOT</span></div><div class="tft-cell c-dim">+</div>
+    </div>
+    <div class="tft-row">
+      <div class="tft-cell tft-label">1H</div><div class="tft-cell">68.4</div><div class="tft-cell">82.1</div><div class="tft-cell"><span class="badge-sq c-green">BULL</span></div><div class="tft-cell c-dim">+</div>
+    </div>
+    <div class="tft-row">
+      <div class="tft-cell tft-label">4H</div><div class="tft-cell">62.0</div><div class="tft-cell">71.5</div><div class="tft-cell"><span class="badge-sq c-green">BULL</span></div><div class="tft-cell c-dim">+</div>
+    </div>
+    <div class="tft-row">
+      <div class="tft-cell tft-label">1D</div><div class="tft-cell">58.3</div><div class="tft-cell">62.0</div><div class="tft-cell"><span class="badge-sq c-green">BULL</span></div><div class="tft-cell c-dim">+</div>
+    </div>
+  </div>
+
+  <h2 class="sect">▼ 10 · ALERT LOG</h2>
+  <div class="card grid-bg">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="mini-lbl">▼ ALERT LOG · 6</div>
+    <div class="alog-item"><div class="alog-icon">⚠</div><div class="alog-msg">RSI 4h quá mua (78.2)</div><div class="alog-time">10:42:18</div></div>
+    <div class="alog-item"><div class="alog-icon">💎</div><div class="alog-msg">StochRSI 15m quá bán</div><div class="alog-time">10:35:02</div></div>
+    <div class="alog-item"><div class="alog-icon">📈</div><div class="alog-msg">Phân kỳ bullish 1h</div><div class="alog-time">10:12:55</div></div>
+    <div class="alog-item"><div class="alog-icon">🚨</div><div class="alog-msg">2 khung kề nhau quá mua</div><div class="alog-time">09:58:31</div></div>
+  </div>
+
+  <h2 class="sect">▼ 11 · SETTINGS PANEL</h2>
+  <div class="card" style="padding:16px;">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div style="color:var(--orange); font-size:12px; font-weight:800; letter-spacing:2px; text-align:center; margin-bottom:12px;">CÀI ĐẶT</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 4px; border-bottom:1px solid var(--border-soft);">
+      <div><div style="color:var(--text); font-size:12px;">📳 Rung</div><div style="color:var(--dim); font-size:9px; margin-top:1px;">Rung khi có cảnh báo mới</div></div>
+      <div style="width:40px; height:20px; background:rgba(247,147,26,0.4); border-radius:10px; position:relative;"><div style="position:absolute; right:2px; top:2px; width:16px; height:16px; background:var(--orange); border-radius:50%;"></div></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 4px; border-bottom:1px solid var(--border-soft);">
+      <div><div style="color:var(--text); font-size:12px;">🔥 RSI Quá Mua</div><div style="color:var(--dim); font-size:9px; margin-top:1px;">Cảnh báo RSI &gt; ngưỡng</div></div>
+      <div style="width:40px; height:20px; background:rgba(247,147,26,0.4); border-radius:10px; position:relative;"><div style="position:absolute; right:2px; top:2px; width:16px; height:16px; background:var(--orange); border-radius:50%;"></div></div>
+    </div>
+    <div style="display:flex; gap:12px; margin-top:12px;">
+      <div style="flex:1;">
+        <div style="color:var(--dim); font-size:9px; letter-spacing:1px; margin-bottom:4px;">NGƯỠNG QUÁ MUA</div>
+        <div style="background:var(--surface); border:1px solid var(--border); padding:10px; text-align:center; color:var(--text); font-weight:800;">75</div>
+      </div>
+      <div style="flex:1;">
+        <div style="color:var(--dim); font-size:9px; letter-spacing:1px; margin-bottom:4px;">NGƯỠNG QUÁ BÁN</div>
+        <div style="background:var(--surface); border:1px solid var(--border); padding:10px; text-align:center; color:var(--text); font-weight:800;">25</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="ln">Cập nhật: 10:42:18</div>
+    <div class="ln">Dữ liệu: Binance · Tự động: 30s · Kéo xuống để làm mới</div>
+    <div class="ver">v4.3.19 · BUILD 2026-04-21</div>
+  </div>
+
+</div>
+
+</body>
+</html>

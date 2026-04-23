@@ -1,0 +1,20 @@
+{
+  "label": "MyRule#1 — Divergence + 1H Uptrend (15m LONG)",
+  "tfKey": "15m",
+  "forceSide": "LONG",
+  "config": {
+    "leverage": 100,
+    "targetPct": 2.0,
+    "stopPct": 1.0,
+    "maxHoldBars": 50,
+    "minScore": 1,
+    "stochOSLevel": 95,
+    "stochOBLevel": 5,
+    "rsiOSLevel": 90,
+    "rsiOBLevel": 10,
+    "requiredConditions": ["stochExtreme", "rsiExtreme", "divergence"],
+    "forceSide": "LONG",
+    "htfTrendFilter": { "mode": "near_match" }
+  },
+  "note": "RSI<90 và Stoch<95 gần như luôn khớp → rule thực chất dựa vào PHÂN KỲ + 1H UP trend."
+}

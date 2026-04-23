@@ -1,0 +1,1892 @@
+{
+  "tf": "15m",
+  "leverage": 100,
+  "feePerSide": 0.05,
+  "candlesAnalyzed": 10000,
+  "period": {
+    "from": "2026-01-02T23:45:00.000Z",
+    "to": "2026-04-17T03:30:00.000Z"
+  },
+  "profitable": 5,
+  "total": 240,
+  "topResults": [
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 65,
+      "wins": 26,
+      "losses": 36,
+      "timeouts": 3,
+      "realWR": 41.9,
+      "grossPnL": 1600,
+      "feeCost": 650,
+      "netPnL": 950,
+      "avgHoldBars": 30.6
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 65,
+      "wins": 18,
+      "losses": 39,
+      "timeouts": 8,
+      "realWR": 31.6,
+      "grossPnL": 1500,
+      "feeCost": 650,
+      "netPnL": 850,
+      "avgHoldBars": 44.2
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 65,
+      "wins": 19,
+      "losses": 30,
+      "timeouts": 16,
+      "realWR": 38.8,
+      "grossPnL": 1200,
+      "feeCost": 650,
+      "netPnL": 550,
+      "avgHoldBars": 59.1
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 10,
+      "sl": 5,
+      "fires": 65,
+      "wins": 2,
+      "losses": 2,
+      "timeouts": 61,
+      "realWR": 50,
+      "grossPnL": 1000,
+      "feeCost": 650,
+      "netPnL": 350,
+      "avgHoldBars": 99.1
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 30,
+      "wins": 13,
+      "losses": 17,
+      "timeouts": 0,
+      "realWR": 43.3,
+      "grossPnL": 450,
+      "feeCost": 300,
+      "netPnL": 150,
+      "avgHoldBars": 15.2
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 30,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 30,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 300,
+      "netPnL": -300,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 30,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 30,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 300,
+      "netPnL": -300,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 30,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 30,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 300,
+      "netPnL": -300,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 98,
+      "wins": 26,
+      "losses": 48,
+      "timeouts": 24,
+      "realWR": 35.1,
+      "grossPnL": 600,
+      "feeCost": 980,
+      "netPnL": -380,
+      "avgHoldBars": 52.8
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 10,
+      "sl": 5,
+      "fires": 58,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 58,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 580,
+      "netPnL": -580,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 15,
+      "sl": 5,
+      "fires": 58,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 58,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 580,
+      "netPnL": -580,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 58,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 58,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 580,
+      "netPnL": -580,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 58,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 58,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 580,
+      "netPnL": -580,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 58,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 58,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 580,
+      "netPnL": -580,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 65,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 65,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 650,
+      "netPnL": -650,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 65,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 65,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 650,
+      "netPnL": -650,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 8,
+      "sl": 4,
+      "fires": 30,
+      "wins": 0,
+      "losses": 1,
+      "timeouts": 29,
+      "realWR": 0,
+      "grossPnL": -400,
+      "feeCost": 300,
+      "netPnL": -700,
+      "avgHoldBars": 98.7
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 58,
+      "wins": 17,
+      "losses": 37,
+      "timeouts": 4,
+      "realWR": 31.5,
+      "grossPnL": -150,
+      "feeCost": 580,
+      "netPnL": -730,
+      "avgHoldBars": 21.5
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 98,
+      "wins": 34,
+      "losses": 64,
+      "timeouts": 0,
+      "realWR": 34.7,
+      "grossPnL": 200,
+      "feeCost": 980,
+      "netPnL": -780,
+      "avgHoldBars": 10.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 10,
+      "sl": 5,
+      "fires": 30,
+      "wins": 0,
+      "losses": 1,
+      "timeouts": 29,
+      "realWR": 0,
+      "grossPnL": -500,
+      "feeCost": 300,
+      "netPnL": -800,
+      "avgHoldBars": 98.8
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 15,
+      "sl": 5,
+      "fires": 30,
+      "wins": 0,
+      "losses": 1,
+      "timeouts": 29,
+      "realWR": 0,
+      "grossPnL": -500,
+      "feeCost": 300,
+      "netPnL": -800,
+      "avgHoldBars": 98.8
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 30,
+      "wins": 8,
+      "losses": 22,
+      "timeouts": 0,
+      "realWR": 26.7,
+      "grossPnL": -600,
+      "feeCost": 300,
+      "netPnL": -900,
+      "avgHoldBars": 30.2
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 90,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 90,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 900,
+      "netPnL": -900,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 90,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 90,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 900,
+      "netPnL": -900,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 90,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 90,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 900,
+      "netPnL": -900,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 98,
+      "wins": 30,
+      "losses": 60,
+      "timeouts": 8,
+      "realWR": 33.3,
+      "grossPnL": 0,
+      "feeCost": 980,
+      "netPnL": -980,
+      "avgHoldBars": 27.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 65,
+      "wins": 19,
+      "losses": 46,
+      "timeouts": 0,
+      "realWR": 29.2,
+      "grossPnL": -400,
+      "feeCost": 650,
+      "netPnL": -1050,
+      "avgHoldBars": 12
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 5,
+      "sl": 3,
+      "fires": 30,
+      "wins": 1,
+      "losses": 5,
+      "timeouts": 24,
+      "realWR": 16.7,
+      "grossPnL": -1000,
+      "feeCost": 300,
+      "netPnL": -1300,
+      "avgHoldBars": 88.9
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 72,
+      "wins": 20,
+      "losses": 52,
+      "timeouts": 0,
+      "realWR": 27.8,
+      "grossPnL": -600,
+      "feeCost": 720,
+      "netPnL": -1320,
+      "avgHoldBars": 8.7
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 65,
+      "wins": 0,
+      "losses": 1,
+      "timeouts": 64,
+      "realWR": 0,
+      "grossPnL": -700,
+      "feeCost": 650,
+      "netPnL": -1350,
+      "avgHoldBars": 99.4
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 30,
+      "wins": 4,
+      "losses": 23,
+      "timeouts": 3,
+      "realWR": 14.8,
+      "grossPnL": -1100,
+      "feeCost": 300,
+      "netPnL": -1400,
+      "avgHoldBars": 37.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 142,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 142,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 1420,
+      "netPnL": -1420,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 142,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 142,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 1420,
+      "netPnL": -1420,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 142,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 142,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 1420,
+      "netPnL": -1420,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 142,
+      "wins": 47,
+      "losses": 95,
+      "timeouts": 0,
+      "realWR": 33.1,
+      "grossPnL": -50,
+      "feeCost": 1420,
+      "netPnL": -1470,
+      "avgHoldBars": 10.2
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 5,
+      "sl": 2.5,
+      "fires": 30,
+      "wins": 1,
+      "losses": 7,
+      "timeouts": 22,
+      "realWR": 12.5,
+      "grossPnL": -1250,
+      "feeCost": 300,
+      "netPnL": -1550,
+      "avgHoldBars": 84.6
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 58,
+      "wins": 13,
+      "losses": 36,
+      "timeouts": 9,
+      "realWR": 26.5,
+      "grossPnL": -1000,
+      "feeCost": 580,
+      "netPnL": -1580,
+      "avgHoldBars": 34
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 98,
+      "wins": 19,
+      "losses": 63,
+      "timeouts": 16,
+      "realWR": 23.2,
+      "grossPnL": -600,
+      "feeCost": 980,
+      "netPnL": -1580,
+      "avgHoldBars": 37.6
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 90,
+      "wins": 25,
+      "losses": 65,
+      "timeouts": 0,
+      "realWR": 27.8,
+      "grossPnL": -750,
+      "feeCost": 900,
+      "netPnL": -1650,
+      "avgHoldBars": 9.1
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 15,
+      "sl": 5,
+      "fires": 65,
+      "wins": 0,
+      "losses": 2,
+      "timeouts": 63,
+      "realWR": 0,
+      "grossPnL": -1000,
+      "feeCost": 650,
+      "netPnL": -1650,
+      "avgHoldBars": 99.3
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 177,
+      "wins": 58,
+      "losses": 115,
+      "timeouts": 4,
+      "realWR": 33.5,
+      "grossPnL": 50,
+      "feeCost": 1770,
+      "netPnL": -1720,
+      "avgHoldBars": 13.6
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 72,
+      "wins": 20,
+      "losses": 50,
+      "timeouts": 2,
+      "realWR": 28.6,
+      "grossPnL": -1000,
+      "feeCost": 720,
+      "netPnL": -1720,
+      "avgHoldBars": 26.4
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 8,
+      "sl": 3,
+      "fires": 30,
+      "wins": 0,
+      "losses": 5,
+      "timeouts": 25,
+      "realWR": 0,
+      "grossPnL": -1500,
+      "feeCost": 300,
+      "netPnL": -1800,
+      "avgHoldBars": 89.9
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 10,
+      "sl": 3,
+      "fires": 30,
+      "wins": 0,
+      "losses": 5,
+      "timeouts": 25,
+      "realWR": 0,
+      "grossPnL": -1500,
+      "feeCost": 300,
+      "netPnL": -1800,
+      "avgHoldBars": 89.9
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+MACD",
+      "conditionKeys": [
+        "divergence",
+        "macdCross"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 491,
+      "wins": 181,
+      "losses": 300,
+      "timeouts": 10,
+      "realWR": 37.6,
+      "grossPnL": 3100,
+      "feeCost": 4910,
+      "netPnL": -1810,
+      "avgHoldBars": 17.9
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 30,
+      "wins": 5,
+      "losses": 21,
+      "timeouts": 4,
+      "realWR": 19.2,
+      "grossPnL": -1650,
+      "feeCost": 300,
+      "netPnL": -1950,
+      "avgHoldBars": 49.4
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 98,
+      "wins": 0,
+      "losses": 1,
+      "timeouts": 97,
+      "realWR": 0,
+      "grossPnL": -1000,
+      "feeCost": 980,
+      "netPnL": -1980,
+      "avgHoldBars": 99.3
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 5,
+      "sl": 2,
+      "fires": 30,
+      "wins": 1,
+      "losses": 11,
+      "timeouts": 18,
+      "realWR": 8.3,
+      "grossPnL": -1700,
+      "feeCost": 300,
+      "netPnL": -2000,
+      "avgHoldBars": 76.7
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div",
+      "conditionKeys": [
+        "divergence"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 885,
+      "wins": 335,
+      "losses": 536,
+      "timeouts": 14,
+      "realWR": 38.5,
+      "grossPnL": 6700,
+      "feeCost": 8850,
+      "netPnL": -2150,
+      "avgHoldBars": 17.8
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 98,
+      "wins": 0,
+      "losses": 2,
+      "timeouts": 96,
+      "realWR": 0,
+      "grossPnL": -1600,
+      "feeCost": 980,
+      "netPnL": -2580,
+      "avgHoldBars": 98.7
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 8,
+      "sl": 4,
+      "fires": 65,
+      "wins": 3,
+      "losses": 11,
+      "timeouts": 51,
+      "realWR": 21.4,
+      "grossPnL": -2000,
+      "feeCost": 650,
+      "netPnL": -2650,
+      "avgHoldBars": 93.6
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 2.5,
+      "fires": 98,
+      "wins": 12,
+      "losses": 31,
+      "timeouts": 55,
+      "realWR": 27.9,
+      "grossPnL": -1750,
+      "feeCost": 980,
+      "netPnL": -2730,
+      "avgHoldBars": 75.7
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 177,
+      "wins": 0,
+      "losses": 1,
+      "timeouts": 176,
+      "realWR": 0,
+      "grossPnL": -1000,
+      "feeCost": 1770,
+      "netPnL": -2770,
+      "avgHoldBars": 99.6
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div",
+      "conditionKeys": [
+        "divergence"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 885,
+      "wins": 271,
+      "losses": 482,
+      "timeouts": 132,
+      "realWR": 36,
+      "grossPnL": 6000,
+      "feeCost": 8850,
+      "netPnL": -2850,
+      "avgHoldBars": 44
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 2,
+      "fires": 65,
+      "wins": 5,
+      "losses": 24,
+      "timeouts": 36,
+      "realWR": 17.2,
+      "grossPnL": -2300,
+      "feeCost": 650,
+      "netPnL": -2950,
+      "avgHoldBars": 72.2
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 98,
+      "wins": 1,
+      "losses": 5,
+      "timeouts": 92,
+      "realWR": 16.7,
+      "grossPnL": -2000,
+      "feeCost": 980,
+      "netPnL": -2980,
+      "avgHoldBars": 97.3
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 177,
+      "wins": 49,
+      "losses": 111,
+      "timeouts": 17,
+      "realWR": 30.6,
+      "grossPnL": -1300,
+      "feeCost": 1770,
+      "netPnL": -3070,
+      "avgHoldBars": 29.1
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 3,
+      "fires": 98,
+      "wins": 12,
+      "losses": 27,
+      "timeouts": 59,
+      "realWR": 30.8,
+      "grossPnL": -2100,
+      "feeCost": 980,
+      "netPnL": -3080,
+      "avgHoldBars": 79.9
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 90,
+      "wins": 22,
+      "losses": 66,
+      "timeouts": 2,
+      "realWR": 25,
+      "grossPnL": -2200,
+      "feeCost": 900,
+      "netPnL": -3100,
+      "avgHoldBars": 25.4
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 177,
+      "wins": 0,
+      "losses": 2,
+      "timeouts": 175,
+      "realWR": 0,
+      "grossPnL": -1600,
+      "feeCost": 1770,
+      "netPnL": -3370,
+      "avgHoldBars": 99.3
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 58,
+      "wins": 5,
+      "losses": 44,
+      "timeouts": 9,
+      "realWR": 10.2,
+      "grossPnL": -2900,
+      "feeCost": 580,
+      "netPnL": -3480,
+      "avgHoldBars": 42.3
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 72,
+      "wins": 9,
+      "losses": 55,
+      "timeouts": 8,
+      "realWR": 14.1,
+      "grossPnL": -2800,
+      "feeCost": 720,
+      "netPnL": -3520,
+      "avgHoldBars": 35.7
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 2,
+      "fires": 98,
+      "wins": 11,
+      "losses": 41,
+      "timeouts": 46,
+      "realWR": 21.2,
+      "grossPnL": -2700,
+      "feeCost": 980,
+      "netPnL": -3680,
+      "avgHoldBars": 70.4
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 15,
+      "sl": 7,
+      "fires": 177,
+      "wins": 1,
+      "losses": 5,
+      "timeouts": 171,
+      "realWR": 16.7,
+      "grossPnL": -2000,
+      "feeCost": 1770,
+      "netPnL": -3770,
+      "avgHoldBars": 98.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 90,
+      "wins": 12,
+      "losses": 68,
+      "timeouts": 10,
+      "realWR": 15,
+      "grossPnL": -3200,
+      "feeCost": 900,
+      "netPnL": -4100,
+      "avgHoldBars": 35.2
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 2.5,
+      "fires": 65,
+      "wins": 5,
+      "losses": 24,
+      "timeouts": 36,
+      "realWR": 17.2,
+      "grossPnL": -3500,
+      "feeCost": 650,
+      "netPnL": -4150,
+      "avgHoldBars": 74.7
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 8,
+      "sl": 4,
+      "fires": 58,
+      "wins": 2,
+      "losses": 13,
+      "timeouts": 43,
+      "realWR": 13.3,
+      "grossPnL": -3600,
+      "feeCost": 580,
+      "netPnL": -4180,
+      "avgHoldBars": 90.8
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 5,
+      "sl": 2.5,
+      "fires": 58,
+      "wins": 3,
+      "losses": 21,
+      "timeouts": 34,
+      "realWR": 12.5,
+      "grossPnL": -3750,
+      "feeCost": 580,
+      "netPnL": -4330,
+      "avgHoldBars": 81.4
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 58,
+      "wins": 5,
+      "losses": 36,
+      "timeouts": 17,
+      "realWR": 12.2,
+      "grossPnL": -3900,
+      "feeCost": 580,
+      "netPnL": -4480,
+      "avgHoldBars": 64.2
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 142,
+      "wins": 36,
+      "losses": 103,
+      "timeouts": 3,
+      "realWR": 25.9,
+      "grossPnL": -3100,
+      "feeCost": 1420,
+      "netPnL": -4520,
+      "avgHoldBars": 26.8
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 5,
+      "sl": 2,
+      "fires": 58,
+      "wins": 3,
+      "losses": 28,
+      "timeouts": 27,
+      "realWR": 9.7,
+      "grossPnL": -4100,
+      "feeCost": 580,
+      "netPnL": -4680,
+      "avgHoldBars": 77
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 3,
+      "fires": 65,
+      "wins": 5,
+      "losses": 22,
+      "timeouts": 38,
+      "realWR": 18.5,
+      "grossPnL": -4100,
+      "feeCost": 650,
+      "netPnL": -4750,
+      "avgHoldBars": 79.8
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 8,
+      "sl": 3,
+      "fires": 65,
+      "wins": 3,
+      "losses": 22,
+      "timeouts": 40,
+      "realWR": 12,
+      "grossPnL": -4200,
+      "feeCost": 650,
+      "netPnL": -4850,
+      "avgHoldBars": 82.1
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+MACD",
+      "conditionKeys": [
+        "divergence",
+        "macdCross"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 491,
+      "wins": 140,
+      "losses": 280,
+      "timeouts": 71,
+      "realWR": 33.3,
+      "grossPnL": 0,
+      "feeCost": 4910,
+      "netPnL": -4910,
+      "avgHoldBars": 44.1
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+MACD",
+      "conditionKeys": [
+        "divergence",
+        "macdCross"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 491,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 491,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 4910,
+      "netPnL": -4910,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 8,
+      "sl": 3,
+      "fires": 58,
+      "wins": 2,
+      "losses": 20,
+      "timeouts": 36,
+      "realWR": 9.1,
+      "grossPnL": -4400,
+      "feeCost": 580,
+      "netPnL": -4980,
+      "avgHoldBars": 84.8
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "BB",
+      "conditionKeys": [
+        "bollingerTouch"
+      ],
+      "tp": 2,
+      "sl": 1,
+      "fires": 565,
+      "wins": 170,
+      "losses": 334,
+      "timeouts": 61,
+      "realWR": 33.7,
+      "grossPnL": 600,
+      "feeCost": 5650,
+      "netPnL": -5050,
+      "avgHoldBars": 36.9
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 5,
+      "sl": 3,
+      "fires": 58,
+      "wins": 3,
+      "losses": 20,
+      "timeouts": 35,
+      "realWR": 13,
+      "grossPnL": -4500,
+      "feeCost": 580,
+      "netPnL": -5080,
+      "avgHoldBars": 84.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+MACD",
+      "conditionKeys": [
+        "divergence",
+        "macdCross"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 491,
+      "wins": 104,
+      "losses": 210,
+      "timeouts": 177,
+      "realWR": 33.1,
+      "grossPnL": -300,
+      "feeCost": 4910,
+      "netPnL": -5210,
+      "avgHoldBars": 64.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 10,
+      "sl": 3,
+      "fires": 65,
+      "wins": 2,
+      "losses": 22,
+      "timeouts": 41,
+      "realWR": 8.3,
+      "grossPnL": -4600,
+      "feeCost": 650,
+      "netPnL": -5250,
+      "avgHoldBars": 82.2
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 2,
+      "fires": 72,
+      "wins": 6,
+      "losses": 38,
+      "timeouts": 28,
+      "realWR": 13.6,
+      "grossPnL": -4600,
+      "feeCost": 720,
+      "netPnL": -5320,
+      "avgHoldBars": 66.9
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 72,
+      "wins": 10,
+      "losses": 51,
+      "timeouts": 11,
+      "realWR": 16.4,
+      "grossPnL": -4650,
+      "feeCost": 720,
+      "netPnL": -5370,
+      "avgHoldBars": 47.6
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 90,
+      "wins": 15,
+      "losses": 60,
+      "timeouts": 15,
+      "realWR": 20,
+      "grossPnL": -4500,
+      "feeCost": 900,
+      "netPnL": -5400,
+      "avgHoldBars": 50.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 10,
+      "sl": 5,
+      "fires": 90,
+      "wins": 0,
+      "losses": 9,
+      "timeouts": 81,
+      "realWR": 0,
+      "grossPnL": -4500,
+      "feeCost": 900,
+      "netPnL": -5400,
+      "avgHoldBars": 96.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 15,
+      "sl": 5,
+      "fires": 90,
+      "wins": 0,
+      "losses": 9,
+      "timeouts": 81,
+      "realWR": 0,
+      "grossPnL": -4500,
+      "feeCost": 900,
+      "netPnL": -5400,
+      "avgHoldBars": 96.5
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "BB",
+      "conditionKeys": [
+        "bollingerTouch"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 565,
+      "wins": 186,
+      "losses": 370,
+      "timeouts": 9,
+      "realWR": 33.5,
+      "grossPnL": 100,
+      "feeCost": 5650,
+      "netPnL": -5550,
+      "avgHoldBars": 13.9
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "BB",
+      "conditionKeys": [
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 10,
+      "fires": 565,
+      "wins": 0,
+      "losses": 0,
+      "timeouts": 565,
+      "realWR": 0,
+      "grossPnL": 0,
+      "feeCost": 5650,
+      "netPnL": -5650,
+      "avgHoldBars": 100
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 177,
+      "wins": 28,
+      "losses": 123,
+      "timeouts": 26,
+      "realWR": 18.5,
+      "grossPnL": -3900,
+      "feeCost": 1770,
+      "netPnL": -5670,
+      "avgHoldBars": 37.9
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 3,
+      "sl": 1,
+      "fires": 142,
+      "wins": 21,
+      "losses": 106,
+      "timeouts": 15,
+      "realWR": 16.5,
+      "grossPnL": -4300,
+      "feeCost": 1420,
+      "netPnL": -5720,
+      "avgHoldBars": 36.5
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 2.5,
+      "fires": 72,
+      "wins": 6,
+      "losses": 32,
+      "timeouts": 34,
+      "realWR": 15.8,
+      "grossPnL": -5000,
+      "feeCost": 720,
+      "netPnL": -5720,
+      "avgHoldBars": 70
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "Div+BB",
+      "conditionKeys": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "tp": 5,
+      "sl": 3,
+      "fires": 72,
+      "wins": 6,
+      "losses": 27,
+      "timeouts": 39,
+      "realWR": 18.2,
+      "grossPnL": -5100,
+      "feeCost": 720,
+      "netPnL": -5820,
+      "avgHoldBars": 75.3
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 15,
+      "sl": 5,
+      "fires": 98,
+      "wins": 1,
+      "losses": 13,
+      "timeouts": 84,
+      "realWR": 7.1,
+      "grossPnL": -5000,
+      "feeCost": 980,
+      "netPnL": -5980,
+      "avgHoldBars": 92.7
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "BB",
+      "conditionKeys": [
+        "bollingerTouch"
+      ],
+      "tp": 1,
+      "sl": 0.5,
+      "fires": 617,
+      "wins": 200,
+      "losses": 401,
+      "timeouts": 16,
+      "realWR": 33.3,
+      "grossPnL": -50,
+      "feeCost": 6170,
+      "netPnL": -6220,
+      "avgHoldBars": 14.5
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 3,
+      "sl": 1.5,
+      "fires": 177,
+      "wins": 35,
+      "losses": 100,
+      "timeouts": 42,
+      "realWR": 25.9,
+      "grossPnL": -4500,
+      "feeCost": 1770,
+      "netPnL": -6270,
+      "avgHoldBars": 54.3
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 10,
+      "sl": 5,
+      "fires": 98,
+      "wins": 1,
+      "losses": 13,
+      "timeouts": 84,
+      "realWR": 7.1,
+      "grossPnL": -5500,
+      "feeCost": 980,
+      "netPnL": -6480,
+      "avgHoldBars": 92.3
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI+BB",
+      "conditionKeys": [
+        "rsiExtreme",
+        "bollingerTouch"
+      ],
+      "tp": 8,
+      "sl": 4,
+      "fires": 90,
+      "wins": 0,
+      "losses": 14,
+      "timeouts": 76,
+      "realWR": 0,
+      "grossPnL": -5600,
+      "feeCost": 900,
+      "netPnL": -6500,
+      "avgHoldBars": 92.4
+    },
+    {
+      "type": "LONG",
+      "conditionLabel": "RSI+MACD",
+      "conditionKeys": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "tp": 10,
+      "sl": 3,
+      "fires": 58,
+      "wins": 0,
+      "losses": 20,
+      "timeouts": 38,
+      "realWR": 0,
+      "grossPnL": -6000,
+      "feeCost": 580,
+      "netPnL": -6580,
+      "avgHoldBars": 85
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 10,
+      "sl": 5,
+      "fires": 142,
+      "wins": 0,
+      "losses": 11,
+      "timeouts": 131,
+      "realWR": 0,
+      "grossPnL": -5500,
+      "feeCost": 1420,
+      "netPnL": -6920,
+      "avgHoldBars": 97
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "RSI",
+      "conditionKeys": [
+        "rsiExtreme"
+      ],
+      "tp": 15,
+      "sl": 5,
+      "fires": 142,
+      "wins": 0,
+      "losses": 11,
+      "timeouts": 131,
+      "realWR": 0,
+      "grossPnL": -5500,
+      "feeCost": 1420,
+      "netPnL": -6920,
+      "avgHoldBars": 97
+    },
+    {
+      "type": "SHORT",
+      "conditionLabel": "BB",
+      "conditionKeys": [
+        "bollingerTouch"
+      ],
+      "tp": 20,
+      "sl": 8,
+      "fires": 565,
+      "wins": 0,
+      "losses": 2,
+      "timeouts": 563,
+      "realWR": 0,
+      "grossPnL": -1600,
+      "feeCost": 5650,
+      "netPnL": -7250,
+      "avgHoldBars": 99.9
+    }
+  ]
+}

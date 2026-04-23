@@ -1,0 +1,20 @@
+{
+  "label": "MyRule#2 — Ride 1H Uptrend (15m LONG, TP 5% / SL 3%)",
+  "tfKey": "15m",
+  "forceSide": "LONG",
+  "config": {
+    "leverage": 100,
+    "targetPct": 5.0,
+    "stopPct": 3.0,
+    "maxHoldBars": 100,
+    "minScore": 1,
+    "stochOSLevel": 95,
+    "stochOBLevel": 5,
+    "rsiOSLevel": 90,
+    "rsiOBLevel": 10,
+    "requiredConditions": ["stochExtreme", "rsiExtreme"],
+    "forceSide": "LONG",
+    "htfTrendFilter": { "mode": "near_match" }
+  },
+  "note": "RSI<90 & Stoch<95 luôn đúng → rule thực chất chỉ là: mua mọi nến khi 1H UP. TP 5% / SL 3%. maxHoldBars tăng lên 100 vì TP rộng cần thời gian."
+}

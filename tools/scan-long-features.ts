@@ -1,0 +1,317 @@
+/**
+ * scan-long-features.ts
+ *
+ * Tommy task:
+ *   - Scan brute-force LONG mọi nến 15m & 1h (10K nến mỗi TF)
+ *   - Rule fix: TP +3% · SL -2% · maxHold 100 · lev 100 · fee 0.04%
+ *   - Ghi lại ~15 feature tại mỗi entry (RSI, MACD, BB%, Stoch, candle, EMA50, ATR%, prev reversal, HTF trend)
+ *   - Classify WIN / LOSS / TIMEOUT
+ *   - Phân tích:
+ *     • Win-rate tổng thể
+ *     • Single feature bucket WR (ví dụ RSI<30: WR=52%, N=340)
+ *     • Pair feature combo top WR
+ *   - Dump JSON → assets/scan_long_features.json
+ *
+ * Usage:
+ *   npx tsx tools/scan-long-features.ts
+ */
+
+import { writeFileSync } from "fs";
+import { join } from "path";
+import {
+  calcRSISeriesAligned,
+  calcMACDSeries,
+  calcBollingerSeries,
+  calcEMASeries,
+} from "../utils/indicators";
+
+const BINANCE = "https://api.binance.com/api/v3";
+
+const args = process.argv.slice(2);
+const getArg = (k: string, d: string) => { const a = args.find(x => x.startsWith(`--${k}=`)); return a ? a.split("=")[1] : d; };
+const CANDLES = parseInt(getArg("candles", "10000"), 10);
+const TP_PCT = parseFloat(getArg("tp", "3"));
+const SL_PCT = parseFloat(getArg("sl", "2"));
+const MAX_HOLD = parseInt(getArg("hold", "100"), 10);
+const LEV = parseFloat(getArg("lev", "100"));
+const FEE = parseFloat(getArg("fee", "0.04"));
+const FEE_PNL = FEE * 2 * LEV;
+
+interface Candle { time: number; open: number; high: number; low: number; close: number; volume: number; }
+
+async function fetchKlines(interval: string, total: number): Promise<Candle[]> {
+  const all: Candle[] = []; let endTime: number | undefined;
+  while (all.length < total) {
+    const limit = Math.min(1000, total - all.length);
+    const params = new URLSearchParams({ symbol: "BTCUSDT", interval, limit: String(limit) });
+    if (endTime) params.set("endTime", String(endTime));
+    const res = await fetch(`${BINANCE}/klines?${params}`);
+    const data: any[] = await res.json();
+    if (!data.length) break;
+    const batch = data.map(k => ({ time:k[0], open:+k[1], high:+k[2], low:+k[3], close:+k[4], volume:+k[5] }));
+    all.unshift(...batch);
+    endTime = batch[0].time - 1;
+    await new Promise(r => setTimeout(r, 80));
+  }
+  const m = new Map<number, Candle>(); for (const c of all) m.set(c.time, c);
+  return [...m.values()].sort((a,b) => a.time - b.time);
+}
+
+function findTFIndexAt(arr: Candle[], t: number): number {
+  let lo = 0, hi = arr.length - 1, ans = -1;
+  while (lo <= hi) { const mid = (lo + hi) >> 1; if (arr[mid].time <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+  return ans;
+}
+
+// ATR% 14
+function atrPct(candles: Candle[], i: number, period = 14): number | null {
+  if (i < period) return null;
+  let sum = 0;
+  for (let j = i - period + 1; j <= i; j++) {
+    const prevClose = j > 0 ? candles[j - 1].close : candles[j].open;
+    const tr = Math.max(
+      candles[j].high - candles[j].low,
+      Math.abs(candles[j].high - prevClose),
+      Math.abs(candles[j].low - prevClose),
+    );
+    sum += tr;
+  }
+  return (sum / period) / candles[i].close * 100;
+}
+
+// Simulate LONG TP/SL forward
+function simulate(candles: Candle[], entryIdx: number, tp: number, sl: number, maxHold: number): "WIN" | "LOSS" | "TIMEOUT" {
+  const entry = candles[entryIdx].close;
+  const tpAbs = entry * (1 + tp / 100);
+  const slAbs = entry * (1 - sl / 100);
+  for (let i = entryIdx + 1; i < Math.min(entryIdx + 1 + maxHold, candles.length); i++) {
+    if (candles[i].low <= slAbs) return "LOSS";
+    if (candles[i].high >= tpAbs) return "WIN";
+  }
+  return "TIMEOUT";
+}
+
+// Discretize continuous feature → bucket label
+function bucket(name: string, v: number | null): string {
+  if (v === null || !isFinite(v)) return `${name}:null`;
+  if (name === "rsi") {
+    if (v < 30) return "rsi:<30";
+    if (v < 45) return "rsi:30-45";
+    if (v < 55) return "rsi:45-55";
+    if (v < 70) return "rsi:55-70";
+    return "rsi:>70";
+  }
+  if (name === "macdHist") {
+    if (v < -50) return "macd:<-50";
+    if (v < 0) return "macd:-50..0";
+    if (v < 50) return "macd:0..50";
+    return "macd:>50";
+  }
+  if (name === "bbPct") {
+    if (v < 0) return "bb%:<0";
+    if (v < 0.25) return "bb%:0-25";
+    if (v < 0.5) return "bb%:25-50";
+    if (v < 0.75) return "bb%:50-75";
+    if (v <= 1) return "bb%:75-100";
+    return "bb%:>100";
+  }
+  if (name === "ema50Dist") {
+    if (v < -2) return "ema:<-2%";
+    if (v < -0.5) return "ema:-2..-0.5%";
+    if (v < 0.5) return "ema:-0.5..0.5%";
+    if (v < 2) return "ema:0.5..2%";
+    return "ema:>2%";
+  }
+  if (name === "atr") {
+    if (v < 0.3) return "atr:<0.3%";
+    if (v < 0.6) return "atr:0.3-0.6%";
+    if (v < 1.0) return "atr:0.6-1.0%";
+    if (v < 2.0) return "atr:1.0-2.0%";
+    return "atr:>2%";
+  }
+  if (name === "bodyPct") {
+    if (v < 0.1) return "body:<0.1%";
+    if (v < 0.3) return "body:0.1-0.3%";
+    if (v < 0.6) return "body:0.3-0.6%";
+    if (v < 1.2) return "body:0.6-1.2%";
+    return "body:>1.2%";
+  }
+  return `${name}:${v.toFixed(2)}`;
+}
+
+interface EntryRecord {
+  idx: number;
+  time: number;
+  outcome: "WIN" | "LOSS" | "TIMEOUT";
+  features: Record<string, string>;
+  raw: Record<string, number | null>;
+}
+
+async function scanTF(tfKey: string, htfKey: string) {
+  console.log(`\n=== Scan ${tfKey.toUpperCase()} (HTF=${htfKey}) ===`);
+  const [entry, htf] = await Promise.all([
+    fetchKlines(tfKey, CANDLES),
+    fetchKlines(htfKey, Math.ceil(CANDLES / (htfKey === "1h" ? 4 : htfKey === "4h" ? 16 : 1)) + 200),
+  ]);
+  console.log(`  got ${entry.length} entry, ${htf.length} htf`);
+
+  const closes = entry.map(c => c.close);
+  const highs = entry.map(c => c.high);
+  const lows = entry.map(c => c.low);
+  const rsiArr = calcRSISeriesAligned(closes, 14);
+  const macdArr = calcMACDSeries(closes);
+  const bbArr = calcBollingerSeries(closes);
+  const ema50Arr = calcEMASeries(closes, 50);
+
+  const htfCloses = htf.map(c => c.close);
+  const htfEma = calcEMASeries(htfCloses, 50);
+
+  const records: EntryRecord[] = [];
+  const startIdx = Math.max(50, 30);
+  const endIdx = entry.length - MAX_HOLD - 1;
+
+  for (let i = startIdx; i < endIdx; i++) {
+    const outcome = simulate(entry, i, TP_PCT, SL_PCT, MAX_HOLD);
+
+    const c = entry[i];
+    const prev = entry[i - 1];
+    const prevBull = prev.close >= prev.open;
+    const currBull = c.close >= c.open;
+    const reversal = prevBull === currBull ? "CONT" : (!prevBull && currBull ? "UP_REV" : "DOWN_REV");
+    const bodyPct = Math.abs(c.close - c.open) / c.open * 100;
+
+    const rsi = rsiArr[i];
+    const macdH = macdArr.histogram[i];
+    const bbUp = bbArr.upper[i], bbLo = bbArr.lower[i];
+    const bbPct = (bbUp != null && bbLo != null && bbUp !== bbLo) ? (c.close - bbLo) / (bbUp - bbLo) : null;
+    const ema50 = ema50Arr[i];
+    const emaDist = ema50 != null ? (c.close - ema50) / ema50 * 100 : null;
+    const atrP = atrPct(entry, i, 14);
+
+    // HTF trend at entry time
+    const htfI = findTFIndexAt(htf, c.time);
+    let htfTrend: string = "htf:na";
+    if (htfI >= 0 && htfEma[htfI] != null) {
+      const diff = (htf[htfI].close - htfEma[htfI]!) / htfEma[htfI]! * 100;
+      if (diff > 0.5) htfTrend = "htf:UP";
+      else if (diff < -0.5) htfTrend = "htf:DOWN";
+      else htfTrend = "htf:FLAT";
+    }
+
+    const features: Record<string, string> = {
+      rsi: bucket("rsi", rsi),
+      macdHist: bucket("macdHist", macdH),
+      bbPct: bucket("bbPct", bbPct),
+      ema50Dist: bucket("ema50Dist", emaDist),
+      atr: bucket("atr", atrP),
+      bodyPct: bucket("bodyPct", bodyPct),
+      candle: currBull ? "candle:BULL" : "candle:BEAR",
+      reversal: `rev:${reversal}`,
+      htf: htfTrend,
+    };
+
+    records.push({
+      idx: i,
+      time: c.time,
+      outcome,
+      features,
+      raw: { rsi, macdHist: macdH, bbPct, ema50Dist: emaDist, atr: atrP, bodyPct },
+    });
+  }
+
+  // Aggregate
+  const total = records.length;
+  const wins = records.filter(r => r.outcome === "WIN").length;
+  const losses = records.filter(r => r.outcome === "LOSS").length;
+  const timeouts = records.filter(r => r.outcome === "TIMEOUT").length;
+  const overallWR = wins / (wins + losses) * 100;
+
+  console.log(`  Total=${total} · W=${wins} L=${losses} T=${timeouts} · WR=${overallWR.toFixed(1)}% (excl timeout)`);
+
+  // Single-feature bucket analysis
+  const singleStats: Record<string, { n: number; w: number; l: number; t: number; wr: number; edge: number }> = {};
+  for (const r of records) {
+    for (const key of Object.keys(r.features)) {
+      const label = r.features[key];
+      if (!singleStats[label]) singleStats[label] = { n: 0, w: 0, l: 0, t: 0, wr: 0, edge: 0 };
+      const s = singleStats[label];
+      s.n++;
+      if (r.outcome === "WIN") s.w++;
+      else if (r.outcome === "LOSS") s.l++;
+      else s.t++;
+    }
+  }
+  for (const k of Object.keys(singleStats)) {
+    const s = singleStats[k];
+    s.wr = s.w + s.l > 0 ? (s.w / (s.w + s.l)) * 100 : 0;
+    s.edge = s.wr - overallWR;
+  }
+
+  // Pair-feature (top combos)
+  const pairStats: Record<string, { n: number; w: number; l: number; wr: number; edge: number }> = {};
+  const featKeys = ["rsi", "macdHist", "bbPct", "ema50Dist", "atr", "bodyPct", "candle", "reversal", "htf"];
+  for (const r of records) {
+    if (r.outcome === "TIMEOUT") continue;
+    for (let i = 0; i < featKeys.length; i++) {
+      for (let j = i + 1; j < featKeys.length; j++) {
+        const k = `${r.features[featKeys[i]]} & ${r.features[featKeys[j]]}`;
+        if (!pairStats[k]) pairStats[k] = { n: 0, w: 0, l: 0, wr: 0, edge: 0 };
+        const s = pairStats[k];
+        s.n++;
+        if (r.outcome === "WIN") s.w++;
+        else s.l++;
+      }
+    }
+  }
+  // Filter pairs with N >= 50 for meaningful stats
+  const pairFiltered: Record<string, { n: number; w: number; l: number; wr: number; edge: number }> = {};
+  for (const k of Object.keys(pairStats)) {
+    if (pairStats[k].n >= 50) {
+      const s = pairStats[k];
+      s.wr = (s.w / (s.w + s.l)) * 100;
+      s.edge = s.wr - overallWR;
+      pairFiltered[k] = s;
+    }
+  }
+
+  return {
+    tfKey,
+    total, wins, losses, timeouts, overallWR,
+    tp: TP_PCT, sl: SL_PCT, lev: LEV, feePnl: FEE_PNL, maxHold: MAX_HOLD,
+    singleStats,
+    pairStats: pairFiltered,
+    samples: records.slice(0, 100), // keep some raw samples for inspection
+  };
+}
+
+(async () => {
+  console.log(`=== scan-long-features ===`);
+  console.log(`Rule: LONG · TP +${TP_PCT}% · SL -${SL_PCT}% · maxHold ${MAX_HOLD} · lev ${LEV}x · fee ${FEE}% (round-trip ${FEE_PNL}%)`);
+
+  const res15m = await scanTF("15m", "1h");
+  const res1h = await scanTF("1h", "4h");
+
+  const out = { generatedAt: new Date().toISOString(), params: { TP_PCT, SL_PCT, MAX_HOLD, LEV, FEE }, tfs: { "15m": res15m, "1h": res1h } };
+  const outPath = join(__dirname, "..", "assets", "scan_long_features.json");
+  writeFileSync(outPath, JSON.stringify(out, null, 2));
+  console.log(`\n✅ Wrote ${outPath}`);
+
+  // Print top single features (edge > 3%, n >= 100)
+  for (const tf of ["15m", "1h"]) {
+    const res = tf === "15m" ? res15m : res1h;
+    console.log(`\n=== ${tf.toUpperCase()} Top single features (edge ≥3%, n≥100) ===`);
+    const singles = Object.entries(res.singleStats)
+      .filter(([, s]) => s.n >= 100 && Math.abs(s.edge) >= 3)
+      .sort((a, b) => b[1].edge - a[1].edge);
+    for (const [k, s] of singles.slice(0, 15)) {
+      console.log(`  ${k.padEnd(18)} n=${String(s.n).padEnd(5)} W=${s.w} L=${s.l} WR=${s.wr.toFixed(1)}% edge=${s.edge > 0 ? "+" : ""}${s.edge.toFixed(1)}%`);
+    }
+    console.log(`\n=== ${tf.toUpperCase()} Top pair features (edge ≥5%, n≥80) ===`);
+    const pairs = Object.entries(res.pairStats)
+      .filter(([, s]) => s.n >= 80 && s.edge >= 5)
+      .sort((a, b) => b[1].edge - a[1].edge);
+    for (const [k, s] of pairs.slice(0, 15)) {
+      console.log(`  ${k.padEnd(50)} n=${String(s.n).padEnd(5)} WR=${s.wr.toFixed(1)}% edge=+${s.edge.toFixed(1)}%`);
+    }
+  }
+})();

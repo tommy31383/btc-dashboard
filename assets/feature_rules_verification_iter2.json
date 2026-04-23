@@ -1,0 +1,305 @@
+{
+  "generatedAt": "2026-04-20T02:02:03.814Z",
+  "version": "v4.3.15-iter2",
+  "results": [
+    {
+      "rank": 1,
+      "label": "LONG Widened EMA+FLAT",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "emaDist": {
+            "op": "between",
+            "min": -0.5,
+            "max": 0.5
+          },
+          "htf": {
+            "mode": "far_flat"
+          }
+        }
+      },
+      "saved": {
+        "winRate": 0,
+        "trades": 0,
+        "netPnL": 0
+      },
+      "fresh": {
+        "trades": 32,
+        "wins": 25,
+        "losses": 7,
+        "timeouts": 0,
+        "winRate": 78.1,
+        "netPnL": 10844,
+        "avgHold": 38.1
+      },
+      "drift": {
+        "wr": 78.1,
+        "n": 32
+      },
+      "accuracy": 0,
+      "skipFilter": 9807,
+      "lossAnalysis": {
+        "avgLossRSI4h": 49.4,
+        "avgWinRSI4h": 53.9,
+        "lossBy4hTrend": {
+          "DOWN": 4,
+          "FLAT": 3
+        },
+        "winBy4hTrend": {
+          "UP": 22,
+          "FLAT": 3
+        },
+        "lossBy1dTrend": {
+          "FLAT": 7
+        }
+      },
+      "suggestions": [
+        "✅ WR match/beat claim, rule OK"
+      ]
+    },
+    {
+      "rank": 2,
+      "label": "Golden ATR+EMA+FLAT",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "atr": {
+            "op": "<",
+            "value": 0.3
+          },
+          "emaDist": {
+            "op": "between",
+            "min": -0.5,
+            "max": 0.5
+          },
+          "htf": {
+            "mode": "far_flat"
+          }
+        }
+      },
+      "saved": {
+        "winRate": 100,
+        "trades": 10,
+        "netPnL": 4920
+      },
+      "fresh": {
+        "trades": 10,
+        "wins": 10,
+        "losses": 0,
+        "timeouts": 0,
+        "winRate": 100,
+        "netPnL": 4920,
+        "avgHold": 55
+      },
+      "drift": {
+        "wr": 0,
+        "n": 0
+      },
+      "accuracy": 100,
+      "skipFilter": 9829,
+      "lossAnalysis": {
+        "avgLossRSI4h": null,
+        "avgWinRSI4h": 52.5,
+        "lossBy4hTrend": {},
+        "winBy4hTrend": {
+          "UP": 8,
+          "FLAT": 2
+        },
+        "lossBy1dTrend": {}
+      },
+      "suggestions": [
+        "⚠️ N=10 quá ít, relax filter hoặc lấy thêm data"
+      ]
+    },
+    {
+      "rank": 3,
+      "label": "Golden ATR+FLAT",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "atr": {
+            "op": "<",
+            "value": 0.3
+          },
+          "htf": {
+            "mode": "far_flat"
+          }
+        }
+      },
+      "saved": {
+        "winRate": 100,
+        "trades": 12,
+        "netPnL": 5904
+      },
+      "fresh": {
+        "trades": 12,
+        "wins": 12,
+        "losses": 0,
+        "timeouts": 0,
+        "winRate": 100,
+        "netPnL": 5904,
+        "avgHold": 50.4
+      },
+      "drift": {
+        "wr": 0,
+        "n": 0
+      },
+      "accuracy": 100,
+      "skipFilter": 9827,
+      "lossAnalysis": {
+        "avgLossRSI4h": null,
+        "avgWinRSI4h": 50.9,
+        "lossBy4hTrend": {},
+        "winBy4hTrend": {
+          "UP": 8,
+          "FLAT": 4
+        },
+        "lossBy1dTrend": {}
+      },
+      "suggestions": [
+        "⚠️ N=12 quá ít, relax filter hoặc lấy thêm data"
+      ]
+    },
+    {
+      "rank": 4,
+      "label": "LONG Trend-follow ATR+4hUP+1dRSImid",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "atr": {
+            "op": "<",
+            "value": 0.4
+          },
+          "emaDist": {
+            "op": "between",
+            "min": -0.5,
+            "max": 1
+          },
+          "htf": {
+            "mode": {
+              "want": "UP",
+              "tf": "near"
+            }
+          }
+        }
+      },
+      "saved": {
+        "winRate": 0,
+        "trades": 0,
+        "netPnL": 0
+      },
+      "fresh": {
+        "trades": 798,
+        "wins": 178,
+        "losses": 252,
+        "timeouts": 368,
+        "winRate": 22.3,
+        "netPnL": 32216,
+        "avgHold": 76.5
+      },
+      "drift": {
+        "wr": 22.3,
+        "n": 798
+      },
+      "accuracy": 0,
+      "skipFilter": 9041,
+      "lossAnalysis": {
+        "avgLossRSI4h": 56.6,
+        "avgWinRSI4h": 56.6,
+        "lossBy4hTrend": {
+          "UP": 252
+        },
+        "winBy4hTrend": {
+          "UP": 178
+        },
+        "lossBy1dTrend": {
+          "DOWN": 31,
+          "UP": 209,
+          "FLAT": 12
+        }
+      },
+      "suggestions": [
+        "💡 100% loss xảy ra khi 4h trend = UP → nếu khác rule intent, thêm filter loại",
+        "✅ WR match/beat claim, rule OK"
+      ]
+    },
+    {
+      "rank": 5,
+      "label": "LONG Bottom-fish EMAfar+4hDOWN+1dRSIstable",
+      "side": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "maxHold": 100,
+        "lev": 100,
+        "filters": {
+          "emaDist": {
+            "op": "<",
+            "value": -2
+          },
+          "htf": {
+            "mode": {
+              "want": "DOWN",
+              "tf": "near"
+            }
+          }
+        }
+      },
+      "saved": {
+        "winRate": 0,
+        "trades": 0,
+        "netPnL": 0
+      },
+      "fresh": {
+        "trades": 294,
+        "wins": 66,
+        "losses": 170,
+        "timeouts": 58,
+        "winRate": 22.4,
+        "netPnL": -3352,
+        "avgHold": 50.4
+      },
+      "drift": {
+        "wr": 22.4,
+        "n": 294
+      },
+      "accuracy": 0,
+      "skipFilter": 9545,
+      "lossAnalysis": {
+        "avgLossRSI4h": 36,
+        "avgWinRSI4h": 33.8,
+        "lossBy4hTrend": {
+          "DOWN": 170
+        },
+        "winBy4hTrend": {
+          "DOWN": 66
+        },
+        "lossBy1dTrend": {
+          "DOWN": 153,
+          "UP": 10,
+          "FLAT": 7
+        }
+      },
+      "suggestions": [
+        "💡 100% loss xảy ra khi 4h trend = DOWN → nếu khác rule intent, thêm filter loại",
+        "✅ WR match/beat claim, rule OK"
+      ]
+    }
+  ]
+}

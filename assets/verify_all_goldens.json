@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "candles": 20000,
+    "tp": 5,
+    "sl": 2,
+    "hold": 100,
+    "fee": 0.05,
+    "generatedAt": "2026-04-22T10:28:58.640Z"
+  },
+  "rules": {
+    "G1_QUADRUPLE": {
+      "pred": "macd0-50 + ema±0.5% + atr<0.3% + FLAT",
+      "side": "LONG",
+      "claim": 71.8,
+      "m": {
+        "n": 163,
+        "wr": 71.78,
+        "sumPnl": 313.29,
+        "avgWin": 3.4,
+        "avgLoss": -1.84,
+        "pf": 4.69,
+        "exp": 1.922,
+        "avgHold": 69.2
+      }
+    },
+    "G2_MACD_EMA": {
+      "pred": "macd0-50 + ema±0.5% + FLAT",
+      "side": "LONG",
+      "claim": 64.9,
+      "m": {
+        "n": 405,
+        "wr": 64.94,
+        "sumPnl": 787.3,
+        "avgWin": 4.03,
+        "avgLoss": -1.91,
+        "pf": 3.9,
+        "exp": 1.944,
+        "avgHold": 58.2
+      }
+    },
+    "G3_MACD_ATR": {
+      "pred": "macd0-50 + atr<0.3% + FLAT",
+      "side": "LONG",
+      "claim": 67.4,
+      "m": {
+        "n": 181,
+        "wr": 67.4,
+        "sumPnl": 311.97,
+        "avgWin": 3.46,
+        "avgLoss": -1.87,
+        "pf": 3.82,
+        "exp": 1.724,
+        "avgHold": 68.5
+      }
+    },
+    "G4_ATR_EMA": {
+      "pred": "atr<0.3% + ema±0.5% + FLAT",
+      "side": "LONG",
+      "claim": 60.4,
+      "m": {
+        "n": 323,
+        "wr": 60.37,
+        "sumPnl": 392.91,
+        "avgWin": 3.28,
+        "avgLoss": -1.93,
+        "pf": 2.59,
+        "exp": 1.216,
+        "avgHold": 65.1
+      }
+    },
+    "G5_CROSS_ATR": {
+      "pred": "ema20>ema50 + atr<0.3% + FLAT",
+      "side": "LONG",
+      "claim": 68.3,
+      "m": {
+        "n": 104,
+        "wr": 68.27,
+        "sumPnl": 151.13,
+        "avgWin": 3,
+        "avgLoss": -1.88,
+        "pf": 3.44,
+        "exp": 1.453,
+        "avgHold": 79.1
+      }
+    },
+    "G6_DOJI_MACD": {
+      "pred": "body<0.1% + macd0-50 + FLAT",
+      "side": "LONG",
+      "claim": 63.7,
+      "m": {
+        "n": 259,
+        "wr": 63.71,
+        "sumPnl": 462.04,
+        "avgWin": 3.86,
+        "avgLoss": -1.86,
+        "pf": 3.64,
+        "exp": 1.784,
+        "avgHold": 61.9
+      }
+    },
+    "G7_BB_MACD": {
+      "pred": "bbWidth<1.5% + macd0-50 + FLAT",
+      "side": "LONG",
+      "claim": 62.3,
+      "m": {
+        "n": 369,
+        "wr": 62.33,
+        "sumPnl": 661.33,
+        "avgWin": 4.03,
+        "avgLoss": -1.9,
+        "pf": 3.5,
+        "exp": 1.792,
+        "avgHold": 57.7
+      }
+    },
+    "G8_SHORT": {
+      "pred": "ema±0.5% + atr<0.3% + UP",
+      "side": "SHORT",
+      "claim": 86.7,
+      "m": {
+        "n": 227,
+        "wr": 34.36,
+        "sumPnl": 1.89,
+        "avgWin": 3.56,
+        "avgLoss": -1.85,
+        "pf": 1.01,
+        "exp": 0.008,
+        "avgHold": 67.9
+      }
+    },
+    "BASELINE_LONG": {
+      "pred": "LONG every bar",
+      "side": "LONG",
+      "claim": 35.5,
+      "m": {
+        "n": 19799,
+        "wr": 35.62,
+        "sumPnl": 915.8,
+        "avgWin": 3.76,
+        "avgLoss": -2.01,
+        "pf": 1.04,
+        "exp": 0.046,
+        "avgHold": 44.7
+      }
+    }
+  }
+}

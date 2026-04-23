@@ -1,0 +1,1025 @@
+{
+  "generatedAt": "2026-04-22T11:54:58.824Z",
+  "byStatus": {
+    "FLIP_JUNK": 21,
+    "FLIP_BRONZE": 7,
+    "FLIP_GOLD": 2,
+    "FLIP_SILVER": 4
+  },
+  "results": [
+    {
+      "tfKey": "5m",
+      "rank": 2,
+      "label": "SHORT rank2",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "rsiExtreme",
+        "macdCross"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 2,
+        "sl": 1,
+        "trades": 46,
+        "winRate": 23.9,
+        "netPnL": 332
+      },
+      "flipped": {
+        "tp": 1,
+        "sl": 3,
+        "trades": 51,
+        "winRate": 39.2,
+        "netPnL": 1592,
+        "pf": 999
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 51
+    },
+    {
+      "tfKey": "5m",
+      "rank": 4,
+      "label": "LONG rank4",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "stochExtreme",
+        "rsiExtreme"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 5,
+        "sl": 3,
+        "trades": 60,
+        "winRate": 1.7,
+        "netPnL": 20
+      },
+      "flipped": {
+        "tp": 1,
+        "sl": 7,
+        "trades": 60,
+        "winRate": 41.7,
+        "netPnL": 2020,
+        "pf": 999
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 60
+    },
+    {
+      "tfKey": "5m",
+      "rank": 5,
+      "label": "LONG rank5",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [],
+      "htfFilter": null,
+      "original": {
+        "tp": 0.76,
+        "sl": 0.35,
+        "trades": 6271,
+        "winRate": 25.5,
+        "netPnL": -54638
+      },
+      "flipped": {
+        "tp": 0.5,
+        "sl": 7,
+        "trades": 6325,
+        "winRate": 49.1,
+        "netPnL": 104750,
+        "pf": 999
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 6325
+    },
+    {
+      "tfKey": "5m",
+      "rank": 6,
+      "label": "LONG rank6",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [],
+      "htfFilter": null,
+      "original": {
+        "tp": 0.76,
+        "sl": 0.35,
+        "trades": 6271,
+        "winRate": 25.5,
+        "netPnL": -54638
+      },
+      "flipped": {
+        "tp": 0.5,
+        "sl": 7,
+        "trades": 6325,
+        "winRate": 49.1,
+        "netPnL": 104750,
+        "pf": 999
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 6325
+    },
+    {
+      "tfKey": "5m",
+      "rank": 7,
+      "label": "LONG rank7",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "stochExtreme",
+        "bollingerTouch"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 5,
+        "sl": 3,
+        "trades": 253,
+        "winRate": 2,
+        "netPnL": -424
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 7,
+        "trades": 252,
+        "winRate": 25,
+        "netPnL": 7434,
+        "pf": 999
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 252
+    },
+    {
+      "tfKey": "5m",
+      "rank": 8,
+      "label": "SHORT rank8",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "divergence"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 1,
+        "sl": 0.5,
+        "trades": 768,
+        "winRate": 29.6,
+        "netPnL": -4194
+      },
+      "flipped": {
+        "tp": 1,
+        "sl": 4,
+        "trades": 846,
+        "winRate": 35.9,
+        "netPnL": 23632,
+        "pf": 999
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 846
+    },
+    {
+      "tfKey": "15m",
+      "rank": 2,
+      "label": "[SHORT] Div+BB TP+3% SL-1% · WR 31.6% · NET +850%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 3,
+        "sl": 1,
+        "trades": 61,
+        "winRate": 23,
+        "netPnL": -288
+      },
+      "flipped": {
+        "tp": 2.5,
+        "sl": 5,
+        "trades": 62,
+        "winRate": 38.7,
+        "netPnL": 5004,
+        "pf": 12
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 62
+    },
+    {
+      "tfKey": "15m",
+      "rank": 3,
+      "label": "[SHORT] Div+BB TP+3% SL-1.5% · WR 38.8% · NET +550%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 3,
+        "sl": 1.5,
+        "trades": 61,
+        "winRate": 24.6,
+        "netPnL": -638
+      },
+      "flipped": {
+        "tp": 2.5,
+        "sl": 5,
+        "trades": 62,
+        "winRate": 38.7,
+        "netPnL": 5004,
+        "pf": 12
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 62
+    },
+    {
+      "tfKey": "15m",
+      "rank": 4,
+      "label": "[SHORT] Div+BB TP+10% SL-5% · WR 50% · NET +350%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "divergence",
+        "bollingerTouch"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 10,
+        "sl": 5,
+        "trades": 61,
+        "winRate": 3.3,
+        "netPnL": 1012
+      },
+      "flipped": {
+        "tp": 2.5,
+        "sl": 5,
+        "trades": 62,
+        "winRate": 38.7,
+        "netPnL": 5004,
+        "pf": 12
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 62
+    },
+    {
+      "tfKey": "15m",
+      "rank": 9,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.3% · NET +38250%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "both_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 1815,
+        "winRate": 28.7,
+        "netPnL": 42780
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 1815,
+        "winRate": 44.7,
+        "netPnL": 60130,
+        "pf": 2.59
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 12,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "near_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 2104,
+        "winRate": 29.9,
+        "netPnL": 35818
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 2102,
+        "winRate": 45.9,
+        "netPnL": 80934,
+        "pf": 3.08
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 2102
+    },
+    {
+      "tfKey": "15m",
+      "rank": 13,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +34080%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "far_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 2552,
+        "winRate": 26.6,
+        "netPnL": 40084
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 2552,
+        "winRate": 44.4,
+        "netPnL": 102534,
+        "pf": 3.62
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 14,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +29860%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "near_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 2104,
+        "winRate": 26.3,
+        "netPnL": 32468
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 2102,
+        "winRate": 45.9,
+        "netPnL": 80934,
+        "pf": 3.08
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 2102
+    },
+    {
+      "tfKey": "15m",
+      "rank": 15,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.7% · NET +29050%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "both_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 1815,
+        "winRate": 29.9,
+        "netPnL": 33280
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 1815,
+        "winRate": 44.7,
+        "netPnL": 60130,
+        "pf": 2.59
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 19,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.4% · NET +4223%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 10,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "both_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 1815,
+        "winRate": 28.7,
+        "netPnL": 4278
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 1815,
+        "winRate": 44.7,
+        "netPnL": 6013,
+        "pf": 2.59
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "15m",
+      "rank": 21,
+      "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +3954%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 10,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "far_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 2552,
+        "winRate": 26.6,
+        "netPnL": 4008
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 2552,
+        "winRate": 44.4,
+        "netPnL": 10253,
+        "pf": 3.62
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 2552
+    },
+    {
+      "tfKey": "15m",
+      "rank": 23,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +3837%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 10,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "near_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 2104,
+        "winRate": 29.9,
+        "netPnL": 3582
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 2102,
+        "winRate": 45.9,
+        "netPnL": 8093,
+        "pf": 3.08
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 2102
+    },
+    {
+      "tfKey": "15m",
+      "rank": 24,
+      "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +3407%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 10,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "near_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 2104,
+        "winRate": 26.3,
+        "netPnL": 3247
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 2102,
+        "winRate": 45.9,
+        "netPnL": 8093,
+        "pf": 3.08
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 2102
+    },
+    {
+      "tfKey": "15m",
+      "rank": 25,
+      "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.8% · NET +3288%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 10,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "both_match",
+      "original": {
+        "tp": 2,
+        "sl": 2,
+        "trades": 1815,
+        "winRate": 29.9,
+        "netPnL": 3328
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 1815,
+        "winRate": 44.7,
+        "netPnL": 6013,
+        "pf": 2.59
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 1815
+    },
+    {
+      "tfKey": "1h",
+      "rank": 1,
+      "label": "LONG Widened EMA+FLAT",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [],
+      "htfFilter": "far_flat",
+      "original": {
+        "tp": 5,
+        "sl": 2,
+        "trades": 9849,
+        "winRate": 19.4,
+        "netPnL": -246392
+      },
+      "flipped": {
+        "tp": 3,
+        "sl": 10,
+        "trades": 9949,
+        "winRate": 44.2,
+        "netPnL": 983408,
+        "pf": 5.14
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 2,
+      "label": "Golden ATR+EMA+FLAT",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [],
+      "htfFilter": "far_flat",
+      "original": {
+        "tp": 5,
+        "sl": 2,
+        "trades": 9849,
+        "winRate": 19.4,
+        "netPnL": -246392
+      },
+      "flipped": {
+        "tp": 3,
+        "sl": 10,
+        "trades": 9949,
+        "winRate": 44.2,
+        "netPnL": 983408,
+        "pf": 5.14
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 3,
+      "label": "Golden ATR+FLAT",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [],
+      "htfFilter": "far_flat",
+      "original": {
+        "tp": 5,
+        "sl": 2,
+        "trades": 9849,
+        "winRate": 19.4,
+        "netPnL": -246392
+      },
+      "flipped": {
+        "tp": 3,
+        "sl": 10,
+        "trades": 9949,
+        "winRate": 44.2,
+        "netPnL": 983408,
+        "pf": 5.14
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 4,
+      "label": "LONG Multi-TF Score ≥70",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [],
+      "htfFilter": null,
+      "original": {
+        "tp": 4,
+        "sl": 1.5,
+        "trades": 9849,
+        "winRate": 24.3,
+        "netPnL": -64442
+      },
+      "flipped": {
+        "tp": 3,
+        "sl": 10,
+        "trades": 9949,
+        "winRate": 44.2,
+        "netPnL": 983408,
+        "pf": 5.14
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 9949
+    },
+    {
+      "tfKey": "1h",
+      "rank": 19,
+      "label": "[HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 100,
+      "maxHold": 100,
+      "required": [
+        "divergence"
+      ],
+      "htfFilter": "far_match",
+      "original": {
+        "tp": 8,
+        "sl": 3,
+        "trades": 430,
+        "winRate": 17,
+        "netPnL": 13860
+      },
+      "flipped": {
+        "tp": 1.5,
+        "sl": 10,
+        "trades": 452,
+        "winRate": 68.6,
+        "netPnL": 10884,
+        "pf": 1.45
+      },
+      "flipStatus": "FLIP_GOLD",
+      "entryCount": 452
+    },
+    {
+      "tfKey": "1h",
+      "rank": 29,
+      "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
+      "origSide": "SHORT",
+      "flipSide": "LONG",
+      "lev": 10,
+      "maxHold": 100,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": "far_match",
+      "original": {
+        "tp": 3,
+        "sl": 1,
+        "trades": 2852,
+        "winRate": 28,
+        "netPnL": 1268
+      },
+      "flipped": {
+        "tp": 3,
+        "sl": 10,
+        "trades": 2851,
+        "winRate": 48.6,
+        "netPnL": 13569,
+        "pf": 1.62
+      },
+      "flipStatus": "FLIP_BRONZE",
+      "entryCount": 2851
+    },
+    {
+      "tfKey": "4h",
+      "rank": 2,
+      "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+5% SL-2% · WR 30.3% · NET +983%",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 10,
+      "maxHold": 50,
+      "required": [],
+      "htfFilter": null,
+      "original": {
+        "tp": 5,
+        "sl": 2,
+        "trades": 717,
+        "winRate": 28.9,
+        "netPnL": 56
+      },
+      "flipped": {
+        "tp": 3,
+        "sl": 10,
+        "trades": 717,
+        "winRate": 63.6,
+        "netPnL": 3806,
+        "pf": 1.47
+      },
+      "flipStatus": "FLIP_GOLD",
+      "entryCount": 717
+    },
+    {
+      "tfKey": "4h",
+      "rank": 6,
+      "label": "LONG rank6",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "macdCross",
+        "rsiExtreme"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 1.5,
+        "sl": 0.5,
+        "trades": 65,
+        "winRate": 21.5,
+        "netPnL": -970
+      },
+      "flipped": {
+        "tp": 10,
+        "sl": 5,
+        "trades": 65,
+        "winRate": 24.6,
+        "netPnL": 4480,
+        "pf": 1.45
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 65
+    },
+    {
+      "tfKey": "4h",
+      "rank": 8,
+      "label": "LONG rank8",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "macdCross",
+        "rsiExtreme"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 1.5,
+        "sl": 0.5,
+        "trades": 65,
+        "winRate": 21.5,
+        "netPnL": -970
+      },
+      "flipped": {
+        "tp": 10,
+        "sl": 5,
+        "trades": 65,
+        "winRate": 24.6,
+        "netPnL": 4480,
+        "pf": 1.45
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 65
+    },
+    {
+      "tfKey": "4h",
+      "rank": 9,
+      "label": "LONG rank9",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "macdCross"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 1.5,
+        "sl": 0.5,
+        "trades": 2937,
+        "winRate": 24.5,
+        "netPnL": -26346
+      },
+      "flipped": {
+        "tp": 5,
+        "sl": 10,
+        "trades": 2961,
+        "winRate": 39.4,
+        "netPnL": 66312,
+        "pf": 1.18
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 2961
+    },
+    {
+      "tfKey": "1d",
+      "rank": 1,
+      "label": "LONG rank1",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "divergence"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 2.5,
+        "sl": 1,
+        "trades": 234,
+        "winRate": 23.5,
+        "netPnL": -6022
+      },
+      "flipped": {
+        "tp": 10,
+        "sl": 10,
+        "trades": 240,
+        "winRate": 55,
+        "netPnL": 25080,
+        "pf": 1.26
+      },
+      "flipStatus": "FLIP_SILVER",
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 2,
+      "label": "LONG rank2",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "divergence"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 2,
+        "sl": 1,
+        "trades": 234,
+        "winRate": 24.8,
+        "netPnL": -7872
+      },
+      "flipped": {
+        "tp": 10,
+        "sl": 10,
+        "trades": 240,
+        "winRate": 55,
+        "netPnL": 25080,
+        "pf": 1.26
+      },
+      "flipStatus": "FLIP_SILVER",
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 5,
+      "label": "LONG rank5",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "divergence"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 3,
+        "sl": 1.5,
+        "trades": 234,
+        "winRate": 29.1,
+        "netPnL": -6372
+      },
+      "flipped": {
+        "tp": 10,
+        "sl": 10,
+        "trades": 240,
+        "winRate": 55,
+        "netPnL": 25080,
+        "pf": 1.26
+      },
+      "flipStatus": "FLIP_SILVER",
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1d",
+      "rank": 8,
+      "label": "LONG rank8",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "divergence"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 2.5,
+        "sl": 1,
+        "trades": 234,
+        "winRate": 23.5,
+        "netPnL": -6022
+      },
+      "flipped": {
+        "tp": 10,
+        "sl": 10,
+        "trades": 240,
+        "winRate": 55,
+        "netPnL": 25080,
+        "pf": 1.26
+      },
+      "flipStatus": "FLIP_SILVER",
+      "entryCount": 240
+    },
+    {
+      "tfKey": "1w",
+      "rank": 1,
+      "label": "LONG rank1",
+      "origSide": "LONG",
+      "flipSide": "SHORT",
+      "lev": 100,
+      "maxHold": 50,
+      "required": [
+        "stochExtreme"
+      ],
+      "htfFilter": null,
+      "original": {
+        "tp": 3,
+        "sl": 1,
+        "trades": 34,
+        "winRate": 8.8,
+        "netPnL": -2472
+      },
+      "flipped": {
+        "tp": 15,
+        "sl": 1.5,
+        "trades": 41,
+        "winRate": 17.1,
+        "netPnL": 5072,
+        "pf": 2.06
+      },
+      "flipStatus": "FLIP_JUNK",
+      "entryCount": 41
+    }
+  ]
+}

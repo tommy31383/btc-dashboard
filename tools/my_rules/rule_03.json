@@ -1,0 +1,20 @@
+{
+  "label": "MyRule#3 — 15m LONG + 1H RSI>70 momentum (TP 3% / SL 1.5%)",
+  "tfKey": "15m",
+  "forceSide": "LONG",
+  "config": {
+    "leverage": 100,
+    "targetPct": 3.0,
+    "stopPct": 1.5,
+    "maxHoldBars": 60,
+    "minScore": 1,
+    "stochOSLevel": 95,
+    "stochOBLevel": 5,
+    "rsiOSLevel": 70,
+    "rsiOBLevel": 10,
+    "requiredConditions": ["stochExtreme", "rsiExtreme"],
+    "forceSide": "LONG",
+    "htfRsiFilter": { "tf": "1h", "op": ">", "value": 70 }
+  },
+  "note": "Realtime-safe: thay vì 'khung 1H tăng' (chỉ biết khi nến đóng), dùng RSI 1H > 70 (tính được ngay từ các nến 1H đã đóng). Entry 15m: RSI<70 & StochRSI<95 (gần như luôn đúng) → rule thực chất chỉ fire khi 1H RSI>70 (momentum mạnh). TP 3% / SL 1.5% (R:R 2:1)."
+}

@@ -1,0 +1,25 @@
+{
+  "label": "MyRule#4b — 15m LONG + 1H momentum + StochK>=40",
+  "tfKey": "15m",
+  "forceSide": "LONG",
+  "config": {
+    "leverage": 100,
+    "targetPct": 3.0,
+    "stopPct": 1.5,
+    "maxHoldBars": 60,
+    "minScore": 1,
+    "stochOSLevel": 95,
+    "stochOBLevel": 5,
+    "rsiOSLevel": 70,
+    "rsiOBLevel": 10,
+    "requiredConditions": ["stochExtreme", "rsiExtreme"],
+    "forceSide": "LONG",
+    "htfFilters": [
+      { "type": "stochRange", "tf": "1h", "kMin": 40 },
+      { "type": "slope",   "tf": "1h", "indicator": "rsi",    "direction": "rising", "lookback": 3 },
+      { "type": "slope",   "tf": "1h", "indicator": "stochK", "direction": "rising", "lookback": 3 },
+      { "type": "compare", "tf": "1h", "left": "rsi", "op": ">", "right": "stochK" }
+    ]
+  },
+  "note": "Thêm 1H StochK >= 40 (stoch đã ra khỏi vùng oversold)."
+}

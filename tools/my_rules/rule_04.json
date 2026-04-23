@@ -1,0 +1,22 @@
+{
+  "label": "MyRule#4 — 15m LONG + 1h StochK≥50 (momentum filter)",
+  "tfKey": "15m",
+  "forceSide": "LONG",
+  "config": {
+    "leverage": 100,
+    "targetPct": 3.0,
+    "stopPct": 1.5,
+    "maxHoldBars": 60,
+    "minScore": 1,
+    "stochOSLevel": 95,
+    "stochOBLevel": 5,
+    "rsiOSLevel": 70,
+    "rsiOBLevel": 10,
+    "requiredConditions": ["stochExtreme"],
+    "forceSide": "LONG",
+    "htfFilters": [
+      { "type": "stochRange", "tf": "1h", "kMin": 55 }
+    ]
+  },
+  "note": "Dựa trên phân tích losers_15m: 500 lệnh thua có 1H StochK TB 37.8, 287 lệnh thắng có 1H StochK TB 55.6 → Δ -17.8. LONG 15m khi 1H Stoch chưa oversold (momentum 1H đang UP). TP 3%/SL 1.5% x100 lev = +300%/-150%."
+}

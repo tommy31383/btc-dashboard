@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>v4.3.18 — TF Sync Preview</title>
+<style>
+  body { margin: 0; padding: 24px; background: #0a0e1a; color: #d0d4e0; font-family: monospace; font-size: 13px; }
+  h1 { color: #f7931a; letter-spacing: 2px; font-size: 18px; text-align: center; }
+  .note { color: #6b7280; font-size: 11px; margin-bottom: 16px; text-align: center; }
+  .scenarios { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1280px; margin: 0 auto; }
+  .scenario { background: #0f1420; border: 1px solid #1f2940; border-radius: 12px; padding: 14px; }
+  .scenario h2 { color: #f7931a; font-size: 13px; letter-spacing: 1px; margin: 0 0 10px; text-align: center; }
+  .sec { background: #0a0e1a; border-radius: 8px; padding: 10px; margin-bottom: 8px; border: 1px solid #1f2940; }
+  .sec-label { color: #6b7280; font-size: 9px; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+  .tfs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tf { padding: 4px 8px; border-radius: 6px; background: #ffffff08; border: 1px solid #ffffff15; color: #6b7280; font-size: 10px; font-weight: 800; }
+  .tf.active { background: #f7931a25; border-color: #f7931a; color: #f7931a; }
+  .sync-note { background: #f7931a10; border-left: 3px solid #f7931a; padding: 6px 8px; border-radius: 4px; font-size: 10px; color: #94a3b8; margin-top: 6px; line-height: 14px; }
+  .sync-btn { background: #f7931a15; border: 1px solid #f7931a50; border-radius: 6px; padding: 6px; text-align: center; color: #f7931a; font-size: 10px; font-weight: 800; margin-top: 6px; }
+  .arrow { text-align: center; color: #475569; font-size: 20px; margin: 4px 0; }
+  .flow { max-width: 900px; margin: 30px auto 0; background: #0f1420; border: 1px solid #1f2940; border-radius: 12px; padding: 16px; font-size: 11px; line-height: 1.8; }
+  .flow h3 { color: #f7931a; margin-top: 0; }
+  .kbd { background: #1f2940; padding: 2px 6px; border-radius: 4px; color: #f7931a; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<h1>🔗 TF SYNC — v4.3.18 (Phương án B)</h1>
+<p class="note">Single source-of-truth: <span class="kbd">selectedTF</span> ở App.tsx · 3 chỗ đều đọc + auto-map cho TradingRulesPanel</p>
+
+<div class="scenarios">
+
+  <!-- Case 1: Global = 1h (trùng tab RulePanel) -->
+  <div class="scenario">
+    <h2>CASE 1: Global = 1h</h2>
+    <p class="note" style="margin:0 0 10px">Tất cả 3 chỗ đồng bộ, không có note</p>
+
+    <div class="sec">
+      <div class="sec-label">🎯 OVERALL VERDICT</div>
+      <div class="tfs">
+        <div class="tf">5m</div><div class="tf">15m</div><div class="tf active">1h</div>
+        <div class="tf">4h</div><div class="tf">1d</div><div class="tf">1w</div><div class="tf">1M</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">📊 CHART</div>
+      <div class="tfs">
+        <div class="tf">5m</div><div class="tf">15m</div><div class="tf active">1h</div>
+        <div class="tf">4h</div><div class="tf">1d</div><div class="tf">1w</div><div class="tf">1M</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">📡 RULE TRADING</div>
+      <div class="tfs">
+        <div class="tf">15m</div><div class="tf active">1h</div><div class="tf">4h</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case 2: Global = 5m (panel auto-map sang 15m) -->
+  <div class="scenario">
+    <h2>CASE 2: Global = 5m</h2>
+    <p class="note" style="margin:0 0 10px">RulePanel auto-map 5m → 15m + note</p>
+
+    <div class="sec">
+      <div class="sec-label">🎯 OVERALL VERDICT</div>
+      <div class="tfs">
+        <div class="tf active">5m</div><div class="tf">15m</div><div class="tf">1h</div>
+        <div class="tf">4h</div><div class="tf">1d</div><div class="tf">1w</div><div class="tf">1M</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">📊 CHART</div>
+      <div class="tfs">
+        <div class="tf active">5m</div><div class="tf">15m</div><div class="tf">1h</div>
+        <div class="tf">4h</div><div class="tf">1d</div><div class="tf">1w</div><div class="tf">1M</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">📡 RULE TRADING</div>
+      <div class="sync-note">ℹ️ TF <b style="color:#f7931a">5m</b> chưa có rule — đang hiển thị rule <b style="color:#f7931a">15m</b> (gần nhất)</div>
+      <div class="tfs" style="margin-top:6px">
+        <div class="tf active">15m</div><div class="tf">1h</div><div class="tf">4h</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case 3: User override ở RulePanel -->
+  <div class="scenario">
+    <h2>CASE 3: User chọn 4h ở Panel</h2>
+    <p class="note" style="margin:0 0 10px">Panel giữ riêng · có nút "Sync lại"</p>
+
+    <div class="sec">
+      <div class="sec-label">🎯 OVERALL VERDICT</div>
+      <div class="tfs">
+        <div class="tf">5m</div><div class="tf">15m</div><div class="tf active">1h</div>
+        <div class="tf">4h</div><div class="tf">1d</div><div class="tf">1w</div><div class="tf">1M</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">📊 CHART</div>
+      <div class="tfs">
+        <div class="tf">5m</div><div class="tf">15m</div><div class="tf active">1h</div>
+        <div class="tf">4h</div><div class="tf">1d</div><div class="tf">1w</div><div class="tf">1M</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">📡 RULE TRADING</div>
+      <div class="sync-btn">🔗 Sync lại với TF 1H global</div>
+      <div class="tfs" style="margin-top:6px">
+        <div class="tf">15m</div><div class="tf">1h</div><div class="tf active">4h</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="flow">
+  <h3>📋 Luật hoạt động</h3>
+  <p><b>1. Single source of truth:</b> <span class="kbd">selectedTF</span> ở App.tsx (default <span class="kbd">1h</span>)</p>
+  <p><b>2. OverallVerdict + Chart:</b> đọc/ghi trực tiếp <span class="kbd">selectedTF</span> — click TF ở chỗ nào, cả 3 chỗ cùng đổi</p>
+  <p><b>3. RulePanel (chỉ có 15m/1h/4h):</b></p>
+  <ul>
+    <li>Global = <b>15m/1h/4h</b> → tự động bám theo</li>
+    <li>Global = <b>5m</b> → auto-map sang <b>15m</b> + hiện note</li>
+    <li>Global = <b>1d/1w/1M</b> → auto-map sang <b>4h</b> + hiện note</li>
+  </ul>
+  <p><b>4. User override:</b> Nếu user tự chọn TF ở Panel → panel khoá, hiện nút <span class="kbd">🔗 Sync lại với TF global</span></p>
+  <p><b>5. Bấm "Sync lại":</b> Panel bỏ override, quay về bám global</p>
+</div>
+
+</body>
+</html>

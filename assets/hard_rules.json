@@ -1,0 +1,4410 @@
+{
+  "generated_at": "2026-04-20T02:18:58.434Z",
+  "data_source": "Binance BTCUSDT (REST /klines) + scan-tpsl with fees + inject-feature-rules-v3.ts iter3 FINAL",
+  "tfs": {
+    "5m": {
+      "interval": "5m",
+      "label": "5M",
+      "candles_used": 10000,
+      "price_range": {
+        "min": 70584,
+        "max": 75855,
+        "first": 72204,
+        "last": 73855
+      },
+      "rules": [
+        {
+          "rank": 1,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "macdCross"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 34.1,
+            "profitFactor": 1.36,
+            "trades": 433,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 0,
+            "wins": 143,
+            "losses": 211,
+            "timeouts": 79,
+            "grossPnL": 3750,
+            "feeCost": 1732,
+            "netPnL": 346,
+            "side": "SHORT",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 1,
+              "sl": 0.5,
+              "wr": 29.5,
+              "net": -1888
+            }
+          }
+        },
+        {
+          "rank": 2,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "macdCross"
+            ]
+          },
+          "stats": {
+            "winRate": 47.1,
+            "profitFactor": 1.78,
+            "trades": 30,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 0,
+            "wins": 8,
+            "losses": 9,
+            "timeouts": 13,
+            "grossPnL": 700,
+            "feeCost": 120,
+            "netPnL": 580,
+            "side": "SHORT",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 21.6,
+              "net": 792
+            }
+          }
+        },
+        {
+          "rank": 3,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme",
+              "macdCross"
+            ]
+          },
+          "stats": {
+            "winRate": 40.2,
+            "profitFactor": 1.34,
+            "trades": 116,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 0,
+            "wins": 39,
+            "losses": 58,
+            "timeouts": 19,
+            "grossPnL": 1000,
+            "feeCost": 464,
+            "netPnL": 536,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1,
+              "sl": 1,
+              "wr": 37.6,
+              "net": 528
+            }
+          }
+        },
+        {
+          "rank": 4,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme",
+              "rsiExtreme"
+            ]
+          },
+          "stats": {
+            "winRate": 100,
+            "profitFactor": 999,
+            "trades": 56,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 0,
+            "wins": 1,
+            "losses": 0,
+            "timeouts": 55,
+            "grossPnL": 500,
+            "feeCost": 224,
+            "netPnL": 276,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1.5,
+              "sl": 1.5,
+              "wr": 28.3,
+              "net": 870
+            }
+          }
+        },
+        {
+          "rank": 5,
+          "source": "GA",
+          "config": {
+            "leverage": 100,
+            "targetPct": 0.76,
+            "stopPct": 0.35,
+            "maxHoldBars": 50,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 80,
+            "rsiOSLevel": 20,
+            "requiredConditions": [],
+            "weights": {
+              "stochExtreme": 1,
+              "rsiExtreme": 1,
+              "divergence": 0,
+              "bollingerTouch": 1,
+              "macdCross": 3
+            },
+            "minWeightedScore": 4,
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 46.2,
+            "profitFactor": 2.61,
+            "trades": 13,
+            "avgWinPct": 76,
+            "avgLossPct": 35,
+            "avgHoldBars": 19,
+            "wins": 6,
+            "losses": 5,
+            "timeouts": 2,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1.5,
+              "sl": 1.5,
+              "wr": 12.3,
+              "net": -19866
+            },
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "SHORT",
+              "reason": "loss_gt_70_flipped"
+            }
+          }
+        },
+        {
+          "rank": 6,
+          "source": "GA",
+          "config": {
+            "leverage": 100,
+            "targetPct": 0.76,
+            "stopPct": 0.35,
+            "maxHoldBars": 50,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 80,
+            "rsiOSLevel": 20,
+            "requiredConditions": [],
+            "weights": {
+              "stochExtreme": 1,
+              "rsiExtreme": 1,
+              "divergence": 2,
+              "bollingerTouch": 1,
+              "macdCross": 3
+            },
+            "minWeightedScore": 4
+          },
+          "stats": {
+            "winRate": 40,
+            "profitFactor": 1.86,
+            "trades": 15,
+            "avgWinPct": 76,
+            "avgLossPct": 35,
+            "avgHoldBars": 16.7,
+            "wins": 6,
+            "losses": 7,
+            "timeouts": 2,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1.5,
+              "sl": 1.5,
+              "wr": 12.3,
+              "net": -19866
+            }
+          }
+        },
+        {
+          "rank": 7,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme",
+              "bollingerTouch"
+            ]
+          },
+          "stats": {
+            "winRate": 50,
+            "profitFactor": 1.67,
+            "trades": 236,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 0,
+            "wins": 5,
+            "losses": 5,
+            "timeouts": 226,
+            "grossPnL": 1000,
+            "feeCost": 944,
+            "netPnL": 56,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 14.2,
+              "net": 1176
+            }
+          }
+        },
+        {
+          "rank": 8,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 29.6,
+            "profitFactor": 1.16,
+            "trades": 788,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 0,
+            "wins": 232,
+            "losses": 400,
+            "timeouts": 156,
+            "grossPnL": 3200,
+            "feeCost": 3152,
+            "netPnL": -4194,
+            "side": "SHORT",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 1,
+              "sl": 0.5,
+              "wr": 26.8,
+              "net": -5768
+            }
+          }
+        },
+        {
+          "rank": 9,
+          "source": "flipped-from-5m-rank5",
+          "label": "[FLIPPED] LONG→SHORT LONG rank5",
+          "config": {
+            "leverage": 100,
+            "targetPct": 0.5,
+            "stopPct": 7,
+            "maxHoldBars": 50,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 80,
+            "rsiOSLevel": 20,
+            "requiredConditions": [],
+            "weights": {
+              "stochExtreme": 1,
+              "rsiExtreme": 1,
+              "divergence": 0,
+              "bollingerTouch": 1,
+              "macdCross": 3
+            },
+            "minWeightedScore": 4,
+            "disabled": true,
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 6325,
+            "wins": 3106,
+            "losses": 3219,
+            "winRate": 49.1,
+            "netPnL": 104750,
+            "profitFactor": 999,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "5m",
+              "rank": 5,
+              "origSide": "LONG",
+              "origWR": 25.5
+            },
+            "tier": "BRONZE",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "disabledAt": "2026-04-22T12:30:01.040Z",
+            "disabledReason": "post-flip-review: edge âm hoặc overfit"
+          }
+        }
+      ]
+    },
+    "15m": {
+      "interval": "15m",
+      "label": "15M",
+      "candles_used": 10000,
+      "price_range": {
+        "min": 65867,
+        "max": 75855,
+        "first": 67372,
+        "last": 73890
+      },
+      "rules": [
+        {
+          "rank": 1,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "bollingerTouch"
+            ],
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "winRate": 41.9,
+            "profitFactor": 1.44,
+            "trades": 65,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 30.6,
+            "wins": 26,
+            "losses": 36,
+            "timeouts": 3,
+            "grossPnL": 1600,
+            "feeCost": 650,
+            "netPnL": 950,
+            "side": "SHORT",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2.5,
+              "sl": 0.5,
+              "wr": 21,
+              "net": 454
+            }
+          },
+          "label": "[SHORT] Div+BB TP+2% SL-1% · WR 41.9% · NET +950%",
+          "compositeScore": 950
+        },
+        {
+          "rank": 2,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "bollingerTouch"
+            ],
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "winRate": 31.6,
+            "profitFactor": 1.38,
+            "trades": 65,
+            "avgWinPct": 300,
+            "avgLossPct": -100,
+            "avgHoldBars": 44.2,
+            "wins": 18,
+            "losses": 39,
+            "timeouts": 8,
+            "grossPnL": 1500,
+            "feeCost": 650,
+            "netPnL": 850,
+            "side": "SHORT",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2.5,
+              "sl": 0.5,
+              "wr": 21,
+              "net": 454
+            }
+          },
+          "label": "[SHORT] Div+BB TP+3% SL-1% · WR 31.6% · NET +850%",
+          "compositeScore": 850
+        },
+        {
+          "rank": 3,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "bollingerTouch"
+            ],
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "winRate": 38.8,
+            "profitFactor": 1.27,
+            "trades": 65,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 59.1,
+            "wins": 19,
+            "losses": 30,
+            "timeouts": 16,
+            "grossPnL": 1200,
+            "feeCost": 650,
+            "netPnL": 550,
+            "side": "SHORT",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2.5,
+              "sl": 0.5,
+              "wr": 21,
+              "net": 454
+            }
+          },
+          "label": "[SHORT] Div+BB TP+3% SL-1.5% · WR 38.8% · NET +550%",
+          "compositeScore": 550
+        },
+        {
+          "rank": 4,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 10,
+            "stopPct": 5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "bollingerTouch"
+            ],
+            "forceSide": "SHORT",
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 3.3,
+            "profitFactor": 2,
+            "trades": 65,
+            "avgWinPct": 1000,
+            "avgLossPct": -500,
+            "avgHoldBars": 99.1,
+            "wins": 2,
+            "losses": 2,
+            "timeouts": 61,
+            "grossPnL": 1000,
+            "feeCost": 650,
+            "netPnL": 1012,
+            "side": "SHORT",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 2.5,
+              "sl": 0.5,
+              "wr": 21,
+              "net": 454
+            }
+          },
+          "label": "[SHORT] Div+BB TP+10% SL-5% · WR 50% · NET +350%",
+          "compositeScore": 350
+        },
+        {
+          "rank": 5,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "macdCross"
+            ],
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "winRate": 43.3,
+            "profitFactor": 1.53,
+            "trades": 30,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 15.2,
+            "wins": 13,
+            "losses": 17,
+            "timeouts": 0,
+            "grossPnL": 450,
+            "feeCost": 300,
+            "netPnL": 150,
+            "side": "SHORT",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 43.8,
+              "net": 544
+            }
+          },
+          "label": "[SHORT] RSI+MACD TP+1% SL-0.5% · WR 43.3% · NET +150%",
+          "compositeScore": 150
+        },
+        {
+          "rank": 6,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            }
+          },
+          "stats": {
+            "winRate": 44,
+            "profitFactor": 1.57,
+            "trades": 1825,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 54.1,
+            "wins": 596,
+            "losses": 759,
+            "timeouts": 470,
+            "grossPnL": 64950,
+            "feeCost": 18250,
+            "netPnL": 46700,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 52.3,
+              "net": 76480
+            }
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44% · NET +46700%",
+          "compositeScore": 46700
+        },
+        {
+          "rank": 7,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "4h cùng chiều"
+            }
+          },
+          "stats": {
+            "winRate": 48,
+            "profitFactor": 1.74,
+            "trades": 2552,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 56.5,
+            "wins": 767,
+            "losses": 1081,
+            "timeouts": 714,
+            "grossPnL": 67950,
+            "feeCost": 25620,
+            "netPnL": 83984,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1.5,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +42330%",
+          "compositeScore": 42330
+        },
+        {
+          "rank": 8,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            }
+          },
+          "stats": {
+            "winRate": 52.3,
+            "profitFactor": 1.92,
+            "trades": 1815,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 34.7,
+            "wins": 745,
+            "losses": 913,
+            "timeouts": 167,
+            "grossPnL": 57700,
+            "feeCost": 18250,
+            "netPnL": 76480,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 44.9% · NET +39450%",
+          "compositeScore": 39450
+        },
+        {
+          "rank": 9,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 52.3,
+            "profitFactor": 1.92,
+            "trades": 1815,
+            "avgWinPct": 300,
+            "avgLossPct": -100,
+            "avgHoldBars": 43.2,
+            "wins": 521,
+            "losses": 998,
+            "timeouts": 306,
+            "grossPnL": 56500,
+            "feeCost": 18250,
+            "netPnL": 76480,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-8"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.3% · NET +38250%",
+          "compositeScore": 38250
+        },
+        {
+          "rank": 10,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48,
+            "profitFactor": 1.74,
+            "trades": 2552,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 37.8,
+            "wins": 965,
+            "losses": 1315,
+            "timeouts": 282,
+            "grossPnL": 61500,
+            "feeCost": 25620,
+            "netPnL": 83984,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-7"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.3% · NET +35880%",
+          "compositeScore": 35880
+        },
+        {
+          "rank": 11,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều"
+            }
+          },
+          "stats": {
+            "winRate": 48.4,
+            "profitFactor": 1.64,
+            "trades": 2105,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 37,
+            "wins": 809,
+            "losses": 1063,
+            "timeouts": 232,
+            "grossPnL": 55500,
+            "feeCost": 21040,
+            "netPnL": 62360,
+            "side": "SHORT",
+            "htfFilterLabel": "1h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y"
+          },
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +34460%",
+          "compositeScore": 34460
+        },
+        {
+          "rank": 12,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48.4,
+            "profitFactor": 1.64,
+            "trades": 2105,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 55.3,
+            "wins": 630,
+            "losses": 892,
+            "timeouts": 582,
+            "grossPnL": 55200,
+            "feeCost": 21040,
+            "netPnL": 62360,
+            "side": "SHORT",
+            "htfFilterLabel": "1h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1.5,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "LONG",
+              "reason": "loss_gt_70_flipped"
+            }
+          },
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
+          "compositeScore": 34160
+        },
+        {
+          "rank": 13,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48,
+            "profitFactor": 1.74,
+            "trades": 2552,
+            "avgWinPct": 300,
+            "avgLossPct": -100,
+            "avgHoldBars": 45.4,
+            "wins": 678,
+            "losses": 1437,
+            "timeouts": 447,
+            "grossPnL": 59700,
+            "feeCost": 25620,
+            "netPnL": 83984,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-7"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +34080%",
+          "compositeScore": 34080
+        },
+        {
+          "rank": 14,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48.4,
+            "profitFactor": 1.64,
+            "trades": 2105,
+            "avgWinPct": 300,
+            "avgLossPct": -100,
+            "avgHoldBars": 44.8,
+            "wins": 553,
+            "losses": 1150,
+            "timeouts": 401,
+            "grossPnL": 50900,
+            "feeCost": 21040,
+            "netPnL": 62360,
+            "side": "SHORT",
+            "htfFilterLabel": "1h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-11"
+          },
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +29860%",
+          "compositeScore": 29860
+        },
+        {
+          "rank": 15,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 52.3,
+            "profitFactor": 1.92,
+            "trades": 1815,
+            "avgWinPct": 200,
+            "avgLossPct": -50,
+            "avgHoldBars": 21.6,
+            "wins": 542,
+            "losses": 1222,
+            "timeouts": 61,
+            "grossPnL": 47300,
+            "feeCost": 18250,
+            "netPnL": 76480,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 0.5,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-8"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.7% · NET +29050%",
+          "compositeScore": 29050
+        },
+        {
+          "rank": 16,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 44.1,
+            "profitFactor": 1.57,
+            "trades": 1821,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 54.1,
+            "wins": 596,
+            "losses": 757,
+            "timeouts": 468,
+            "grossPnL": 6525,
+            "feeCost": 1457,
+            "netPnL": 5068,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 52.3,
+              "net": 7648
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-6"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44.1% · NET +5068%",
+          "compositeScore": 5068
+        },
+        {
+          "rank": 17,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48,
+            "profitFactor": 1.74,
+            "trades": 2552,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 56.5,
+            "wins": 767,
+            "losses": 1079,
+            "timeouts": 712,
+            "grossPnL": 6825,
+            "feeCost": 2046,
+            "netPnL": 8398,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1.5,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-7"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +4779%",
+          "compositeScore": 4779
+        },
+        {
+          "rank": 18,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 52.3,
+            "profitFactor": 1.92,
+            "trades": 1815,
+            "avgWinPct": 20,
+            "avgLossPct": -10,
+            "avgHoldBars": 34.6,
+            "wins": 745,
+            "losses": 910,
+            "timeouts": 166,
+            "grossPnL": 5800,
+            "feeCost": 1457,
+            "netPnL": 7648,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-8"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 45% · NET +4343%",
+          "compositeScore": 4343
+        },
+        {
+          "rank": 19,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 52.3,
+            "profitFactor": 1.92,
+            "trades": 1815,
+            "avgWinPct": 30,
+            "avgLossPct": -10,
+            "avgHoldBars": 43.1,
+            "wins": 521,
+            "losses": 995,
+            "timeouts": 305,
+            "grossPnL": 5680,
+            "feeCost": 1457,
+            "netPnL": 7648,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-8"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.4% · NET +4223%",
+          "compositeScore": 4223
+        },
+        {
+          "rank": 20,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48,
+            "profitFactor": 1.74,
+            "trades": 2552,
+            "avgWinPct": 20,
+            "avgLossPct": -10,
+            "avgHoldBars": 37.8,
+            "wins": 965,
+            "losses": 1312,
+            "timeouts": 281,
+            "grossPnL": 6180,
+            "feeCost": 2046,
+            "netPnL": 8398,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-7"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.4% · NET +4134%",
+          "compositeScore": 4134
+        },
+        {
+          "rank": 21,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48,
+            "profitFactor": 1.74,
+            "trades": 2552,
+            "avgWinPct": 30,
+            "avgLossPct": -10,
+            "avgHoldBars": 45.4,
+            "wins": 678,
+            "losses": 1434,
+            "timeouts": 446,
+            "grossPnL": 6000,
+            "feeCost": 2046,
+            "netPnL": 8398,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-7"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 32.1% · NET +3954%",
+          "compositeScore": 3954
+        },
+        {
+          "rank": 22,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48.4,
+            "profitFactor": 1.64,
+            "trades": 2105,
+            "avgWinPct": 20,
+            "avgLossPct": -10,
+            "avgHoldBars": 37,
+            "wins": 809,
+            "losses": 1063,
+            "timeouts": 232,
+            "grossPnL": 5550,
+            "feeCost": 1683,
+            "netPnL": 6236,
+            "side": "SHORT",
+            "htfFilterLabel": "1h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-11"
+          },
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +3867%",
+          "compositeScore": 3867
+        },
+        {
+          "rank": 23,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48.4,
+            "profitFactor": 1.64,
+            "trades": 2105,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 55.3,
+            "wins": 630,
+            "losses": 892,
+            "timeouts": 582,
+            "grossPnL": 5520,
+            "feeCost": 1683,
+            "netPnL": 6236,
+            "side": "SHORT",
+            "htfFilterLabel": "1h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1.5,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-11"
+          },
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +3837%",
+          "compositeScore": 3837
+        },
+        {
+          "rank": 24,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 48.4,
+            "profitFactor": 1.64,
+            "trades": 2105,
+            "avgWinPct": 30,
+            "avgLossPct": -10,
+            "avgHoldBars": 44.8,
+            "wins": 553,
+            "losses": 1150,
+            "timeouts": 401,
+            "grossPnL": 5090,
+            "feeCost": 1683,
+            "netPnL": 6236,
+            "side": "SHORT",
+            "htfFilterLabel": "1h cùng chiều",
+            "originalTP": 3,
+            "originalSL": 1,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-11"
+          },
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1% · WR 32.5% · NET +3407%",
+          "compositeScore": 3407
+        },
+        {
+          "rank": 25,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 1h + 4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 52.3,
+            "profitFactor": 1.92,
+            "trades": 1815,
+            "avgWinPct": 20,
+            "avgLossPct": -5,
+            "avgHoldBars": 21.5,
+            "wins": 542,
+            "losses": 1219,
+            "timeouts": 60,
+            "grossPnL": 4745,
+            "feeCost": 1457,
+            "netPnL": 7648,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
+            "originalTP": 2,
+            "originalSL": 0.5,
+            "rescuedAt": "2026-04-22T11:15:16.911Z",
+            "rescueSource": "grid-search-2.3Y",
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-8"
+          },
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-0.5% · WR 30.8% · NET +3288%",
+          "compositeScore": 3288
+        },
+        {
+          "rank": 26,
+          "source": "flipped-from-15m-rank12",
+          "label": "[FLIPPED] SHORT→LONG [HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1.5,
+            "stopPct": 10,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "LONG",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "1h cùng chiều",
+              "invertedFromFlip": true
+            },
+            "disabled": true
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 2102,
+            "wins": 965,
+            "losses": 1137,
+            "winRate": 45.9,
+            "netPnL": 80934,
+            "profitFactor": 3.08,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "15m",
+              "rank": 12,
+              "origSide": "SHORT",
+              "origWR": 29.9
+            },
+            "tier": "BRONZE",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "disabledAt": "2026-04-22T12:30:01.040Z",
+            "disabledReason": "post-flip-review: edge âm hoặc overfit"
+          }
+        }
+      ]
+    },
+    "1h": {
+      "interval": "1h",
+      "label": "1H",
+      "candles_used": 10000,
+      "price_range": {
+        "min": 62900,
+        "max": 75624,
+        "first": 67556,
+        "last": 73666
+      },
+      "rules": [
+        {
+          "rank": 1,
+          "source": "FEATURE_SCAN_v4.3.15_iter3",
+          "label": "LONG Widened EMA+FLAT",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 0,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "forceSide": "LONG",
+            "emaDistFilter": {
+              "op": "between",
+              "min": -0.5,
+              "max": 0.5
+            },
+            "htfTrendFilter": {
+              "mode": "far_flat"
+            }
+          },
+          "stats": {
+            "winRate": 78.1,
+            "profitFactor": 11.2,
+            "trades": 32,
+            "avgWinPct": 500,
+            "avgLossPct": -200,
+            "avgHoldBars": 20,
+            "wins": 25,
+            "losses": 7,
+            "timeouts": 0,
+            "grossPnL": 11100,
+            "feeCost": 256,
+            "netPnL": 10844,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 3,
+              "sl": 1.5,
+              "wr": 33.2,
+              "net": 14608
+            }
+          }
+        },
+        {
+          "rank": 2,
+          "source": "FEATURE_SCAN_v4.3.15_iter3",
+          "label": "Golden ATR+EMA+FLAT",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 0,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "forceSide": "LONG",
+            "atrFilter": {
+              "op": "<",
+              "value": 0.3
+            },
+            "emaDistFilter": {
+              "op": "between",
+              "min": -0.5,
+              "max": 0.5
+            },
+            "htfTrendFilter": {
+              "mode": "far_flat"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 100,
+            "profitFactor": 999,
+            "trades": 10,
+            "avgWinPct": 500,
+            "avgLossPct": -200,
+            "avgHoldBars": 14,
+            "wins": 10,
+            "losses": 0,
+            "timeouts": 0,
+            "grossPnL": 5000,
+            "feeCost": 80,
+            "netPnL": 4920,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 3,
+              "sl": 1.5,
+              "wr": 33.2,
+              "net": 14608
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-1"
+          }
+        },
+        {
+          "rank": 3,
+          "source": "FEATURE_SCAN_v4.3.15_iter3",
+          "label": "Golden ATR+FLAT",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 0,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "forceSide": "LONG",
+            "atrFilter": {
+              "op": "<",
+              "value": 0.3
+            },
+            "htfTrendFilter": {
+              "mode": "far_flat"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 100,
+            "profitFactor": 999,
+            "trades": 12,
+            "avgWinPct": 500,
+            "avgLossPct": -200,
+            "avgHoldBars": 18,
+            "wins": 12,
+            "losses": 0,
+            "timeouts": 0,
+            "grossPnL": 6000,
+            "feeCost": 96,
+            "netPnL": 5904,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 3,
+              "sl": 1.5,
+              "wr": 33.2,
+              "net": 14608
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-1"
+          }
+        },
+        {
+          "rank": 4,
+          "source": "FEATURE_SCAN_v4.3.15_iter3",
+          "label": "LONG Multi-TF Score ≥70",
+          "config": {
+            "leverage": 100,
+            "targetPct": 4,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 0,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "forceSide": "LONG",
+            "multiTfScoreFilter": {
+              "side": "LONG",
+              "threshold": 70
+            }
+          },
+          "stats": {
+            "winRate": 39.1,
+            "profitFactor": 1.45,
+            "trades": 92,
+            "avgWinPct": 400,
+            "avgLossPct": -150,
+            "avgHoldBars": 60,
+            "wins": 36,
+            "losses": 56,
+            "timeouts": 0,
+            "grossPnL": 6000,
+            "feeCost": 736,
+            "netPnL": 7964,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 3,
+              "sl": 1.5,
+              "wr": 33.2,
+              "net": 14608
+            }
+          }
+        },
+        {
+          "rank": 5,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 10,
+            "stopPct": 5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG"
+          },
+          "stats": {
+            "winRate": 50,
+            "profitFactor": 2,
+            "trades": 16,
+            "avgWinPct": 1000,
+            "avgLossPct": -500,
+            "avgHoldBars": 83.5,
+            "wins": 2,
+            "losses": 2,
+            "timeouts": 12,
+            "grossPnL": 1000,
+            "feeCost": 160,
+            "netPnL": 840,
+            "side": "LONG"
+          },
+          "label": "[LONG] RSI+Div TP+10% SL-5% · WR 50% · NET +840%",
+          "compositeScore": 840
+        },
+        {
+          "rank": 6,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "winRate": 55,
+            "profitFactor": 2.44,
+            "trades": 20,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 6,
+            "wins": 11,
+            "losses": 9,
+            "timeouts": 0,
+            "grossPnL": 650,
+            "feeCost": 200,
+            "netPnL": 450,
+            "side": "SHORT"
+          },
+          "label": "[SHORT] RSI+Div TP+1% SL-0.5% · WR 55% · NET +450%",
+          "compositeScore": 450
+        },
+        {
+          "rank": 7,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG"
+          },
+          "stats": {
+            "winRate": 41.7,
+            "profitFactor": 1.19,
+            "trades": 16,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 57.1,
+            "wins": 5,
+            "losses": 7,
+            "timeouts": 4,
+            "grossPnL": 400,
+            "feeCost": 160,
+            "netPnL": 240,
+            "side": "LONG"
+          },
+          "label": "[LONG] RSI+Div TP+5% SL-3% · WR 41.7% · NET +240%",
+          "compositeScore": 240
+        },
+        {
+          "rank": 8,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 8,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG"
+          },
+          "stats": {
+            "winRate": 30,
+            "profitFactor": 1.14,
+            "trades": 16,
+            "avgWinPct": 800,
+            "avgLossPct": -300,
+            "avgHoldBars": 64.4,
+            "wins": 3,
+            "losses": 7,
+            "timeouts": 6,
+            "grossPnL": 300,
+            "feeCost": 160,
+            "netPnL": 140,
+            "side": "LONG"
+          },
+          "label": "[LONG] RSI+Div TP+8% SL-3% · WR 30% · NET +140%",
+          "compositeScore": 140
+        },
+        {
+          "rank": 9,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG"
+          },
+          "stats": {
+            "winRate": 35.7,
+            "profitFactor": 1.11,
+            "trades": 16,
+            "avgWinPct": 500,
+            "avgLossPct": -250,
+            "avgHoldBars": 51.7,
+            "wins": 5,
+            "losses": 9,
+            "timeouts": 2,
+            "grossPnL": 250,
+            "feeCost": 160,
+            "netPnL": 90,
+            "side": "LONG"
+          },
+          "label": "[LONG] RSI+Div TP+5% SL-2.5% · WR 35.7% · NET +90%",
+          "compositeScore": 90
+        },
+        {
+          "rank": 10,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 37.4,
+            "profitFactor": 1.73,
+            "trades": 453,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 62.7,
+            "wins": 164,
+            "losses": 158,
+            "timeouts": 131,
+            "grossPnL": 34600,
+            "feeCost": 4530,
+            "netPnL": 35960,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 5,
+              "sl": 2,
+              "wr": 34.1,
+              "net": 26584
+            }
+          },
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +30070%",
+          "compositeScore": 30070
+        },
+        {
+          "rank": 11,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 4h + 1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 31,
+            "profitFactor": 1.34,
+            "trades": 1852,
+            "avgWinPct": 300,
+            "avgLossPct": -100,
+            "avgHoldBars": 15.4,
+            "wins": 571,
+            "losses": 1278,
+            "timeouts": 3,
+            "grossPnL": 43500,
+            "feeCost": 18520,
+            "netPnL": 29240,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 30.9,
+              "net": 31898
+            }
+          },
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +24980%",
+          "compositeScore": 24980
+        },
+        {
+          "rank": 12,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 37.8,
+            "profitFactor": 1.23,
+            "trades": 2247,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 24.5,
+            "wins": 845,
+            "losses": 1379,
+            "timeouts": 23,
+            "grossPnL": 46650,
+            "feeCost": 22470,
+            "netPnL": 29580,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 3,
+              "sl": 2,
+              "wr": 43.8,
+              "net": 34756
+            }
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +24180%",
+          "compositeScore": 24180
+        },
+        {
+          "rank": 13,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 4h + 1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 38.6,
+            "profitFactor": 1.25,
+            "trades": 1852,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 21.2,
+            "wins": 710,
+            "losses": 1137,
+            "timeouts": 5,
+            "grossPnL": 42450,
+            "feeCost": 18520,
+            "netPnL": 28540,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 30.9,
+              "net": 31898
+            }
+          },
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +23930%",
+          "compositeScore": 23930
+        },
+        {
+          "rank": 14,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "4h cùng chiều"
+            }
+          },
+          "stats": {
+            "winRate": 30,
+            "profitFactor": 1.28,
+            "trades": 2247,
+            "avgWinPct": 300,
+            "avgLossPct": -100,
+            "avgHoldBars": 17.6,
+            "wins": 671,
+            "losses": 1567,
+            "timeouts": 9,
+            "grossPnL": 44600,
+            "feeCost": 22470,
+            "netPnL": 22130,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 3,
+              "sl": 2,
+              "wr": 43.8,
+              "net": 34756
+            }
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +22130%",
+          "compositeScore": 22130
+        },
+        {
+          "rank": 15,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 34.7,
+            "profitFactor": 1.5,
+            "trades": 453,
+            "avgWinPct": 500,
+            "avgLossPct": -200,
+            "avgHoldBars": 48.3,
+            "wins": 147,
+            "losses": 245,
+            "timeouts": 61,
+            "grossPnL": 24500,
+            "feeCost": 4530,
+            "netPnL": 26860,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 5,
+              "sl": 2,
+              "wr": 34.1,
+              "net": 26584
+            }
+          },
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +19970%",
+          "compositeScore": 19970
+        },
+        {
+          "rank": 16,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 36.3,
+            "profitFactor": 1.16,
+            "trades": 2936,
+            "avgWinPct": 300,
+            "avgLossPct": -150,
+            "avgHoldBars": 23.6,
+            "wins": 1063,
+            "losses": 1831,
+            "timeouts": 42,
+            "grossPnL": 44250,
+            "feeCost": 29360,
+            "netPnL": 20984,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 28.8,
+              "net": 22792
+            }
+          },
+          "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +14890%",
+          "compositeScore": 14890
+        },
+        {
+          "rank": 17,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 36.7,
+            "profitFactor": 1.61,
+            "trades": 249,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 62.5,
+            "wins": 86,
+            "losses": 89,
+            "timeouts": 74,
+            "grossPnL": 16300,
+            "feeCost": 2490,
+            "netPnL": 18092,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 2,
+              "wr": 41.9,
+              "net": 13112
+            }
+          },
+          "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +13810%",
+          "compositeScore": 13810
+        },
+        {
+          "rank": 18,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 4h + 1d cùng chiều"
+            }
+          },
+          "stats": {
+            "winRate": 38.8,
+            "profitFactor": 1.27,
+            "trades": 1852,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 11.9,
+            "wins": 718,
+            "losses": 1134,
+            "timeouts": 0,
+            "grossPnL": 30200,
+            "feeCost": 18520,
+            "netPnL": 11680,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 30.9,
+              "net": 31898
+            }
+          },
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +11680%",
+          "compositeScore": 11680
+        },
+        {
+          "rank": 19,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 8,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 33.1,
+            "profitFactor": 1.32,
+            "trades": 453,
+            "avgWinPct": 800,
+            "avgLossPct": -300,
+            "avgHoldBars": 73.4,
+            "wins": 78,
+            "losses": 158,
+            "timeouts": 217,
+            "grossPnL": 15000,
+            "feeCost": 4530,
+            "netPnL": 10470,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 2,
+              "wr": 34.1,
+              "net": 26584
+            },
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "LONG",
+              "reason": "loss_gt_70_flipped"
+            }
+          },
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
+          "compositeScore": 10470
+        },
+        {
+          "rank": 20,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 37.4,
+            "profitFactor": 1.73,
+            "trades": 453,
+            "avgWinPct": 50,
+            "avgLossPct": -30,
+            "avgHoldBars": 62.7,
+            "wins": 164,
+            "losses": 158,
+            "timeouts": 131,
+            "grossPnL": 3460,
+            "feeCost": 362,
+            "netPnL": 3596,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 5,
+              "sl": 2,
+              "wr": 34.1,
+              "net": 2658
+            }
+          },
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +3098%",
+          "compositeScore": 3098
+        },
+        {
+          "rank": 21,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 4h + 1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 31,
+            "profitFactor": 1.34,
+            "trades": 1851,
+            "avgWinPct": 30,
+            "avgLossPct": -10,
+            "avgHoldBars": 15.4,
+            "wins": 571,
+            "losses": 1277,
+            "timeouts": 3,
+            "grossPnL": 4360,
+            "feeCost": 1481,
+            "netPnL": 2924,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 30.9,
+              "net": 3190
+            }
+          },
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +2879%",
+          "compositeScore": 2879
+        },
+        {
+          "rank": 22,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 37.8,
+            "profitFactor": 1.22,
+            "trades": 2246,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 24.5,
+            "wins": 844,
+            "losses": 1379,
+            "timeouts": 23,
+            "grossPnL": 4635,
+            "feeCost": 1797,
+            "netPnL": 2958,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 3,
+              "sl": 2,
+              "wr": 43.8,
+              "net": 3476
+            }
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +2838%",
+          "compositeScore": 2838
+        },
+        {
+          "rank": 23,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 4h + 1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 38.6,
+            "profitFactor": 1.25,
+            "trades": 1851,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 21.2,
+            "wins": 709,
+            "losses": 1137,
+            "timeouts": 5,
+            "grossPnL": 4215,
+            "feeCost": 1481,
+            "netPnL": 2854,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 30.9,
+              "net": 3190
+            }
+          },
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +2734%",
+          "compositeScore": 2734
+        },
+        {
+          "rank": 24,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "near_match",
+              "label": "4h cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 30,
+            "profitFactor": 1.29,
+            "trades": 2246,
+            "avgWinPct": 30,
+            "avgLossPct": -10,
+            "avgHoldBars": 17.6,
+            "wins": 671,
+            "losses": 1566,
+            "timeouts": 9,
+            "grossPnL": 4470,
+            "feeCost": 1797,
+            "netPnL": 2673,
+            "side": "SHORT",
+            "htfFilterLabel": "4h cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 3,
+              "sl": 2,
+              "wr": 43.8,
+              "net": 3476
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-14"
+          },
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +2673%",
+          "compositeScore": 2673
+        },
+        {
+          "rank": 25,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 34.7,
+            "profitFactor": 1.5,
+            "trades": 453,
+            "avgWinPct": 50,
+            "avgLossPct": -20,
+            "avgHoldBars": 48.3,
+            "wins": 147,
+            "losses": 245,
+            "timeouts": 61,
+            "grossPnL": 2450,
+            "feeCost": 362,
+            "netPnL": 2686,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 5,
+              "sl": 2,
+              "wr": 34.1,
+              "net": 2658
+            }
+          },
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +2088%",
+          "compositeScore": 2088
+        },
+        {
+          "rank": 26,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 36.3,
+            "profitFactor": 1.16,
+            "trades": 2935,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 23.6,
+            "wins": 1062,
+            "losses": 1831,
+            "timeouts": 42,
+            "grossPnL": 4395,
+            "feeCost": 2348,
+            "netPnL": 2098,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 28.8,
+              "net": 2279
+            }
+          },
+          "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +2047%",
+          "compositeScore": 2047
+        },
+        {
+          "rank": 27,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "both_match",
+              "label": "cả 4h + 1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 38.8,
+            "profitFactor": 1.27,
+            "trades": 1851,
+            "avgWinPct": 20,
+            "avgLossPct": -10,
+            "avgHoldBars": 11.9,
+            "wins": 718,
+            "losses": 1133,
+            "timeouts": 0,
+            "grossPnL": 3030,
+            "feeCost": 1481,
+            "netPnL": 1549,
+            "side": "SHORT",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 30.9,
+              "net": 3190
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-18"
+          },
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +1549%",
+          "compositeScore": 1549
+        },
+        {
+          "rank": 28,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 36.7,
+            "profitFactor": 1.61,
+            "trades": 249,
+            "avgWinPct": 50,
+            "avgLossPct": -30,
+            "avgHoldBars": 62.5,
+            "wins": 86,
+            "losses": 89,
+            "timeouts": 74,
+            "grossPnL": 1630,
+            "feeCost": 199,
+            "netPnL": 1809,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 4,
+              "sl": 2,
+              "wr": 41.9,
+              "net": 1311
+            }
+          },
+          "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +1431%",
+          "compositeScore": 1431
+        },
+        {
+          "rank": 29,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "SHORT",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều"
+            },
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 28.1,
+            "profitFactor": 1.17,
+            "trades": 2935,
+            "avgWinPct": 30,
+            "avgLossPct": -10,
+            "avgHoldBars": 16.7,
+            "wins": 820,
+            "losses": 2100,
+            "timeouts": 15,
+            "grossPnL": 3600,
+            "feeCost": 2348,
+            "netPnL": 1252,
+            "side": "SHORT",
+            "htfFilterLabel": "1d cùng chiều",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 4,
+              "sl": 1.5,
+              "wr": 28.8,
+              "net": 2279
+            },
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "LONG",
+              "reason": "loss_gt_70_flipped"
+            }
+          },
+          "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
+          "compositeScore": 1252
+        },
+        {
+          "rank": 30,
+          "source": "golden-riskRadar",
+          "label": "🥇 Golden LONG QUADRUPLE (MACD+EMA+ATR+FLAT)",
+          "config": {
+            "goldenId": "golden_long_quadruple",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "macdBull",
+              "emaNear",
+              "atrLow"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 163,
+            "wins": 117,
+            "losses": 46,
+            "winRate": 71.8,
+            "netPnL": 4800,
+            "profitFactor": 4.69,
+            "expectancy": 1.92,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 31,
+          "source": "golden-riskRadar",
+          "label": "🥈 Golden LONG TRIPLE (MACD+EMA+FLAT)",
+          "config": {
+            "goldenId": "golden_long_macd_flat",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "macdBull",
+              "emaNear"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 405,
+            "wins": 263,
+            "losses": 142,
+            "winRate": 64.9,
+            "netPnL": 9986,
+            "profitFactor": 3.9,
+            "expectancy": 1.94,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 32,
+          "source": "golden-riskRadar",
+          "label": "🥉 Golden LONG TRIPLE (MACD+ATR+FLAT)",
+          "config": {
+            "goldenId": "golden_long_macd_atr_flat",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "macdBull",
+              "atrLow"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 181,
+            "wins": 122,
+            "losses": 59,
+            "winRate": 67.4,
+            "netPnL": 4775,
+            "profitFactor": 3.82,
+            "expectancy": 1.72,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 33,
+          "source": "golden-riskRadar",
+          "label": "Golden LONG SILENT+CENTER (ATR+EMA+FLAT)",
+          "config": {
+            "goldenId": "golden_long_atr_ema_flat",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "atrLow",
+              "emaNear"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 323,
+            "wins": 195,
+            "losses": 128,
+            "winRate": 60.4,
+            "netPnL": 6932,
+            "profitFactor": 2.59,
+            "expectancy": 1.22,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 34,
+          "source": "golden-riskRadar",
+          "label": "Golden LONG 1H SILENT (ATR+FLAT)",
+          "config": {
+            "goldenId": "golden_long_atr_flat",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "atrLow"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 84,
+            "wins": 68,
+            "losses": 16,
+            "winRate": 81,
+            "netPnL": 3013,
+            "profitFactor": null,
+            "expectancy": null,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 35,
+          "source": "golden-riskRadar",
+          "label": "Golden LONG EMA CROSS BULL + SILENT",
+          "config": {
+            "goldenId": "golden_long_cross_silent",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "emaCrossBull",
+              "atrLow"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 104,
+            "wins": 71,
+            "losses": 33,
+            "winRate": 68.3,
+            "netPnL": 2807,
+            "profitFactor": 3.44,
+            "expectancy": 1.45,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 36,
+          "source": "golden-riskRadar",
+          "label": "Golden LONG DOJI + MACD BULL",
+          "config": {
+            "goldenId": "golden_long_doji_macd",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "bodySmall",
+              "macdBull"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 259,
+            "wins": 165,
+            "losses": 94,
+            "winRate": 63.7,
+            "netPnL": 6163,
+            "profitFactor": 3.64,
+            "expectancy": 1.78,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 37,
+          "source": "golden-riskRadar",
+          "label": "Golden LONG BB SQUEEZE + MACD BULL",
+          "config": {
+            "goldenId": "golden_long_bb_squeeze",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "LONG",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "FLAT"
+            },
+            "features": [
+              "bbSqueeze",
+              "macdBull"
+            ]
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 369,
+            "wins": 230,
+            "losses": 139,
+            "winRate": 62.3,
+            "netPnL": 8425,
+            "profitFactor": 3.5,
+            "expectancy": 1.79,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 38,
+          "source": "golden-riskRadar",
+          "label": "🥇 Golden SHORT QUADRUPLE DOWN (EMA+ATR+MACD+DOWN)",
+          "config": {
+            "goldenId": "golden_short_quadruple",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "SHORT",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "DOWN"
+            },
+            "features": [
+              "emaCrossBear",
+              "atrLow",
+              "macdBear"
+            ]
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 46,
+            "wins": 32,
+            "losses": 14,
+            "winRate": 69.6,
+            "netPnL": 1283,
+            "profitFactor": 4.53,
+            "expectancy": 1.84,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 39,
+          "source": "golden-riskRadar",
+          "label": "🥈 Golden SHORT EMA CROSS BEAR + SILENT",
+          "config": {
+            "goldenId": "golden_short_cross_silent",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "SHORT",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "DOWN"
+            },
+            "features": [
+              "emaCrossBear",
+              "atrLow"
+            ]
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 174,
+            "wins": 113,
+            "losses": 61,
+            "winRate": 64.9,
+            "netPnL": 4291,
+            "profitFactor": 3.37,
+            "expectancy": 1.67,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 40,
+          "source": "golden-riskRadar",
+          "label": "🥉 Golden SHORT MACD BEAR + SILENT",
+          "config": {
+            "goldenId": "golden_short_macd_silent",
+            "delegatedTo": "useRiskRadar",
+            "forceSide": "SHORT",
+            "targetPct": 5,
+            "stopPct": 2,
+            "leverage": 100,
+            "maxHoldBars": 100,
+            "htfTrendFilter": {
+              "mode": "custom_htf_state",
+              "state": "DOWN"
+            },
+            "features": [
+              "macdBear",
+              "atrLow"
+            ]
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 62,
+            "wins": 39,
+            "losses": 23,
+            "winRate": 62.9,
+            "netPnL": 1440,
+            "profitFactor": 3.27,
+            "expectancy": 1.57,
+            "verified": true,
+            "source": "forward-test-2.3Y",
+            "injectedAt": "2026-04-22T11:21:04.005Z"
+          }
+        },
+        {
+          "rank": 41,
+          "source": "flipped-from-1h-rank19",
+          "label": "[FLIPPED] SHORT→LONG [HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1.5,
+            "stopPct": 10,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "LONG",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều",
+              "invertedFromFlip": true
+            },
+            "disabled": false
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 452,
+            "wins": 310,
+            "losses": 142,
+            "winRate": 68.6,
+            "netPnL": 10884,
+            "profitFactor": 1.45,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "1h",
+              "rank": 19,
+              "origSide": "SHORT",
+              "origWR": 17
+            },
+            "tier": "GOLD",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "oos": {
+              "days": 90,
+              "N": 43,
+              "WR": 67.4,
+              "BE": 87,
+              "edge": -19.5,
+              "PF": 1.09,
+              "finalEquity": 6,
+              "maxDD": -3228,
+              "maxConsL": 3,
+              "note": "lev=100 rủi ro"
+            },
+            "oosTestedAt": "2026-04-22T12:31:45.896Z"
+          }
+        },
+        {
+          "rank": 42,
+          "source": "flipped-from-1h-rank29",
+          "label": "[FLIPPED] SHORT→LONG [HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 10,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "forceSide": "LONG",
+            "htfTrendFilter": {
+              "mode": "far_match",
+              "label": "1d cùng chiều",
+              "invertedFromFlip": true
+            },
+            "disabled": true
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 2851,
+            "wins": 1386,
+            "losses": 1465,
+            "winRate": 48.6,
+            "netPnL": 13569,
+            "profitFactor": 1.62,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "1h",
+              "rank": 29,
+              "origSide": "SHORT",
+              "origWR": 28
+            },
+            "tier": "BRONZE",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "disabledAt": "2026-04-22T12:30:01.040Z",
+            "disabledReason": "post-flip-review: edge âm hoặc overfit"
+          }
+        }
+      ]
+    },
+    "4h": {
+      "interval": "4h",
+      "label": "4H",
+      "candles_used": 1500,
+      "price_range": {
+        "min": 62910,
+        "max": 125411,
+        "first": 116892,
+        "last": 73716
+      },
+      "rules": [
+        {
+          "source": "VERIFIED_REVERSAL",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 50,
+            "candleReversalFilter": {
+              "tf": "4h",
+              "type": "UP"
+            },
+            "forceSide": "LONG",
+            "minScore": 0,
+            "requiredConditions": []
+          },
+          "stats": {
+            "winRate": 36.1,
+            "profitFactor": 1.67,
+            "trades": 1588,
+            "avgWinPct": 50,
+            "avgLossPct": -30,
+            "avgHoldBars": 12,
+            "wins": 573,
+            "losses": 683,
+            "timeouts": 332,
+            "grossPnL": 8165,
+            "feeCost": 6465,
+            "netPnL": 1700,
+            "side": "LONG",
+            "htfFilterLabel": "Mọi UP reversal 4h",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 26.7,
+              "net": 3005
+            }
+          },
+          "label": "[REVERSAL 4H LONG] Mọi UP reversal · TP+5% SL-3% · WR 36.1% · NET +1700%",
+          "compositeScore": 1700,
+          "rank": 1
+        },
+        {
+          "source": "VERIFIED_REVERSAL",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2,
+            "maxHoldBars": 50,
+            "candleReversalFilter": {
+              "tf": "4h",
+              "type": "UP"
+            },
+            "emaPosFilter": "below",
+            "forceSide": "LONG",
+            "minScore": 0,
+            "requiredConditions": [],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 30.3,
+            "profitFactor": 1.52,
+            "trades": 846,
+            "avgWinPct": 50,
+            "avgLossPct": -20,
+            "avgHoldBars": 13.5,
+            "wins": 256,
+            "losses": 460,
+            "timeouts": 130,
+            "grossPnL": 3600,
+            "feeCost": 2617,
+            "netPnL": 983,
+            "side": "LONG",
+            "htfFilterLabel": "UP reversal + giá dưới EMA50 4h",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 25.9,
+              "net": 971
+            },
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "SHORT",
+              "reason": "loss_gt_70_flipped"
+            }
+          },
+          "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+5% SL-2% · WR 30.3% · NET +983%",
+          "compositeScore": 983,
+          "rank": 2
+        },
+        {
+          "source": "VERIFIED_REVERSAL",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 50,
+            "candleReversalFilter": {
+              "tf": "4h",
+              "type": "UP"
+            },
+            "emaPosFilter": "above",
+            "forceSide": "LONG",
+            "minScore": 0,
+            "requiredConditions": [],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 38.2,
+            "profitFactor": 1.65,
+            "trades": 728,
+            "avgWinPct": 50,
+            "avgLossPct": -30,
+            "avgHoldBars": 11.8,
+            "wins": 262,
+            "losses": 312,
+            "timeouts": 154,
+            "grossPnL": 3740,
+            "feeCost": 2852,
+            "netPnL": 2524,
+            "side": "LONG",
+            "htfFilterLabel": "UP reversal + giá trên EMA50 4h (pullback)",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 27.2,
+              "net": 2034
+            }
+          },
+          "label": "[REVERSAL 4H LONG] UP + trên EMA50 (pullback) · TP+5% SL-3% · WR 35.9% · NET +888%",
+          "compositeScore": 888,
+          "rank": 3
+        },
+        {
+          "source": "VERIFIED_REVERSAL",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "candleReversalFilter": {
+              "tf": "4h",
+              "type": "UP"
+            },
+            "emaPosFilter": "below",
+            "forceSide": "LONG",
+            "minScore": 0,
+            "requiredConditions": []
+          },
+          "stats": {
+            "winRate": 37,
+            "profitFactor": 1.48,
+            "trades": 846,
+            "avgWinPct": 30,
+            "avgLossPct": -15,
+            "avgHoldBars": 10.3,
+            "wins": 313,
+            "losses": 409,
+            "timeouts": 124,
+            "grossPnL": 3255,
+            "feeCost": 2537,
+            "netPnL": 718,
+            "side": "LONG",
+            "htfFilterLabel": "UP reversal + giá dưới EMA50 4h",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 25.9,
+              "net": 971
+            }
+          },
+          "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+3% SL-1.5% · WR 37.0% · NET +718%",
+          "compositeScore": 718,
+          "rank": 4
+        },
+        {
+          "rank": 5,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "macdCross"
+            ]
+          },
+          "stats": {
+            "winRate": 62.5,
+            "profitFactor": 2.78,
+            "trades": 8,
+            "avgWinPct": 250,
+            "avgLossPct": 150,
+            "avgHoldBars": 8.5,
+            "wins": 5,
+            "losses": 3,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 26.3,
+              "net": 51262
+            }
+          }
+        },
+        {
+          "rank": 6,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1.5,
+            "stopPct": 0.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "macdCross",
+              "rsiExtreme"
+            ]
+          },
+          "stats": {
+            "winRate": 50,
+            "profitFactor": 3,
+            "trades": 8,
+            "avgWinPct": 150,
+            "avgLossPct": 50,
+            "avgHoldBars": 3.3,
+            "wins": 4,
+            "losses": 4,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 29.2,
+              "net": 2080
+            }
+          }
+        },
+        {
+          "rank": 7,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 90,
+            "stochOSLevel": 10,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 57.1,
+            "profitFactor": 2.22,
+            "trades": 14,
+            "avgWinPct": 250,
+            "avgLossPct": 150,
+            "avgHoldBars": 7.1,
+            "wins": 8,
+            "losses": 6,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 26.3,
+              "net": 51262
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-5"
+          }
+        },
+        {
+          "rank": 8,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1.5,
+            "stopPct": 0.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 90,
+            "stochOSLevel": 10,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "macdCross",
+              "rsiExtreme"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 46.2,
+            "profitFactor": 2.57,
+            "trades": 13,
+            "avgWinPct": 150,
+            "avgLossPct": 50,
+            "avgHoldBars": 3,
+            "wins": 6,
+            "losses": 7,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 29.2,
+              "net": 2080
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-6"
+          }
+        },
+        {
+          "rank": 9,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1.5,
+            "stopPct": 0.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 90,
+            "stochOSLevel": 10,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "macdCross"
+            ]
+          },
+          "stats": {
+            "winRate": 43.8,
+            "profitFactor": 2.33,
+            "trades": 16,
+            "avgWinPct": 150,
+            "avgLossPct": 50,
+            "avgHoldBars": 3.4,
+            "wins": 7,
+            "losses": 9,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 26.3,
+              "net": 51262
+            }
+          }
+        },
+        {
+          "rank": 10,
+          "source": "flipped-from-4h-rank2",
+          "label": "[FLIPPED] LONG→SHORT [REVERSAL 4H LONG] UP + dưới EMA50 · TP+5% SL-2% · WR 30.3% · NET +983%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 10,
+            "maxHoldBars": 50,
+            "candleReversalFilter": {
+              "tf": "4h",
+              "type": "UP",
+              "invertedFromFlip": true
+            },
+            "emaPosFilter": "below",
+            "forceSide": "SHORT",
+            "minScore": 0,
+            "requiredConditions": [],
+            "disabled": false
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 717,
+            "wins": 456,
+            "losses": 261,
+            "winRate": 63.6,
+            "netPnL": 3806,
+            "profitFactor": 1.47,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "4h",
+              "rank": 2,
+              "origSide": "LONG",
+              "origWR": 28.9
+            },
+            "tier": "GOLD",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "oos": {
+              "days": 90,
+              "N": 82,
+              "WR": 69.5,
+              "BE": 76.9,
+              "edge": -7.4,
+              "PF": 1.55,
+              "finalEquity": 544,
+              "maxDD": -637,
+              "maxConsL": 4
+            },
+            "oosTestedAt": "2026-04-22T12:31:45.896Z"
+          }
+        }
+      ]
+    },
+    "1d": {
+      "interval": "1d",
+      "label": "1D",
+      "candles_used": 1500,
+      "price_range": {
+        "min": 15781,
+        "max": 124659,
+        "first": 38731,
+        "last": 73596
+      },
+      "rules": [
+        {
+          "rank": 1,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 71.4,
+            "profitFactor": 6.25,
+            "trades": 7,
+            "avgWinPct": 250,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.4,
+            "wins": 5,
+            "losses": 2,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "SHORT",
+              "reason": "loss_gt_70_flipped"
+            }
+          }
+        },
+        {
+          "rank": 2,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ]
+          },
+          "stats": {
+            "winRate": 71.4,
+            "profitFactor": 5,
+            "trades": 7,
+            "avgWinPct": 200,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.3,
+            "wins": 5,
+            "losses": 2,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            }
+          }
+        },
+        {
+          "rank": 3,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 2,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "bollingerTouch",
+              "divergence"
+            ]
+          },
+          "stats": {
+            "winRate": 66.7,
+            "profitFactor": 5,
+            "trades": 6,
+            "avgWinPct": 250,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.5,
+            "wins": 4,
+            "losses": 2,
+            "timeouts": 0
+          }
+        },
+        {
+          "rank": 4,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ]
+          },
+          "stats": {
+            "winRate": 71.4,
+            "profitFactor": 4.17,
+            "trades": 7,
+            "avgWinPct": 250,
+            "avgLossPct": 150,
+            "avgHoldBars": 1.4,
+            "wins": 5,
+            "losses": 2,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            }
+          }
+        },
+        {
+          "rank": 5,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ]
+          },
+          "stats": {
+            "winRate": 66.7,
+            "profitFactor": 4,
+            "trades": 12,
+            "avgWinPct": 300,
+            "avgLossPct": 150,
+            "avgHoldBars": 1.9,
+            "wins": 8,
+            "losses": 4,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            }
+          }
+        },
+        {
+          "rank": 6,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 2,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "bollingerTouch",
+              "divergence"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 62.5,
+            "profitFactor": 4.17,
+            "trades": 8,
+            "avgWinPct": 250,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.5,
+            "wins": 5,
+            "losses": 3,
+            "timeouts": 0,
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-3"
+          }
+        },
+        {
+          "rank": 7,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 69.2,
+            "profitFactor": 3.75,
+            "trades": 13,
+            "avgWinPct": 250,
+            "avgLossPct": 150,
+            "avgHoldBars": 1.6,
+            "wins": 9,
+            "losses": 4,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
+            "dedupeReason": "dup-of-rank-4"
+          }
+        },
+        {
+          "rank": 8,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ]
+          },
+          "stats": {
+            "winRate": 61.5,
+            "profitFactor": 4,
+            "trades": 13,
+            "avgWinPct": 250,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.5,
+            "wins": 8,
+            "losses": 5,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            }
+          }
+        },
+        {
+          "rank": 9,
+          "source": "flipped-from-1d-rank1",
+          "label": "[FLIPPED] LONG→SHORT LONG rank1",
+          "config": {
+            "leverage": 100,
+            "targetPct": 10,
+            "stopPct": 10,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": false,
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 240,
+            "wins": 132,
+            "losses": 108,
+            "winRate": 55,
+            "netPnL": 25080,
+            "profitFactor": 1.26,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "1d",
+              "rank": 1,
+              "origSide": "LONG",
+              "origWR": 23.5
+            },
+            "tier": "SILVER",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "oos": {
+              "days": 90,
+              "N": 1,
+              "WR": 100,
+              "BE": 50,
+              "edge": 50,
+              "PF": 999,
+              "finalEquity": 992,
+              "maxDD": 0,
+              "maxConsL": 0,
+              "note": "N=1, không đủ tin cậy"
+            },
+            "oosTestedAt": "2026-04-22T12:31:45.896Z"
+          }
+        }
+      ]
+    },
+    "1w": {
+      "interval": "1w",
+      "label": "1W",
+      "candles_used": 453,
+      "price_range": {
+        "min": 3229,
+        "max": 123482,
+        "first": 4086,
+        "last": 73654
+      },
+      "rules": [
+        {
+          "rank": 1,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme"
+            ]
+          },
+          "stats": {
+            "winRate": 33.3,
+            "profitFactor": 1.5,
+            "trades": 12,
+            "avgWinPct": 300,
+            "avgLossPct": 100,
+            "avgHoldBars": 1,
+            "wins": 4,
+            "losses": 8,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 0.5,
+              "wr": 7.3,
+              "net": -728
+            }
+          }
+        },
+        {
+          "rank": 2,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 2,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "stochExtreme"
+            ]
+          },
+          "stats": {
+            "winRate": 30.8,
+            "profitFactor": 1.33,
+            "trades": 13,
+            "avgWinPct": 300,
+            "avgLossPct": 100,
+            "avgHoldBars": 1,
+            "wins": 4,
+            "losses": 9,
+            "timeouts": 0
+          }
+        }
+      ]
+    }
+  },
+  "last_rescued_at": "2026-04-22T11:15:16.911Z",
+  "rescue_summary": {
+    "rescued": 18,
+    "dead_disabled": 18,
+    "improved_flagged": 37,
+    "not_found": 0
+  },
+  "last_goldens_injected_at": "2026-04-22T11:21:04.005Z",
+  "goldens_count": 11,
+  "last_flipped_at": "2026-04-22T12:29:51.040Z",
+  "flip_summary": {
+    "candidates": 13,
+    "uniqueCount": 6,
+    "disabled": 6,
+    "appended": 6,
+    "flippedAt": "2026-04-22T12:29:51.040Z"
+  },
+  "last_dedupe_at": "2026-04-22T12:29:54.615Z",
+  "dedupe_summary": {
+    "groups": 11,
+    "disabled": 23
+  }
+}
