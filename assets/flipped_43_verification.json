@@ -1,0 +1,1140 @@
+{
+  "generatedAt": "2026-04-23T10:01:23.417Z",
+  "assumptions": "Flip side only; keep original conditions, TP/SL, leverage, maxHold, HTF filters",
+  "results": [
+    {
+      "tfKey": "5m",
+      "rank": 1,
+      "label": "SHORT rank1",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 1,
+        "slPct": 0.5,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "divergence",
+          "macdCross"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 449,
+        "wins": 118,
+        "losses": 281,
+        "timeouts": 50,
+        "winRate": 26.3,
+        "netPnL": -5842,
+        "avgHold": 38.5
+      }
+    },
+    {
+      "tfKey": "5m",
+      "rank": 2,
+      "label": "SHORT rank2",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 2,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "rsiExtreme",
+          "macdCross"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 52,
+        "wins": 5,
+        "losses": 23,
+        "timeouts": 24,
+        "winRate": 9.6,
+        "netPnL": -1716,
+        "avgHold": 73.1
+      }
+    },
+    {
+      "tfKey": "5m",
+      "rank": 4,
+      "label": "LONG rank4",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 3,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "stochExtreme",
+          "rsiExtreme"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 55,
+        "wins": 0,
+        "losses": 4,
+        "timeouts": 51,
+        "winRate": 0,
+        "netPnL": -1640,
+        "avgHold": 97.1
+      }
+    },
+    {
+      "tfKey": "5m",
+      "rank": 5,
+      "label": "LONG rank5",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 0.76,
+        "slPct": 0.35,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6269,
+        "wins": 1427,
+        "losses": 3635,
+        "timeouts": 1207,
+        "winRate": 22.8,
+        "netPnL": -68925,
+        "avgHold": 22.9
+      }
+    },
+    {
+      "tfKey": "5m",
+      "rank": 6,
+      "label": "LONG rank6",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 0.76,
+        "slPct": 0.35,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6269,
+        "wins": 1427,
+        "losses": 3635,
+        "timeouts": 1207,
+        "winRate": 22.8,
+        "netPnL": -68925,
+        "avgHold": 22.9
+      }
+    },
+    {
+      "tfKey": "5m",
+      "rank": 7,
+      "label": "LONG rank7",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 3,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "stochExtreme",
+          "bollingerTouch"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 247,
+        "wins": 0,
+        "losses": 15,
+        "timeouts": 232,
+        "winRate": 0,
+        "netPnL": -6476,
+        "avgHold": 97.4
+      }
+    },
+    {
+      "tfKey": "5m",
+      "rank": 8,
+      "label": "SHORT rank8",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 1,
+        "slPct": 0.5,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 843,
+        "wins": 232,
+        "losses": 501,
+        "timeouts": 110,
+        "winRate": 27.5,
+        "netPnL": -8594,
+        "avgHold": 39.2
+      }
+    },
+    {
+      "tfKey": "15m",
+      "rank": 2,
+      "label": "[SHORT] Div+BB TP+3% SL-1% · WR 31.6% · NET +850%",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 3,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "divergence",
+          "bollingerTouch"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 61,
+        "wins": 17,
+        "losses": 38,
+        "timeouts": 6,
+        "winRate": 27.9,
+        "netPnL": 812,
+        "avgHold": 42.2
+      }
+    },
+    {
+      "tfKey": "15m",
+      "rank": 3,
+      "label": "[SHORT] Div+BB TP+3% SL-1.5% · WR 38.8% · NET +550%",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 3,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "divergence",
+          "bollingerTouch"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 61,
+        "wins": 19,
+        "losses": 33,
+        "timeouts": 9,
+        "winRate": 31.1,
+        "netPnL": 262,
+        "avgHold": 56.2
+      }
+    },
+    {
+      "tfKey": "15m",
+      "rank": 4,
+      "label": "[SHORT] Div+BB TP+10% SL-5% · WR 50% · NET +350%",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 10,
+        "slPct": 5,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "divergence",
+          "bollingerTouch"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 61,
+        "wins": 0,
+        "losses": 3,
+        "timeouts": 58,
+        "winRate": 0,
+        "netPnL": -1988,
+        "avgHold": 98.5
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 1,
+      "label": "LONG Widened EMA+FLAT",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 0
+      },
+      "flipped": {
+        "trades": 168,
+        "wins": 42,
+        "losses": 112,
+        "timeouts": 14,
+        "winRate": 25,
+        "netPnL": -2744,
+        "avgHold": 33.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 2,
+      "label": "Golden ATR+EMA+FLAT",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 0
+      },
+      "flipped": {
+        "trades": 168,
+        "wins": 42,
+        "losses": 112,
+        "timeouts": 14,
+        "winRate": 25,
+        "netPnL": -2744,
+        "avgHold": 33.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 3,
+      "label": "Golden ATR+FLAT",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 0
+      },
+      "flipped": {
+        "trades": 168,
+        "wins": 42,
+        "losses": 112,
+        "timeouts": 14,
+        "winRate": 25,
+        "netPnL": -2744,
+        "avgHold": 33.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 4,
+      "label": "LONG Multi-TF Score ≥70",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 4,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 0
+      },
+      "flipped": {
+        "trades": 9849,
+        "wins": 2448,
+        "losses": 6573,
+        "timeouts": 828,
+        "winRate": 24.9,
+        "netPnL": -85542,
+        "avgHold": 35.7
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 5,
+      "label": "[LONG] RSI+Div TP+10% SL-5% · WR 50% · NET +840%",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 10,
+        "slPct": 5,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "rsiExtreme",
+          "divergence"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 21,
+        "wins": 1,
+        "losses": 7,
+        "timeouts": 13,
+        "winRate": 4.8,
+        "netPnL": -2668,
+        "avgHold": 75.8
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 8,
+      "label": "[LONG] RSI+Div TP+8% SL-3% · WR 30% · NET +140%",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 8,
+        "slPct": 3,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [
+          "rsiExtreme",
+          "divergence"
+        ],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 21,
+        "wins": 1,
+        "losses": 10,
+        "timeouts": 10,
+        "winRate": 4.8,
+        "netPnL": -2368,
+        "avgHold": 67.5
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 30,
+      "label": "🥇 Golden LONG QUADRUPLE (MACD+EMA+ATR+FLAT)",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 31,
+      "label": "🥈 Golden LONG TRIPLE (MACD+EMA+FLAT)",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 32,
+      "label": "🥉 Golden LONG TRIPLE (MACD+ATR+FLAT)",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 33,
+      "label": "Golden LONG SILENT+CENTER (ATR+EMA+FLAT)",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 34,
+      "label": "Golden LONG 1H SILENT (ATR+FLAT)",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 35,
+      "label": "Golden LONG EMA CROSS BULL + SILENT",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 36,
+      "label": "Golden LONG DOJI + MACD BULL",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 37,
+      "label": "Golden LONG BB SQUEEZE + MACD BULL",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6354,
+        "wins": 1294,
+        "losses": 3768,
+        "timeouts": 1292,
+        "winRate": 20.4,
+        "netPnL": -157432,
+        "avgHold": 48.3
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 38,
+      "label": "🥇 Golden SHORT QUADRUPLE DOWN (EMA+ATR+MACD+DOWN)",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6470,
+        "wins": 1256,
+        "losses": 3669,
+        "timeouts": 1545,
+        "winRate": 19.4,
+        "netPnL": -157560,
+        "avgHold": 51
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 39,
+      "label": "🥈 Golden SHORT EMA CROSS BEAR + SILENT",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6470,
+        "wins": 1256,
+        "losses": 3669,
+        "timeouts": 1545,
+        "winRate": 19.4,
+        "netPnL": -157560,
+        "avgHold": 51
+      }
+    },
+    {
+      "tfKey": "1h",
+      "rank": 40,
+      "label": "🥉 Golden SHORT MACD BEAR + SILENT",
+      "originalSide": "SHORT",
+      "flippedSide": "LONG",
+      "config": {
+        "tpPct": 5,
+        "slPct": 2,
+        "lev": 100,
+        "maxHold": 100,
+        "required": [],
+        "minScore": 1
+      },
+      "flipped": {
+        "trades": 6470,
+        "wins": 1256,
+        "losses": 3669,
+        "timeouts": 1545,
+        "winRate": 19.4,
+        "netPnL": -157560,
+        "avgHold": 51
+      }
+    },
+    {
+      "tfKey": "4h",
+      "rank": 4,
+      "label": "[REVERSAL 4H LONG] UP + dưới EMA50 · TP+3% SL-1.5% · WR 37.0% · NET +718%",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 3,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [],
+        "minScore": 0
+      },
+      "flipped": {
+        "trades": 715,
+        "wins": 248,
+        "losses": 466,
+        "timeouts": 1,
+        "winRate": 34.7,
+        "netPnL": -1220,
+        "avgHold": 7.4
+      }
+    },
+    {
+      "tfKey": "4h",
+      "rank": 5,
+      "label": "LONG rank5",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "macdCross"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 2939,
+        "wins": 1046,
+        "losses": 1892,
+        "timeouts": 1,
+        "winRate": 35.6,
+        "netPnL": -45812,
+        "avgHold": 6.8
+      }
+    },
+    {
+      "tfKey": "4h",
+      "rank": 6,
+      "label": "LONG rank6",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 1.5,
+        "slPct": 0.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "macdCross",
+          "rsiExtreme"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 65,
+        "wins": 12,
+        "losses": 53,
+        "timeouts": 0,
+        "winRate": 18.5,
+        "netPnL": -1370,
+        "avgHold": 2.2
+      }
+    },
+    {
+      "tfKey": "4h",
+      "rank": 7,
+      "label": "LONG rank7",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "macdCross"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 2939,
+        "wins": 1046,
+        "losses": 1892,
+        "timeouts": 1,
+        "winRate": 35.6,
+        "netPnL": -45812,
+        "avgHold": 6.8
+      }
+    },
+    {
+      "tfKey": "4h",
+      "rank": 8,
+      "label": "LONG rank8",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 1.5,
+        "slPct": 0.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "macdCross",
+          "rsiExtreme"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 65,
+        "wins": 12,
+        "losses": 53,
+        "timeouts": 0,
+        "winRate": 18.5,
+        "netPnL": -1370,
+        "avgHold": 2.2
+      }
+    },
+    {
+      "tfKey": "4h",
+      "rank": 9,
+      "label": "LONG rank9",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 1.5,
+        "slPct": 0.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "macdCross"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 2939,
+        "wins": 662,
+        "losses": 2277,
+        "timeouts": 0,
+        "winRate": 22.5,
+        "netPnL": -38062,
+        "avgHold": 2.4
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 1,
+      "label": "LONG rank1",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 219,
+        "wins": 70,
+        "losses": 149,
+        "timeouts": 0,
+        "winRate": 32,
+        "netPnL": 848,
+        "avgHold": 1.4
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 2,
+      "label": "LONG rank2",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 219,
+        "wins": 76,
+        "losses": 143,
+        "timeouts": 0,
+        "winRate": 34.7,
+        "netPnL": -852,
+        "avgHold": 1.3
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 3,
+      "label": "LONG rank3",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "bollingerTouch",
+          "divergence"
+        ],
+        "minScore": 2
+      },
+      "flipped": {
+        "trades": 21,
+        "wins": 9,
+        "losses": 12,
+        "timeouts": 0,
+        "winRate": 42.9,
+        "netPnL": 882,
+        "avgHold": 1
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 4,
+      "label": "LONG rank4",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 219,
+        "wins": 85,
+        "losses": 134,
+        "timeouts": 0,
+        "winRate": 38.8,
+        "netPnL": -602,
+        "avgHold": 1.6
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 5,
+      "label": "LONG rank5",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 3,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 219,
+        "wins": 79,
+        "losses": 140,
+        "timeouts": 0,
+        "winRate": 36.1,
+        "netPnL": 948,
+        "avgHold": 1.7
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 6,
+      "label": "LONG rank6",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "bollingerTouch",
+          "divergence"
+        ],
+        "minScore": 2
+      },
+      "flipped": {
+        "trades": 21,
+        "wins": 9,
+        "losses": 12,
+        "timeouts": 0,
+        "winRate": 42.9,
+        "netPnL": 882,
+        "avgHold": 1
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 7,
+      "label": "LONG rank7",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1.5,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 219,
+        "wins": 85,
+        "losses": 134,
+        "timeouts": 0,
+        "winRate": 38.8,
+        "netPnL": -602,
+        "avgHold": 1.6
+      }
+    },
+    {
+      "tfKey": "1d",
+      "rank": 8,
+      "label": "LONG rank8",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 2.5,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "divergence"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 219,
+        "wins": 70,
+        "losses": 149,
+        "timeouts": 0,
+        "winRate": 32,
+        "netPnL": 848,
+        "avgHold": 1.4
+      }
+    },
+    {
+      "tfKey": "1w",
+      "rank": 1,
+      "label": "LONG rank1",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 3,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "stochExtreme"
+        ],
+        "minScore": 3
+      },
+      "flipped": {
+        "trades": 34,
+        "wins": 5,
+        "losses": 29,
+        "timeouts": 0,
+        "winRate": 14.7,
+        "netPnL": -1672,
+        "avgHold": 1
+      }
+    },
+    {
+      "tfKey": "1w",
+      "rank": 2,
+      "label": "LONG rank2",
+      "originalSide": "LONG",
+      "flippedSide": "SHORT",
+      "config": {
+        "tpPct": 3,
+        "slPct": 1,
+        "lev": 100,
+        "maxHold": 50,
+        "required": [
+          "rsiExtreme",
+          "stochExtreme"
+        ],
+        "minScore": 2
+      },
+      "flipped": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "timeouts": 0,
+        "winRate": 0,
+        "netPnL": 0,
+        "avgHold": 0
+      }
+    }
+  ],
+  "summary": {
+    "5m": {
+      "total": 7,
+      "positive": 0,
+      "negative": 7,
+      "zero": 0
+    },
+    "15m": {
+      "total": 3,
+      "positive": 2,
+      "negative": 1,
+      "zero": 0
+    },
+    "1h": {
+      "total": 17,
+      "positive": 0,
+      "negative": 17,
+      "zero": 0
+    },
+    "4h": {
+      "total": 6,
+      "positive": 0,
+      "negative": 6,
+      "zero": 0
+    },
+    "1d": {
+      "total": 8,
+      "positive": 5,
+      "negative": 3,
+      "zero": 0
+    },
+    "1w": {
+      "total": 2,
+      "positive": 0,
+      "negative": 1,
+      "zero": 1
+    }
+  }
+}
