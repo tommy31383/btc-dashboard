@@ -697,11 +697,23 @@ export interface UseRuleAlertsResult {
   liveConditions: Record<string, LiveCondSnapshot>;
 }
 
+export interface RuleAlertOptions {
+  notifyEnabled?: boolean;
+  notifyMinScore?: number;
+}
+
+function klineFingerprint(kline: Kline | undefined): string {
+  if (!kline) return "0";
+  return [kline.time, kline.open, kline.high, kline.low, kline.close, kline.volume].join(":");
+}
+
 export function useRuleAlerts(
   rawKlines: RawKlinesMap | undefined,
   trackedIds: Set<TrackedRuleId>,
-  notifyEnabled: boolean = true,
+  options: boolean | RuleAlertOptions = true,
 ): UseRuleAlertsResult {
+  const notifyEnabled = typeof options === "boolean" ? options : options.notifyEnabled ?? true;
+  const notifyMinScore = typeof options === "boolean" ? 1 : options.notifyMinScore ?? 1;
   const [activeAlerts, setActiveAlerts] = useState<RuleAlert[]>([]);
   const [lastEvaluated, setLastEvaluated] = useState(0);
   const [ruleStatus, setRuleStatus] = useState<Record<TrackedRuleId, "ARMED" | "FIRED" | "OFF">>({});
@@ -709,7 +721,7 @@ export function useRuleAlerts(
   const [liveConditions, setLiveConditions] = useState<Record<string, LiveCondSnapshot>>({});
 
   const lastFireCandleTimeRef = useRef<Record<TrackedRuleId, number>>({});
-  const lastEvalCandleTimesRef = useRef<Record<string, number>>({});
+  const lastEvalFingerprintsRef = useRef<Record<string, string>>({});
 
   const trackedIdsArr = useMemo(() => Array.from(trackedIds), [trackedIds]);
 
@@ -757,20 +769,20 @@ export function useRuleAlerts(
       }
     }
 
-    // ── Phase 2: Throttle — skip if no new candle ──
+    // ── Phase 2: Throttle — skip only if live candle content is unchanged ──
     let advanced = false;
     for (const tfKey of neededTFs) {
       const klines = rawKlines[tfKey] || [];
       if (klines.length === 0) continue;
-      const lastTime = klines[klines.length - 1].time;
-      if (lastTime !== (lastEvalCandleTimesRef.current[tfKey] || 0)) {
+      const fingerprint = klineFingerprint(klines[klines.length - 1]);
+      if (fingerprint !== (lastEvalFingerprintsRef.current[tfKey] || "")) {
         advanced = true; break;
       }
     }
     if (!advanced && lastEvaluated > 0) return;
     for (const tfKey of neededTFs) {
       const klines = rawKlines[tfKey] || [];
-      if (klines.length > 0) lastEvalCandleTimesRef.current[tfKey] = klines[klines.length - 1].time;
+      if (klines.length > 0) lastEvalFingerprintsRef.current[tfKey] = klineFingerprint(klines[klines.length - 1]);
     }
 
     // Detect whether any rule needs multi-TF score → pre-fetch 4h/1d/1w data
@@ -1069,7 +1081,8 @@ export function useRuleAlerts(
 
       if (isNewFire) {
         lastFireCandleTimeRef.current[id] = lastCandle.time;
-        if (notifyEnabled) {
+        const notifyScore = cfg.candleReversalFilter ? 1 : popcount(bits);
+        if (notifyEnabled && notifyScore >= notifyMinScore) {
           notifyRuleFire(rule, effectiveSide, entryPrice, tpPrice, slPrice).catch(() => {});
         }
       }
@@ -1080,7 +1093,7 @@ export function useRuleAlerts(
     setRuleMatchDetails(newDetails);
     setLiveConditions(newLiveConds);
     setLastEvaluated(Date.now());
-  }, [rawKlines, trackedIdsArr.join(","), notifyEnabled]);
+  }, [rawKlines, trackedIdsArr.join(","), notifyEnabled, notifyMinScore]);
 
   return { activeAlerts, lastEvaluated, ruleStatus, ruleMatchDetails, liveConditions };
 }

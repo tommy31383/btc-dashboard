@@ -56,6 +56,12 @@ export function getHardRulesForTF(tfKey: string): HardRule[] {
   return all.tfs[tfKey]?.rules || [];
 }
 
+/** Rules marked disabled or delegated are shown elsewhere and should not be monitored here. */
+export function isRuleMonitorable(rule: HardRule): boolean {
+  const cfg = rule.config as BacktestConfig & { disabled?: boolean; delegatedTo?: string };
+  return cfg.disabled !== true && !cfg.delegatedTo;
+}
+
 /** Sanity check: does our bundled JSON have any rules? */
 export function hasHardRules(): boolean {
   const all = getHardRules();

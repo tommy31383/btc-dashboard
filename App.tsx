@@ -42,6 +42,13 @@ import { BottomNavBar, NavTab } from "./components/v2/BottomNavBar";
 import { useAppFonts } from "./components/v2/useAppFonts";
 
 const SETTINGS_KEY = "@btc_dashboard_settings";
+const CACHE_KEYS = [
+  "@btc_klines_cache",
+  "@btc_backtest_results",
+  "@btc_opt_by_tf",
+  "@btc_backtest_candles",
+  "@btc_config_source_by_tf",
+];
 const APP_VERSION = "4.4.0";
 const BUILD_DATE = "2026-04-24";
 
@@ -65,7 +72,7 @@ class ErrorBoundary extends React.Component<
   }
   clearAndReload = async () => {
     try {
-      await AsyncStorage.clear();
+      await AsyncStorage.multiRemove(CACHE_KEYS);
     } catch {}
     if (typeof window !== "undefined" && window.location) {
       window.location.reload();
@@ -136,7 +143,10 @@ export default function App() {
 
   // Tracked rules + live alerts: re-evaluates on every klines update (~60s)
   const tracked = useTrackedRules();
-  const { activeAlerts, ruleStatus, ruleMatchDetails, liveConditions } = useRuleAlerts(rawKlines, tracked.trackedIds, settings.notifyEntrySignal);
+  const { activeAlerts, ruleStatus, ruleMatchDetails, liveConditions } = useRuleAlerts(rawKlines, tracked.trackedIds, {
+    notifyEnabled: settings.notifyEntrySignal,
+    notifyMinScore: settings.notifyMinScore,
+  });
 
   // Learner + Paper Trader: log mỗi rule fire, resolve khi giá hit SL/TP/timeout
   const calib = useCalibration(activeAlerts, priceData?.price ?? null);
@@ -194,6 +204,11 @@ export default function App() {
             onSettings={() => setShowSettings(true)}
           />
           <RiskRadar state={riskState} />
+          <SettingsPanel
+            visible={showSettings}
+            settings={settings}
+            onUpdate={updateSettings}
+          />
           <BottomNavBar
             active={navTab}
             tradesBadge={firingGoldensCount}

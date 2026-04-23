@@ -9,7 +9,7 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getHardRules } from "../utils/hardRules";
+import { getHardRules, getHardRulesForTF, isRuleMonitorable } from "../utils/hardRules";
 
 const STORAGE_KEY = "@btc_tracked_rule_ids";
 /** Sentinel value — if this key exists, user has seen the app before.
@@ -32,8 +32,16 @@ export interface UseTrackedRulesResult {
   isTracked: (id: TrackedRuleId) => boolean;
   toggle: (id: TrackedRuleId) => void;
   trackAll: (ids: TrackedRuleId[]) => void;
+  untrackMany: (ids: TrackedRuleId[]) => void;
   untrackAll: () => void;
   count: number;
+}
+
+function isMonitorableId(id: TrackedRuleId): boolean {
+  const { tfKey, rank } = parseRuleId(id);
+  if (!tfKey || Number.isNaN(rank)) return false;
+  const rule = getHardRulesForTF(tfKey).find((r) => r.rank === rank);
+  return rule ? isRuleMonitorable(rule) : false;
 }
 
 export function useTrackedRules(): UseTrackedRulesResult {
@@ -51,7 +59,11 @@ export function useTrackedRules(): UseTrackedRulesResult {
           // Returning user — load saved tracked IDs
           const arr = JSON.parse(saved);
           if (Array.isArray(arr) && arr.length > 0) {
-            setTrackedIds(new Set(arr));
+            const filtered = arr.filter((id) => typeof id === "string" && isMonitorableId(id));
+            setTrackedIds(new Set(filtered));
+            if (filtered.length !== arr.length) {
+              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+            }
             return;
           }
         }
@@ -61,7 +73,7 @@ export function useTrackedRules(): UseTrackedRulesResult {
         const allIds: TrackedRuleId[] = [];
         for (const tfKey of Object.keys(data.tfs)) {
           for (const rule of data.tfs[tfKey].rules) {
-            allIds.push(makeRuleId(tfKey, rule.rank));
+            if (isRuleMonitorable(rule)) allIds.push(makeRuleId(tfKey, rule.rank));
           }
         }
         if (allIds.length > 0) {
@@ -93,7 +105,18 @@ export function useTrackedRules(): UseTrackedRulesResult {
   const trackAll = useCallback((ids: TrackedRuleId[]) => {
     setTrackedIds((prev) => {
       const next = new Set(prev);
-      for (const id of ids) next.add(id);
+      for (const id of ids) {
+        if (isMonitorableId(id)) next.add(id);
+      }
+      persist(next);
+      return next;
+    });
+  }, [persist]);
+
+  const untrackMany = useCallback((ids: TrackedRuleId[]) => {
+    setTrackedIds((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) next.delete(id);
       persist(next);
       return next;
     });
@@ -109,6 +132,7 @@ export function useTrackedRules(): UseTrackedRulesResult {
     isTracked,
     toggle,
     trackAll,
+    untrackMany,
     untrackAll,
     count: trackedIds.size,
   };

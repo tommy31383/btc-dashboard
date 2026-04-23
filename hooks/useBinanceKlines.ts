@@ -52,6 +52,11 @@ export type RawKlinesMap = Record<string, Kline[]>;
 
 const CACHE_KEY = "@btc_klines_cache";
 
+function klineFingerprint(kline: Kline | undefined): string {
+  if (!kline) return "0";
+  return [kline.time, kline.open, kline.high, kline.low, kline.close, kline.volume].join(":");
+}
+
 function analyzeKlines(klines: Kline[], tfKey: TimeframeKey, tfLabel: string): TFAnalysis {
   const closes = klines.map((k) => k.close);
   const volumes = klines.map((k) => k.volume);
@@ -135,7 +140,7 @@ export function useBinanceKlines(): {
     });
   }, []);
 
-  const lastCandleTimeRef = useRef<Record<string, number>>({});
+  const lastCandleFingerprintRef = useRef<Record<string, string>>({});
   const analysisCacheRef = useRef<Record<string, TFAnalysis>>({});
 
   const fetchAllKlines = useCallback(async () => {
@@ -166,17 +171,17 @@ export function useBinanceKlines(): {
         }));
         newRawKlines[tf.key] = klines;
 
-        // Skip re-analysis if last candle time unchanged (cheap check)
-        const lastTime = klines[klines.length - 1]?.time ?? 0;
-        const prevTime = lastCandleTimeRef.current[tf.key] ?? 0;
+        // Skip re-analysis only when the live candle content is unchanged.
+        const fingerprint = klineFingerprint(klines[klines.length - 1]);
+        const prevFingerprint = lastCandleFingerprintRef.current[tf.key] ?? "";
         const cached = analysisCacheRef.current[tf.key];
-        if (lastTime === prevTime && cached) {
+        if (fingerprint === prevFingerprint && cached) {
           analyses.push(cached);
         } else {
           const result = analyzeKlines(klines, tf.key as TimeframeKey, tf.label);
           analyses.push(result);
           analysisCacheRef.current[tf.key] = result;
-          lastCandleTimeRef.current[tf.key] = lastTime;
+          lastCandleFingerprintRef.current[tf.key] = fingerprint;
         }
 
         // Yield to UI thread between TFs — prevents 300-500ms jank on refresh

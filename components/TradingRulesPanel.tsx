@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Animated, Easing } from "react-native";
 import { COLORS, TIMEFRAMES } from "../utils/constants";
 import { P } from "../utils/v2Theme";
-import { getHardRules, hasHardRules, HardRule } from "../utils/hardRules";
+import { getHardRules, hasHardRules, HardRule, isRuleMonitorable } from "../utils/hardRules";
 import { useTrackedRules, makeRuleId } from "../hooks/useTrackedRules";
 import { RuleMatchDetail } from "../hooks/useRuleAlerts";
 
@@ -536,9 +536,10 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
 
   const visibleRules = useMemo(() => {
     if (!tfData) return [];
+    const monitorableRules = tfData.rules.filter(isRuleMonitorable);
     const filtered = showOnlyTracked
-      ? tfData.rules.filter((r) => tracked.isTracked(makeRuleId(currentTF, r.rank)))
-      : tfData.rules;
+      ? monitorableRules.filter((r) => tracked.isTracked(makeRuleId(currentTF, r.rank)))
+      : monitorableRules;
     // Sort: tracked first (and within tracked, FIRED first), then untracked
     const sorted = [...filtered].sort((a, b) => {
       const aTracked = tracked.isTracked(makeRuleId(currentTF, a.rank));
@@ -550,8 +551,8 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
   }, [tfData, showOnlyTracked, tracked, currentTF, showAll]);
 
   const totalCount = tfData ? (showOnlyTracked
-    ? tfData.rules.filter((r) => tracked.isTracked(makeRuleId(currentTF, r.rank))).length
-    : tfData.rules.length) : 0;
+    ? tfData.rules.filter((r) => isRuleMonitorable(r) && tracked.isTracked(makeRuleId(currentTF, r.rank))).length
+    : tfData.rules.filter(isRuleMonitorable).length) : 0;
   const hasMore = !showAll && !showOnlyTracked && totalCount > PAGE_SIZE;
 
   return (
@@ -596,7 +597,7 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsRow}>
         {availableTFs.map((tfKey) => {
           const tf = data.tfs[tfKey];
-          const trackedCount = tf.rules.filter((r) => tracked.isTracked(makeRuleId(tfKey, r.rank))).length;
+          const trackedCount = tf.rules.filter((r) => isRuleMonitorable(r) && tracked.isTracked(makeRuleId(tfKey, r.rank))).length;
           const isActive = currentTF === tfKey;
           return (
             <TouchableOpacity
@@ -677,17 +678,14 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
       {tfData && (
         <View style={styles.bulkBtnRow}>
           <TouchableOpacity
-            onPress={() => tracked.trackAll(tfData.rules.map((r) => makeRuleId(currentTF, r.rank)))}
+            onPress={() => tracked.trackAll(tfData.rules.filter(isRuleMonitorable).map((r) => makeRuleId(currentTF, r.rank)))}
             style={styles.bulkBtnOn}
           >
             <Text style={styles.bulkBtnOnText}>Bật tất cả {data.tfs[currentTF]?.label}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              for (const r of tfData.rules) {
-                const id = makeRuleId(currentTF, r.rank);
-                if (tracked.isTracked(id)) tracked.toggle(id);
-              }
+              tracked.untrackMany(tfData.rules.filter(isRuleMonitorable).map((r) => makeRuleId(currentTF, r.rank)));
             }}
             style={styles.bulkBtnOff}
           >

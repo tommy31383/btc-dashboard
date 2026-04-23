@@ -1,29 +1,25 @@
 /**
- * BottomNavBar — fixed footer với 4 tabs.
+ * BottomNavBar — fixed footer với các tab đã có màn hình.
  *
  * Pattern từ Stitch (06_settings.html variant — chuẩn Material You):
  *   h-16 bg #1C1B1B, border-t outline-variant
  *   Active tab: bg neutral-900 + border-t-2 border-bitcoinOrange, text primaryContainer
  *   Inactive: text outline, hover text primaryContainer
  *
- * 4 tabs:
+ * Tabs:
  *   RADAR (default active for dashboard)
  *   TRADES
- *   ASSETS
- *   PROFILE
  */
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { P } from "../../utils/v2Theme";
 import { MaterialIcon } from "./MaterialIcon";
 
-export type NavTab = "radar" | "trades" | "assets" | "profile";
+export type NavTab = "radar" | "trades";
 
 const TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"] }[] = [
   { key: "radar",   label: "RADAR",   icon: "radar" },
   { key: "trades",  label: "TRADES",  icon: "swap_horiz" },
-  { key: "assets",  label: "ASSETS",  icon: "account_balance_wallet" },
-  { key: "profile", label: "PROFILE", icon: "person" },
 ];
 
 export function BottomNavBar({

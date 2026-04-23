@@ -121,12 +121,6 @@ export default function SettingsPanel({ visible, settings, onUpdate }: Props) {
           onToggle={(v) => update("notifyEntrySignal", v)}
           desc="Push notification khi có tín hiệu LONG/SHORT mới"
         />
-        <ToggleRow
-          label="🎯 Kết quả tín hiệu"
-          value={settings.notifyExitSignal}
-          onToggle={(v) => update("notifyExitSignal", v)}
-          desc="Push notification khi tín hiệu WIN/LOSS/HẾT HẠN"
-        />
       </View>
 
       <View style={styles.inputRow}>
