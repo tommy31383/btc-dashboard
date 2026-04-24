@@ -50,7 +50,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.34";
+const APP_VERSION = "4.3.35";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -332,7 +332,12 @@ export default function App() {
         <AlertBanner alerts={criticalAlerts} />
 
         {/* v4.3.16 — Live feature snapshot (B): show current RSI/MACD/ATR/EMA Dist/HTF */}
-        <LiveFeatureSnapshot tfData={tfData} />
+        <LiveFeatureSnapshot
+          tfData={tfData}
+          trackedIds={tracked.trackedIds}
+          ruleStatus={ruleStatus}
+          ruleMatchDetails={ruleMatchDetails}
+        />
 
         {/* v4.3.16 — Live rules aggregate summary (C) */}
         <LiveRulesSummary
