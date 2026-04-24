@@ -491,7 +491,7 @@ export default function App() {
           onLayout={(e) => { tradingPanelYRef.current = e.nativeEvent.layout.y; }}
         >
           <TradingRulesPanel
-            tfFilter={["15m", "1h", "4h"]}
+            tfFilter={["5m", "15m", "1h", "4h"]}
             ruleStatus={ruleStatus}
             ruleMatchDetails={ruleMatchDetails}
             highlightedRuleId={highlightedRuleId}
