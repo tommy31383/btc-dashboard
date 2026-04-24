@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing, Modal } from "react-native";
 import Svg, { Polyline, Line } from "react-native-svg";
 import { COLORS, TIMEFRAMES } from "../utils/constants";
 import { P } from "../utils/v2Theme";
@@ -146,6 +146,7 @@ interface RuleCardProps {
 const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracked, onToggle, liveStatus, matchDetail, isHighlighted, qualityRank }: RuleCardProps) {
   // Compact-by-default: cards collapsed unless user taps to expand
   const [expanded, setExpanded] = useState(false);
+  const [zoomEquity, setZoomEquity] = useState(false);
 
   // Auto-expand when highlighted (from banner tap)
   useEffect(() => {
@@ -288,7 +289,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
           )}
         </View>
 
-        {/* Equity curve sparkline + trend badge + max drawdown */}
+        {/* Equity curve sparkline + trend badge + max drawdown + risk + age */}
         {stats.equityCurve && stats.equityCurve.length >= 2 && (() => {
           const trend = (stats.equityTrend as "UP" | "FLAT" | "DOWN") || "FLAT";
           const trendCfg = trend === "UP"
@@ -296,19 +297,56 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
             : trend === "DOWN"
               ? { icon: "📉", label: "DOWN", color: COLORS.bear }
               : { icon: "➡️", label: "FLAT", color: COLORS.textDim };
-          const dd = stats.maxDrawdownPct ?? 0;
+          const dd = Math.abs(stats.maxDrawdownPct ?? 0);
+          const net = Math.abs(netPnL ?? 0);
+          const highRisk = net > 0 && dd > net; // DD > NET tổng = nguy hiểm
+          const riskRatio = net > 0 ? (dd / net).toFixed(1) : null;
+          // Backtest age
+          let ageBadge: { label: string; color: string } | null = null;
+          if (stats.lastBacktestAt) {
+            const ageMs = Date.now() - new Date(stats.lastBacktestAt).getTime();
+            const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
+            const c = ageDays > 30 ? COLORS.warning : COLORS.textMuted;
+            ageBadge = { label: ageDays === 0 ? "Hôm nay" : `${ageDays}d trước`, color: c };
+          }
           return (
             <View style={styles.rcEquityRow}>
-              <EquitySparkline curve={stats.equityCurve} trend={trend} />
+              <TouchableOpacity onPress={() => setZoomEquity(true)} activeOpacity={0.7}>
+                <EquitySparkline curve={stats.equityCurve} trend={trend} />
+              </TouchableOpacity>
               <View style={styles.rcTrendCol}>
                 <View style={[styles.rcTrendBadge, { backgroundColor: trendCfg.color + "20", borderColor: trendCfg.color + "60" }]}>
                   <Text style={[styles.rcTrendText, { color: trendCfg.color }]}>{trendCfg.icon} {trendCfg.label}</Text>
                 </View>
-                <Text style={styles.rcDdText}>DD -{Math.abs(dd) >= 1000 ? `${(dd/1000).toFixed(1)}K` : dd}%</Text>
+                <Text style={styles.rcDdText}>DD -{dd >= 1000 ? `${(dd/1000).toFixed(1)}K` : dd}%</Text>
               </View>
+              {highRisk && (
+                <View style={[styles.rcTrendBadge, { backgroundColor: COLORS.bear + "20", borderColor: COLORS.bear + "70" }]}>
+                  <Text style={[styles.rcTrendText, { color: COLORS.bear }]}>⚠ HIGH RISK ×{riskRatio}</Text>
+                </View>
+              )}
+              {ageBadge && (
+                <Text style={[styles.rcAgeText, { color: ageBadge.color }]}>⏰ {ageBadge.label}</Text>
+              )}
             </View>
           );
         })()}
+
+        {/* Equity zoom modal */}
+        <Modal visible={zoomEquity} transparent animationType="fade" onRequestClose={() => setZoomEquity(false)}>
+          <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setZoomEquity(false)}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalTitle}>Equity curve · #{qualityRank} · {stats.trades} trades</Text>
+              <EquitySparkline curve={stats.equityCurve || []} trend={(stats.equityTrend as any) || "FLAT"} width={300} height={180} />
+              <Text style={styles.modalMeta}>
+                NET <Text style={{ color: (netPnL ?? 0) >= 0 ? COLORS.bull : COLORS.bear, fontWeight: "900" }}>
+                  {(netPnL ?? 0) >= 0 ? "+" : ""}{netPnL}%
+                </Text> · DD -{Math.abs(stats.maxDrawdownPct ?? 0)}% · trend {stats.equityTrend || "FLAT"}
+              </Text>
+              <Text style={styles.modalHint}>Tap để đóng</Text>
+            </View>
+          </TouchableOpacity>
+        </Modal>
 
         {/* Live status + condition match detail */}
         {isTracked && liveStatus && (
@@ -576,7 +614,9 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
   const data = getHardRules();
   const availableTFs = useMemo(() => {
     const all = Object.keys(data.tfs);
-    return tfFilter ? all.filter((tf) => tfFilter.includes(tf)) : all;
+    const filtered = tfFilter ? all.filter((tf) => tfFilter.includes(tf)) : all;
+    // Hide TF tabs where no monitorable rules exist (e.g., 5m sau khi move loser)
+    return filtered.filter((tf) => (data.tfs[tf]?.rules || []).some(isRuleMonitorable));
   }, [data, tfFilter]);
 
   const { mapped: currentTF, isAutoMapped } = mapToPanelTF(activeTab, availableTFs);
@@ -671,20 +711,26 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsRow}>
         {availableTFs.map((tfKey) => {
           const tf = data.tfs[tfKey];
-          const trackedCount = tf.rules.filter((r) => isRuleMonitorable(r) && tracked.isTracked(makeRuleId(tfKey, r.rank))).length;
+          const monitorables = tf.rules.filter(isRuleMonitorable);
+          const firedCount = monitorables.filter((r) => ruleStatus[makeRuleId(tfKey, r.rank)] === "FIRED").length;
           const isActive = currentTF === tfKey;
           return (
             <TouchableOpacity
               key={tfKey}
               onPress={() => { setActiveTab(tfKey); setUserOverrode(true); }}
-              style={[styles.tab, isActive && styles.tabActive]}
+              style={[styles.tab, isActive && styles.tabActive, firedCount > 0 && styles.tabFiring]}
             >
               <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
                 {tf.label}
               </Text>
               <Text style={styles.tabCount}>
-                {tf.rules.length} rule{trackedCount > 0 ? ` · 📡${trackedCount}` : ""}
+                {monitorables.length} rule
               </Text>
+              {firedCount > 0 && (
+                <View style={styles.tabFireBadge}>
+                  <Text style={styles.tabFireBadgeText}>🔥 {firedCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           );
         })}
@@ -918,6 +964,15 @@ const styles = StyleSheet.create({
   rcTrendBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 3, borderWidth: 1 },
   rcTrendText: { fontSize: 9, fontWeight: "800" as const, fontFamily: "monospace", letterSpacing: 0.5 },
   rcDdText: { fontSize: 9, color: COLORS.textMuted, fontFamily: "monospace" },
+  rcAgeText: { fontSize: 9, fontFamily: "monospace", marginLeft: 4 },
+  tabFiring: { borderWidth: 1, borderColor: COLORS.bitcoin + "90" },
+  tabFireBadge: { position: "absolute" as const, top: -4, right: -4, backgroundColor: COLORS.bitcoin, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 8 },
+  tabFireBadgeText: { color: "#000", fontSize: 8, fontWeight: "900" as const, fontFamily: "monospace" },
+  modalBackdrop: { flex: 1, backgroundColor: "#000000c0", justifyContent: "center" as const, alignItems: "center" as const, padding: 20 },
+  modalCard: { backgroundColor: P.card, borderRadius: 8, padding: 16, alignItems: "center" as const, gap: 10, borderWidth: 1, borderColor: P.dim + "40" },
+  modalTitle: { color: P.text, fontSize: 12, fontWeight: "800" as const, fontFamily: "monospace", letterSpacing: 1 },
+  modalMeta: { color: COLORS.textDim, fontSize: 11, fontFamily: "monospace" },
+  modalHint: { color: COLORS.textMuted, fontSize: 9, fontFamily: "monospace", fontStyle: "italic" as const, marginTop: 4 },
   rcStatus: {
     flexDirection: "row",
     alignItems: "center",
