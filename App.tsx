@@ -38,7 +38,6 @@ import GptRuleScreen from "./components/GptRuleScreen";
 import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 import PaperTradeJournal from "./components/PaperTradeJournal";
-import GistSyncPanel from "./components/GistSyncPanel";
 import AutoTraderPanel from "./components/AutoTraderPanel";
 import HistoryScreen from "./components/HistoryScreen";
 import { useAutoTrader } from "./hooks/useAutoTrader";
@@ -56,7 +55,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.41";
+const APP_VERSION = "4.3.42";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -394,9 +393,6 @@ export default function App() {
           ruleMatchDetails={ruleMatchDetails}
           tfData={tfData}
         />
-
-        {/* v4.3.37 — Gist sync cho paper journal (lưu cross-device) */}
-        <GistSyncPanel />
 
         {/* v4.3.41 — AUTO TRADER: tự động vào lệnh khi rule fire (1000U cap, 30U margin, 100x lev) */}
         <AutoTraderPanel

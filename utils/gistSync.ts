@@ -325,7 +325,7 @@ export async function deleteFile(path: string, commitMsg: string): Promise<boole
 
 // ─── Debounced push helper ─────────────────────────────────────────────────
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
-const PUSH_DEBOUNCE_MS = 5000; // tăng lên 5s để gom nhiều thay đổi vào 1 commit
+const PUSH_DEBOUNCE_MS = 20000; // 20s (v4.3.42) — gom nhiều update vào 1 commit, giảm rate-limit risk
 
 export function schedulePush(getTrades: () => Promise<PaperTrade[]>): void {
   if (pushTimer) clearTimeout(pushTimer);
