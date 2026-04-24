@@ -1,22 +1,14 @@
 /**
- * useTrackedRules — manages which hard rules the user is monitoring.
+ * useTrackedRules — ALL monitorable rules luôn ON.
  *
- * Persists tracked rule IDs to AsyncStorage. A rule ID is the composite
- * "<tfKey>:<rank>" so we can uniquely identify rules across TFs.
- *
- * The app uses this to know which rules to actively check against incoming
- * candle data and fire push notifications for.
+ * Tommy quyết định bỏ vụ tắt/bật từ user (v4.3.28). Mọi rule trong
+ * hard_rules.json (NET PnL > 0, không bị disable) đều được theo dõi.
+ * Các setter là no-op để giữ tương thích với call site cũ.
  */
-import { useEffect, useState, useCallback } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getHardRules, getHardRulesForTF, isRuleMonitorable } from "../utils/hardRules";
+import { useMemo } from "react";
+import { getHardRules, isRuleMonitorable } from "../utils/hardRules";
 
-const STORAGE_KEY = "@btc_tracked_rule_ids";
-/** Sentinel value — if this key exists, user has seen the app before.
- *  First-time users get all rules auto-tracked. */
-const INIT_KEY = "@btc_rules_initialized";
-
-export type TrackedRuleId = string; // format: "15m:42"
+export type TrackedRuleId = string; // "tfKey:rank"
 
 export function makeRuleId(tfKey: string, rank: number): TrackedRuleId {
   return `${tfKey}:${rank}`;
@@ -37,103 +29,27 @@ export interface UseTrackedRulesResult {
   count: number;
 }
 
-function isMonitorableId(id: TrackedRuleId): boolean {
-  const { tfKey, rank } = parseRuleId(id);
-  if (!tfKey || Number.isNaN(rank)) return false;
-  const rule = getHardRulesForTF(tfKey).find((r) => r.rank === rank);
-  return rule ? isRuleMonitorable(rule) : false;
-}
+const NOOP = () => {};
 
 export function useTrackedRules(): UseTrackedRulesResult {
-  const [trackedIds, setTrackedIds] = useState<Set<TrackedRuleId>>(new Set());
-
-  // Load on mount — first-time users get ALL rules auto-tracked
-  useEffect(() => {
-    (async () => {
-      try {
-        const [saved, initialized] = await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEY),
-          AsyncStorage.getItem(INIT_KEY),
-        ]);
-        if (saved) {
-          // Returning user — load saved tracked IDs
-          const arr = JSON.parse(saved);
-          if (Array.isArray(arr) && arr.length > 0) {
-            const filtered = arr.filter((id) => typeof id === "string" && isMonitorableId(id));
-            setTrackedIds(new Set(filtered));
-            if (filtered.length !== arr.length) {
-              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-            }
-            return;
-          }
-        }
-        if (initialized) return; // user explicitly untracked everything
-        // First-time: auto-track ALL rules
-        const data = getHardRules();
-        const allIds: TrackedRuleId[] = [];
-        for (const tfKey of Object.keys(data.tfs)) {
-          for (const rule of data.tfs[tfKey].rules) {
-            if (isRuleMonitorable(rule)) allIds.push(makeRuleId(tfKey, rule.rank));
-          }
-        }
-        if (allIds.length > 0) {
-          const newSet = new Set(allIds);
-          setTrackedIds(newSet);
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allIds));
-        }
-        await AsyncStorage.setItem(INIT_KEY, "1");
-      } catch {}
-    })();
-  }, []);
-
-  const persist = useCallback((next: Set<TrackedRuleId>) => {
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next))).catch(() => {});
-  }, []);
-
-  const isTracked = useCallback((id: TrackedRuleId) => trackedIds.has(id), [trackedIds]);
-
-  const toggle = useCallback((id: TrackedRuleId) => {
-    setTrackedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      persist(next);
-      return next;
-    });
-  }, [persist]);
-
-  const trackAll = useCallback((ids: TrackedRuleId[]) => {
-    setTrackedIds((prev) => {
-      const next = new Set(prev);
-      for (const id of ids) {
-        if (isMonitorableId(id)) next.add(id);
+  const trackedIds = useMemo(() => {
+    const ids = new Set<TrackedRuleId>();
+    const data = getHardRules();
+    for (const tfKey of Object.keys(data.tfs)) {
+      for (const rule of data.tfs[tfKey].rules) {
+        if (isRuleMonitorable(rule)) ids.add(makeRuleId(tfKey, rule.rank));
       }
-      persist(next);
-      return next;
-    });
-  }, [persist]);
-
-  const untrackMany = useCallback((ids: TrackedRuleId[]) => {
-    setTrackedIds((prev) => {
-      const next = new Set(prev);
-      for (const id of ids) next.delete(id);
-      persist(next);
-      return next;
-    });
-  }, [persist]);
-
-  const untrackAll = useCallback(() => {
-    setTrackedIds(new Set());
-    persist(new Set());
-  }, [persist]);
+    }
+    return ids;
+  }, []);
 
   return {
     trackedIds,
-    isTracked,
-    toggle,
-    trackAll,
-    untrackMany,
-    untrackAll,
+    isTracked: () => true,
+    toggle: NOOP,
+    trackAll: NOOP,
+    untrackMany: NOOP,
+    untrackAll: NOOP,
     count: trackedIds.size,
   };
 }

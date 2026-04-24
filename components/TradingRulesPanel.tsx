@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Animated, Easing } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from "react-native";
 import { COLORS, TIMEFRAMES } from "../utils/constants";
 import { P } from "../utils/v2Theme";
 import { getHardRules, hasHardRules, HardRule, isRuleMonitorable } from "../utils/hardRules";
@@ -217,13 +217,6 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
           <View style={[styles.rcWrPill, { backgroundColor: wrBg, borderColor: wrBorder }]}>
             <Text style={[styles.rcWrText, { color: wrColor }]}>{stats.winRate}%</Text>
           </View>
-          <Switch
-            value={isTracked}
-            onValueChange={onToggle}
-            trackColor={{ false: "#333", true: COLORS.bull + "66" }}
-            thumbColor={isTracked ? COLORS.bull : "#888"}
-            style={{ transform: [{ scale: 0.75 }] }}
-          />
         </View>
 
         {/* META LINE: lev · PF · N · TP/SL · NET */}
@@ -562,7 +555,7 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
           <Text style={styles.title}>📡 RULE TRADING</Text>
           <View style={styles.trackedCounter}>
             <Text style={styles.trackedCounterText}>
-              <Text style={{ color: COLORS.bull, fontWeight: "900" }}>🟢 {tracked.count}</Text> rule bật
+              <Text style={{ color: COLORS.bull, fontWeight: "900" }}>🟢 {tracked.count}</Text> rule
             </Text>
             <Text style={styles.collapseIcon}>{collapsed ? "▶" : "▼"}</Text>
           </View>
@@ -576,7 +569,7 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
       ) : (
       <>
       <Text style={styles.hint}>
-        💡 Bật "Theo dõi" cho rule muốn theo dõi — app sẽ báo khi giá khớp điều kiện.
+        💡 Tất cả rule đều được theo dõi — app sẽ báo khi giá khớp điều kiện.
       </Text>
 
       {/* Auto-map note khi TF global nằm ngoài list */}
@@ -615,17 +608,6 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
           );
         })}
       </ScrollView>
-
-      {/* Filter toggle */}
-      <View style={styles.filterRow}>
-        <Text style={styles.filterLabel}>Chỉ hiện rule đang theo dõi:</Text>
-        <Switch
-          value={showOnlyTracked}
-          onValueChange={setShowOnlyTracked}
-          trackColor={{ false: "#333", true: COLORS.bitcoin + "66" }}
-          thumbColor={showOnlyTracked ? COLORS.bitcoin : "#888"}
-        />
-      </View>
 
       {/* TF context */}
       {tfData && (
@@ -674,25 +656,6 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
         </>
       )}
 
-      {/* Bật/Tắt tất cả cho TF hiện tại */}
-      {tfData && (
-        <View style={styles.bulkBtnRow}>
-          <TouchableOpacity
-            onPress={() => tracked.trackAll(tfData.rules.filter(isRuleMonitorable).map((r) => makeRuleId(currentTF, r.rank)))}
-            style={styles.bulkBtnOn}
-          >
-            <Text style={styles.bulkBtnOnText}>Bật tất cả {data.tfs[currentTF]?.label}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              tracked.untrackMany(tfData.rules.filter(isRuleMonitorable).map((r) => makeRuleId(currentTF, r.rank)));
-            }}
-            style={styles.bulkBtnOff}
-          >
-            <Text style={styles.bulkBtnOffText}>Tắt tất cả {data.tfs[currentTF]?.label}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
       </>
       )}
     </View>
