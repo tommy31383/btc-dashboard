@@ -50,7 +50,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.35";
+const APP_VERSION = "4.3.36";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -344,6 +344,7 @@ export default function App() {
           trackedIds={tracked.trackedIds}
           ruleStatus={ruleStatus}
           ruleMatchDetails={ruleMatchDetails}
+          tfData={tfData}
         />
 
         {/* PAPER TRADE JOURNAL + LEARNER — auto log mỗi rule FIRE, học hit-rate live */}
