@@ -19,8 +19,8 @@ import { MaterialIcon } from "./MaterialIcon";
 export type NavTab = "radar" | "trades" | "gptRule";
 
 const TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"] }[] = [
-  { key: "radar",   label: "RADAR",   icon: "radar" },
-  { key: "trades",  label: "TRADES",  icon: "swap_horiz" },
+  { key: "radar",   label: "CLAUDE",  icon: "radar" },
+  { key: "trades",  label: "ALERT",   icon: "swap_horiz" },
   { key: "gptRule", label: "GPT RULE", icon: "analytics" },
 ];
 
