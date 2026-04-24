@@ -21,6 +21,8 @@ const SL_PCT = 2;
 const MAX_HOLD = 100;
 const MIN_WR = 60;
 const MIN_N = 40;
+const FEE_PER_SIDE = 0.05;
+const REQUIRE_HTF_UP = true;
 
 async function fetchKlines(interval: string, startTime: number): Promise<Candle[]> {
   const all: Candle[] = [];
@@ -83,6 +85,7 @@ function simulate(candles: Candle[], entryIdx: number): Outcome {
   const entry = candles[entryIdx].close;
   const tpAbs = entry * (1 + TP_PCT / 100);
   const slAbs = entry * (1 - SL_PCT / 100);
+  // GPT spec: SL trước TP (pessimistic on ambiguous candles)
   for (let i = entryIdx + 1; i < Math.min(entryIdx + 1 + MAX_HOLD, candles.length); i++) {
     if (candles[i].low <= slAbs) return "LOSS";
     if (candles[i].high >= tpAbs) return "WIN";
@@ -106,7 +109,10 @@ function summarize(outcomes: Outcome[]) {
   const losses = outcomes.filter((o) => o === "LOSS").length;
   const timeouts = outcomes.filter((o) => o === "TIMEOUT").length;
   const wr = wins + losses > 0 ? wins / (wins + losses) * 100 : 0;
-  const net = wins * TP_PCT - losses * SL_PCT;
+  const grossNet = wins * TP_PCT - losses * SL_PCT;
+  // GPT spec fee: 0.05%/side → round-trip 0.10% mỗi trade (kể cả TIMEOUT)
+  const fee = outcomes.length * FEE_PER_SIDE * 2;
+  const net = grossNet - fee;
   const pf = losses > 0 ? (wins * TP_PCT) / (losses * SL_PCT) : 0;
   return {
     trades: outcomes.length,
@@ -114,14 +120,17 @@ function summarize(outcomes: Outcome[]) {
     losses,
     timeouts,
     winRate: Number(wr.toFixed(2)),
-    netRawPct: Number(net.toFixed(2)),
+    grossPct: Number(grossNet.toFixed(2)),
+    feePct: Number(fee.toFixed(2)),
+    netPct: Number(net.toFixed(2)),
     profitFactor: Number(pf.toFixed(2)),
   };
 }
 
 async function main() {
   console.log("Loading scanned >60% rules for 1H...");
-  const scan = JSON.parse(readFileSync("E:/AI/BTC/btc-dashboard/assets/scan_features_LONG_tp3sl2.json", "utf8"));
+  const ASSETS = `${__dirname}/../assets`;
+  const scan = JSON.parse(readFileSync(`${ASSETS}/scan_features_LONG_tp3sl2.json`, "utf8"));
   const tf = scan.tfs["1h"];
 
   const pairCandidates = Object.entries<any>(tf.pairStats)
@@ -193,25 +202,29 @@ async function main() {
 
   const results = candidates.map((candidate) => {
     const parts = candidate.rule.split(" & ");
-    const matched = records.filter((r) => parts.every((p) => Object.values(r.features).includes(p)));
+    let matched = records.filter((r) => parts.every((p) => Object.values(r.features).includes(p)));
+    // Spec align: nếu side LONG và bật REQUIRE_HTF_UP → chỉ giữ entry khi HTF=UP
+    if (REQUIRE_HTF_UP && SIDE === "LONG") {
+      matched = matched.filter((r) => r.features.htf === "htf:UP");
+    }
     const summary = summarize(matched.map((m) => m.outcome));
     return {
       ...candidate,
       ...summary,
       edgeVsBaseline: Number((summary.winRate - 41.2).toFixed(2)),
     };
-  }).sort((a, b) => b.netRawPct - a.netRawPct);
+  }).sort((a, b) => b.netPct - a.netPct);
 
   const out = {
     generatedAt: new Date().toISOString(),
     period: "3 years",
-    params: { side: SIDE, tp: TP_PCT, sl: SL_PCT, hold: MAX_HOLD, minWr: MIN_WR, minN: MIN_N },
+    params: { side: SIDE, tp: TP_PCT, sl: SL_PCT, hold: MAX_HOLD, minWr: MIN_WR, minN: MIN_N, feePerSide: FEE_PER_SIDE, requireHtfUp: REQUIRE_HTF_UP },
     totalCandidates: candidates.length,
     topByNet: results.slice(0, 30),
     topByWinRate: [...results].sort((a, b) => b.winRate - a.winRate).slice(0, 30),
   };
 
-  const outPath = "E:/AI/BTC/btc-dashboard/assets/highwr_1h_rules_backtest.json";
+  const outPath = `${ASSETS}/highwr_1h_rules_backtest.json`;
   writeFileSync(outPath, JSON.stringify(out, null, 2));
   console.log(JSON.stringify({
     totalCandidates: out.totalCandidates,

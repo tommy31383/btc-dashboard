@@ -118,6 +118,47 @@ interface IndSeries {
   bbLower: (number | null)[];
   macdHist: (number | null)[];
   ema50: (number | null)[];
+  atrPct: (number | null)[];
+}
+
+type FeatFilter = { op: ">" | "<" | ">=" | "<=" | "between"; value?: number; min?: number; max?: number };
+function evalFeatFilter(v: number | null, f: FeatFilter | undefined): boolean {
+  if (!f) return true;
+  if (v === null) return false;
+  switch (f.op) {
+    case ">":  return v >  (f.value ?? 0);
+    case "<":  return v <  (f.value ?? 0);
+    case ">=": return v >= (f.value ?? 0);
+    case "<=": return v <= (f.value ?? 0);
+    case "between": return v >= (f.min ?? -Infinity) && v <= (f.max ?? Infinity);
+  }
+  return false;
+}
+
+function calcATRPctSeries(candles: Candle[], period = 14): (number | null)[] {
+  const out: (number | null)[] = new Array(candles.length).fill(null);
+  if (candles.length < period + 1) return out;
+  let sum = 0;
+  for (let i = 1; i <= period; i++) {
+    const tr = Math.max(
+      candles[i].high - candles[i].low,
+      Math.abs(candles[i].high - candles[i - 1].close),
+      Math.abs(candles[i].low - candles[i - 1].close),
+    );
+    sum += tr;
+  }
+  let atr = sum / period;
+  out[period] = (atr / candles[period].close) * 100;
+  for (let i = period + 1; i < candles.length; i++) {
+    const tr = Math.max(
+      candles[i].high - candles[i].low,
+      Math.abs(candles[i].high - candles[i - 1].close),
+      Math.abs(candles[i].low - candles[i - 1].close),
+    );
+    atr = (atr * (period - 1) + tr) / period;
+    out[i] = (atr / candles[i].close) * 100;
+  }
+  return out;
 }
 
 function calcEMASeries(closes: number[], period: number): (number | null)[] {
@@ -148,6 +189,7 @@ function precomputeSeries(candles: Candle[]): IndSeries {
     bbLower: bb.lower,
     macdHist: macd.histogram,
     ema50,
+    atrPct: calcATRPctSeries(candles, 14),
   };
 }
 
@@ -358,10 +400,10 @@ function backtestOneRule(
   const closes = entryCandles.map((c) => c.close);
 
   const trades: TradeOutcome[] = [];
-  let lastEntryIdx = -cfg.maxHoldBars;
+  let blockedUntilIdx = -1;
 
   for (let i = MIN_LOOKBACK; i < entryCandles.length - cfg.maxHoldBars - 1; i++) {
-    if (i - lastEntryIdx < cfg.maxHoldBars) continue;
+    if (i <= blockedUntilIdx) continue;
 
     const rsiV = entrySeries.rsi[i];
     const stochKV = entrySeries.stochK[i];
@@ -407,6 +449,16 @@ function backtestOneRule(
         if (v === null || !applyOp(v, f.op, f.value)) continue;
       }
 
+      // Feature filters on entry TF (atr / rsi range / emaDist) — used by GPT high-WR rules
+      const cfgX = cfg as any;
+      if (cfgX.atrFilter && !evalFeatFilter(entrySeries.atrPct[i], cfgX.atrFilter)) continue;
+      if (cfgX.rsiFilter && !evalFeatFilter(rsiV, cfgX.rsiFilter)) continue;
+      if (cfgX.emaDistFilter) {
+        const ema = entrySeries.ema50[i];
+        const dist = ema !== null && ema > 0 ? ((price - ema) / ema) * 100 : null;
+        if (!evalFeatFilter(dist, cfgX.emaDistFilter)) continue;
+      }
+
       // Extensible htfFilters[]
       if (cfg.htfFilters?.length) {
         let ok = true;
@@ -437,7 +489,7 @@ function backtestOneRule(
 
       const t = simulateTrade(entryCandles, i, side, cfg);
       trades.push(t);
-      lastEntryIdx = i;
+      blockedUntilIdx = i + t.holdBars;
       break;
     }
   }

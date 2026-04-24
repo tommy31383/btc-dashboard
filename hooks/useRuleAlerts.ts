@@ -580,6 +580,8 @@ function ruleMatchesSmart(
 
     // v4.3.15 — FAST PATH 2d: atrFilter on entry TF
     if (cfg.atrFilter && !evalFeatFilter(ind.atrPct, cfg.atrFilter)) { setReason("atr", `ATR% ngoài range (đang ${ind.atrPct?.toFixed(2) ?? "—"}%)`, side); continue; }
+    // rsiFilter on entry TF (range filter, used by GPT high-WR rules)
+    if ((cfg as any).rsiFilter && !evalFeatFilter(ind.rsi, (cfg as any).rsiFilter)) { setReason("rsi", `RSI ngoài range (đang ${ind.rsi?.toFixed(1) ?? "—"})`, side); continue; }
     // v4.3.15 — FAST PATH 2e: macdHistFilter on entry TF
     if (cfg.macdHistFilter && !evalFeatFilter(ind.macdHistogram, cfg.macdHistFilter)) { setReason("macdHist", `MACD hist ngoài range (đang ${ind.macdHistogram?.toFixed(1) ?? "—"})`, side); continue; }
     // v4.3.15 — FAST PATH 2f: emaDistFilter on entry TF
