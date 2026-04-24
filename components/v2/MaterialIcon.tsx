@@ -41,7 +41,8 @@ type StitchIconName =
   | "gpp_maybe"
   | "analytics"
   | "history"
-  | "auto_graph";
+  | "auto_graph"
+  | "bolt";
 
 // Map Stitch names → @expo/vector-icons MaterialIcons names.
 // MaterialIcons uses snake_case same as Material Symbols for most icons,
@@ -78,6 +79,7 @@ const ICON_MAP: Record<StitchIconName, React.ComponentProps<typeof MaterialIcons
   analytics: "analytics",
   history: "history",
   auto_graph: "auto-graph",
+  bolt: "bolt",
 };
 
 export function MaterialIcon({

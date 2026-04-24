@@ -16,7 +16,7 @@ import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "r
 import { P } from "../../utils/v2Theme";
 import { MaterialIcon } from "./MaterialIcon";
 
-export type NavTab = "radar" | "trades" | "gptRule" | "history" | "all15m";
+export type NavTab = "radar" | "trades" | "gptRule" | "history" | "all15m" | "all5m";
 
 const ALL_TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"]; pcOnly?: boolean }[] = [
   { key: "radar",   label: "CLAUDE",  icon: "radar" },
@@ -24,6 +24,7 @@ const ALL_TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof 
   { key: "gptRule", label: "GPT RULE", icon: "analytics" },
   { key: "history", label: "HISTORY", icon: "history" },
   { key: "all15m",  label: "15m ALL", icon: "auto_graph", pcOnly: true },
+  { key: "all5m",   label: "5m ALL",  icon: "bolt", pcOnly: true },
 ];
 
 const PC_BREAKPOINT = 768;
