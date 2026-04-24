@@ -112,6 +112,25 @@ function EquitySparkline({ curve, trend, width = 90, height = 26 }: {
   );
 }
 
+/** Quality score: NET × log(N+1) × min(PF,5) × trendMul × edgePenalty.
+ *  trendMul: UP=1.2, FLAT=1.0, DOWN=0.7.
+ *  edgePenalty: 0.6 nếu WR < BE_WR, 1.0 nếu vượt.
+ *  Negative NET → score âm để loser chìm xuống đáy. */
+export function computeQualityScore(rule: HardRule): number {
+  const cfg: any = rule.config || {};
+  const stats: any = rule.stats || {};
+  const net = stats.netPnL || 0;
+  const trades = stats.trades || 0;
+  const pf = Math.min(stats.profitFactor || 0, 5);
+  const trend = stats.equityTrend as "UP" | "FLAT" | "DOWN" | undefined;
+  const trendMul = trend === "UP" ? 1.2 : trend === "DOWN" ? 0.7 : 1.0;
+  const tp = cfg.targetPct, sl = cfg.stopPct;
+  const beWR = tp && sl ? (sl / (tp + sl)) * 100 : 50;
+  const wr = stats.winRate || 0;
+  const edgePenalty = wr < beWR ? 0.6 : 1.0;
+  return net * Math.log(trades + 1) * (pf || 0.1) * trendMul * edgePenalty;
+}
+
 interface RuleCardProps {
   rule: HardRule;
   tfKey: string;
@@ -121,9 +140,10 @@ interface RuleCardProps {
   liveStatus?: "ARMED" | "FIRED" | "OFF";
   matchDetail?: RuleMatchDetail;
   isHighlighted?: boolean;
+  qualityRank: number; // 1-based rank trong TF theo computeQualityScore
 }
 
-const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracked, onToggle, liveStatus, matchDetail, isHighlighted }: RuleCardProps) {
+const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracked, onToggle, liveStatus, matchDetail, isHighlighted, qualityRank }: RuleCardProps) {
   // Compact-by-default: cards collapsed unless user taps to expand
   const [expanded, setExpanded] = useState(false);
 
@@ -179,7 +199,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
   const isFlipped = typeof rule.source === "string" && rule.source.startsWith("flipped-from-");
 
   // 2026-04-23: Rarity theo rank
-  const rarity = getRarity(rule.rank);
+  const rarity = getRarity(qualityRank);
   // Pulse animation cho LEGENDARY (or FIRING)
   const pulse = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -235,7 +255,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
               <Text style={[styles.rcSideText, { color: COLORS.textDim }]}>⇅ BOTH</Text>
             </View>
           )}
-          <Text style={[styles.rcRank, { color: accentColor }]}>#{rule.rank}</Text>
+          <Text style={[styles.rcRank, { color: accentColor }]}>#{qualityRank}</Text>
           <Text style={styles.rcTitle} numberOfLines={1}>
             {formatRuleShape(cfg.requiredConditions)}{cfg.candleReversalFilter ? " · CR" : ""}{cfg.emaPosFilter ? ` · EMA` : ""}
           </Text>
@@ -577,21 +597,32 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
     setCollapsed(false);       // auto-uncollapse panel when jumped from banner
   }, [highlightedRuleId]);
 
+  // Quality-rank map: highest score = #1. Tính 1 lần per TF.
+  const qualityRankMap = useMemo(() => {
+    const map = new Map<number, number>();
+    if (!tfData) return map;
+    const monitorables = tfData.rules.filter(isRuleMonitorable);
+    const scored = monitorables
+      .map((r) => ({ rank: r.rank, score: computeQualityScore(r) }))
+      .sort((a, b) => b.score - a.score);
+    scored.forEach((x, i) => map.set(x.rank, i + 1));
+    return map;
+  }, [tfData]);
+
   const visibleRules = useMemo(() => {
     if (!tfData) return [];
     const monitorableRules = tfData.rules.filter(isRuleMonitorable);
     const filtered = showOnlyTracked
       ? monitorableRules.filter((r) => tracked.isTracked(makeRuleId(currentTF, r.rank)))
       : monitorableRules;
-    // Sort: tracked first (and within tracked, FIRED first), then untracked
+    // Sort theo quality rank (rule tốt nhất lên đầu)
     const sorted = [...filtered].sort((a, b) => {
-      const aTracked = tracked.isTracked(makeRuleId(currentTF, a.rank));
-      const bTracked = tracked.isTracked(makeRuleId(currentTF, b.rank));
-      if (aTracked !== bTracked) return aTracked ? -1 : 1;
-      return a.rank - b.rank;
+      const qa = qualityRankMap.get(a.rank) ?? 999;
+      const qb = qualityRankMap.get(b.rank) ?? 999;
+      return qa - qb;
     });
     return showAll || showOnlyTracked ? sorted : sorted.slice(0, PAGE_SIZE);
-  }, [tfData, showOnlyTracked, tracked, currentTF, showAll]);
+  }, [tfData, showOnlyTracked, tracked, currentTF, showAll, qualityRankMap]);
 
   const totalCount = tfData ? (showOnlyTracked
     ? tfData.rules.filter((r) => isRuleMonitorable(r) && tracked.isTracked(makeRuleId(currentTF, r.rank))).length
@@ -683,6 +714,7 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
                 rule={rule}
                 tfKey={currentTF}
                 days={days}
+                qualityRank={qualityRankMap.get(rule.rank) ?? 999}
                 isTracked={tracked.isTracked(id)}
                 onToggle={() => tracked.toggle(id)}
                 liveStatus={ruleStatus[id]}
