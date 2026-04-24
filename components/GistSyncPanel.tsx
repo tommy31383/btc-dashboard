@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { P } from "../utils/v2Theme";
 import {
-  getGistConfig, setGistConfig, clearGistConfig, createNewGist,
+  getGistConfig, setGistConfig, clearGistConfig,
   pullFromGist, pushToGist, mergeTrades,
 } from "../utils/gistSync";
 import { loadTrades, replaceTrades } from "../utils/paperTrader";
@@ -22,7 +22,6 @@ interface Props {
 export default function GistSyncPanel({ onTradesReplaced }: Props) {
   const [collapsed, setCollapsed] = useState(true);
   const [pat, setPat] = useState("");
-  const [gistId, setGistId] = useState("");
   const [lastSyncMs, setLastSyncMs] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
@@ -31,39 +30,19 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
     (async () => {
       const c = await getGistConfig();
       if (c.pat) setPat(c.pat);
-      if (c.gistId) setGistId(c.gistId);
       setLastSyncMs(c.lastSyncMs);
     })();
   }, []);
 
-  const isConfigured = pat.length > 0 && gistId.length > 0;
+  const isConfigured = pat.length > 0;
 
   async function handleSave() {
-    if (!pat.trim() || !gistId.trim()) {
-      setMsg({ text: "Cần cả PAT và Gist ID", ok: false });
-      return;
-    }
-    await setGistConfig(pat.trim(), gistId.trim());
-    setMsg({ text: "Đã lưu config ✓", ok: true });
-  }
-
-  async function handleCreateNew() {
     if (!pat.trim()) {
-      setMsg({ text: "Cần PAT trước khi tạo gist", ok: false });
+      setMsg({ text: "Cần PAT", ok: false });
       return;
     }
-    setBusy("create");
-    setMsg(null);
-    try {
-      const id = await createNewGist(pat.trim());
-      setGistId(id);
-      await setGistConfig(pat.trim(), id);
-      setMsg({ text: `Đã tạo gist ${id.slice(0, 8)}... ✓`, ok: true });
-    } catch (e: any) {
-      setMsg({ text: e.message || "Tạo gist fail", ok: false });
-    } finally {
-      setBusy(null);
-    }
+    await setGistConfig(pat.trim());
+    setMsg({ text: "Đã lưu PAT ✓", ok: true });
   }
 
   async function handlePush() {
@@ -104,12 +83,11 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
   }
 
   function handleClear() {
-    if (typeof window !== "undefined" && !window.confirm("Xoá PAT + Gist ID khỏi máy?")) return;
+    if (typeof window !== "undefined" && !window.confirm("Xoá PAT khỏi máy?")) return;
     clearGistConfig().then(() => {
       setPat("");
-      setGistId("");
       setLastSyncMs(0);
-      setMsg({ text: "Đã xoá config", ok: true });
+      setMsg({ text: "Đã xoá PAT", ok: true });
     });
   }
 
@@ -121,9 +99,9 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
     <View style={styles.card}>
       <TouchableOpacity onPress={() => setCollapsed((v) => !v)} style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>☁️ GIST SYNC · PAPER JOURNAL</Text>
+          <Text style={styles.title}>☁️ REPO SYNC · PAPER JOURNAL</Text>
           <Text style={styles.subtitle}>
-            {isConfigured ? `Connected · last ${lastSyncText}` : "Chưa setup — bấm để config"}
+            {isConfigured ? `Connected · last ${lastSyncText}` : "Chưa setup — bấm để dán PAT"}
           </Text>
         </View>
         <Text style={styles.chevron}>{collapsed ? "▾" : "▴"}</Text>
@@ -132,16 +110,19 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
       {!collapsed && (
         <View style={styles.body}>
           <Text style={styles.help}>
-            Lưu lịch sử paper trade lên GitHub Gist private. Cần PAT scope{" "}
-            <Text style={styles.code}>gist</Text> (tạo tại github.com/settings/tokens).
-            App sẽ tự push mỗi 3s sau khi trade thay đổi.
+            Lưu lịch sử paper trade thẳng vào file{" "}
+            <Text style={styles.code}>data/paper_trades.json</Text> trong repo
+            project. Cần PAT scope{" "}
+            <Text style={styles.code}>Contents: read+write</Text> (fine-grained,
+            tạo tại github.com/settings/tokens?type=beta). App tự push mỗi 5s
+            sau khi trade thay đổi.
           </Text>
 
           <Text style={styles.label}>GitHub PAT</Text>
           <TextInput
             value={pat}
             onChangeText={setPat}
-            placeholder="ghp_..."
+            placeholder="github_pat_..."
             placeholderTextColor={P.dim}
             style={styles.input}
             secureTextEntry
@@ -149,24 +130,8 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
             autoCorrect={false}
           />
 
-          <Text style={styles.label}>Gist ID</Text>
-          <TextInput
-            value={gistId}
-            onChangeText={setGistId}
-            placeholder="32-char gist id (hoặc bấm Tạo mới)"
-            placeholderTextColor={P.dim}
-            style={styles.input}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-
           <View style={styles.btnRow}>
-            <Btn label="Lưu config" onPress={handleSave} />
-            <Btn
-              label={busy === "create" ? "..." : "Tạo gist mới"}
-              onPress={handleCreateNew}
-              disabled={!!busy || !pat.trim()}
-            />
+            <Btn label="Lưu PAT" onPress={handleSave} disabled={!pat.trim()} />
           </View>
           <View style={styles.btnRow}>
             <Btn
@@ -192,7 +157,7 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
 
           <Text style={styles.note}>
             Last sync: <Text style={styles.code}>{lastSyncText}</Text>
-            {"\n"}File: <Text style={styles.code}>btc_paper_trades.json</Text>
+            {"\n"}File: <Text style={styles.code}>tommy31383/btc-dashboard:data/paper_trades.json</Text>
           </Text>
         </View>
       )}
