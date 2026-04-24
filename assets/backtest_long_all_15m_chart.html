@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Backtest LONG-ALL 15m · 1Y Equity Curve</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  body { background:#0a0a1a; color:#e8e8f0; font-family:-apple-system,Segoe UI,Roboto,sans-serif; margin:0; padding:24px; }
+  h1 { font-size:18px; letter-spacing:1.5px; margin:0 0 4px; color:#7aa2ff; }
+  .sub { font-size:11px; color:#8a8aa0; margin-bottom:20px; }
+  .grid { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:20px; }
+  .kpi { background:#15152a; border-left:3px solid #7aa2ff; padding:10px 12px; border-radius:2px; }
+  .kpi .lbl { font-size:9px; color:#8a8aa0; letter-spacing:1px; }
+  .kpi .val { font-size:18px; font-weight:700; margin-top:4px; font-family:'JetBrains Mono',monospace; }
+  .green { color:#26d97f; } .red { color:#ff5577; } .blue { color:#7aa2ff; }
+  .panel { background:#15152a; border-radius:4px; padding:16px; margin-bottom:14px; }
+  .panel h2 { font-size:12px; color:#bbb; letter-spacing:1.2px; margin:0 0 12px; }
+  canvas { max-height:380px; }
+  table { width:100%; border-collapse:collapse; font-size:11px; font-family:'JetBrains Mono',monospace; }
+  td,th { padding:6px 10px; text-align:right; border-bottom:1px solid #25253a; }
+  th { color:#8a8aa0; text-align:left; font-weight:600; letter-spacing:0.5px; }
+  td:first-child,th:first-child { text-align:left; }
+  .footer { font-size:10px; color:#6a6a80; text-align:center; margin-top:14px; }
+</style>
+</head>
+<body>
+
+<h1>📈 BACKTEST · LONG MỌI NẾN 15m · 1 NĂM</h1>
+<div class="sub" id="rangeInfo"></div>
+
+<div class="grid" id="kpiGrid"></div>
+
+<div class="panel">
+  <h2>EQUITY CURVE (Cumulative NET % theo Trade Index)</h2>
+  <canvas id="eqChart"></canvas>
+</div>
+
+<div class="panel" style="display:grid; grid-template-columns:1.3fr 1fr; gap:24px;">
+  <div>
+    <h2>HOLD TIME DISTRIBUTION</h2>
+    <canvas id="holdChart"></canvas>
+  </div>
+  <div>
+    <h2>WIN / LOSS BREAKDOWN</h2>
+    <canvas id="wlChart"></canvas>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>STATS TABLE</h2>
+  <table id="statTable"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody id="statBody"></tbody></table>
+</div>
+
+<div class="footer">BTCUSDT 15m · TP +5% / SL -2% · No leverage · Conservative SL-first khi same-bar</div>
+
+<script>
+const DATA = {"stats":{"totalTrades":35039,"closed":34746,"wins":11411,"losses":23335,"open":293,"winRate":32.84,"profitFactor":1.22,"totalPnlPct":10385,"avgHoldBars":286.94,"maxDrawdownPct":6668,"equityTrend":"UP","breakEvenWR":28.57,"edge":4.27},"range":{"from":"2025-04-24","to":"2026-04-24"},"eq":[5,1271,1949,1638,3261,2719,3481,4815,4898,4202,3508,2812,2958,2593,1953,1259,563,1437,1980,2350,3593,5328,5885,5191,4495,3801,3107,2411,3201,4710,6060,5455,4761,4065,3371,2696,4228,5450,7010,6897,6201,5507,4811,5160,6900,7711,7015,6342,5744,6156,6776,7356,6662,5966,5426,5878,5184,4488,3808,4610,5218,4522,4507,4681,4139,3529,3666,3735,5083,6608,8334,8389,9212,10751,10055,9361,8667,7971,7277,6637,6503,5842,5778,5082,4388,4679,4524,4885,4394,5779,7008,6314,6052,5358,5341,5879,7080,8297,9120,10134,10385],"hold":{"1":22,"2-5":316,"6-20":2043,"21-100":9727,"100+":22638}};
+
+document.getElementById("rangeInfo").textContent =
+  "BTCUSDT \u00b7 15m \u00b7 " + DATA.range.from + " \u2192 " + DATA.range.to + " \u00b7 " + DATA.stats.totalTrades.toLocaleString() + " trades";
+
+function makeKpi(lbl, val, cls) {
+  const card = document.createElement("div"); card.className = "kpi";
+  const l = document.createElement("div"); l.className = "lbl"; l.textContent = lbl;
+  const v = document.createElement("div"); v.className = "val " + (cls || ""); v.textContent = val;
+  card.appendChild(l); card.appendChild(v); return card;
+}
+const kpiGrid = document.getElementById("kpiGrid");
+[
+  ["TOTAL NET", "+" + DATA.stats.totalPnlPct.toLocaleString() + "%", "green"],
+  ["WIN RATE", DATA.stats.winRate.toFixed(2) + "%", "blue"],
+  ["BREAK-EVEN WR", DATA.stats.breakEvenWR.toFixed(2) + "%", ""],
+  ["EDGE", "+" + DATA.stats.edge.toFixed(2) + "pp", "green"],
+  ["PROFIT FACTOR", DATA.stats.profitFactor.toFixed(2), "blue"],
+  ["MAX DRAWDOWN", "-" + DATA.stats.maxDrawdownPct.toLocaleString() + "%", "red"],
+].forEach(([l,v,c]) => kpiGrid.appendChild(makeKpi(l,v,c)));
+
+const eq = DATA.eq;
+let peak=-Infinity, peakIdx=0, ddTroughIdx=0, maxDD=0, curPeakIdx=0;
+for (let i=0;i<eq.length;i++){if(eq[i]>peak){peak=eq[i];curPeakIdx=i;}const dd=peak-eq[i];if(dd>maxDD){maxDD=dd;peakIdx=curPeakIdx;ddTroughIdx=i;}}
+
+const labels = eq.map((_,i)=>i);
+const ctx = document.getElementById("eqChart").getContext("2d");
+const gradient = ctx.createLinearGradient(0,0,0,380);
+gradient.addColorStop(0,"rgba(38,217,127,0.4)");
+gradient.addColorStop(1,"rgba(38,217,127,0)");
+
+new Chart(ctx, {
+  type:"line",
+  data:{
+    labels,
+    datasets:[
+      { label:"Cumulative NET PnL %", data:eq, borderColor:"#26d97f", backgroundColor:gradient,
+        fill:true, tension:0.25, pointRadius:0, borderWidth:2 },
+      { label:"Max-DD window", data:eq.map((v,i)=>(i>=peakIdx&&i<=ddTroughIdx)?v:null),
+        borderColor:"#ff5577", backgroundColor:"transparent", fill:false,
+        tension:0.25, pointRadius:0, borderWidth:3 },
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:"#bbb"}},
+      tooltip:{callbacks:{label:(c)=>"Trade #" + Math.floor(c.label*347) + ": " + (c.raw>=0?"+":"") + c.raw + "%"}}
+    },
+    scales:{
+      x:{ ticks:{color:"#8a8aa0",callback:(v,i)=>i%10===0?Math.floor(i*347)+"":""}, grid:{color:"#1f1f30"}},
+      y:{ ticks:{color:"#8a8aa0",callback:(v)=>v.toLocaleString()+"%"}, grid:{color:"#1f1f30"}},
+    }
+  }
+});
+
+new Chart(document.getElementById("holdChart"), {
+  type:"bar",
+  data:{
+    labels:Object.keys(DATA.hold),
+    datasets:[{label:"# trades",data:Object.values(DATA.hold),
+      backgroundColor:["#7aa2ff","#7aa2ff","#7aa2ff","#ffa500","#ff5577"]}]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>c.raw.toLocaleString()+" trades"}}},
+    scales:{
+      x:{ticks:{color:"#8a8aa0"},grid:{color:"#1f1f30"},title:{display:true,text:"hold bars (15m each)",color:"#6a6a80"}},
+      y:{ticks:{color:"#8a8aa0"},grid:{color:"#1f1f30"}}
+    }
+  }
+});
+
+new Chart(document.getElementById("wlChart"), {
+  type:"doughnut",
+  data:{
+    labels:[
+      "WIN (+5%) \u00b7 " + DATA.stats.wins.toLocaleString(),
+      "LOSS (-2%) \u00b7 " + DATA.stats.losses.toLocaleString(),
+      "OPEN \u00b7 " + DATA.stats.open
+    ],
+    datasets:[{data:[DATA.stats.wins,DATA.stats.losses,DATA.stats.open],
+      backgroundColor:["#26d97f","#ff5577","#666"],borderColor:"#15152a",borderWidth:2}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#bbb",font:{size:11}}}}}
+});
+
+function makeStatRow(metric, valueText, valueClass) {
+  const tr = document.createElement("tr");
+  const td1 = document.createElement("td"); td1.textContent = metric;
+  const td2 = document.createElement("td");
+  if (valueClass) { const span = document.createElement("span"); span.className = valueClass; span.textContent = valueText; td2.appendChild(span); }
+  else { td2.textContent = valueText; }
+  tr.appendChild(td1); tr.appendChild(td2); return tr;
+}
+const statBody = document.getElementById("statBody");
+[
+  ["Total trades", DATA.stats.totalTrades.toLocaleString(), ""],
+  ["Closed", DATA.stats.closed.toLocaleString(), ""],
+  ["Wins (+5%)", DATA.stats.wins.toLocaleString(), "green"],
+  ["Losses (-2%)", DATA.stats.losses.toLocaleString(), "red"],
+  ["Win rate", DATA.stats.winRate.toFixed(2) + "%", "blue"],
+  ["Break-even WR", DATA.stats.breakEvenWR.toFixed(2) + "%", ""],
+  ["Edge", "+" + DATA.stats.edge.toFixed(2) + "pp", "green"],
+  ["Profit factor", DATA.stats.profitFactor.toFixed(2), ""],
+  ["Total NET PnL (cumulative %)", "+" + DATA.stats.totalPnlPct.toLocaleString() + "%", "green"],
+  ["Avg PnL/trade", "+" + (DATA.stats.totalPnlPct/DATA.stats.closed).toFixed(3) + "%", ""],
+  ["Avg hold", DATA.stats.avgHoldBars.toFixed(1) + " bars (" + (DATA.stats.avgHoldBars*15/60).toFixed(1) + "h \u2248 " + (DATA.stats.avgHoldBars*15/60/24).toFixed(1) + " days)", ""],
+  ["Max drawdown", "-" + DATA.stats.maxDrawdownPct.toLocaleString() + "%", "red"],
+  ["Equity trend", DATA.stats.equityTrend, "green"],
+].forEach(([m,v,c]) => statBody.appendChild(makeStatRow(m,v,c)));
+</script>
+
+</body>
+</html>

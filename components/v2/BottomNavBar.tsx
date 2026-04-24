@@ -12,18 +12,21 @@
  *   GPT RULE
  */
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
 import { P } from "../../utils/v2Theme";
 import { MaterialIcon } from "./MaterialIcon";
 
-export type NavTab = "radar" | "trades" | "gptRule" | "history";
+export type NavTab = "radar" | "trades" | "gptRule" | "history" | "all15m";
 
-const TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"] }[] = [
+const ALL_TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"]; pcOnly?: boolean }[] = [
   { key: "radar",   label: "CLAUDE",  icon: "radar" },
   { key: "trades",  label: "ALERT",   icon: "swap_horiz" },
   { key: "gptRule", label: "GPT RULE", icon: "analytics" },
   { key: "history", label: "HISTORY", icon: "history" },
+  { key: "all15m",  label: "15m ALL", icon: "auto_graph", pcOnly: true },
 ];
+
+const PC_BREAKPOINT = 768;
 
 export function BottomNavBar({
   active,
@@ -35,6 +38,8 @@ export function BottomNavBar({
   /** Số golden đang firing — hiển thị badge cam trên tab TRADES khi > 0 */
   tradesBadge?: number;
 }) {
+  const { width } = useWindowDimensions();
+  const TABS = ALL_TABS.filter((t) => !t.pcOnly || width >= PC_BREAKPOINT);
   return (
     <View style={styles.bar}>
       {TABS.map((t) => {

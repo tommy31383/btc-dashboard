@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="UTF-8" />
+<title>Portfolio Backtest · 64 Active Rules · 1Y</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  body{background:#0a0a1a;color:#e8e8f0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px}
+  h1{font-size:18px;letter-spacing:1.5px;margin:0 0 4px;color:#7aa2ff}
+  .sub{font-size:11px;color:#8a8aa0;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+  .kpi{background:#15152a;border-left:3px solid #7aa2ff;padding:10px 12px;border-radius:2px}
+  .kpi .lbl{font-size:9px;color:#8a8aa0;letter-spacing:1px}
+  .kpi .val{font-size:18px;font-weight:700;margin-top:4px;font-family:'JetBrains Mono',monospace}
+  .green{color:#26d97f}.red{color:#ff5577}.blue{color:#7aa2ff}.orange{color:#ffa500}
+  .panel{background:#15152a;border-radius:4px;padding:16px;margin-bottom:14px}
+  .panel h2{font-size:12px;color:#bbb;letter-spacing:1.2px;margin:0 0 12px}
+  canvas{max-height:400px}
+  table{width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace}
+  td,th{padding:6px 10px;text-align:right;border-bottom:1px solid #25253a}
+  th{color:#8a8aa0;text-align:left;font-weight:600;letter-spacing:0.5px}
+  td:first-child,th:first-child{text-align:left}
+  .footer{font-size:10px;color:#6a6a80;text-align:center;margin-top:14px}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+</style></head><body>
+
+<h1>📊 PORTFOLIO BACKTEST · 64 ACTIVE RULES · 1 NĂM</h1>
+<div class="sub" id="rangeInfo"></div>
+
+<div class="grid" id="kpiGrid"></div>
+
+<div class="panel">
+  <h2>EQUITY CURVE (USD theo thời gian) · capital 10,000U · margin 30U/lệnh × 100x</h2>
+  <canvas id="eqChart"></canvas>
+</div>
+
+<div class="panel">
+  <h2>OPEN POSITIONS THEO THỜI GIAN</h2>
+  <canvas id="openChart" style="max-height:200px"></canvas>
+</div>
+
+<div class="twocol">
+  <div class="panel">
+    <h2>TOP 10 CONTRIBUTORS (USD)</h2>
+    <table id="topTbl"><thead><tr><th>Rule</th><th>TF</th><th>Trades</th><th>WR</th><th>Net (USD)</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="panel">
+    <h2>BOTTOM 10 (smallest contribution)</h2>
+    <table id="botTbl"><thead><tr><th>Rule</th><th>TF</th><th>Trades</th><th>WR</th><th>Net (USD)</th></tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>SUMMARY STATS</h2>
+  <table id="sumTbl"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody></tbody></table>
+</div>
+
+<div class="footer">BTCUSDT · 64 active rules (15m/1h/4h/1d/1w) · 1 năm Apr 2025 → Apr 2026 · margin 30U × lev rule (avg 100x)</div>
+
+<script>
+const DATA = 
+{"cfg":{"years":1,"capital":10000,"marginPerTrade":30,"leverage":100,"useUserLev":false,"feePerSidePct":0.05},"sum":{"finalEquity":94280.66079007734,"roi":842.8066079007733,"peakEquity":94313.66079007734,"maxDD_USD":1803.2804661089976,"maxDD_pct":2.8294084736858864,"entries":6538,"skippedNoMargin":0,"wins":2193,"losses":3074,"timeouts":1271,"liquidations":2337,"maxConcurrent":35,"ruleCount":64,"totalRuleTrades":6538},"eq":[{"t":1745686800000,"e":10000,"o":1},{"t":1746054000000,"e":9935.12,"o":8},{"t":1746414000000,"e":10028.54,"o":10},{"t":1746665100000,"e":9653.15,"o":10},{"t":1746741600000,"e":12302.15,"o":9},{"t":1747300500000,"e":12147.17,"o":11},{"t":1747665900000,"e":12368.21,"o":11},{"t":1748093400000,"e":13735.96,"o":11},{"t":1748437200000,"e":13509.6,"o":18},{"t":1748565900000,"e":14053.28,"o":16},{"t":1748700000000,"e":14285.84,"o":20},{"t":1748944800000,"e":13988.87,"o":16},{"t":1749124800000,"e":14182.22,"o":21},{"t":1749150000000,"e":14357.83,"o":17},{"t":1749186900000,"e":14378.83,"o":15},{"t":1749463200000,"e":15135.28,"o":10},{"t":1749772800000,"e":16210.38,"o":12},{"t":1749830400000,"e":16036.38,"o":20},{"t":1750014900000,"e":15793.31,"o":18},{"t":1750172400000,"e":16336.82,"o":17},{"t":1750338000000,"e":16599.13,"o":23},{"t":1750438800000,"e":16727.68,"o":23},{"t":1750536000000,"e":17037.81,"o":21},{"t":1750600800000,"e":17472.81,"o":14},{"t":1750629600000,"e":18171.81,"o":24},{"t":1750704300000,"e":17280.81,"o":14},{"t":1751076000000,"e":18883.63,"o":15},{"t":1751372100000,"e":19250.55,"o":29},{"t":1751468400000,"e":18601.75,"o":13},{"t":1751986800000,"e":19067.82,"o":19},{"t":1752181200000,"e":21707.83,"o":4},{"t":1752472800000,"e":23774.17,"o":6},{"t":1752555600000,"e":23474.17,"o":10},{"t":1752944400000,"e":23564.14,"o":12},{"t":1753279200000,"e":23234.92,"o":15},{"t":1753412400000,"e":22946.95,"o":15},{"t":1753581600000,"e":23023.02,"o":23},{"t":1753833600000,"e":23590.55,"o":30},{"t":1753981200000,"e":23224.17,"o":24},{"t":1754010000000,"e":23572.83,"o":12},{"t":1754089200000,"e":23338.83,"o":20},{"t":1754265600000,"e":23266.97,"o":25},{"t":1754456400000,"e":23108.64,"o":17},{"t":1754816400000,"e":23350.81,"o":15},{"t":1755043200000,"e":24579.51,"o":25},{"t":1755198000000,"e":25712.24,"o":16},{"t":1755392400000,"e":25900.32,"o":24},{"t":1755486000000,"e":25782.26,"o":18},{"t":1755612000000,"e":26081.42,"o":25},{"t":1755673200000,"e":26734.59,"o":21},{"t":1755844200000,"e":26547.2,"o":27},{"t":1755990000000,"e":26500.71,"o":13},{"t":1756062000000,"e":26812.34,"o":18},{"t":1756152000000,"e":27325.34,"o":24},{"t":1756159200000,"e":28348.23,"o":22},{"t":1756335600000,"e":27769.35,"o":24},{"t":1756447200000,"e":27257.29,"o":29},{"t":1756472400000,"e":27968.29,"o":27},{"t":1756587600000,"e":28144.09,"o":29},{"t":1756778400000,"e":27905.5,"o":19},{"t":1756872900000,"e":28213.19,"o":12},{"t":1757052000000,"e":27975.02,"o":24},{"t":1757242800000,"e":27689.31,"o":28},{"t":1757419200000,"e":27332.06,"o":19},{"t":1757754000000,"e":28510.2,"o":11},{"t":1758179700000,"e":28374.67,"o":13},{"t":1758391200000,"e":28273.43,"o":17},{"t":1758520800000,"e":28662.45,"o":6},{"t":1758702600000,"e":28727.88,"o":22},{"t":1758807900000,"e":29280.57,"o":24},{"t":1758834000000,"e":29874.57,"o":24},{"t":1759021200000,"e":29692.07,"o":33},{"t":1759194000000,"e":30301.33,"o":9},{"t":1759406400000,"e":32264.35,"o":11},{"t":1759773600000,"e":34056.69,"o":12},{"t":1760104800000,"e":33669.27,"o":14},{"t":1760115600000,"e":33828.27,"o":24},{"t":1760129100000,"e":35031.27,"o":10},{"t":1760131800000,"e":35871.27,"o":13},{"t":1760166000000,"e":35391.27,"o":17},{"t":1760244300000,"e":36550.96,"o":23},{"t":1760292000000,"e":35820.91,"o":21},{"t":1760411700000,"e":35559.29,"o":30},{"t":1760454000000,"e":36927.29,"o":26},{"t":1760533200000,"e":36571.83,"o":18},{"t":1760619600000,"e":37739.38,"o":27},{"t":1760644800000,"e":38681.38,"o":19},{"t":1760688000000,"e":39458.38,"o":21},{"t":1760738400000,"e":39806.38,"o":17},{"t":1760886000000,"e":39030.66,"o":10},{"t":1760954400000,"e":39927.66,"o":12},{"t":1761040800000,"e":40032.66,"o":26},{"t":1761076800000,"e":40836.66,"o":16},{"t":1761130800000,"e":41088.66,"o":27},{"t":1761200100000,"e":41251.68,"o":13},{"t":1761436800000,"e":40925.84,"o":21},{"t":1761609600000,"e":42105.31,"o":16},{"t":1761760800000,"e":42583.49,"o":14},{"t":1761778800000,"e":42769.49,"o":22},{"t":1761810300000,"e":42484.49,"o":16},{"t":1761832800000,"e":42850.49,"o":23},{"t":1761871500000,"e":43306.49,"o":11},{"t":1761971400000,"e":42969.82,"o":21},{"t":1762182000000,"e":44223.23,"o":15},{"t":1762200000000,"e":44202.23,"o":24},{"t":1762264800000,"e":45177.23,"o":18},{"t":1762279200000,"e":45630.23,"o":24},{"t":1762298100000,"e":46212.23,"o":16},{"t":1762314300000,"e":45993.23,"o":13},{"t":1762367400000,"e":45366.23,"o":19},{"t":1762459200000,"e":46299.23,"o":25},{"t":1762520400000,"e":46022.24,"o":20},{"t":1762629300000,"e":45706.33,"o":26},{"t":1762732800000,"e":46532.04,"o":6},{"t":1762869600000,"e":46204.46,"o":24},{"t":1762959600000,"e":46374.02,"o":23},{"t":1762966800000,"e":47355.02,"o":21},{"t":1763050500000,"e":47286.16,"o":21},{"t":1763058600000,"e":48408.62,"o":13},{"t":1763100000000,"e":48447.62,"o":22},{"t":1763121600000,"e":49353.62,"o":10},{"t":1763136000000,"e":49326.62,"o":16},{"t":1763174700000,"e":49206.62,"o":19},{"t":1763312400000,"e":49190.1,"o":25},{"t":1763370000000,"e":49658.1,"o":21},{"t":1763406900000,"e":50714.1,"o":9},{"t":1763435700000,"e":51458.1,"o":8},{"t":1763476200000,"e":51086.1,"o":24},{"t":1763501400000,"e":50459.1,"o":30},{"t":1763564400000,"e":51194.1,"o":24},{"t":1763598600000,"e":51083.1,"o":13},{"t":1763654400000,"e":52271.1,"o":9},{"t":1763678700000,"e":52676.1,"o":23},{"t":1763708400000,"e":52697.1,"o":20},{"t":1763715600000,"e":54041.1,"o":20},{"t":1763735400000,"e":54902.1,"o":18},{"t":1763751600000,"e":54341.1,"o":28},{"t":1763838900000,"e":53883.54,"o":25},{"t":1763871300000,"e":54834.54,"o":13},{"t":1763938800000,"e":54315.54,"o":21},{"t":1764003600000,"e":53915.23,"o":27},{"t":1764081000000,"e":54078.14,"o":30},{"t":1764194400000,"e":54892.01,"o":2},{"t":1764543600000,"e":54691.35,"o":18},{"t":1764554400000,"e":55057.35,"o":25},{"t":1764601200000,"e":55312.35,"o":19},{"t":1764622800000,"e":56149.35,"o":21},{"t":1764684000000,"e":55291.35,"o":13},{"t":1764853200000,"e":56532.53,"o":16},{"t":1764950400000,"e":57814.97,"o":10},{"t":1765033200000,"e":57673.97,"o":20},{"t":1765126800000,"e":57880.48,"o":16},{"t":1765206000000,"e":57640.48,"o":29},{"t":1765299600000,"e":58492.48,"o":11},{"t":1765414800000,"e":58072.48,"o":25},{"t":1765481400000,"e":58240.48,"o":21},{"t":1765555200000,"e":58663.84,"o":20},{"t":1765736100000,"e":59382.42,"o":22},{"t":1765810800000,"e":59195.26,"o":20},{"t":1765814400000,"e":59981.26,"o":27},{"t":1765890000000,"e":60116.26,"o":21},{"t":1765982700000,"e":59506.7,"o":17},{"t":1766062800000,"e":59314.7,"o":23},{"t":1766084400000,"e":59896.7,"o":24},{"t":1766115000000,"e":59464.7,"o":20},{"t":1766160000000,"e":60120.02,"o":16},{"t":1766403900000,"e":59710.02,"o":16},{"t":1766502000000,"e":60804.61,"o":23},{"t":1766534400000,"e":60451.22,"o":29},{"t":1766692800000,"e":60057.67,"o":17},{"t":1766759400000,"e":59531.66,"o":22},{"t":1766908800000,"e":59720.08,"o":22},{"t":1767009600000,"e":59777.07,"o":26},{"t":1767196800000,"e":59836.06,"o":22},{"t":1767304800000,"e":59642.62,"o":25},{"t":1767571200000,"e":60990.53,"o":3},{"t":1767801600000,"e":60834.53,"o":13},{"t":1767888000000,"e":60759.53,"o":27},{"t":1768035600000,"e":60328.77,"o":26},{"t":1768205700000,"e":59944.02,"o":22},{"t":1768312800000,"e":59659.88,"o":14},{"t":1768598100000,"e":61516.32,"o":11},{"t":1768780800000,"e":61673.35,"o":17},{"t":1768871700000,"e":61745.09,"o":23},{"t":1768921200000,"e":61973.66,"o":23},{"t":1768948200000,"e":62648.66,"o":16},{"t":1769013000000,"e":62447.66,"o":26},{"t":1769061600000,"e":62773.88,"o":30},{"t":1769194800000,"e":62490.99,"o":26},{"t":1769352300000,"e":62762.02,"o":31},{"t":1769367600000,"e":63559.48,"o":13},{"t":1769418000000,"e":63238.48,"o":23},{"t":1769468400000,"e":62949.86,"o":22},{"t":1769562000000,"e":62394.32,"o":24},{"t":1769697900000,"e":62272.2,"o":20},{"t":1769702400000,"e":62872.2,"o":24},{"t":1769734800000,"e":63208.2,"o":11},{"t":1769760000000,"e":63727.2,"o":21},{"t":1769810400000,"e":62950.2,"o":17},{"t":1769871600000,"e":63925.2,"o":11},{"t":1769878800000,"e":64246.2,"o":8},{"t":1769884200000,"e":65539.2,"o":14},{"t":1769940000000,"e":65065.2,"o":22},{"t":1769986800000,"e":65266.2,"o":20},{"t":1770001200000,"e":65626.2,"o":23},{"t":1770008400000,"e":65680.2,"o":23},{"t":1770042600000,"e":64954.2,"o":23},{"t":1770133500000,"e":64535.79,"o":24},{"t":1770141600000,"e":65970.71,"o":12},{"t":1770146100000,"e":66057.71,"o":14},{"t":1770217200000,"e":67044.71,"o":16},{"t":1770225300000,"e":67560.71,"o":23},{"t":1770260400000,"e":68421.71,"o":21},{"t":1770290100000,"e":68589.71,"o":17},{"t":1770303600000,"e":68217.71,"o":13},{"t":1770307200000,"e":68964.71,"o":14},{"t":1770315300000,"e":68493.71,"o":24},{"t":1770323400000,"e":69753.71,"o":8},{"t":1770330600000,"e":69939.71,"o":15},{"t":1770337800000,"e":69795.71,"o":3},{"t":1770357600000,"e":69168.71,"o":9},{"t":1770386400000,"e":70422.71,"o":9},{"t":1770404400000,"e":69837.71,"o":12},{"t":1770436800000,"e":70419.71,"o":4},{"t":1770451200000,"e":71592.71,"o":10},{"t":1770472800000,"e":70998.71,"o":18},{"t":1770559200000,"e":70347.71,"o":17},{"t":1770631200000,"e":70188.71,"o":25},{"t":1770655500000,"e":70644.71,"o":13},{"t":1770732000000,"e":71421.78,"o":22},{"t":1770786000000,"e":71628.78,"o":24},{"t":1770822000000,"e":72144.78,"o":12},{"t":1770836400000,"e":71811.78,"o":14},{"t":1770912000000,"e":71877.78,"o":21},{"t":1770922800000,"e":72159.78,"o":13},{"t":1770984000000,"e":71466.78,"o":15},{"t":1770998400000,"e":72123.78,"o":7},{"t":1771156800000,"e":71883.78,"o":20},{"t":1771247700000,"e":72083.31,"o":22},{"t":1771293600000,"e":71725.03,"o":24},{"t":1771355700000,"e":72256.49,"o":27},{"t":1771437600000,"e":72795.4,"o":17},{"t":1771488000000,"e":72675.4,"o":21},{"t":1771570800000,"e":72549.4,"o":21},{"t":1771682400000,"e":72325.87,"o":26},{"t":1771804800000,"e":72504.22,"o":28},{"t":1771812000000,"e":73740.22,"o":16},{"t":1771855200000,"e":73146.22,"o":24},{"t":1771894800000,"e":74121.22,"o":17},{"t":1771912800000,"e":74550.22,"o":27},{"t":1771981200000,"e":74706.22,"o":15},{"t":1772023500000,"e":75240.22,"o":15},{"t":1772121600000,"e":76734.22,"o":4},{"t":1772210700000,"e":77178.22,"o":24},{"t":1772258400000,"e":77433.22,"o":18},{"t":1772262000000,"e":78279.22,"o":25},{"t":1772308800000,"e":78525.22,"o":3},{"t":1772395200000,"e":79140.22,"o":17},{"t":1772431200000,"e":78480.22,"o":21},{"t":1772467200000,"e":79506.22,"o":8},{"t":1772550000000,"e":79332.22,"o":16},{"t":1772650800000,"e":80427.22,"o":10},{"t":1772802000000,"e":80280.22,"o":26},{"t":1772820000000,"e":81696.22,"o":13},{"t":1772942400000,"e":81853.58,"o":23},{"t":1773007200000,"e":82387,"o":13},{"t":1773025200000,"e":82368.46,"o":24},{"t":1773061200000,"e":81837.46,"o":14},{"t":1773180000000,"e":83022.46,"o":18},{"t":1773406800000,"e":84283.81,"o":2},{"t":1773632700000,"e":84051.88,"o":11},{"t":1773792000000,"e":85308.88,"o":13},{"t":1773838800000,"e":85059.88,"o":31},{"t":1773903600000,"e":85467.88,"o":27},{"t":1773921600000,"e":86577.88,"o":30},{"t":1773957600000,"e":86781.88,"o":30},{"t":1774030500000,"e":86268.88,"o":32},{"t":1774137600000,"e":86595.15,"o":15},{"t":1774214100000,"e":87132.15,"o":17},{"t":1774263600000,"e":86837.47,"o":19},{"t":1774353600000,"e":87646.21,"o":21},{"t":1774414800000,"e":87466.21,"o":24},{"t":1774525500000,"e":87482.12,"o":24},{"t":1774601100000,"e":88478.12,"o":12},{"t":1774609200000,"e":89453.12,"o":6},{"t":1774791000000,"e":89573.93,"o":21},{"t":1774828800000,"e":89617.02,"o":21},{"t":1774875600000,"e":88966.02,"o":21},{"t":1774948500000,"e":88699.02,"o":26},{"t":1775023200000,"e":87925.02,"o":14},{"t":1775147400000,"e":88564.02,"o":24},{"t":1775296800000,"e":88576.37,"o":28},{"t":1775430000000,"e":88073.07,"o":13},{"t":1775516400000,"e":89117.07,"o":13},{"t":1775603700000,"e":90656.07,"o":3},{"t":1776047400000,"e":90646.97,"o":13},{"t":1776189600000,"e":92495.14,"o":6},{"t":1776438000000,"e":93847.97,"o":6},{"t":1776630600000,"e":93326.66,"o":10},{"t":1776967200000,"e":94280.66,"o":0}],"topN":[{"key":"15m#10","net":3864.518967277886,"trades":319,"wins":133,"losses":97,"tf":"15m"},{"key":"15m#7","net":3864.518967277886,"trades":319,"wins":133,"losses":97,"tf":"15m"},{"key":"15m#12","net":3821.326972258189,"trades":341,"wins":133,"losses":102,"tf":"15m"},{"key":"15m#11","net":3821.326972258189,"trades":341,"wins":133,"losses":102,"tf":"15m"},{"key":"15m#16","net":3716.385654761368,"trades":232,"wins":67,"losses":87,"tf":"15m"},{"key":"15m#6","net":3716.385654761368,"trades":232,"wins":67,"losses":87,"tf":"15m"},{"key":"15m#9","net":3701.0442293528035,"trades":273,"wins":120,"losses":81,"tf":"15m"},{"key":"15m#8","net":3701.0442293528035,"trades":273,"wins":120,"losses":81,"tf":"15m"},{"key":"15m#26","net":3324.51889036825,"trades":303,"wins":142,"losses":0,"tf":"15m"},{"key":"1h#12","net":2778.8494191498403,"trades":183,"wins":72,"losses":108,"tf":"1h"}],"botN":[{"key":"4h#14","net":-33,"trades":1,"wins":0,"losses":1,"tf":"4h"},{"key":"1h#6","net":18,"trades":9,"wins":4,"losses":5,"tf":"1h"},{"key":"1d#2","net":57,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#1","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#3","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#4","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#6","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#7","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#8","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"},{"key":"1d#10","net":72,"trades":1,"wins":1,"losses":0,"tf":"1d"}]};
+
+const fmtUSD = n => "$" + n.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtPct = n => (n>=0?"+":"") + n.toFixed(2) + "%";
+const dStart = new Date(DATA.eq[0].t).toISOString().slice(0,10);
+const dEnd = new Date(DATA.eq[DATA.eq.length-1].t).toISOString().slice(0,10);
+document.getElementById("rangeInfo").textContent =
+  "BTCUSDT \u00b7 " + dStart + " \u2192 " + dEnd + " \u00b7 " + DATA.sum.entries.toLocaleString() + " trades \u00b7 " + DATA.sum.ruleCount + " rules";
+
+function makeKpi(lbl, val, cls) {
+  const c = document.createElement("div"); c.className = "kpi";
+  const l = document.createElement("div"); l.className = "lbl"; l.textContent = lbl;
+  const v = document.createElement("div"); v.className = "val " + (cls||""); v.textContent = val;
+  c.appendChild(l); c.appendChild(v); return c;
+}
+const grid = document.getElementById("kpiGrid");
+[
+  ["FINAL EQUITY", fmtUSD(DATA.sum.finalEquity), "green"],
+  ["ROI", fmtPct(DATA.sum.roi), "green"],
+  ["MAX DRAWDOWN", "-" + fmtUSD(DATA.sum.maxDD_USD) + " (" + DATA.sum.maxDD_pct.toFixed(2) + "%)", "red"],
+  ["TRADES", DATA.sum.entries.toLocaleString(), "blue"],
+  ["WIN RATE", (DATA.sum.wins/DATA.sum.entries*100).toFixed(1) + "%", "blue"],
+  ["MAX CONCURRENT", String(DATA.sum.maxConcurrent), "orange"],
+].forEach(([l,v,c]) => grid.appendChild(makeKpi(l,v,c)));
+
+const eqLabels = DATA.eq.map(p => p.t);
+const eqVals = DATA.eq.map(p => p.e);
+const openVals = DATA.eq.map(p => p.o);
+
+let peak=-Infinity, peakIdx=0, ddTrough=0, maxDD=0, curPeakIdx=0;
+for(let i=0;i<eqVals.length;i++){if(eqVals[i]>peak){peak=eqVals[i];curPeakIdx=i;}const dd=peak-eqVals[i];if(dd>maxDD){maxDD=dd;peakIdx=curPeakIdx;ddTrough=i;}}
+
+const ctx = document.getElementById("eqChart").getContext("2d");
+const grad = ctx.createLinearGradient(0,0,0,400);
+grad.addColorStop(0,"rgba(38,217,127,0.45)");
+grad.addColorStop(1,"rgba(38,217,127,0)");
+
+new Chart(ctx, {
+  type:"line",
+  data:{
+    labels: eqLabels,
+    datasets:[
+      {label:"Equity (USD)", data:eqVals, borderColor:"#26d97f", backgroundColor:grad, fill:true, tension:0.2, pointRadius:0, borderWidth:2},
+      {label:"Max-DD window", data:eqVals.map((v,i)=>(i>=peakIdx&&i<=ddTrough)?v:null), borderColor:"#ff5577", borderWidth:3, pointRadius:0, fill:false, tension:0.2},
+      {label:"Initial capital ($10k)", data:eqVals.map(()=>10000), borderColor:"#666", borderWidth:1, pointRadius:0, borderDash:[4,4]},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:"#bbb"}},
+      tooltip:{callbacks:{label:(c)=>c.dataset.label + ": " + fmtUSD(c.raw)}}
+    },
+    scales:{
+      x:{type:"time", time:{unit:"month"}, ticks:{color:"#8a8aa0"}, grid:{color:"#1f1f30"}},
+      y:{ticks:{color:"#8a8aa0", callback:(v)=>"$"+v.toLocaleString()}, grid:{color:"#1f1f30"}}
+    }
+  }
+});
+
+new Chart(document.getElementById("openChart"), {
+  type:"line",
+  data:{labels:eqLabels, datasets:[{label:"Open positions", data:openVals, borderColor:"#ffa500", backgroundColor:"rgba(255,165,0,0.15)", fill:true, tension:0.2, pointRadius:0, borderWidth:1.5}]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:"#bbb"}}},
+    scales:{x:{type:"time", time:{unit:"month"}, ticks:{color:"#8a8aa0"}, grid:{color:"#1f1f30"}}, y:{ticks:{color:"#8a8aa0"}, grid:{color:"#1f1f30"}, beginAtZero:true}}
+  }
+});
+
+function fillTbl(id, rows) {
+  const tbody = document.querySelector("#"+id+" tbody");
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    const wr = (r.wins+r.losses) ? (r.wins/(r.wins+r.losses)*100).toFixed(1)+"%" : "—";
+    const cells = [r.key, r.tf, r.trades, wr, (r.net>=0?"+":"") + r.net.toFixed(2)];
+    cells.forEach((cell, i) => {
+      const td = document.createElement("td");
+      if (i === 4) {
+        const span = document.createElement("span");
+        span.className = r.net >= 0 ? "green" : "red";
+        span.textContent = cell;
+        td.appendChild(span);
+      } else td.textContent = cell;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+fillTbl("topTbl", DATA.topN);
+fillTbl("botTbl", DATA.botN);
+
+const sumBody = document.querySelector("#sumTbl tbody");
+[
+  ["Capital initial", fmtUSD(DATA.cfg.capital)],
+  ["Margin per trade", fmtUSD(DATA.cfg.marginPerTrade) + " (× rule lev)"],
+  ["Final equity", fmtUSD(DATA.sum.finalEquity)],
+  ["ROI", fmtPct(DATA.sum.roi)],
+  ["Peak equity", fmtUSD(DATA.sum.peakEquity)],
+  ["Max drawdown (USD)", "-" + fmtUSD(DATA.sum.maxDD_USD)],
+  ["Max drawdown (%)", DATA.sum.maxDD_pct.toFixed(2) + "%"],
+  ["Total trades entered", DATA.sum.entries.toLocaleString()],
+  ["Skipped (no margin)", DATA.sum.skippedNoMargin.toLocaleString()],
+  ["Wins", DATA.sum.wins.toLocaleString() + " (" + (DATA.sum.wins/DATA.sum.entries*100).toFixed(1) + "%)"],
+  ["Losses", DATA.sum.losses.toLocaleString()],
+  ["Timeouts", DATA.sum.timeouts.toLocaleString()],
+  ["Liquidations (margin wipe)", DATA.sum.liquidations.toLocaleString()],
+  ["Max concurrent open", String(DATA.sum.maxConcurrent)],
+  ["Total source rule trades", DATA.sum.totalRuleTrades.toLocaleString()],
+].forEach(([k,v]) => {
+  const tr = document.createElement("tr");
+  const td1 = document.createElement("td"); td1.textContent = k;
+  const td2 = document.createElement("td"); td2.textContent = v;
+  tr.appendChild(td1); tr.appendChild(td2); sumBody.appendChild(tr);
+});
+</script></body></html>

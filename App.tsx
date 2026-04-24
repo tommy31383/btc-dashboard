@@ -41,7 +41,9 @@ import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 import PaperTradeJournal from "./components/PaperTradeJournal";
 import AutoTraderPanel from "./components/AutoTraderPanel";
 import HistoryScreen from "./components/HistoryScreen";
+import All15mPanel from "./components/All15mPanel";
 import { useAutoTrader } from "./hooks/useAutoTrader";
+import { use15mAllTrader } from "./hooks/use15mAllTrader";
 import { pullFromGist, mergeTrades } from "./utils/gistSync";
 import { loadTrades, replaceTrades } from "./utils/paperTrader";
 import { TopAppBar } from "./components/v2/TopAppBar";
@@ -56,7 +58,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.43";
+const APP_VERSION = "4.3.44";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -121,7 +123,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "history">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "history" | "all15m">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -161,6 +163,9 @@ export default function App() {
   // v4.3.41 — Auto Trader: tự động vào lệnh khi rule fire (paper account
   // 1000 USD, margin 30/lệnh, lev 100x, limit ±0.1% chờ tối đa 5p).
   const autoTrader = useAutoTrader(activeAlerts, priceData?.price ?? null);
+
+  // v4.3.44 — 15m All trader: PC-only, local AsyncStorage, LONG every closed 15m bar
+  const all15m = use15mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all15m");
 
   // v4.3.37 — Auto-pull paper trades từ Gist khi app mount (best-effort).
   useEffect(() => {
@@ -202,6 +207,7 @@ export default function App() {
     if (t === "trades") setActiveTab("risk");
     else if (t === "gptRule") setActiveTab("gptRule");
     else if (t === "history") setActiveTab("history");
+    else if (t === "all15m") setActiveTab("all15m");
     else setActiveTab("dashboard");
   }, []);
 
@@ -268,6 +274,37 @@ export default function App() {
             onSettings={() => setShowSettings(true)}
           />
           <HistoryScreen account={autoTrader.account} summary={autoTrader.summary} />
+          <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
+          <BottomNavBar
+            active={navTab}
+            tradesBadge={firingGoldensCount}
+            onSelect={handleNavSelect}
+          />
+        </SafeAreaView>
+      </ErrorBoundary>
+    );
+  }
+
+  if (activeTab === "all15m") {
+    return (
+      <ErrorBoundary>
+        <SafeAreaView style={styles.safe}>
+          <StatusBar style="light" />
+          <TopAppBar
+            title="BTC DASHBOARD"
+            version={APP_VERSION}
+            buildDate={BUILD_DATE}
+            lastUpdate={lastUpdate}
+            onNotifications={() => {}}
+            onSettings={() => setShowSettings(true)}
+          />
+          <All15mPanel
+            account={all15m.account}
+            summary={all15m.summary}
+            currentPrice={priceData?.price ?? null}
+            stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
+            onReset={all15m.reset}
+          />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}
