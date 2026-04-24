@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"/>
+<title>v4.3.16 — Per-TF Verdict Preview</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto;max-width:1100px;margin:24px auto;padding:0 16px;background:#0b0f14;color:#e5e7eb}
+  h1{color:#fbbf24}h2{color:#60a5fa;border-bottom:1px solid #1f2937;padding-bottom:6px;margin-top:32px}
+  .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:16px;margin:12px 0}
+  .tfbar{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+  .tfbtn{padding:8px 16px;border-radius:8px;background:#1f2937;color:#9ca3af;border:1px solid #374151;font-family:monospace;font-weight:800;font-size:13px;cursor:default}
+  .tfbtn.active{background:rgba(251,146,60,.2);border-color:#fb923c;color:#fb923c}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
+  th,td{padding:6px 8px;text-align:left;border-bottom:1px solid #1f2937}
+  th{color:#fbbf24;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .good{color:#22c55e;font-weight:700}.warn{color:#f59e0b;font-weight:700}.bad{color:#ef4444;font-weight:700}
+  .meta{color:#6b7280;font-size:12px}
+  code{background:#1f2937;padding:2px 6px;border-radius:4px;color:#c4b5fd;font-size:12px}
+  .big{font-size:20px;font-weight:900}
+  .block{background:#0f172a;border-left:4px solid #3b82f6;padding:10px 14px;margin:8px 0;border-radius:6px}
+  .block.warn{border-left-color:#f59e0b}
+  .block.bad{border-left-color:#ef4444}
+  .block.ok{border-left-color:#22c55e}
+  .tag{display:inline-block;padding:1px 8px;background:#1e3a8a;color:#dbeafe;border-radius:4px;font-size:11px;margin-left:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+</style></head>
+<body>
+<h1>🎯 BTC Dashboard v4.3.16 — Per-TF Verdict Classifier</h1>
+<div class="meta">Phương án C: UI selector 7 TF · 5m/15m suppress LONG · 1w/1M fallback stats sang 1d · Classifier adaptive ATR P30</div>
+
+<h2>📊 Per-TF Backtest Result (verdict_accuracy_by_tf.json)</h2>
+
+<div class="tfbar">
+  <span class="tfbtn">5m</span>
+  <span class="tfbtn">15m</span>
+  <span class="tfbtn active">1h ⭐</span>
+  <span class="tfbtn">4h</span>
+  <span class="tfbtn">1d</span>
+  <span class="tfbtn">1w*</span>
+  <span class="tfbtn">1M*</span>
+</div>
+<div class="meta" style="text-align:center">* 1w/1M N quá nhỏ → UI fallback sang stats của 1d (báo rõ trong trust box)</div>
+
+<div class="grid">
+
+<div class="card">
+<h3 style="color:#ef4444;margin:0 0 8px">5m · atrTight 0.122% · TP 0.5 SL 0.3 · BE 47.5%</h3>
+<div class="block bad"><b>⚠️ LONG bị suppress</b> — Backtest cho thấy scalp 5m mọi LONG verdict edge âm (GOLDEN -27.5%, STRONG -18.7%, POTENTIAL -13.7%).</div>
+<table>
+<tr><th>Verdict</th><th>WR</th><th>N</th><th>Edge</th><th>NET</th></tr>
+<tr><td class="good">🟢 SHORT CAUTION</td><td>58.1%</td><td>31</td><td>+10.6%</td><td class="good">+292%</td></tr>
+<tr><td class="bad">🔴 LONG các loại</td><td>20–38%</td><td>1100+</td><td>-9 đến -28%</td><td class="bad">toàn âm</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3 style="color:#ef4444;margin:0 0 8px">15m · atrTight 0.257% · TP 1.0 SL 0.5 · BE 38.7%</h3>
+<div class="block bad"><b>⚠️ LONG bị suppress</b> tương tự 5m. Noise quá lớn.</div>
+<table>
+<tr><th>Verdict</th><th>WR</th><th>N</th><th>Edge</th><th>NET</th></tr>
+<tr><td class="good">🟢 SHORT CAUTION</td><td>45%</td><td>40</td><td>+6.3%</td><td class="good">+430%</td></tr>
+<tr><td class="bad">🔴 LONG các loại</td><td>13–34%</td><td>778</td><td>-5 đến -26%</td><td class="bad">toàn âm</td></tr>
+</table>
+</div>
+
+<div class="card" style="grid-column:span 2">
+<h3 style="color:#22c55e;margin:0 0 8px">1h ⭐ Sweet spot · atrTight 0.468% · TP 3 SL 2 · BE 41.6%</h3>
+<div class="block ok"><b>✅ Zone vàng của classifier</b> — iter2/iter4 cũng chỉ profitable ở 1h.</div>
+<table>
+<tr><th>Verdict</th><th>WR</th><th>N</th><th>Edge</th><th>NET/tr</th><th>NET</th></tr>
+<tr><td class="good">💎 GOLDEN LONG</td><td class="big good">83.3%</td><td>6</td><td>+41.7%</td><td>+208.7%</td><td class="good">+1252%</td></tr>
+<tr><td>🚀 STRONG LONG</td><td>31.2%</td><td>77</td><td>-10.4%</td><td>+38.8%</td><td class="good">+2984%</td></tr>
+<tr><td>🟢 WEAK LONG</td><td>29.7%</td><td>175</td><td>-11.9%</td><td>+18.3%</td><td class="good">+3200%</td></tr>
+<tr><td>📊 POTENTIAL LONG</td><td>23.5%</td><td>179</td><td>-18.1%</td><td>+8.8%</td><td class="good">+1568%</td></tr>
+<tr><td class="bad">⚡ STOCH REVERSAL</td><td>23.1%</td><td>130</td><td>-18.5%</td><td>-8%</td><td class="bad">-1040%</td></tr>
+<tr><td class="bad">🔴 SHORT CAUTION</td><td>28.6%</td><td>56</td><td>-13%</td><td>-22.3%</td><td class="bad">-1248%</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3 style="color:#22c55e;margin:0 0 8px">4h · atrTight 1.057% · TP 4 SL 2.5 · BE 39.7%</h3>
+<table>
+<tr><th>Verdict</th><th>WR</th><th>N</th><th>Edge</th><th>NET</th></tr>
+<tr><td class="good">🚀 STRONG LONG</td><td>66.7%</td><td>3</td><td>+27%</td><td class="good">+526%</td></tr>
+<tr><td class="good">📊 POTENTIAL LONG</td><td>45.5%</td><td>33</td><td>+5.8%</td><td class="good">+1486%</td></tr>
+<tr><td class="warn">🟢 WEAK LONG</td><td>42%</td><td>69</td><td>+2.3%</td><td class="good">+2798%</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3 style="color:#f59e0b;margin:0 0 8px">1d · atrTight 3.127% · TP 6 SL 3 · BE 34.2%</h3>
+<table>
+<tr><th>Verdict</th><th>WR</th><th>N</th><th>Edge</th><th>NET</th></tr>
+<tr><td class="warn">🟢 WEAK LONG</td><td>37.5%</td><td>32</td><td>+3.3%</td><td class="good">+944%</td></tr>
+<tr><td class="warn">⚡ STOCH REVERSAL</td><td>35.1%</td><td>37</td><td>+0.9%</td><td class="good">+304%</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3 style="color:#6b7280;margin:0 0 8px">1w / 1M · fallback → 1d</h3>
+<div class="block warn">N quá nhỏ (≤9). UI hiển thị stats của 1d kèm chú thích <code>(fallback từ 1d — TF 1w N quá nhỏ)</code> để user hiểu là đánh giá gián tiếp.</div>
+</div>
+
+</div>
+
+<h2>🧠 Logic thay đổi</h2>
+<div class="card">
+<ul>
+<li><b>useAlerts.ts</b> — nhận <code>selectedTF</code>, lookup per-TF config <code>{near, far, atrTight, suppressLong}</code></li>
+<li><b>atrTight adaptive</b> — P30 percentile từ 10K candle lịch sử mỗi TF (5m=0.122%, 1h=0.468%, 4h=1.06%, 1d=3.13%)</li>
+<li><b>HTF context per-TF</b> — 5m→15m+1h · 1h→4h+1d · 4h→1d+1w · …</li>
+<li><b>suppressLong cho 5m/15m</b> — mọi LONG branch bị skip, verdict fallback về SHORT CAUTION hoặc TRUNG TÍNH</li>
+<li><b>OverallVerdict.tsx</b> — thêm hàng TF selector (7 tab), trust box đọc <code>verdict_accuracy_by_tf.json[selectedTF][text]</code></li>
+<li>Trust box show: WR · N · Edge · Break-even + TP/SL/maxHold của TF đó, kèm nhãn fallback nếu có</li>
+</ul>
+</div>
+
+<h2>✅ Ready</h2>
+<div class="card">
+<div>Version: <b>v4.3.16</b> · Phương án C (suppress-LONG 5m/15m + fallback 1w→1d)</div>
+<div>Gõ <code>build</code> để em chạy <code>./gradlew assembleRelease</code> nếu anh OK.</div>
+</div>
+
+</body></html>

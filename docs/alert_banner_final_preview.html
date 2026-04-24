@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="UTF-8">
+<title>🎯 RULE ALERT BANNER — FINAL v4.3.10 (3 BUG FIXED)</title>
+<style>
+  :root {
+    --bg:#0a0a1a; --bull:#2ed573; --bear:#ff4757; --bearSoft:#ff6b78;
+    --gold:#d4af37; --goldLight:#f0d97a; --cream:#f5e8c7;
+    --navy:#0f1729; --navyDeep:#0a0f1e; --text:#fff; --textDim:#aaa;
+    --bitcoin:#f7931a;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'SF Mono',Consolas,monospace; padding:16px; }
+  h1 { font-size:16px; color:var(--gold); margin-bottom:6px; letter-spacing:2px; }
+  .subtitle { font-size:11px; color:var(--textDim); margin-bottom:20px; font-style:italic; }
+  .phone {
+    max-width:420px; margin:0 auto; padding:12px;
+    background:#000; border-radius:24px; border:2px solid #333;
+  }
+  .phone-top { display:flex; justify-content:space-between; padding:4px 12px 10px; font-size:10px; color:#666; }
+
+  /* ═══════════════════ FINAL DESIGN (B+D) ═══════════════════ */
+  .banner {
+    background: var(--navy);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.12);
+  }
+  .shimmer-bar {
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shine 3s linear infinite;
+  }
+  @keyframes shine {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .crown-header {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--gold);
+  }
+  .crown-icon { font-size: 13px; color: var(--navyDeep); }
+  .crown-title {
+    color: var(--navyDeep);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2.5px;
+  }
+  .tap-hint {
+    color: var(--cream);
+    font-size: 9px;
+    font-style: italic;
+    margin: 10px 12px 6px;
+    text-align: center;
+    opacity: 0.6;
+  }
+  .list { padding: 0 12px 12px; }
+
+  .alert-card {
+    background: var(--navyDeep);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 6px;
+    border-left: 3px solid;
+    cursor: pointer;
+  }
+  .alert-long { border-left-color: var(--bull); }
+  .alert-short { border-left-color: var(--bear); }
+
+  .alert-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .arrow { font-size: 16px; font-weight: 900; }
+  .arrow-long { color: var(--bull); filter: drop-shadow(0 0 4px rgba(46,213,115,0.5)); }
+  .arrow-short { color: var(--bear); filter: drop-shadow(0 0 4px rgba(255,71,87,0.5)); }
+  .side-tag {
+    font-size: 11px; font-weight: 900;
+    padding: 3px 8px; border-radius: 4px; border: 1px solid;
+    letter-spacing: 0.8px;
+  }
+  .side-long { color: var(--bull); background: #2ed57320; border-color: #2ed57360; }
+  .side-short { color: var(--bear); background: #ff475720; border-color: #ff475760; }
+  .rule-title {
+    color: var(--cream); font-size: 11px; font-weight: 700;
+    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rank-badge {
+    background: var(--gold);
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .rank-badge-text {
+    color: var(--navyDeep); font-size: 10px; font-weight: 900; letter-spacing: 0.5px;
+  }
+
+  .card-stats {
+    display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid #d4af3730;
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .stat-label {
+    color: var(--gold); font-size: 9px; font-weight: 800; letter-spacing: 0.5px;
+  }
+  .stat-val {
+    color: var(--cream); font-size: 11px; font-weight: 900;
+  }
+  .stat-bull { color: var(--bull); }
+  .stat-bear { color: var(--bearSoft); }
+  .stat-gold { color: var(--gold); }
+
+  .price-grid { display: flex; gap: 6px; margin-bottom: 6px; }
+  .price-box {
+    flex: 1; text-align: center;
+    background: rgba(0,0,0,0.35);
+    padding: 8px; border-radius: 6px;
+    border: 1px solid #d4af3720;
+  }
+  .price-label { color: var(--gold); font-size: 9px; font-weight: 800; letter-spacing: 0.5px; }
+  .price-val { font-size: 14px; font-weight: 900; margin-top: 2px; }
+  .price-sub { color: var(--cream); font-size: 8px; margin-top: 2px; opacity: 0.6; }
+  .price-entry { color: var(--bitcoin); }
+  .price-tp { color: var(--bull); }
+  .price-sl { color: var(--bear); }
+
+  .meta { color: var(--cream); font-size: 10px; margin-top: 4px; opacity: 0.75; }
+  .meta b { color: var(--cream); opacity: 1; }
+  .tap-prompt {
+    color: var(--goldLight); font-size: 9px; font-style: italic;
+    text-align: right; margin-top: 4px; opacity: 0.7;
+  }
+
+  /* Expanded detail */
+  .detail-box {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid #d4af3730;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .detail-section {
+    background: rgba(0,0,0,0.35);
+    padding: 8px; border-radius: 6px;
+    border-left: 2px solid #d4af3760;
+  }
+  .detail-title {
+    color: var(--gold); font-size: 10px; font-weight: 900;
+    letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .detail-text { color: var(--textDim); font-size: 10px; line-height: 16px; }
+  .detail-emph { color: var(--text); font-weight: 800; }
+
+  .rating {
+    display: flex; gap: 10px;
+    font-size: 11px; margin-top: 12px;
+    padding: 8px 12px;
+    background: #ffffff05; border-radius: 6px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .rating b { color: var(--bull); }
+
+  .desc-block {
+    max-width: 800px; margin: 30px auto; padding: 12px;
+    background: #ffffff05; border-radius: 6px;
+    font-size: 11px; color: var(--textDim); line-height: 1.6;
+  }
+  .desc-block h3 { color: var(--gold); font-size: 13px; margin-bottom: 8px; letter-spacing: 1px; }
+  .desc-block code { background: #ffffff08; padding: 1px 4px; border-radius: 3px; color: var(--goldLight); }
+  .new-badge {
+    display: inline-block;
+    background: var(--bull); color: #000;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 9px; font-weight: 900;
+    margin-left: 6px; vertical-align: middle;
+  }
+</style></head>
+<body>
+
+<h1>✨ v4.3.10 — FIX 3 BUG TOMMY BÁO</h1>
+<p class="subtitle"><b style="color:var(--bull)">BUG 1:</b> TB thắng/thua số ảo (double × lev) → bỏ nhân lại · <b style="color:var(--bull)">BUG 2:</b> "1/1 khớp" → đổi "2/5 · Ngưỡng rule: 1/1 ✓ ĐỦ" · <b style="color:var(--bull)">BUG 3:</b> avgHold=0 → ẩn dòng + fix scan tool tính thực tế</p>
+
+<div class="phone">
+  <div class="phone-top">
+    <span>BTC Dashboard · v4.3.9</span>
+    <span>12:19 · 4G</span>
+  </div>
+
+  <div class="banner">
+    <div class="shimmer-bar"></div>
+    <div class="crown-header">
+      <span class="crown-icon">⚡</span>
+      <span class="crown-title">SIGNAL LIVE · 3 RULE KÍCH HOẠT</span>
+      <span class="crown-icon">⚡</span>
+    </div>
+    <div class="tap-hint">Bấm vào rule để xem/ẩn chi tiết</div>
+    <div class="list">
+
+      <!-- ═════ Rule #1 1h SHORT — EXPANDED, USES REAL DATA v4.3.10 ═════ -->
+      <div class="alert-card alert-short">
+        <div class="alert-header">
+          <span class="arrow arrow-short">⬇</span>
+          <span class="side-tag side-short">SHORT</span>
+          <span class="rule-title">1H · 106 trades · Stoch+MACD</span>
+          <span class="rank-badge"><span class="rank-badge-text">#1</span></span>
+        </div>
+
+        <!-- Stats row 1: WR / PF / NET -->
+        <div class="card-stats">
+          <div class="stat-pill"><span class="stat-label">WR</span><span class="stat-val stat-gold">47.1%</span></div>
+          <div class="stat-pill"><span class="stat-label">PF</span><span class="stat-val">1.6</span></div>
+          <div class="stat-pill"><span class="stat-label">NET</span><span class="stat-val stat-bull">+4.1K%</span></div>
+        </div>
+
+        <!-- Stats row 2 — FIXED: không còn nhân lev lại (Bug 1) -->
+        <div class="card-stats">
+          <div class="stat-pill"><span class="stat-label">TB THẮNG</span><span class="stat-val stat-bull">+500%</span></div>
+          <div class="stat-pill"><span class="stat-label">TB THUA</span><span class="stat-val stat-bear">-300%</span></div>
+          <div class="stat-pill"><span class="stat-label">/THÁNG</span><span class="stat-val stat-bull">+595%</span></div>
+        </div>
+
+        <div class="price-grid">
+          <div class="price-box">
+            <div class="price-label">VÀO LỆNH</div>
+            <div class="price-val price-entry">$74,708</div>
+          </div>
+          <div class="price-box">
+            <div class="price-label">TP (chốt lời)</div>
+            <div class="price-val price-tp">$72,467</div>
+            <div class="price-sub">+300% PnL</div>
+          </div>
+          <div class="price-box">
+            <div class="price-label">SL (cắt lỗ)</div>
+            <div class="price-val price-sl">$75,828</div>
+            <div class="price-sub">-150% PnL</div>
+          </div>
+        </div>
+        <div class="meta">Đòn bẩy: <b>x100</b> · R:R 1:2.0 · 1H:<b style="color:var(--bear)">DOWN</b> · 4H:<b style="color:var(--bear)">DOWN</b></div>
+
+        <!-- ═════ EXPANDED DETAIL BOX ═════ -->
+        <div class="detail-box">
+          <div class="detail-section">
+            <div class="detail-title">🎯 NGƯỠNG vs HIỆN TẠI (SHORT)</div>
+            <div class="detail-text">StochRSI · Hiện tại: <span style="color:var(--bull); font-weight:900">K=96.5 / D=94.2</span> · Cần: <span style="color:orange; font-weight:900">&gt;95</span> <span style="color:var(--bull); font-weight:900">✓ KHỚP</span></div>
+            <div class="detail-text">RSI · Hiện tại: <span style="color:var(--bull); font-weight:900">78.3</span> · Cần: <span style="color:orange; font-weight:900">&gt;75</span> <span style="color:var(--bull); font-weight:900">✓ KHỚP</span></div>
+          </div>
+
+          <!-- ═════ BUG 2 FIXED: '2/5 khớp' + 'Ngưỡng rule 1/1 ✓ ĐỦ' ═════ -->
+          <div class="detail-section">
+            <div class="detail-title">📋 ĐIỀU KIỆN KHỚP — 2/5</div>
+            <div class="detail-text" style="margin-bottom:6px;">Ngưỡng rule: <span style="color:var(--bull); font-weight:800">1/1 ✓ ĐỦ</span></div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              <span style="padding:3px 7px; background:#ffffff08; border:1px solid #ffffff15; border-radius:4px; color:var(--textDim); font-size:10px; font-weight:700;">✗ StochRSI cực</span>
+              <span style="padding:3px 7px; background:#ffffff08; border:1px solid #ffffff15; border-radius:4px; color:var(--textDim); font-size:10px; font-weight:700;">✗ RSI cực</span>
+              <span style="padding:3px 7px; background:#2ed57320; border:1px solid #2ed57360; border-radius:4px; color:var(--bull); font-size:10px; font-weight:700;">✓ Phân kỳ</span>
+              <span style="padding:3px 7px; background:#ffffff08; border:1px solid #ffffff15; border-radius:4px; color:var(--textDim); font-size:10px; font-weight:700;">✗ Chạm Bollinger</span>
+              <span style="padding:3px 7px; background:#2ed57320; border:1px solid #2ed57360; border-radius:4px; color:var(--bull); font-size:10px; font-weight:700;">✓ MACD đảo chiều</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-title">⚙️ LOGIC VÀO LỆNH</div>
+            <div class="detail-text">Bắt buộc: <span class="detail-emph">StochRSI cực, RSI cực, Chạm Bollinger</span></div>
+            <div class="detail-text">HTF RSI filter: <span class="detail-emph">1h RSI &gt; 50</span> (hiện tại: <span style="color:var(--bull); font-weight:800">62.3 ✓</span>)</div>
+            <div class="detail-text">Max hold: <span class="detail-emph">48</span> bars</div>
+          </div>
+
+          <!-- ═════ BUG 3 FIXED: avgHold từ scan-tpsl tính thực tế 62.2 bars, không còn 0 ═════ -->
+          <div class="detail-section">
+            <div class="detail-title">📊 HIỆU SUẤT BACKTEST</div>
+            <div class="detail-text">Trades: <span class="detail-emph">106</span> · Wins: <span style="color:var(--bull); font-weight:800">50</span> · Losses: <span style="color:var(--bear); font-weight:800">56</span></div>
+            <div class="detail-text">Avg win: <span style="color:var(--bull); font-weight:800">+500%</span> PnL · Avg loss: <span style="color:var(--bear); font-weight:800">-300%</span> PnL</div>
+            <div class="detail-text">Avg hold: <span class="detail-emph">62.2</span> bars</div>
+          </div>
+
+          <!-- ═════ PnL BREAKDOWN — UPDATED với data thật từ hard_rules.json ═════ -->
+          <div class="detail-section" style="border-left-color:var(--gold);">
+            <div class="detail-title">💰 CHI TIẾT PnL</div>
+            <div class="detail-text">Gross PnL: <span style="color:var(--bull); font-weight:800">+14,700%</span></div>
+            <div class="detail-text">Phí Binance (0.05%×2×100×106): <span style="color:var(--bear); font-weight:800">-1,060%</span></div>
+            <div class="detail-text">NET PnL (sau fee): <span style="color:var(--bull); font-weight:800">+13,640%</span></div>
+            <div class="detail-text">Trung bình/tháng: <span style="color:var(--bull); font-weight:800">~+595%/tháng</span> · Test trên <span class="detail-emph">208 ngày</span></div>
+          </div>
+
+          <div style="background: rgba(247,147,26,0.15); border: 1px solid rgba(247,147,26,0.5); border-radius: 6px; padding: 10px; text-align: center;">
+            <span style="color:var(--bitcoin); font-size:11px; font-weight:800;">📜 Xem trong danh sách rule bên dưới</span>
+          </div>
+        </div>
+
+        <div class="tap-prompt">👆 Bấm để ẨN chi tiết</div>
+      </div>
+
+      <!-- ═════ Rule #2 15m SHORT — data thật ═════ -->
+      <div class="alert-card alert-short">
+        <div class="alert-header">
+          <span class="arrow arrow-short">⬇</span>
+          <span class="side-tag side-short">SHORT</span>
+          <span class="rule-title">15M · 822 trades · Stoch</span>
+          <span class="rank-badge"><span class="rank-badge-text">#2</span></span>
+        </div>
+        <div class="card-stats">
+          <div class="stat-pill"><span class="stat-label">WR</span><span class="stat-val stat-gold">38.5%</span></div>
+          <div class="stat-pill"><span class="stat-label">PF</span><span class="stat-val">1.3</span></div>
+          <div class="stat-pill"><span class="stat-label">NET</span><span class="stat-val stat-bull">+3.0K%</span></div>
+        </div>
+        <div class="card-stats">
+          <div class="stat-pill"><span class="stat-label">TB THẮNG</span><span class="stat-val stat-bull">+200%</span></div>
+          <div class="stat-pill"><span class="stat-label">TB THUA</span><span class="stat-val stat-bear">-100%</span></div>
+          <div class="stat-pill"><span class="stat-label">/THÁNG</span><span class="stat-val stat-bull">+888%</span></div>
+        </div>
+        <div class="tap-prompt">👆 Bấm để XEM chi tiết rule</div>
+      </div>
+
+      <!-- ═════ Rule #3 4h LONG — data thật từ GRID ═════ -->
+      <div class="alert-card alert-long">
+        <div class="alert-header">
+          <span class="arrow arrow-long">⬆</span>
+          <span class="side-tag side-long">LONG</span>
+          <span class="rule-title">4H · 8 trades · Stoch+MACD oversold</span>
+          <span class="rank-badge"><span class="rank-badge-text">#3</span></span>
+        </div>
+        <div class="card-stats">
+          <div class="stat-pill"><span class="stat-label">WR</span><span class="stat-val stat-gold">62.5%</span></div>
+          <div class="stat-pill"><span class="stat-label">PF</span><span class="stat-val">1.7</span></div>
+          <div class="stat-pill"><span class="stat-label">NET</span><span class="stat-val stat-bull">+800%</span></div>
+        </div>
+        <div class="card-stats">
+          <div class="stat-pill"><span class="stat-label">TB THẮNG</span><span class="stat-val stat-bull">+250%</span></div>
+          <div class="stat-pill"><span class="stat-label">TB THUA</span><span class="stat-val stat-bear">-150%</span></div>
+          <div class="stat-pill"><span class="stat-label">/THÁNG</span><span class="stat-val stat-bull">+120%</span></div>
+        </div>
+        <div class="tap-prompt">👆 Bấm để XEM chi tiết rule</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="rating">
+    <b>✓ Bug 1 FIX</b>
+    <b>✓ Bug 2 FIX</b>
+    <b>✓ Bug 3 FIX</b>
+    <b>✓ Data chuẩn</b>
+  </div>
+</div>
+
+<div class="desc-block">
+  <h3>🔧 v4.3.10 — FIX 3 BUG TOMMY BÁO</h3>
+
+  <b style="color:var(--bull)">🐛 BUG 1: TB thắng/thua số ảo (+50000% / -30000%)</b><br>
+  Root: <code>avgWinPct</code> trong backtester đã là <code>leveragedPnlPct</code> (đã × leverage rồi).
+  Banner lại nhân <code>× lev</code> lần nữa → double-multiply.<br>
+  Fix: <code>RuleAlertBanner.tsx</code> bỏ <code>× lev</code>, hiển thị thẳng <code>Math.round(stats.avgWinPct)%</code>.<br>
+  Kết quả: +500% / -300% (số hợp lý cho leverage x100).<br>
+  <br>
+
+  <b style="color:var(--bull)">🐛 BUG 2: "5 điều kiện 1/1 khớp" — sai, phải 2/5</b><br>
+  Root: Title nói "5 điều kiện" nhưng <code>detail.required</code> chỉ là số <code>requiredConditions</code> (1 với rule MACD).
+  Thực tế có 2/5 chip ✓ nhưng counter hiển thị 1/1.<br>
+  Fix: Đổi title thành <b>"ĐIỀU KIỆN KHỚP — 2/5"</b> (đếm hết chip true)
+  + subtitle <b>"Ngưỡng rule: 1/1 ✓ ĐỦ"</b> (giữ info rule fire).<br>
+  <br>
+
+  <b style="color:var(--bull)">🐛 BUG 3: Avg hold 0 bars</b><br>
+  Root: <code>tools/inject-verified-rules.ts:119</code> hard-code <code>avgHoldBars: 0</code>.
+  Scan tool <code>scan-tpsl.ts</code> cũng không track hold bars.<br>
+  Fix 2 tầng:<br>
+  &nbsp;&nbsp;1. <b>Scan tools</b>: <code>simulateOutcome</code> return thêm <code>holdBars</code>.
+  Accumulate <code>sumHold</code> → <code>avgHoldBars</code> lưu vào <code>scan_tpsl_&lt;tf&gt;.json</code>.<br>
+  &nbsp;&nbsp;2. <b>Inject tool</b>: dùng <code>scan.avgHoldBars ?? 0</code>.<br>
+  &nbsp;&nbsp;3. <b>UI fallback</b>: nếu <code>stats.avgHoldBars === 0</code> → ẩn dòng (cho data legacy).<br>
+  Đã re-run scan 15m + 1h → hard_rules.json giờ có avgHold thực (62.2 bars cho 1h #1, 39.1 bars cho 15m #1).<br>
+  <br>
+
+  <b style="color:var(--gold)">📊 Data mới sau regen:</b><br>
+  • 1h #1 SHORT Stoch+MACD · WR 47.1% · NET +4.1K% · avgHold 62.2 bars<br>
+  • 15m #1 SHORT Stoch · WR 38.5% · NET +3.0K% · avgHold 39.1 bars<br>
+  • 4h #1 LONG Stoch+MACD · WR 62.5% · NET +800% · avgHold 8.5 bars<br>
+  <br>
+
+  <b style="color:var(--gold)">Files touched:</b>
+  <code>components/RuleAlertBanner.tsx</code> ·
+  <code>tools/scan-tpsl.ts</code> ·
+  <code>tools/scan-tpsl-htf.ts</code> ·
+  <code>tools/inject-verified-rules.ts</code> ·
+  <code>assets/hard_rules.json</code> (regenerated).
+</div>
+
+</body></html>

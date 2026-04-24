@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>v4.3.20 Shell Preview — TopAppBar + BottomNavBar</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #131313;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    color: #e5e2e1;
+  }
+  .phone-label {
+    position: absolute;
+    bottom: -28px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #9f8e80;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+  }
+
+  /* ── TopAppBar ── */
+  .top-bar {
+    height: 56px;
+    background: #1c1b1b;
+    border-bottom: 2px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+  .top-bar-left, .top-bar-right { display: flex; align-items: center; gap: 12px; }
+  .top-bar-title {
+    color: #ffb874;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+  .top-bar-btc { color: #F7931A; }
+  .icon-btn {
+    color: #ffb874;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  /* ── Body ── */
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    padding-bottom: 80px;
+  }
+  .placeholder-card {
+    background: #1c1b1b;
+    border-radius: 2px;
+    padding: 14px 14px 14px 18px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .placeholder-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0; width: 4px;
+    background: #ffb874;
+  }
+  .placeholder-card.error::before { background: #ffb4ab; }
+  .placeholder-card.tertiary::before { background: #b5ebff; }
+  .placeholder-card.green::before { background: #10b981; }
+  .placeholder-card.dim::before { background: #514439; }
+
+  .section-header { margin-bottom: 10px; padding: 0 2px; }
+  .section-caption {
+    color: #d6c3b4;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: 2px;
+  }
+  .section-title {
+    color: #e5e2e1;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.5px;
+  }
+  .p-title {
+    color: #e5e2e1;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: 4px;
+  }
+  .p-body {
+    color: #d6c3b4;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+  .p-mono { font-family: 'JetBrains Mono', monospace; color: #ffdcc0; font-size: 13px; }
+
+  /* ── BottomNavBar ── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    background: #1c1b1b;
+    border-top: 1px solid #353534;
+    display: flex;
+    padding: 0 8px;
+  }
+  .nav-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-top: 2px solid transparent;
+    padding-top: 2px;
+    cursor: pointer;
+  }
+  .nav-tab.active {
+    background: #2a2a2a;
+    border-top-color: #F7931A;
+  }
+  .nav-tab .material-icons {
+    font-size: 22px;
+    color: #9f8e80;
+  }
+  .nav-tab.active .material-icons { color: #ffb874; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #9f8e80;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .nav-tab.active .nav-label { color: #ffb874; }
+
+  /* Page header */
+  .hdr {
+    text-align: center;
+    color: #ffb874;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .hdr h1 { font-size: 28px; letter-spacing: 2px; }
+  .hdr p { color: #9f8e80; font-size: 13px; margin-top: 6px; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>v4.3.20 — APP SHELL PREVIEW</h1>
+  <p>TopAppBar + BottomNavBar + Material You warm palette · Space Grotesk + Inter + JetBrains Mono</p>
+</div>
+
+<!-- ═══ PHONE 1: Dashboard shell (RADAR tab active) ═══ -->
+<div class="phone">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="material-icons icon-btn">menu</span>
+      <div class="top-bar-title"><span class="top-bar-btc">₿</span> BTC DASHBOARD</div>
+    </div>
+    <div class="top-bar-right">
+      <span class="material-icons icon-btn">notifications</span>
+      <span class="material-icons icon-btn">settings</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="section-header">
+      <div class="section-caption">Live Market</div>
+      <div class="section-title">Active Signals</div>
+    </div>
+
+    <div class="placeholder-card">
+      <div class="p-title">PriceHeader placeholder</div>
+      <div class="p-body">Card này sẽ là Price Hero khi em refactor tiếp — border-l-4 primaryContainer, bar sparkline emerald, 3-col stats.</div>
+      <div class="p-mono" style="margin-top:8px;">$95,328.50 · +4.28%</div>
+    </div>
+
+    <div class="placeholder-card error">
+      <div class="p-title">RuleAlertBanner placeholder</div>
+      <div class="p-body">Accent border-l-4 error (#ffb4ab) cho signal FIRING — em sẽ dùng south_east/north_east icon cho SHORT/LONG.</div>
+    </div>
+
+    <div class="placeholder-card tertiary">
+      <div class="p-title">LiveFeatureSnapshot placeholder</div>
+      <div class="p-body">Accent tertiary (ice blue #b5ebff) cho info/waiting states — pattern từ Rules Summary quote box.</div>
+    </div>
+
+    <div class="placeholder-card green">
+      <div class="p-title">TradingRulesPanel placeholder</div>
+      <div class="p-body">Accent green (#10b981) cho LONG rules. Mỗi rule có condition tags với Material icon check_circle / trending_up.</div>
+    </div>
+
+    <div class="placeholder-card dim">
+      <div class="p-title">AlertLog placeholder</div>
+      <div class="p-body">Accent dim (#514439) cho list ít ưu tiên — pattern từ design 05 History card.</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-tab active">
+      <span class="material-icons">radar</span>
+      <div class="nav-label">RADAR</div>
+    </div>
+    <div class="nav-tab">
+      <span class="material-icons">swap_horiz</span>
+      <div class="nav-label">TRADES</div>
+    </div>
+    <div class="nav-tab">
+      <span class="material-icons">account_balance_wallet</span>
+      <div class="nav-label">ASSETS</div>
+    </div>
+    <div class="nav-tab">
+      <span class="material-icons">person</span>
+      <div class="nav-label">PROFILE</div>
+    </div>
+  </div>
+
+  <div class="phone-label">DASHBOARD SHELL · RADAR ACTIVE</div>
+</div>
+
+<!-- ═══ PHONE 2: Alternate nav state (TRADES active) ═══ -->
+<div class="phone">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="material-icons icon-btn">menu</span>
+      <div class="top-bar-title"><span class="top-bar-btc">₿</span> BTC DASHBOARD</div>
+    </div>
+    <div class="top-bar-right">
+      <span class="material-icons icon-btn">notifications</span>
+      <span class="material-icons icon-btn">settings</span>
+    </div>
+  </div>
+
+  <div class="body" style="padding-top: 24px;">
+    <div class="section-header">
+      <div class="section-caption">Aggregate Analysis</div>
+      <div class="section-title">Trades View</div>
+    </div>
+
+    <div class="placeholder-card">
+      <div class="p-title">Tab TRADES chưa wire</div>
+      <div class="p-body">Ở v4.3.20 shell em chỉ làm skeleton — 4 tabs chuyển qua lại được, nhưng RADAR = Risk Radar, TRADES/ASSETS/PROFILE placeholder chờ task sau ạ.</div>
+    </div>
+
+    <div class="placeholder-card tertiary">
+      <div class="p-title">Theme tokens chung</div>
+      <div class="p-body" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.8;">
+        bg #131313 · card #1c1b1b<br/>
+        primary #ffdcc0 · primaryContainer #ffb874<br/>
+        bitcoinOrange #F7931A · tertiary #b5ebff<br/>
+        error #ffb4ab · emerald #10b981
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-tab">
+      <span class="material-icons">radar</span>
+      <div class="nav-label">RADAR</div>
+    </div>
+    <div class="nav-tab active">
+      <span class="material-icons">swap_horiz</span>
+      <div class="nav-label">TRADES</div>
+    </div>
+    <div class="nav-tab">
+      <span class="material-icons">account_balance_wallet</span>
+      <div class="nav-label">ASSETS</div>
+    </div>
+    <div class="nav-tab">
+      <span class="material-icons">person</span>
+      <div class="nav-label">PROFILE</div>
+    </div>
+  </div>
+
+  <div class="phone-label">NAV STATE · TRADES ACTIVE</div>
+</div>
+
+</body>
+</html>

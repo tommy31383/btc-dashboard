@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BTC Dashboard HardRule",
+  "description": "Schema validate cho 1 entry trong assets/hard_rules.json. Nếu hard_rules.json bị edit tay sai format, validateRule() sẽ báo trước khi load.",
+  "type": "object",
+  "required": ["rank", "source", "config", "stats"],
+  "properties": {
+    "rank": { "type": "integer", "minimum": 1 },
+    "source": { "type": "string", "enum": ["GRID", "GA", "VERIFIED", "MANUAL"] },
+    "label": { "type": "string" },
+    "compositeScore": { "type": "number" },
+    "config": {
+      "type": "object",
+      "required": ["leverage", "targetPct", "stopPct", "maxHoldBars", "minScore", "stochOBLevel", "stochOSLevel", "rsiOBLevel", "rsiOSLevel"],
+      "properties": {
+        "leverage": { "type": "number", "minimum": 1, "maximum": 125 },
+        "targetPct": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 },
+        "stopPct": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 },
+        "maxHoldBars": { "type": "integer", "minimum": 1 },
+        "minScore": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "stochOBLevel": { "type": "number", "minimum": 50, "maximum": 100 },
+        "stochOSLevel": { "type": "number", "minimum": 0, "maximum": 50 },
+        "rsiOBLevel": { "type": "number", "minimum": 50, "maximum": 100 },
+        "rsiOSLevel": { "type": "number", "minimum": 0, "maximum": 50 },
+        "minWeightedScore": { "type": "number" },
+        "forceSide": { "type": "string", "enum": ["LONG", "SHORT"] },
+        "disabled": { "type": "boolean" },
+        "delegatedTo": { "type": "string" },
+        "requiredConditions": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["stochExtreme", "rsiExtreme", "divergence", "bollingerTouch", "macdCross"] }
+        },
+        "weights": {
+          "type": "object",
+          "additionalProperties": { "type": "number", "minimum": 0, "maximum": 5 }
+        },
+        "htfTrendFilter": {},
+        "htfRsiFilter": {
+          "type": "object",
+          "required": ["tf", "op", "value"],
+          "properties": {
+            "tf": { "type": "string" },
+            "op": { "type": "string", "enum": [">", "<", ">=", "<="] },
+            "value": { "type": "number" }
+          }
+        },
+        "htfFilters": { "type": "array" },
+        "atrFilter": { "type": "object" },
+        "macdHistFilter": { "type": "object" },
+        "emaDistFilter": { "type": "object" },
+        "candleReversalFilter": {},
+        "emaPosFilter": { "type": "string", "enum": ["above", "below"] },
+        "multiTfScoreFilter": { "type": "object" }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": ["winRate", "profitFactor", "trades"],
+      "properties": {
+        "winRate": { "type": "number", "minimum": 0, "maximum": 100 },
+        "profitFactor": { "type": "number", "minimum": 0 },
+        "trades": { "type": "integer", "minimum": 0 },
+        "avgWinPct": { "type": "number" },
+        "avgLossPct": { "type": "number" },
+        "avgHoldBars": { "type": "number" },
+        "wins": { "type": "integer" },
+        "losses": { "type": "integer" },
+        "timeouts": { "type": "integer" },
+        "side": { "type": "string", "enum": ["LONG", "SHORT", "BOTH"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Paper Trade Journal · Preview v4.4.0</title>
+<style>
+  :root {
+    --bg: #131313;
+    --card: #1c1b1b;
+    --cardAlt: #201f1f;
+    --border: #514439;
+    --borderSoft: #2a2a2a;
+    --text: #e5e2e1;
+    --text2: #d6c3b4;
+    --dim: #9f8e80;
+    --primary: #ffdcc0;
+    --amber: #ffb874;
+    --green: #10b981;
+    --error: #ffb4ab;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 12px;
+  }
+  h1 { font-size: 18px; margin-bottom: 4px; color: var(--primary); letter-spacing: 1px; }
+  .sub { color: var(--dim); font-size: 11px; margin-bottom: 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--amber);
+    border-radius: 2px;
+    margin-bottom: 16px;
+    max-width: 720px;
+  }
+  .header { padding: 12px; cursor: pointer; display: flex; align-items: center; }
+  .title { color: var(--primary); font-size: 12px; font-weight: 900; letter-spacing: 1px; }
+  .subtitle { color: var(--dim); font-size: 10px; margin-top: 4px; }
+  .chev { color: var(--dim); font-size: 18px; padding: 0 8px; margin-left: auto; }
+  .body { padding: 12px; border-top: 1px solid var(--borderSoft); }
+  .stats-row { display: flex; justify-content: space-between; margin-top: 4px; margin-bottom: 12px; }
+  .stat { text-align: center; flex: 1; }
+  .stat-label { color: var(--dim); font-size: 9px; letter-spacing: 1px; }
+  .stat-value { font-size: 13px; font-weight: 700; margin-top: 2px; }
+  .green { color: var(--green); }
+  .red { color: var(--error); }
+  .amber { color: var(--amber); }
+  .dim { color: var(--dim); }
+  .section-title { color: var(--text2); font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-top: 14px; margin-bottom: 6px; }
+  .health-row { display: flex; align-items: center; padding: 4px 0; gap: 8px; font-size: 10px; }
+  .dot { width: 12px; }
+  .health-rule-id { color: var(--text); width: 110px; }
+  .health-cell { color: var(--text2); width: 70px; }
+  .trade-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(42,42,42,0.5);
+    font-size: 10px;
+    gap: 8px;
+  }
+  .t-rule { color: var(--dim); width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .t-side { width: 50px; font-weight: 700; }
+  .t-status { width: 70px; font-weight: 700; }
+  .t-pnl { flex: 1; text-align: right; }
+  .note { color: var(--dim); font-size: 11px; max-width: 720px; line-height: 1.5; padding: 16px; background: var(--cardAlt); border-left: 3px solid var(--amber); margin-top: 24px; border-radius: 2px; }
+</style>
+</head>
+<body>
+  <h1>📓 PAPER JOURNAL · LEARNER — v4.4.0 PREVIEW</h1>
+  <p class="sub">Component mới: <code>components/PaperTradeJournal.tsx</code> — chèn ngay TRÊN <code>TradingRulesPanel</code></p>
+
+  <!-- ============== COLLAPSED (default) ============== -->
+  <div class="card">
+    <div class="header">
+      <div style="flex:1">
+        <div class="title">📓 PAPER JOURNAL · LEARNER</div>
+        <div class="subtitle">14 lệnh · OPEN 3 · WR 63.6% · PnL <span class="green" style="font-weight:700">+24.5%</span> · Pending 5</div>
+      </div>
+      <div class="chev">▾</div>
+    </div>
+  </div>
+
+  <!-- ============== EXPANDED ============== -->
+  <div class="card">
+    <div class="header">
+      <div style="flex:1">
+        <div class="title">📓 PAPER JOURNAL · LEARNER</div>
+        <div class="subtitle">14 lệnh · OPEN 3 · WR 63.6% · PnL <span class="green" style="font-weight:700">+24.5%</span> · Pending 5</div>
+      </div>
+      <div class="chev">▴</div>
+    </div>
+    <div class="body">
+      <div class="stats-row">
+        <div class="stat"><div class="stat-label">WIN</div><div class="stat-value green">7</div></div>
+        <div class="stat"><div class="stat-label">LOSS</div><div class="stat-value red">4</div></div>
+        <div class="stat"><div class="stat-label">TIMEOUT</div><div class="stat-value dim">0</div></div>
+        <div class="stat"><div class="stat-label">BEST</div><div class="stat-value green">+200.0%</div></div>
+        <div class="stat"><div class="stat-label">WORST</div><div class="stat-value red">-100.0%</div></div>
+      </div>
+
+      <div class="section-title">🩺 RULE HEALTH (live calibration)</div>
+
+      <div class="health-row">
+        <span class="dot green">●</span>
+        <span class="health-rule-id">15m:1</span>
+        <span class="health-cell">n=14</span>
+        <span class="health-cell green" style="font-weight:700">WR 71%</span>
+        <span class="health-cell green">μ +0.42%</span>
+      </div>
+      <div class="health-row">
+        <span class="dot amber">●</span>
+        <span class="health-rule-id">1h:3</span>
+        <span class="health-cell">n=12</span>
+        <span class="health-cell amber" style="font-weight:700">WR 33%</span>
+        <span class="health-cell red">μ -0.21%</span>
+      </div>
+      <div class="health-row">
+        <span class="dot red">●</span>
+        <span class="health-rule-id">4h:2</span>
+        <span class="health-cell">n=33</span>
+        <span class="health-cell red" style="font-weight:700">WR 18%</span>
+        <span class="health-cell red">μ -0.55%</span>
+      </div>
+
+      <div class="section-title">📜 LẦN LỆNH GẦN ĐÂY</div>
+
+      <div class="trade-row">
+        <span class="t-rule">15m:1</span>
+        <span class="t-side green">LONG</span>
+        <span class="t-status amber">OPEN</span>
+        <span class="t-pnl dim">—</span>
+      </div>
+      <div class="trade-row">
+        <span class="t-rule">1h:3</span>
+        <span class="t-side red">SHORT</span>
+        <span class="t-status green">WIN</span>
+        <span class="t-pnl green">+200.0%</span>
+      </div>
+      <div class="trade-row">
+        <span class="t-rule">4h:2</span>
+        <span class="t-side green">LONG</span>
+        <span class="t-status red">LOSS</span>
+        <span class="t-pnl red">-100.0%</span>
+      </div>
+      <div class="trade-row">
+        <span class="t-rule">15m:1</span>
+        <span class="t-side green">LONG</span>
+        <span class="t-status green">WIN</span>
+        <span class="t-pnl green">+150.0%</span>
+      </div>
+      <div class="trade-row">
+        <span class="t-rule">1h:5</span>
+        <span class="t-side red">SHORT</span>
+        <span class="t-status dim">TIMEOUT</span>
+        <span class="t-pnl green">+12.0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong style="color:var(--amber)">3 cải tiến trong v4.4.0:</strong><br><br>
+    <strong>1. Learner</strong> (port từ <code>BTCX/live/backend/learner.py</code>):<br>
+    &nbsp;&nbsp;• Mỗi rule FIRE → log prediction kèm horizon (3-5 nến tuỳ TF)<br>
+    &nbsp;&nbsp;• Khi mature → so giá hiện tại với entry → cộng dồn vào hit-rate per rule<br>
+    &nbsp;&nbsp;• Sau ≥10 mẫu → đánh "warn", sau ≥30 mẫu hit-rate &lt;40% → đánh "bad" (chỉ cảnh báo, KHÔNG tự untrack)<br><br>
+    <strong>2. Schema validator</strong>:<br>
+    &nbsp;&nbsp;• <code>assets/rule_schema.json</code> — JSON schema cho HardRule<br>
+    &nbsp;&nbsp;• <code>utils/ruleValidator.ts</code> — gọi <code>validateRules()</code> để bắt lỗi <code>hard_rules.json</code> trước khi load<br><br>
+    <strong>3. Paper Trader</strong> (port simplified từ <code>BTCX/live/backend/trader.py</code>):<br>
+    &nbsp;&nbsp;• Rule FIRE → tự mở lệnh OPEN với SL/TP theo cfg<br>
+    &nbsp;&nbsp;• Mỗi tick price → check SL/TP/timeout → đóng lệnh, ghi PnL ×leverage<br>
+    &nbsp;&nbsp;• KHÔNG đụng API thật, chỉ ghi log AsyncStorage<br><br>
+    Tất cả persist AsyncStorage, có thể clear bằng nút "Xoá cache" trong ErrorBoundary.
+  </div>
+</body>
+</html>

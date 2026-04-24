@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛰 RULE TRADING — UI/UX Preview (Before vs After)</title>
+<style>
+  :root {
+    --bg:        #0a0a1a;
+    --bgCard:    #0d1117;
+    --bgPanel:   #1a1a2e;
+    --bitcoin:   #f7931a;
+    --bull:      #2ed573;
+    --bear:      #ff4757;
+    --warning:   #ffa502;
+    --myrule:    #ff66cc;
+    --text:      #ffffff;
+    --textDim:   #aaaaaa;
+    --textMuted: #666666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'SF Mono', Consolas, Menlo, monospace; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 16px; color: var(--bitcoin); margin-bottom: 6px; letter-spacing: 1px; }
+  .subtitle { font-size: 11px; color: var(--textDim); margin-bottom: 20px; font-style: italic; }
+  .comparison {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .side {
+    flex: 0 0 auto;
+    width: 400px;
+    max-width: 100%;
+  }
+  .side-header {
+    padding: 8px 12px;
+    border-radius: 6px 6px 0 0;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+  .side-header.before {
+    background: var(--bear);
+    color: #fff;
+  }
+  .side-header.after {
+    background: var(--bull);
+    color: #000;
+  }
+  .panel {
+    background: var(--bgCard);
+    border: 1px solid #ffffff10;
+    border-radius: 0 0 12px 12px;
+    padding: 12px;
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .panel-title {
+    color: var(--bitcoin);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+  .counter {
+    color: var(--textDim);
+    font-size: 11px;
+  }
+  .hint {
+    color: var(--textMuted);
+    font-size: 10px;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .context {
+    background: #f7931a10;
+    border-left: 3px solid #f7931a60;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 10px;
+    color: var(--textDim);
+    font-size: 10px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .tab {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #ffffff05;
+    border: 1px solid #ffffff15;
+    font-size: 12px;
+    color: var(--textDim);
+    font-weight: 800;
+  }
+  .tab.active {
+    background: #f7931a20;
+    border-color: #f7931a60;
+    color: var(--bitcoin);
+  }
+  .tab-count {
+    font-size: 8px;
+    color: var(--textMuted);
+    margin-top: 2px;
+  }
+
+  /* Card */
+  .card {
+    background: #ffffff05;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 4px;
+    border-left: 2px solid #ffffff20;
+  }
+  .card.tracked { border-left-color: var(--bull); background: #2ed57308; }
+  .card.fired { border-left-color: var(--bear); border-left-width: 5px; background: #ff475712; }
+
+  /* Compact row */
+  .compact-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+  }
+  .compact-row-after {
+    gap: 4px;
+  }
+  .side-icon { font-size: 14px; }
+  .side-icon-after { font-size: 13px; }
+  .rank {
+    color: var(--warning);
+    font-size: 11px;
+    font-weight: 900;
+    min-width: 28px;
+  }
+  .rank-after {
+    font-size: 10px;
+    min-width: 22px;
+  }
+  .wr-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid;
+    min-width: 44px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+  }
+  .wr-badge-after {
+    padding: 1px 5px;
+    min-width: 38px;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+  .wr-warn {
+    color: var(--warning);
+    background: #ffa50215;
+    border-color: #ffa50240;
+  }
+  .wr-bear {
+    color: var(--bear);
+    background: #ff475715;
+    border-color: #ff475740;
+  }
+  .pf {
+    color: var(--textDim);
+    font-size: 10px;
+    min-width: 42px;
+  }
+  .pf-after {
+    font-size: 9px;
+    min-width: 32px;
+  }
+  .trades {
+    color: var(--textMuted);
+    font-size: 10px;
+    min-width: 38px;
+  }
+  .trades-after {
+    font-size: 9px;
+    min-width: 32px;
+  }
+  .net {
+    font-size: 11px;
+    font-weight: 800;
+    flex: 1;
+  }
+  .net-after {
+    font-size: 10px;
+    flex: 1;
+  }
+  .net-bull { color: var(--bull); }
+  .net-bear { color: var(--bear); }
+
+  /* Source badge */
+  .src-badge {
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid;
+    font-size: 8px;
+    font-weight: 800;
+  }
+  .src-badge-after {
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid;
+    font-size: 11px;
+    font-weight: 800;
+    min-width: 22px;
+    text-align: center;
+  }
+  .src-verified {
+    color: var(--bitcoin);
+    background: #f7931a20;
+    border-color: #f7931a60;
+  }
+
+  /* Switch */
+  .switch {
+    width: 36px;
+    height: 18px;
+    background: #2ed57366;
+    border-radius: 18px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: var(--bull);
+    border-radius: 50%;
+  }
+
+  /* Status area */
+  .compact-status { margin-top: 4px; }
+  .match-bar { margin-bottom: 4px; }
+
+  /* Before — bad label */
+  .match-label-old {
+    color: var(--warning);
+    font-size: 10px;
+    font-weight: 800;
+    margin-bottom: 3px;
+  }
+
+  /* After — new styled label */
+  .match-label-new {
+    font-size: 11px;
+    font-weight: 900;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .progress-bg {
+    height: 4px;
+    background: #ffffff10;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 4px;
+    border-radius: 2px;
+  }
+  .progress-green { background: var(--bull); }
+  .progress-red { background: var(--bear); }
+  .progress-orange { background: var(--warning); }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+  }
+  .chip {
+    font-size: 8px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+  .chip-on {
+    color: var(--bull);
+    background: #2ed57315;
+    border-color: #2ed57340;
+  }
+  .chip-off {
+    color: var(--textMuted);
+    background: #ffffff05;
+    border-color: #ffffff15;
+  }
+  .htf-chip-on {
+    color: var(--bitcoin);
+    background: #f7931a15;
+    border-color: #f7931a40;
+  }
+  .htf-chip-off {
+    color: var(--bear);
+    background: #ff475710;
+    border-color: #ff475740;
+  }
+
+  /* Summary */
+  .summary {
+    font-size: 10px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #ffffff08;
+    color: var(--textDim);
+  }
+  .summary.single { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Fired banner */
+  .fired-banner {
+    color: var(--bear);
+    font-size: 11px;
+    font-weight: 900;
+    text-align: center;
+    background: #ff475720;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ff475760;
+    letter-spacing: 0.5px;
+  }
+
+  .note {
+    margin-top: 14px;
+    padding: 10px;
+    background: #f7931a08;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--textDim);
+    line-height: 1.6;
+    border-left: 3px solid var(--bitcoin);
+  }
+  .note b { color: var(--bitcoin); }
+  .note .bull { color: var(--bull); }
+  .note .bear { color: var(--bear); }
+  .note .warn { color: var(--warning); }
+
+  h2.section-title {
+    font-size: 14px;
+    color: var(--bitcoin);
+    margin: 24px 0 10px;
+    letter-spacing: 1px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 10px;
+    color: var(--textDim);
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: #ffffff05;
+    border-radius: 6px;
+  }
+  .legend span b { font-weight: 900; }
+</style>
+</head>
+<body>
+
+<h1>🛰 RULE TRADING — UI/UX Preview</h1>
+<p class="subtitle">So sánh BEFORE vs AFTER · 4 priority fixed (progress logic · noise chips · compact · status color)</p>
+
+<div class="comparison">
+
+  <!-- ══════════════════════════════ BEFORE ══════════════════════════════ -->
+  <div class="side">
+    <div class="side-header before">❌ BEFORE — Vấn đề UI/UX</div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📡 RULE TRADING</div>
+        <div class="counter">Đang theo dõi: <b style="color:var(--bull)">53</b> ▼</div>
+      </div>
+      <div class="hint">💡 Bật "Theo dõi" cho rule muốn theo dõi — app sẽ báo khi giá khớp.</div>
+      <div class="tabs">
+        <div class="tab active">
+          15M
+          <div class="tab-count">15 rule · 📡15</div>
+        </div>
+        <div class="tab">1H<div class="tab-count">15 rule · 📡15</div></div>
+      </div>
+      <div class="context">📅 Test trên <b>3.5 tháng</b> · 10,000 nến · Giá $67,372 → $73,890</div>
+
+      <!-- Rule #1 — HTF fail nhưng thanh XANH FULL (misleading!) -->
+      <div class="card tracked">
+        <div class="compact-row">
+          <span class="side-icon">🔴</span>
+          <span class="rank">#1</span>
+          <span class="wr-badge wr-warn">44%</span>
+          <span class="pf">PF1.6</span>
+          <span class="trades">1825L</span>
+          <span class="net net-bull">+46700%</span>
+          <span class="src-badge src-verified">⭐ Verified</span>
+          <span class="switch"></span>
+        </div>
+        <div class="compact-status">
+          <div class="match-bar">
+            <div class="match-label-old">
+              📡 1/1 ĐK khớp <span style="color:var(--bear)">· HTF ✗</span>
+            </div>
+            <div class="progress-bg">
+              <div class="progress-fill progress-green" style="width:100%"></div>
+            </div>
+          </div>
+          <!-- 4 noise chips + 1 real -->
+          <div class="chips">
+            <span class="chip chip-off">✗ Stoch</span>
+            <span class="chip chip-off">✗ RSI</span>
+            <span class="chip chip-off">✗ Div</span>
+            <span class="chip chip-off">✗ BB</span>
+            <span class="chip chip-on">✓ MACD</span>
+          </div>
+        </div>
+        <div class="summary single">
+          <span style="color:var(--bull)">MACD</span>
+          <span> · </span>
+          <span style="color:var(--bitcoin)">📈HTF</span>
+          <span> · </span>
+          <span style="color:var(--bull)">TP+300%</span>
+          <span style="color:#888"> / </span>
+          <span style="color:var(--bear)">SL-150%</span>
+          <span> · 17.5 lệnh/n...</span>
+        </div>
+      </div>
+
+      <!-- Rule #2 — cùng vấn đề -->
+      <div class="card tracked">
+        <div class="compact-row">
+          <span class="side-icon">🔴</span>
+          <span class="rank">#2</span>
+          <span class="wr-badge wr-warn">41.5%</span>
+          <span class="pf">PF1.4</span>
+          <span class="trades">2562L</span>
+          <span class="net net-bull">+42330%</span>
+          <span class="src-badge src-verified">⭐ Verified</span>
+          <span class="switch"></span>
+        </div>
+        <div class="compact-status">
+          <div class="match-bar">
+            <div class="match-label-old">
+              📡 1/1 ĐK khớp <span style="color:var(--bear)">· HTF ✗</span>
+            </div>
+            <div class="progress-bg">
+              <div class="progress-fill progress-green" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip chip-off">✗ Stoch</span>
+            <span class="chip chip-off">✗ RSI</span>
+            <span class="chip chip-off">✗ Div</span>
+            <span class="chip chip-off">✗ BB</span>
+            <span class="chip chip-on">✓ MACD</span>
+          </div>
+        </div>
+        <div class="summary single">
+          <span style="color:var(--bull)">MACD</span>
+          <span> · </span>
+          <span style="color:var(--bitcoin)">📈HTF</span>
+          <span> · </span>
+          <span style="color:var(--bull)">TP+300%</span>
+          <span style="color:#888"> / </span>
+          <span style="color:var(--bear)">SL-150%</span>
+          <span> · 24.6 lệnh/n...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ AFTER ══════════════════════════════ -->
+  <div class="side">
+    <div class="side-header after">✅ AFTER — Đã sửa 4 priority</div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📡 RULE TRADING</div>
+        <div class="counter"><b style="color:var(--bull)">🟢 53</b> rule bật ▼</div>
+      </div>
+      <div class="hint">💡 Bật "Theo dõi" cho rule muốn theo dõi — app sẽ báo khi giá khớp.</div>
+      <div class="tabs">
+        <div class="tab active">
+          15M
+          <div class="tab-count">15 rule · 📡15</div>
+        </div>
+        <div class="tab">1H<div class="tab-count">15 rule · 📡15</div></div>
+      </div>
+      <div class="context">📅 Test trên <b>3.5 tháng</b> · 10,000 nến · Giá $67,372 → $73,890</div>
+
+      <!-- Rule #1 — HTF CHẶN: cond đủ nhưng HTF fail → RED bar -->
+      <div class="card tracked">
+        <div class="compact-row compact-row-after">
+          <span class="side-icon-after">🔴</span>
+          <span class="rank rank-after">#1</span>
+          <span class="wr-badge wr-badge-after wr-warn">44%</span>
+          <span class="pf pf-after">PF1.6</span>
+          <span class="trades trades-after">1825L</span>
+          <span class="net net-after net-bull">+46700%</span>
+          <span class="src-badge-after src-verified">⭐</span>
+          <span class="switch"></span>
+        </div>
+        <div class="compact-status">
+          <div class="match-bar">
+            <div class="match-label-new" style="color:var(--bear)">
+              🚫 HTF CHẶN (0/1 filter pass)
+            </div>
+            <div class="progress-bg">
+              <!-- cond 1/1 + htf 0/1 = 1/2 = 50%, RED -->
+              <div class="progress-fill progress-red" style="width:50%"></div>
+            </div>
+          </div>
+          <!-- Only required cond shown -->
+          <div class="chips">
+            <span class="chip chip-on">✓ MACD</span>
+          </div>
+          <!-- HTF chips with REAL label -->
+          <div class="chips">
+            <span class="chip htf-chip-off">✗ 1h+4h cùng chiều</span>
+          </div>
+        </div>
+        <div class="summary">
+          <span style="color:var(--bull)">MACD</span>
+          <span> · </span>
+          <span style="color:var(--bitcoin)">📈HTF</span>
+          <span> · </span>
+          <span style="color:var(--bull)">TP+300%</span>
+          <span style="color:#888"> / </span>
+          <span style="color:var(--bear)">SL-150%</span>
+          <span> · 17.5 lệnh/ngày  ▼</span>
+        </div>
+      </div>
+
+      <!-- Rule #2 — SẴN SÀNG: cond ✓ + HTF ✓ → GREEN full -->
+      <div class="card tracked">
+        <div class="compact-row compact-row-after">
+          <span class="side-icon-after">🔴</span>
+          <span class="rank rank-after">#2</span>
+          <span class="wr-badge wr-badge-after wr-warn">41.5%</span>
+          <span class="pf pf-after">PF1.4</span>
+          <span class="trades trades-after">2562L</span>
+          <span class="net net-after net-bull">+42330%</span>
+          <span class="src-badge-after src-verified">⭐</span>
+          <span class="switch"></span>
+        </div>
+        <div class="compact-status">
+          <div class="match-bar">
+            <div class="match-label-new" style="color:var(--bull)">
+              🎯 SẴN SÀNG VÀO LỆNH
+            </div>
+            <div class="progress-bg">
+              <div class="progress-fill progress-green" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip chip-on">✓ MACD</span>
+          </div>
+          <div class="chips">
+            <span class="chip htf-chip-on">✓ 4h cùng chiều</span>
+          </div>
+        </div>
+        <div class="summary">
+          <span style="color:var(--bull)">MACD</span>
+          <span> · </span>
+          <span style="color:var(--bitcoin)">📈HTF</span>
+          <span> · </span>
+          <span style="color:var(--bull)">TP+300%</span>
+          <span style="color:#888"> / </span>
+          <span style="color:var(--bear)">SL-150%</span>
+          <span> · 24.6 lệnh/ngày  ▼</span>
+        </div>
+      </div>
+
+      <!-- Rule #3 — Partial match: 0/1 cond + HTF chưa check → warning orange -->
+      <div class="card tracked">
+        <div class="compact-row compact-row-after">
+          <span class="side-icon-after">🔴</span>
+          <span class="rank rank-after">#3</span>
+          <span class="wr-badge wr-badge-after wr-bear">34.3%</span>
+          <span class="pf pf-after">PF1.6</span>
+          <span class="trades trades-after">1825L</span>
+          <span class="net net-after net-bull">+38250%</span>
+          <span class="src-badge-after src-verified">⭐</span>
+          <span class="switch"></span>
+        </div>
+        <div class="compact-status">
+          <div class="match-bar">
+            <div class="match-label-new" style="color:var(--warning)">
+              📡 1/2 điều kiện khớp
+            </div>
+            <div class="progress-bg">
+              <div class="progress-fill progress-orange" style="width:50%"></div>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip chip-off">✗ MACD</span>
+          </div>
+          <div class="chips">
+            <span class="chip htf-chip-on">✓ 1h+4h cùng chiều</span>
+          </div>
+        </div>
+        <div class="summary">
+          <span style="color:var(--bull)">MACD</span>
+          <span> · </span>
+          <span style="color:var(--bitcoin)">📈HTF</span>
+          <span> · </span>
+          <span style="color:var(--bull)">TP+300%</span>
+          <span style="color:#888"> / </span>
+          <span style="color:var(--bear)">SL-100%</span>
+          <span> · 17.5 lệnh/ngày  ▼</span>
+        </div>
+      </div>
+
+      <!-- Rule MYRULE sample — new icon 📝 -->
+      <div class="card tracked">
+        <div class="compact-row compact-row-after">
+          <span class="side-icon-after">🟢</span>
+          <span class="rank rank-after">#18</span>
+          <span class="wr-badge wr-badge-after wr-bear">20%</span>
+          <span class="pf pf-after">PF1.7</span>
+          <span class="trades trades-after">59L</span>
+          <span class="net net-after net-bull">+1667%</span>
+          <span class="src-badge-after" style="color:var(--myrule);background:#ff66cc20;border-color:#ff66cc60">📝</span>
+          <span class="switch"></span>
+        </div>
+        <div class="compact-status">
+          <div class="match-bar">
+            <div class="match-label-new" style="color:var(--bull)">
+              🎯 SẴN SÀNG VÀO LỆNH
+            </div>
+            <div class="progress-bg">
+              <div class="progress-fill progress-green" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip chip-on">✓ Stoch</span>
+          </div>
+          <div class="chips">
+            <span class="chip htf-chip-on">✓ 1h stochK ≥ 55</span>
+          </div>
+        </div>
+        <div class="summary">
+          <span style="color:var(--bull)">Stoch</span>
+          <span> · </span>
+          <span style="color:var(--bitcoin)">📈HTF</span>
+          <span> · </span>
+          <span style="color:var(--bull)">TP+300%</span>
+          <span style="color:#888"> / </span>
+          <span style="color:var(--bear)">SL-150%</span>
+          <span> · 17.0 lệnh/tháng  ▼</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2 class="section-title">📋 Checklist các fix đã apply</h2>
+
+<div class="note">
+<b>🔥 Priority 1 — Progress bar + HTF logic (MISLEADING fix)</b><br>
+• Progress bar giờ tính <b>TỔNG</b> = conditions + HTF checks, không chỉ conditions<br>
+• 3 state rõ ràng:
+<span class="bull">🎯 SẴN SÀNG VÀO LỆNH</span> (xanh lá full) ·
+<span class="bear">🚫 HTF CHẶN (X/Y filter pass)</span> (đỏ) ·
+<span class="warn">📡 N/M điều kiện khớp</span> (cam)<br>
+• Người dùng KHÔNG còn bị lừa bởi thanh xanh đầy khi rule thực tế không trigger
+</div>
+
+<div class="note">
+<b>🧹 Priority 2 — Giảm noise chips</b><br>
+• Chỉ show <b>required conditions</b> — không còn 4 chip ✗ (Stoch/RSI/Div/BB) noise ở các rule chỉ cần MACD<br>
+• GA rules (có weights) vẫn hiện tất cả vì dùng weighted score → không mất info<br>
+• <b>Thêm row chips HTF riêng</b>: mỗi filter 1 chip với ✓/✗ + label (vd "1h StochK ≥ 55") → thấy rõ filter nào chặn
+</div>
+
+<div class="note">
+<b>📏 Priority 3 — Compact layout</b><br>
+• Source badge: "⭐ Verified" → chỉ icon <b>⭐</b> (save ~50px)<br>
+• Thêm <b>MYRULE</b> icon <span style="color:var(--myrule)">📝</span> (màu hồng)<br>
+• compactRow: gap 6→4, wrBadge 44→38px, PF/Trades minWidth 42→32<br>
+• Emoji side: 14→13<br>
+• Summary: <code>numberOfLines={1}</code> → <code>{2}</code> (không còn bị cắt "17.5 lệnh/n...")
+</div>
+
+<div class="note">
+<b>🎨 Priority 4 — Trạng thái + màu sắc</b><br>
+• <b>matchLabelNew</b> style mới: fontSize 11, bold, letterSpacing — đọc rõ hơn<br>
+• Status color <b>dynamic</b> theo state (xanh/đỏ/cam)<br>
+• <b>htfChip</b> style riêng: màu bitcoin khi ✓, màu bear khi ✗<br>
+• <b>"Đang theo dõi: 53"</b> → <b>"🟢 53 rule bật"</b> (rõ nghĩa hơn)
+</div>
+
+<div class="legend">
+  <span><b style="color:var(--bull)">🎯 SẴN SÀNG</b> — rule sắp fire (cond + HTF OK)</span>
+  <span><b style="color:var(--bear)">🚫 HTF CHẶN</b> — cond đủ nhưng HTF filter fail</span>
+  <span><b style="color:var(--warning)">📡 N/M khớp</b> — đang build progress</span>
+  <span><b style="color:var(--bear)">🚨 KÍCH HOẠT</b> — fire rồi, vào lệnh ngay</span>
+</div>
+
+</body>
+</html>

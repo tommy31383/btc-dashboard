@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 RULE ALERT BANNER — UX Redesign (Less Red, More Elegant)</title>
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --bgCard: #0d1117;
+    --bull: #2ed573;
+    --bear: #ff4757;
+    --bearDim: #c23a4c;
+    --bitcoin: #f7931a;
+    --gold: #d4af37;
+    --goldLight: #f0d97a;
+    --cream: #f5e8c7;
+    --navy: #0f1729;
+    --navyDeep: #0a0f1e;
+    --text: #ffffff;
+    --textDim: #aaaaaa;
+    --textMuted: #666666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Mono', Consolas, Menlo, monospace;
+    padding: 16px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 16px; color: var(--bitcoin); margin-bottom: 6px; letter-spacing: 1px; }
+  .subtitle { font-size: 11px; color: var(--textDim); margin-bottom: 20px; font-style: italic; }
+  h2.variant-title {
+    font-size: 14px;
+    color: var(--bitcoin);
+    margin: 28px 0 10px;
+    letter-spacing: 1px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed #ffffff15;
+  }
+  .desc {
+    font-size: 11px;
+    color: var(--textDim);
+    margin-bottom: 10px;
+    font-style: italic;
+    padding: 6px 10px;
+    background: #ffffff05;
+    border-left: 2px solid var(--bitcoin);
+    border-radius: 3px;
+  }
+
+  @keyframes pulseBorder {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+    50%      { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0.0); }
+  }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+    50%      { box-shadow: 0 0 0 8px rgba(255, 71, 87, 0.0); }
+  }
+  @keyframes shine {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes softGlow {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+
+  /* ═══════════════════════════════════════════════════════ */
+  /* VARIANT A — CURRENT (for reference) */
+  /* ═══════════════════════════════════════════════════════ */
+  .v-current {
+    background: #ff475715;
+    border: 2px solid var(--bear);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .v-current .header-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .v-current .header-icon { font-size: 24px; }
+  .v-current .header-title {
+    color: var(--bear); font-size: 14px; font-weight: 900;
+    letter-spacing: 1px;
+  }
+  .v-current .hint { color: var(--textMuted); font-size: 9px; font-style: italic; margin-bottom: 8px; }
+  .v-current .alert-card {
+    background: #ff475720;
+    border-left: 4px solid var(--bear);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 6px;
+  }
+  .v-current .side-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 900; background: #ff475720;
+    color: var(--bear); margin-right: 8px;
+  }
+  .v-current .rule-id {
+    color: var(--bear); font-weight: 900; font-size: 13px;
+  }
+
+  /* ═══════════════════════════════════════════════════════ */
+  /* VARIANT B — GOLD LUXURY (navy + gold accents) */
+  /* ═══════════════════════════════════════════════════════ */
+  .v-gold {
+    background: linear-gradient(135deg, #0f1729 0%, #1a2442 100%);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    animation: pulseBorder 2s ease-in-out infinite;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.15);
+  }
+  .v-gold::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    background-size: 200% 100%;
+    animation: shine 3s linear infinite;
+  }
+  .v-gold .header-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .v-gold .header-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.6));
+  }
+  .v-gold .header-title {
+    color: var(--goldLight);
+    font-size: 13px; font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+  }
+  .v-gold .header-badge {
+    margin-left: auto;
+    background: var(--gold);
+    color: var(--navyDeep);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+  .v-gold .alert-card {
+    background: rgba(0,0,0,0.35);
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .v-gold .alert-card:last-child { margin-bottom: 0; }
+  .v-gold .side-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .v-gold .side-tag-long {
+    padding: 3px 10px;
+    background: linear-gradient(135deg, #2ed57330, #2ed57310);
+    color: var(--bull);
+    border: 1px solid #2ed57360;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+  }
+  .v-gold .side-tag-short {
+    padding: 3px 10px;
+    background: linear-gradient(135deg, #ff475730, #ff475710);
+    color: var(--bear);
+    border: 1px solid #ff475760;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+  }
+  .v-gold .rule-name {
+    color: var(--cream);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .v-gold .rule-meta {
+    font-size: 10px;
+    color: var(--textDim);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .v-gold .rule-meta b { color: var(--goldLight); }
+  .v-gold .action-btn {
+    background: var(--gold);
+    color: var(--navyDeep);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* ═══════════════════════════════════════════════════════ */
+  /* VARIANT C — MINIMALIST (near-black + thin gold bar) */
+  /* ═══════════════════════════════════════════════════════ */
+  .v-minimal {
+    background: #050810;
+    border: 1px solid #ffffff10;
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .v-minimal::after {
+    content: '';
+    position: absolute;
+    top: 14px; left: -3px; bottom: 14px;
+    width: 3px;
+    background: var(--gold);
+    box-shadow: 0 0 12px var(--gold);
+    animation: softGlow 2s ease-in-out infinite;
+  }
+  .v-minimal .header-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .v-minimal .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+    animation: softGlow 1.5s ease-in-out infinite;
+  }
+  .v-minimal .header-title {
+    color: var(--cream);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+  .v-minimal .count-large {
+    color: var(--gold);
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin: 6px 0 2px;
+  }
+  .v-minimal .count-label {
+    color: var(--textDim);
+    font-size: 10px;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .v-minimal .alert-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid #ffffff08;
+  }
+  .v-minimal .alert-row:first-of-type { border-top: 1px solid #ffffff15; margin-top: 8px; }
+  .v-minimal .side-dot-long { width: 6px; height: 6px; border-radius: 50%; background: var(--bull); box-shadow: 0 0 6px var(--bull); }
+  .v-minimal .side-dot-short { width: 6px; height: 6px; border-radius: 50%; background: var(--bear); box-shadow: 0 0 6px var(--bear); }
+  .v-minimal .rule-info { flex: 1; }
+  .v-minimal .rule-line-1 {
+    color: var(--cream);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .v-minimal .rule-line-2 {
+    color: var(--textDim);
+    font-size: 10px;
+    margin-top: 2px;
+  }
+  .v-minimal .price-big {
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 900;
+    text-align: right;
+  }
+
+  /* ═══════════════════════════════════════════════════════ */
+  /* VARIANT D — SIDED (LONG green gold / SHORT red gold) */
+  /* ═══════════════════════════════════════════════════════ */
+  .v-sided {
+    background: linear-gradient(180deg, #0d1117 0%, #050810 100%);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .v-sided .header-crown {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 6px 12px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+    margin: -14px -14px 12px;
+    border-bottom: 1px solid var(--gold);
+  }
+  .v-sided .crown-title {
+    color: var(--navyDeep);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .v-sided .alert-card-long {
+    background: linear-gradient(135deg, #2ed57308 0%, transparent 100%);
+    border-left: 3px solid var(--bull);
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 6px;
+  }
+  .v-sided .alert-card-short {
+    background: linear-gradient(135deg, #ff475708 0%, transparent 100%);
+    border-left: 3px solid var(--bear);
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 6px;
+  }
+  .v-sided .card-top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+  }
+  .v-sided .arrow-long {
+    color: var(--bull);
+    font-size: 18px;
+    filter: drop-shadow(0 0 4px rgba(46, 213, 115, 0.5));
+  }
+  .v-sided .arrow-short {
+    color: var(--bear);
+    font-size: 18px;
+    filter: drop-shadow(0 0 4px rgba(255, 71, 87, 0.5));
+  }
+  .v-sided .rule-title {
+    color: var(--cream);
+    font-size: 12px;
+    font-weight: 800;
+    flex: 1;
+  }
+  .v-sided .rank-badge {
+    background: var(--gold);
+    color: var(--navyDeep);
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .v-sided .card-stats {
+    display: flex; gap: 12px;
+    font-size: 10px;
+    color: var(--textDim);
+    flex-wrap: wrap;
+  }
+  .v-sided .card-stats b { color: var(--cream); }
+  .v-sided .stat-wr { color: var(--goldLight); }
+  .v-sided .stat-net { color: var(--bull); font-weight: 900; }
+
+  .phone-frame {
+    max-width: 400px;
+    margin: 0 auto 30px;
+    padding: 12px;
+    background: #000;
+    border-radius: 24px;
+    border: 2px solid #333;
+  }
+  .phone-header {
+    display: flex; justify-content: space-between;
+    padding: 4px 12px 10px;
+    font-size: 10px; color: var(--textMuted);
+  }
+
+  .rating {
+    display: flex; gap: 8px; margin-top: 8px; font-size: 11px;
+  }
+  .rating .good { color: var(--bull); }
+  .rating .bad { color: var(--bear); }
+  .rating .warn { color: var(--bitcoin); }
+</style>
+</head>
+<body>
+
+<h1>🎯 RULE ALERT BANNER — 4 UX Redesigns</h1>
+<p class="subtitle">So sánh thiết kế "đang kích hoạt": hiện giờ (đỏ chói) vs 3 phương án sang trọng hơn · Choose 1 để build</p>
+
+<!-- ═══════════════════════════════ VARIANT A ══════════════════════════════ -->
+<h2 class="variant-title">❌ A — HIỆN TẠI (toàn màu đỏ, chói mắt, mệt mắt)</h2>
+<div class="desc">Background đỏ, border đỏ, text đỏ — quá nhiều màu đỏ tập trung → chói mắt, không sang.</div>
+<div class="phone-frame">
+  <div class="phone-header">
+    <span>BTC Dashboard</span>
+    <span>12:19 · 4G</span>
+  </div>
+  <div class="v-current">
+    <div class="header-row">
+      <span class="header-icon">🚨</span>
+      <span class="header-title">2 RULE ĐANG KÍCH HOẠT — VÀO LỆNH NGAY</span>
+    </div>
+    <div class="hint">👇 Bấm vào rule để xem/ẩn chi tiết</div>
+    <div class="alert-card">
+      <span class="side-tag">🔴 SHORT</span>
+      <span class="rule-id">15M #1 · WR 44% · PF 1.6</span>
+    </div>
+    <div class="alert-card">
+      <span class="side-tag">🔴 SHORT</span>
+      <span class="rule-id">15M #2 · WR 41.5% · PF 1.4</span>
+    </div>
+  </div>
+  <div class="rating">
+    <span class="bad">✗ Chói mắt</span>
+    <span class="bad">✗ Không sang</span>
+    <span class="bad">✗ Information density thấp</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ VARIANT B ══════════════════════════════ -->
+<h2 class="variant-title">⭐ B — GOLD LUXURY (navy + gold shimmer, premium)</h2>
+<div class="desc">Background navy deep, border gold + subtle pulse animation, shimmer line trên đỉnh. Trông như premium notification của ngân hàng/tòa án → uy tín, sang trọng. SHORT/LONG vẫn giữ màu để rõ hướng.</div>
+<div class="phone-frame">
+  <div class="phone-header">
+    <span>BTC Dashboard</span>
+    <span>12:19 · 4G</span>
+  </div>
+  <div class="v-gold">
+    <div class="header-row">
+      <span class="header-icon">🎯</span>
+      <span class="header-title">TÍN HIỆU KÍCH HOẠT</span>
+      <span class="header-badge">2 RULE</span>
+    </div>
+    <div class="alert-card">
+      <div class="side-row">
+        <span class="side-tag-short">⬇ SHORT</span>
+        <span class="rule-name">15M · Rule #1</span>
+      </div>
+      <div class="rule-meta">
+        <span>WR <b>44%</b></span>
+        <span>PF <b>1.6</b></span>
+        <span>NET <b style="color:#2ed573">+46,700%</b></span>
+        <span>TP/SL <b>+300% / -150%</b></span>
+      </div>
+      <div class="action-btn">▶ XEM CHI TIẾT</div>
+    </div>
+    <div class="alert-card">
+      <div class="side-row">
+        <span class="side-tag-short">⬇ SHORT</span>
+        <span class="rule-name">15M · Rule #2</span>
+      </div>
+      <div class="rule-meta">
+        <span>WR <b>41.5%</b></span>
+        <span>PF <b>1.4</b></span>
+        <span>NET <b style="color:#2ed573">+42,330%</b></span>
+      </div>
+    </div>
+  </div>
+  <div class="rating">
+    <span class="good">✓ Sang trọng</span>
+    <span class="good">✓ Đỡ chói</span>
+    <span class="good">✓ Info hierarchy tốt</span>
+    <span class="warn">⚠ Animation tốn CPU nhẹ</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ VARIANT C ══════════════════════════════ -->
+<h2 class="variant-title">🖤 C — MINIMALIST DARK (nền đen + 1 dải gold glow)</h2>
+<div class="desc">Gần như hoàn toàn nền đen, CHỈ có 1 dải gold bên trái glow pulse + dot chấm gold. Cực kỳ tinh tế, focus vào content. Inspired by Bloomberg Terminal, Apple Watch notification.</div>
+<div class="phone-frame">
+  <div class="phone-header">
+    <span>BTC Dashboard</span>
+    <span>12:19 · 4G</span>
+  </div>
+  <div class="v-minimal">
+    <div class="header-row">
+      <span class="dot"></span>
+      <span class="header-title">LIVE SIGNAL</span>
+    </div>
+    <div class="count-large">2</div>
+    <div class="count-label">rule đang kích hoạt · vào lệnh ngay</div>
+    <div class="alert-row">
+      <span class="side-dot-short"></span>
+      <div class="rule-info">
+        <div class="rule-line-1">15M · Rule #1 · SHORT</div>
+        <div class="rule-line-2">WR 44% · PF 1.6 · NET +46,700%</div>
+      </div>
+      <div class="price-big">$74.5K</div>
+    </div>
+    <div class="alert-row">
+      <span class="side-dot-short"></span>
+      <div class="rule-info">
+        <div class="rule-line-1">15M · Rule #2 · SHORT</div>
+        <div class="rule-line-2">WR 41.5% · PF 1.4 · NET +42,330%</div>
+      </div>
+      <div class="price-big">$74.5K</div>
+    </div>
+  </div>
+  <div class="rating">
+    <span class="good">✓ Cực kỳ sang</span>
+    <span class="good">✓ Không chói gì cả</span>
+    <span class="good">✓ Đọc nhanh</span>
+    <span class="warn">⚠ Có thể hơi MỜ (user miss)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ VARIANT D ══════════════════════════════ -->
+<h2 class="variant-title">👑 D — ROYAL CROWN (gold header bar + sided cards)</h2>
+<div class="desc">Header strip vàng kiểu "hoàng gia" ở top, mỗi rule card phân biệt LONG/SHORT rõ bằng màu viền trái nhưng nền vẫn tối. Rank badge vàng nhỏ bên phải. Trông như email thông báo từ Goldman Sachs.</div>
+<div class="phone-frame">
+  <div class="phone-header">
+    <span>BTC Dashboard</span>
+    <span>12:19 · 4G</span>
+  </div>
+  <div class="v-sided">
+    <div class="header-crown">
+      <span class="crown-title">⚡ SIGNAL LIVE · 2 RULE KÍCH HOẠT</span>
+    </div>
+    <div class="alert-card-short">
+      <div class="card-top">
+        <span class="arrow-short">⬇</span>
+        <span class="rule-title">15M SHORT · Cả 1h+4h cùng chiều</span>
+        <span class="rank-badge">#1</span>
+      </div>
+      <div class="card-stats">
+        <span class="stat-wr">WR <b>44%</b></span>
+        <span>PF <b>1.6</b></span>
+        <span class="stat-net">NET +46,700%</span>
+        <span>1825 trades</span>
+      </div>
+    </div>
+    <div class="alert-card-short">
+      <div class="card-top">
+        <span class="arrow-short">⬇</span>
+        <span class="rule-title">15M SHORT · 4h cùng chiều</span>
+        <span class="rank-badge">#2</span>
+      </div>
+      <div class="card-stats">
+        <span class="stat-wr">WR <b>41.5%</b></span>
+        <span>PF <b>1.4</b></span>
+        <span class="stat-net">NET +42,330%</span>
+        <span>2562 trades</span>
+      </div>
+    </div>
+    <div class="alert-card-long">
+      <div class="card-top">
+        <span class="arrow-long">⬆</span>
+        <span class="rule-title">1H LONG · StochOS + RSI</span>
+        <span class="rank-badge">#3</span>
+      </div>
+      <div class="card-stats">
+        <span class="stat-wr">WR <b>62%</b></span>
+        <span>PF <b>2.1</b></span>
+        <span class="stat-net">NET +12,500%</span>
+      </div>
+    </div>
+  </div>
+  <div class="rating">
+    <span class="good">✓ Cực uy tín</span>
+    <span class="good">✓ LONG/SHORT phân biệt rõ</span>
+    <span class="good">✓ Rank cao nhìn thấy ngay</span>
+    <span class="warn">⚠ Header chiếm chỗ hơi nhiều</span>
+  </div>
+</div>
+
+<!-- COMPARISON SUMMARY -->
+<h2 class="variant-title">📊 So sánh tổng hợp</h2>
+<div style="padding: 12px; background: #ffffff05; border-radius: 6px;">
+  <table style="width:100%; font-size:11px; border-collapse:collapse; color:var(--textDim);">
+    <tr style="border-bottom:1px solid #ffffff15">
+      <th style="text-align:left; padding:6px; color:var(--bitcoin)">Tiêu chí</th>
+      <th style="padding:6px; color:var(--bear)">A Current</th>
+      <th style="padding:6px; color:var(--gold)">B Gold Luxury</th>
+      <th style="padding:6px; color:var(--cream)">C Minimalist</th>
+      <th style="padding:6px; color:var(--gold)">D Royal Crown</th>
+    </tr>
+    <tr style="border-bottom:1px solid #ffffff08"><td style="padding:6px">Đỡ chói mắt</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅✅</td><td style="text-align:center">✅</td></tr>
+    <tr style="border-bottom:1px solid #ffffff08"><td style="padding:6px">Sang trọng</td><td style="text-align:center">❌</td><td style="text-align:center">✅✅</td><td style="text-align:center">✅✅</td><td style="text-align:center">✅✅✅</td></tr>
+    <tr style="border-bottom:1px solid #ffffff08"><td style="padding:6px">Rõ ràng (không miss)</td><td style="text-align:center">✅✅</td><td style="text-align:center">✅✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅✅</td></tr>
+    <tr style="border-bottom:1px solid #ffffff08"><td style="padding:6px">LONG/SHORT phân biệt</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅✅</td></tr>
+    <tr style="border-bottom:1px solid #ffffff08"><td style="padding:6px">Thông tin hiển thị</td><td style="text-align:center">Ít</td><td style="text-align:center">Nhiều</td><td style="text-align:center">TB</td><td style="text-align:center">Nhiều</td></tr>
+    <tr><td style="padding:6px">CPU (animation)</td><td style="text-align:center">0</td><td style="text-align:center">Nhẹ</td><td style="text-align:center">Nhẹ</td><td style="text-align:center">0</td></tr>
+  </table>
+  <div style="margin-top: 12px; padding: 10px; background: var(--bitcoin) + '20'; border-left: 3px solid var(--bitcoin); border-radius: 4px;">
+    <b style="color:var(--bitcoin)">💡 Recommendation:</b>
+    <span style="color:var(--textDim); font-size:11px;">
+      Tao nghiêng về <b style="color:var(--gold)">B (Gold Luxury)</b> hoặc <b style="color:var(--gold)">D (Royal Crown)</b> vì vừa sang vừa vẫn NỔI BẬT không bị miss.
+      <br>C quá tinh tế có thể user không để ý khi đang bận.
+      <br>Chọn <b>B</b> nếu mày thích animation shimmer · <b>D</b> nếu mày thích LONG/SHORT phân biệt sắc nét hơn.
+    </span>
+  </div>
+</div>
+
+</body>
+</html>

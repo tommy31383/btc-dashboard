@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"/>
+<title>v4.3.16 — Feature Rules Merged Preview</title>
+<style>
+  body{background:#0a0a1a;color:#e8eaf0;font-family:-apple-system,sans-serif;margin:0;padding:16px}
+  h1{color:#4ade80;font-size:20px;margin:0 0 4px}
+  h2{color:#fbbf24;font-size:15px;margin:18px 0 6px}
+  .sub{color:#9ca3af;font-size:12px;margin-bottom:16px}
+  .phone{max-width:440px;margin:0 auto}
+  .card{background:#111327;border:1px solid #1f2340;border-radius:12px;padding:12px;margin-bottom:12px}
+  /* B — snapshot */
+  .snap{background:#111327;border:1px solid rgba(251,146,60,.3);border-left:3px solid #fb923c;border-radius:12px;padding:10px;margin-bottom:12px}
+  .snap-title{color:#fb923c;font-size:9px;font-weight:800;letter-spacing:1px;margin-bottom:6px}
+  .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .snap-cell{padding:4px}
+  .snap-lab{color:#6b7280;font-size:7px;font-weight:700;letter-spacing:.5px}
+  .snap-val{font-size:13px;font-weight:900;margin-top:2px}
+  .snap-hint{font-size:7px;font-weight:700;margin-top:1px;opacity:.9}
+  /* C — summary */
+  .sum-title{color:#9ca3af;font-size:9px;font-weight:800;letter-spacing:1px;margin-bottom:8px}
+  .sum-row{display:flex;gap:4px;margin-bottom:8px}
+  .sum-cell{flex:1;padding:6px 2px;background:#ffffff05;border:1px solid #ffffff10;border-radius:6px;text-align:center}
+  .sum-cell.active{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4)}
+  .sum-cell.fired{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4)}
+  .sum-icon{font-size:11px}.sum-val{font-size:14px;font-weight:900;display:block}
+  .sum-lab{font-size:7px;font-weight:700}
+  .hint-box{margin-top:8px;padding:6px;border-radius:6px;background:rgba(245,158,11,.08);border-left:2px solid rgba(245,158,11,.6)}
+  .hint-title{color:#f59e0b;font-size:8px;font-weight:800;letter-spacing:.5px;margin-bottom:3px}
+  .hint-line{color:#9ca3af;font-size:9px;line-height:14px}
+  /* A — rule card sections */
+  .rule-head{display:flex;justify-content:space-between;align-items:center}
+  .side-long{color:#4ade80;font-weight:700;font-size:14px}
+  .side-short{color:#f87171;font-weight:700;font-size:14px}
+  .wr{color:#4ade80;font-weight:700}
+  .meta{color:#9ca3af;font-size:11px;margin:6px 0}
+  .sec{margin-top:6px;background:#ffffff04;border-radius:6px;padding:6px;border-left:2px solid #ffffff15}
+  .sec-title{color:#9ca3af;font-size:8px;font-weight:800;letter-spacing:.5px;margin-bottom:4px}
+  .frow{display:flex;align-items:flex-start;gap:6px;padding:2px 0}
+  .fmark{font-size:11px;font-weight:900;width:12px}
+  .flab{color:#e8eaf0;font-size:9px;font-weight:600}
+  .flive{font-size:8px;font-weight:700;margin-top:1px}
+  .ok{color:#4ade80}.bad{color:#f87171}.neu{color:#fbbf24}.htf{color:#fb923c}
+  .chip-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+  .chip{font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;border:1px solid}
+  .chip-ok{color:#4ade80;background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.4)}
+  .chip-off{color:#6b7280;background:#ffffff05;border-color:#ffffff15}
+</style></head>
+<body>
+<div class="phone">
+<h1>🧪 v4.3.16 — Feature Rules Merged (A+B+C)</h1>
+<div class="sub">Merge phần <code>feature_rules_preview.html</code> vào app production. Giả lập live BTC $75 842 / 4H UP / ATR 0.60% / EMA +1.59%</div>
+
+<!-- B: LIVE SNAPSHOT -->
+<h2 style="color:#fb923c">B · LiveFeatureSnapshot (trên đầu TradingRulesPanel)</h2>
+<div class="snap">
+  <div class="snap-title">📡 LIVE FEATURE SNAPSHOT · 1H</div>
+  <div class="snap-grid">
+    <div class="snap-cell"><div class="snap-lab">RSI 1H</div><div class="snap-val" style="color:#e8eaf0">65.1</div><div class="snap-hint"></div></div>
+    <div class="snap-cell"><div class="snap-lab">MACD HIST</div><div class="snap-val ok">+91.6</div><div class="snap-hint ok">BULL</div></div>
+    <div class="snap-cell"><div class="snap-lab">ATR%</div><div class="snap-val neu">0.60%</div><div class="snap-hint neu">BÌNH THƯỜNG</div></div>
+    <div class="snap-cell"><div class="snap-lab">EMA DIST</div><div class="snap-val neu">+1.59%</div><div class="snap-hint neu">XA VỪA</div></div>
+    <div class="snap-cell"><div class="snap-lab">HTF 4H</div><div class="snap-val ok">UP</div></div>
+    <div class="snap-cell"><div class="snap-lab">HTF 1D</div><div class="snap-val ok">UP</div></div>
+  </div>
+</div>
+
+<!-- C: SUMMARY -->
+<h2 style="color:#9ca3af">C · LiveRulesSummary (trên đầu danh sách rule)</h2>
+<div class="card">
+  <div class="sum-title">🎯 KẾT LUẬN LIVE · 30 RULE</div>
+  <div class="sum-row">
+    <div class="sum-cell"><div class="sum-icon">🔥</div><span class="sum-val" style="color:#6b7280">0</span><div class="sum-lab" style="color:#6b7280">FIRED</div></div>
+    <div class="sum-cell active"><div class="sum-icon">🎯</div><span class="sum-val neu">2</span><div class="sum-lab neu">ARMED</div></div>
+    <div class="sum-cell active"><div class="sum-icon">🚫</div><span class="sum-val" style="color:#9ca3af">18</span><div class="sum-lab" style="color:#9ca3af">HTF CHẶN</div></div>
+    <div class="sum-cell active"><div class="sum-icon">🧪</div><span class="sum-val" style="color:#9ca3af">9</span><div class="sum-lab" style="color:#9ca3af">FEAT CHẶN</div></div>
+    <div class="sum-cell"><div class="sum-icon">○</div><span class="sum-val" style="color:#6b7280">1</span><div class="sum-lab" style="color:#6b7280">TẮT</div></div>
+  </div>
+  <div class="hint-box">
+    <div class="hint-title">💡 ĐANG CHỜ:</div>
+    <div class="hint-line">• 14 rule chờ <span class="neu">HTF 4h = FLAT</span></div>
+    <div class="hint-line">• 7 rule chờ <span class="neu">ATR% &lt; 0.3</span></div>
+    <div class="hint-line">• 5 rule chờ <span class="neu">EMA Dist% ∈ [-0.5, 0.5]</span></div>
+  </div>
+</div>
+
+<!-- A: RULE CARD với section labels -->
+<h2 style="color:#4ade80">A · Rule card — section labels + live values (khi expand)</h2>
+
+<div class="card">
+  <div class="rule-head"><span class="side-long">🟢 #1 LONG · Golden ATR+FLAT</span><span class="wr">WR 100%</span></div>
+  <div class="meta">N=12 · TP+500% / SL-200% · Source ⭐ VERIFIED</div>
+
+  <div class="sec" style="border-left-color:#4ade80">
+    <div class="sec-title ok">✅ REQUIRED (1/1 khớp)</div>
+    <div class="chip-row"><span class="chip chip-ok">✓ RSI</span></div>
+  </div>
+
+  <div class="sec" style="border-left-color:#a78bfa">
+    <div class="sec-title" style="color:#a78bfa">🧪 FEATURE FILTERS (0/1 khớp)</div>
+    <div class="frow"><span class="fmark bad">✗</span><div><div class="flab">ATR% &lt; 0.3</div><div class="flive bad">ATR=0.60%</div></div></div>
+  </div>
+
+  <div class="sec" style="border-left-color:#fb923c">
+    <div class="sec-title htf">🔭 HTF TREND (0/1 khớp)</div>
+    <div class="frow"><span class="fmark bad">✗</span><div><div class="flab">1d FLAT</div><div class="flive bad">1d: UP</div></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="rule-head"><span class="side-long">🟢 #4 LONG · Multi-TF Score ≥70</span><span class="wr" style="color:#fbbf24">WR 31.9%</span></div>
+  <div class="meta">N=448 · TP+400% / SL-150% · NET +24 666%</div>
+
+  <div class="sec" style="border-left-color:#a78bfa">
+    <div class="sec-title" style="color:#a78bfa">🧪 FEATURE FILTERS (0/1 khớp)</div>
+    <div class="frow"><span class="fmark bad">✗</span><div><div class="flab">multiTfScore ≥ 70</div><div class="flive bad">Score=38</div></div></div>
+  </div>
+</div>
+
+<h2>🔌 Tích hợp</h2>
+<div class="card">
+<ul style="margin:4px 0;padding-left:18px;font-size:12px;line-height:1.6">
+<li><b>LiveFeatureSnapshot.tsx</b> — đọc <code>tfData[1h]</code> → render RSI/MACD/ATR/EMA Dist + HTF 4h/1d, màu theo ngưỡng (ATR&lt;0.3 xanh / &lt;0.8 vàng / &gt;=0.8 đỏ)</li>
+<li><b>LiveRulesSummary.tsx</b> — aggregate <code>ruleStatus</code> + <code>ruleMatchDetails</code>, đếm FIRED/ARMED/HTF-chặn/FEAT-chặn, top-3 filter fail nhiều nhất</li>
+<li><b>TradingRulesPanel.tsx</b> — rule card expand mode giờ có 3 section nhãn rõ: REQUIRED / FEATURE FILTERS / HTF TREND, mỗi filter có live value dưới label</li>
+<li>Tất cả data <code>featFiltersStatus</code> đã compute sẵn trong useRuleAlerts từ v4.3.15, UI hiện mới consume</li>
+</ul>
+</div>
+
+<div class="meta" style="text-align:center;margin-top:20px">v4.3.16 · Build 2026-04-20 · A+B+C merged</div>
+</div>
+</body></html>

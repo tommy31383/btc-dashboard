@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Live diagnostic — Tại sao rule chưa fire</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { background:#0a0a1a; color:#e5e5e5; font-family:'SF Mono',Consolas,monospace; padding:24px; line-height:1.5; }
+  h1 { color:#f7931a; font-size:22px; letter-spacing:2px; margin-bottom:6px; }
+  .sub { color:#888; font-size:12px; margin-bottom:24px; }
+  .card { background:#131325; border:1px solid #ffffff15; border-radius:10px; padding:18px; margin-bottom:18px; }
+  .card-title { color:#f7931a; font-size:14px; font-weight:900; margin-bottom:12px; letter-spacing:1px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th, td { padding:8px 10px; text-align:left; border-bottom:1px solid #ffffff10; }
+  th { color:#888; font-weight:700; text-transform:uppercase; font-size:10px; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .good { color:#26a69a; font-weight:700; }
+  .bad  { color:#ef5350; font-weight:700; }
+  .warn { color:#f7931a; font-weight:700; }
+  .dim  { color:#666; }
+  .verdict { padding:14px; border-radius:8px; font-size:13px; line-height:1.7; }
+  .verdict.neutral { background:#f7931a15; border:1px solid #f7931a50; color:#f7d48a; }
+  .big { font-size:16px; font-weight:900; color:#f7931a; }
+  code { background:#000; padding:2px 6px; border-radius:4px; color:#f7931a; font-size:11px; }
+  ul { padding-left:20px; margin-top:8px; }
+  li { margin-bottom:4px; font-size:12px; }
+</style>
+</head>
+<body>
+
+<h1>🔬 LIVE DIAGNOSTIC — RULE FIRE CHECK</h1>
+<div class="sub">Dạ anh Tommy, em fetch live Binance data + eval từng rule xem tại sao chưa fire.</div>
+
+<!-- Live indicators -->
+<div class="card">
+  <div class="card-title">📊 CHỈ SỐ LIVE BTC — $74,782</div>
+  <table>
+    <thead>
+      <tr>
+        <th>TF</th>
+        <th class="num">RSI</th>
+        <th>Trend EMA50</th>
+        <th class="num">StochK</th>
+        <th>MACD cross</th>
+        <th>BB touch</th>
+        <th>Divergence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>15m</b></td>
+        <td class="num">51.6</td>
+        <td class="good">UP</td>
+        <td class="num">49.3</td>
+        <td class="dim">—</td>
+        <td class="dim">—</td>
+        <td class="dim">—</td>
+      </tr>
+      <tr>
+        <td><b>1h</b></td>
+        <td class="num">51.9</td>
+        <td class="good">UP</td>
+        <td class="num">58.5</td>
+        <td class="dim">—</td>
+        <td class="dim">—</td>
+        <td class="bad">bear ✓</td>
+      </tr>
+      <tr>
+        <td><b>4h</b></td>
+        <td class="num">57.9</td>
+        <td class="good">UP</td>
+        <td class="num">67.8</td>
+        <td class="dim">—</td>
+        <td class="dim">—</td>
+        <td class="dim">—</td>
+      </tr>
+      <tr>
+        <td><b>1d</b></td>
+        <td class="num">62.0</td>
+        <td class="good">UP</td>
+        <td class="num warn">88.6</td>
+        <td class="dim">—</td>
+        <td class="dim">—</td>
+        <td class="bad">bear ✓</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- HTF filter check -->
+<div class="card">
+  <div class="card-title">🚦 HTF FILTER — CHẶN/CHO QUA</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Rule side</th>
+        <th>HTF yêu cầu</th>
+        <th>HTF hiện tại</th>
+        <th>Trạng thái</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bad">SHORT (25/25 rule 15m · 21/25 rule 1h)</td>
+        <td>1h/4h/1d DOWN</td>
+        <td class="good">1h↑ 4h↑ 1d↑ (tất cả UP)</td>
+        <td><b class="bad">✗ BỊ CHẶN HẾT</b></td>
+      </tr>
+      <tr>
+        <td class="good">LONG (4 rule 1h)</td>
+        <td>4h/1d UP</td>
+        <td class="good">4h↑ 1d↑</td>
+        <td><b class="good">✓ QUA HTF</b> — chờ entry signal</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- LONG rules detail -->
+<div class="card">
+  <div class="card-title">🟢 4 RULE LONG 1h — ĐIỀU KIỆN ENTRY</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Rule</th>
+        <th>Required conditions</th>
+        <th>Live match</th>
+        <th>Thiếu gì</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>LONG Div TP+2/SL-1</td>
+        <td>divergence BULL</td>
+        <td class="bad">✗ (bear có, bull không)</td>
+        <td class="warn">Chờ bull div 1h</td>
+      </tr>
+      <tr>
+        <td>LONG Div TP+10/SL-5</td>
+        <td>divergence BULL</td>
+        <td class="bad">✗</td>
+        <td class="warn">Chờ bull div 1h</td>
+      </tr>
+      <tr>
+        <td>LONG Div TP+2/SL-0.5</td>
+        <td>divergence BULL</td>
+        <td class="bad">✗</td>
+        <td class="warn">Chờ bull div 1h</td>
+      </tr>
+      <tr>
+        <td>LONG MACD TP+2/SL-1</td>
+        <td>macdCross UP</td>
+        <td class="bad">✗</td>
+        <td class="warn">Chờ MACD cross up 1h</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Verdict -->
+<div class="card">
+  <div class="card-title">🎯 KẾT LUẬN</div>
+  <div class="verdict neutral">
+    <p class="big">✅ RULE KHÔNG BỊ BUG — đang làm đúng việc chờ.</p>
+    <p style="margin-top:10px;">Lý do chưa có rule nào fire ngay lúc này:</p>
+    <ul>
+      <li><b class="bad">25/29 rule là SHORT</b> nhưng thị trường hiện tại <b class="good">UP trên tất cả TF (1h, 4h, 1d)</b> → HTF filter chặn hoàn toàn.</li>
+      <li><b class="good">4 rule LONG</b> qua được HTF filter (4h+1d UP) nhưng <b>đang chờ entry signal</b>: cần <code>bull divergence</code> hoặc <code>MACD cross up</code> trên 1h — hiện chưa có.</li>
+      <li>Cả <b>15m + 1h</b> đều ở trạng thái <b>trung tính</b>: RSI 51-52, StochK 49-58, không BB touch, không MACD cross → không có điểm vào đẹp.</li>
+    </ul>
+    <p style="margin-top:12px;">Banner sẽ fire khi một trong các tình huống xảy ra:</p>
+    <ul>
+      <li>💥 <b>Giá pullback + bull div 1h</b> → LONG Div rule kích hoạt</li>
+      <li>💥 <b>MACD cross up trên 1h</b> → LONG MACD rule kích hoạt</li>
+      <li>💥 <b>Nếu market đảo thành DOWN</b> (HTF 1h/4h/1d bear) → 25 rule SHORT được mở khóa + chờ entry</li>
+    </ul>
+    <p style="margin-top:12px;color:#f7931a;"><b>→ Đây là hành vi đúng của hệ thống filter HTF. Rule đang "kiên nhẫn chờ điểm vào" thay vì fire ẩu.</b></p>
+  </div>
+</div>
+
+<!-- Options -->
+<div class="card">
+  <div class="card-title">⚙️ NẾU ANH MUỐN THẤY BANNER FIRE NHIỀU HƠN</div>
+  <ul>
+    <li><b>Option 1 (giữ nguyên):</b> Chờ market — HTF filter đảm bảo chất lượng, chỉ fire ở điểm vào tốt.</li>
+    <li><b>Option 2:</b> Thêm rule <b>KHÔNG dùng HTF filter</b> (nhận NET thấp hơn nhưng fire thường xuyên). Trước có 6 combo 15m "không lọc" best NET +108%.</li>
+    <li><b>Option 3:</b> Giảm HTF từ <code>both_match</code> xuống <code>near_match</code> (chỉ cần 1h đồng thuận, bỏ 4h) → rule sẽ fire sớm hơn khi trend chưa đảo rõ.</li>
+    <li><b>Option 4:</b> Inject top-K theo cả hai side (forceLong + forceShort) để luôn có ít nhất 1 bộ rule match với market hiện tại.</li>
+  </ul>
+  <p style="margin-top:12px;color:#f7931a;"><b>→ Anh muốn em triển khai option nào, hay giữ nguyên chờ market?</b></p>
+</div>
+
+</body>
+</html>

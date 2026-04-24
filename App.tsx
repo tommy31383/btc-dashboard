@@ -19,6 +19,7 @@ import { useBinanceKlines } from "./hooks/useBinanceKlines";
 import { useAlerts } from "./hooks/useAlerts";
 import { useTrackedRules } from "./hooks/useTrackedRules";
 import { useRuleAlerts } from "./hooks/useRuleAlerts";
+import { useCalibration } from "./hooks/useCalibration";
 import { initNotifications } from "./utils/notifications";
 
 import PriceHeader from "./components/PriceHeader";
@@ -35,13 +36,14 @@ import LiveRulesSummary from "./components/LiveRulesSummary";
 import RiskRadar from "./components/RiskRadar";
 import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
+import PaperTradeJournal from "./components/PaperTradeJournal";
 import { TopAppBar } from "./components/v2/TopAppBar";
 import { BottomNavBar, NavTab } from "./components/v2/BottomNavBar";
 import { useAppFonts } from "./components/v2/useAppFonts";
 
 const SETTINGS_KEY = "@btc_dashboard_settings";
-const APP_VERSION = "4.3.20";
-const BUILD_DATE = "2026-04-22";
+const APP_VERSION = "4.4.0";
+const BUILD_DATE = "2026-04-24";
 
 /**
  * Catches React render crashes and shows a friendly error screen with the
@@ -135,6 +137,9 @@ export default function App() {
   // Tracked rules + live alerts: re-evaluates on every klines update (~60s)
   const tracked = useTrackedRules();
   const { activeAlerts, ruleStatus, ruleMatchDetails, liveConditions } = useRuleAlerts(rawKlines, tracked.trackedIds, settings.notifyEntrySignal);
+
+  // Learner + Paper Trader: log mỗi rule fire, resolve khi giá hit SL/TP/timeout
+  const calib = useCalibration(activeAlerts, priceData?.price ?? null);
 
   // Risk Radar — compute lesson-learn warnings + golden opportunities from rawKlines
   const riskState = useRiskRadar(rawKlines);
@@ -278,6 +283,14 @@ export default function App() {
           trackedIds={tracked.trackedIds}
           ruleStatus={ruleStatus}
           ruleMatchDetails={ruleMatchDetails}
+        />
+
+        {/* PAPER TRADE JOURNAL + LEARNER — auto log mỗi rule FIRE, học hit-rate live */}
+        <PaperTradeJournal
+          trades={calib.trades}
+          summary={calib.summary}
+          stats={calib.stats}
+          pendingCount={calib.pendingCount}
         />
 
         {/* RULE TRADING — main interaction. User picks which pre-baked rules

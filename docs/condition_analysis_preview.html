@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Phân tích điều kiện rule — Dạ anh Tommy</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a1a;
+    color: #e5e5e5;
+    font-family: 'SF Mono', Consolas, monospace;
+    padding: 24px;
+    line-height: 1.5;
+  }
+  h1 {
+    color: #f7931a;
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .sub { color: #888; font-size: 12px; margin-bottom: 24px; }
+  .card {
+    background: #131325;
+    border: 1px solid #ffffff15;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    color: #f7931a;
+    font-size: 14px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #ffffff10;
+  }
+  th { color: #888; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .good { color: #26a69a; font-weight: 700; }
+  .bad  { color: #ef5350; font-weight: 700; }
+  .warn { color: #f7931a; font-weight: 700; }
+  .dim  { color: #666; }
+  .pct-bar {
+    display: inline-block;
+    height: 8px;
+    background: #26a69a;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .pct-bar.mid { background: #f7931a; }
+  .pct-bar.low { background: #ef5350; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+  .badge.keep { background: #26a69a30; color: #26a69a; border: 1px solid #26a69a; }
+  .badge.drop { background: #ef535030; color: #ef5350; border: 1px solid #ef5350; }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .col {
+    background: #0a0a1a;
+    border: 1px solid #ffffff20;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .col.old { border-color: #ef535040; }
+  .col.new { border-color: #26a69a40; }
+  .col h3 { font-size: 12px; margin-bottom: 8px; }
+  .col ul { list-style: none; padding-left: 0; }
+  .col li { padding: 4px 0; font-size: 12px; }
+  .recom {
+    background: linear-gradient(135deg, #26a69a15, #f7931a15);
+    border: 1px solid #f7931a50;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 10px;
+  }
+  .recom h2 { color: #f7931a; font-size: 14px; margin-bottom: 8px; }
+  .recom p { font-size: 12px; color: #ccc; margin-bottom: 6px; }
+  code { background: #000; padding: 2px 6px; border-radius: 4px; color: #f7931a; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<h1>📊 PHÂN TÍCH ĐIỀU KIỆN RULE</h1>
+<div class="sub">Dạ anh Tommy, em phân tích từ <code>scan_tpsl_htf_15m.json</code> + <code>scan_tpsl_htf_1h.json</code> — top 100 rule có NET dương mỗi TF.</div>
+
+<!-- 15m -->
+<div class="card">
+  <div class="card-title">⏱ TIMEFRAME 15m HTF — 100 rule profit</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Điều kiện</th>
+        <th class="num">% Xuất hiện</th>
+        <th class="num">NET tốt nhất</th>
+        <th class="num">Fire TB</th>
+        <th class="num">Single rule profit</th>
+        <th>Đánh giá</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>divergence</b></td>
+        <td class="num good"><span class="pct-bar" style="width:64px"></span>64%</td>
+        <td class="num good">+46,700%</td>
+        <td class="num">~2,100</td>
+        <td class="num good">25</td>
+        <td><span class="badge keep">GIỮ</span></td>
+      </tr>
+      <tr>
+        <td><b>macdCross</b></td>
+        <td class="num good"><span class="pct-bar" style="width:41px"></span>41%</td>
+        <td class="num good">+46,700%</td>
+        <td class="num">~2,143</td>
+        <td class="num good">18</td>
+        <td><span class="badge keep">GIỮ</span></td>
+      </tr>
+      <tr>
+        <td><b>bollingerTouch</b></td>
+        <td class="num warn"><span class="pct-bar mid" style="width:34px"></span>34%</td>
+        <td class="num good">+32,400%</td>
+        <td class="num">~1,800</td>
+        <td class="num warn">8</td>
+        <td><span class="badge keep">GIỮ</span></td>
+      </tr>
+      <tr>
+        <td><b>rsiExtreme</b></td>
+        <td class="num bad"><span class="pct-bar low" style="width:6px"></span>6%</td>
+        <td class="num dim">—</td>
+        <td class="num dim">rare</td>
+        <td class="num bad">0</td>
+        <td><span class="badge drop">BỎ</span></td>
+      </tr>
+      <tr>
+        <td><b>stochExtreme</b></td>
+        <td class="num dim">0% (đã bỏ trước)</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td><span class="badge drop">ĐÃ BỎ</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 1h -->
+<div class="card">
+  <div class="card-title">⏱ TIMEFRAME 1h HTF — 100 rule profit</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Điều kiện</th>
+        <th class="num">% Xuất hiện</th>
+        <th class="num">NET tốt nhất</th>
+        <th class="num">WR cao nhất</th>
+        <th class="num">Single rule profit</th>
+        <th>Đánh giá</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>divergence</b></td>
+        <td class="num good"><span class="pct-bar" style="width:64px"></span>64%</td>
+        <td class="num good">+30,070%</td>
+        <td class="num">62%</td>
+        <td class="num good">22</td>
+        <td><span class="badge keep">GIỮ</span></td>
+      </tr>
+      <tr>
+        <td><b>macdCross</b></td>
+        <td class="num good"><span class="pct-bar" style="width:46px"></span>46%</td>
+        <td class="num good">+24,980%</td>
+        <td class="num">58%</td>
+        <td class="num good">15</td>
+        <td><span class="badge keep">GIỮ</span></td>
+      </tr>
+      <tr>
+        <td><b>rsiExtreme</b></td>
+        <td class="num warn"><span class="pct-bar mid" style="width:21px"></span>21%</td>
+        <td class="num warn">+9,380%</td>
+        <td class="num">55%</td>
+        <td class="num warn">4</td>
+        <td><span class="badge drop">BỎ</span> <span class="dim">(rare trigger, NET thấp)</span></td>
+      </tr>
+      <tr>
+        <td><b>bollingerTouch</b></td>
+        <td class="num warn"><span class="pct-bar mid" style="width:10px"></span>10%</td>
+        <td class="num warn">+8,200%</td>
+        <td class="num good">70.5%</td>
+        <td class="num warn">2</td>
+        <td><span class="badge keep">GIỮ</span> <span class="dim">(WR cao)</span></td>
+      </tr>
+      <tr>
+        <td><b>stochExtreme</b></td>
+        <td class="num dim">0% (đã bỏ trước)</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td class="num dim">—</td>
+        <td><span class="badge drop">ĐÃ BỎ</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Compare -->
+<div class="card">
+  <div class="card-title">🔄 SO SÁNH: TRƯỚC ↔ SAU</div>
+  <div class="compare">
+    <div class="col old">
+      <h3 class="bad">❌ HIỆN TẠI (4 conds)</h3>
+      <ul>
+        <li>✓ rsiExtreme <span class="dim">(RSI&lt;30 / &gt;70)</span></li>
+        <li>✓ divergence</li>
+        <li>✓ bollingerTouch</li>
+        <li>✓ macdCross</li>
+      </ul>
+      <p class="dim" style="margin-top:8px;font-size:11px;">→ Rule đòi rsiExtreme → banner ít fire vì RSI cực trị hiếm.</p>
+    </div>
+    <div class="col new">
+      <h3 class="good">✅ ĐỀ XUẤT (3 conds)</h3>
+      <ul>
+        <li>✓ divergence</li>
+        <li>✓ bollingerTouch</li>
+        <li>✓ macdCross</li>
+        <li class="dim">✗ rsiExtreme (bỏ khỏi scan)</li>
+      </ul>
+      <p class="good" style="margin-top:8px;font-size:11px;">→ Banner fire thường xuyên hơn + giữ chất lượng rule (NET cao nhất đều không cần rsiExtreme).</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recom -->
+<div class="recom">
+  <h2>🎯 KHUYẾN NGHỊ</h2>
+  <p>Dạ anh Tommy, dựa trên data em phân tích:</p>
+  <p>• <b class="good">divergence</b> + <b class="good">macdCross</b> là 2 điều kiện đóng góp NET cao nhất (cả 15m + 1h).</p>
+  <p>• <b class="good">bollingerTouch</b> giữ vì WR rất cao trên 1h (70.5%).</p>
+  <p>• <b class="bad">rsiExtreme</b> nên <b>bỏ khỏi COND_KEYS trong scan</b> — xuất hiện ít, 0 single-rule profit trên 15m, NET thấp trên 1h. Vẫn <b>hiển thị giá trị RSI hiện tại</b> trên UI cho user tham khảo (giống cách xử lý stochExtreme).</p>
+  <p style="margin-top:10px;">Sau khi anh duyệt, em sẽ:</p>
+  <p>&nbsp;&nbsp;1. Sửa <code>tools/scan-tpsl.ts</code> + <code>scan-tpsl-htf.ts</code>: bỏ <code>rsiExtreme</code> khỏi <code>COND_KEYS</code></p>
+  <p>&nbsp;&nbsp;2. Re-scan 15m + 1h (chỉ 2 TF này)</p>
+  <p>&nbsp;&nbsp;3. Re-inject vào <code>hard_rules.json</code></p>
+  <p>&nbsp;&nbsp;4. Bump version v4.3.12 — <b>chờ anh ra lệnh "build"</b></p>
+  <p style="margin-top:12px;color:#f7931a;"><b>→ Anh duyệt phương án này không ạ?</b></p>
+</div>
+
+</body>
+</html>

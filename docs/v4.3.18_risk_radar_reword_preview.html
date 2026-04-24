@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>v4.3.18 — RiskRadar Reword Preview</title>
+<style>
+  body { margin: 0; padding: 24px; background: #0a0e1a; color: #d0d4e0; font-family: monospace; font-size: 13px; }
+  h1 { color: #f7931a; letter-spacing: 2px; font-size: 18px; }
+  .note { color: #6b7280; font-size: 11px; margin-bottom: 16px; }
+  .stage { max-width: 480px; margin: 0 auto; background: #0f1420; padding: 14px; border-radius: 12px; border: 1px solid #1f2940; }
+  .title { color: #f7931a; font-weight: 900; letter-spacing: 1px; font-size: 13px; margin-top: 18px; margin-bottom: 4px; }
+  .title.bull { color: #10b981; }
+  .title.bear { color: #ef4444; }
+  .sub { color: #6b7280; font-size: 11px; margin-bottom: 10px; }
+  .sub.ok { color: #10b981; }
+  .sub.warn { color: #f59e0b; }
+  .warn-row { display:flex; align-items:center; padding:8px 10px; border-left:3px solid; border-radius:4px; margin-bottom:4px; }
+  .warn-row .icon { margin-right: 8px; font-size: 14px; }
+  .warn-row .t { font-weight: 700; font-size: 11px; }
+  .warn-row .d { color: #6b7280; font-size: 10px; margin-top: 2px; }
+  .snap-card { background: #0f1420; border: 1px solid #ffffff15; border-radius: 8px; padding: 12px; }
+  .snap-row { display:flex; align-items:center; padding:3px 0; border-bottom:1px solid #ffffff08; }
+  .snap-label { color: #6b7280; width: 100px; font-size: 11px; }
+  .snap-val { color: #d0d4e0; font-weight: 700; min-width: 60px; text-align: right; font-size: 11px; }
+  .snap-hint { flex:1; font-size: 10px; margin-left: 8px; font-style: italic; }
+  .bull { color: #10b981; }
+  .bear { color: #ef4444; }
+  .warn-c { color: #f59e0b; }
+  .muted { color: #6b7280; }
+  .gold { color: #f7931a; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .side-label { color: #6b7280; font-size: 10px; margin-top: 24px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<h1>🎯 RISK RADAR — v4.3.18 REWORD</h1>
+<p class="note">So sánh wording cũ (mơ hồ) ↔ wording mới (rõ ràng + có phân tích)</p>
+
+<div class="stage">
+  <div class="side-label" style="margin-top:0">⬇️ CHECKLIST LONG — khi KHÔNG có dấu hiệu xấu nào</div>
+  <div class="title bull">🔍 CHECKLIST LONG — 5 dấu hiệu KHÔNG nên mua</div>
+  <div class="sub ok">✅ 0/5 dấu hiệu xấu → Có thể LONG an toàn</div>
+
+  <div class="side-label">⬇️ CHECKLIST LONG — khi có 2 dấu hiệu xấu</div>
+  <div class="title bull">🔍 CHECKLIST LONG — 5 dấu hiệu KHÔNG nên mua</div>
+  <div class="sub warn">⚠️ 2/5 dấu hiệu xấu đang xuất hiện → cân nhắc kỹ trước khi LONG</div>
+  <div class="warn-row" style="border-color:#ef4444; background:#ef444412;">
+    <span class="icon">🔴</span>
+    <div>
+      <div class="t bear">RSI quá mua (&gt;75)</div>
+      <div class="d">RSI 1h = 78.2 · lesson: WR long 32%</div>
+    </div>
+  </div>
+  <div class="warn-row" style="border-color:#f59e0b; background:#f59e0b12;">
+    <span class="icon">🟡</span>
+    <div>
+      <div class="t warn-c">EMA50 xa quá (&gt;2%)</div>
+      <div class="d">1h EMA Δ = +3.1% · lesson: WR long 41%</div>
+    </div>
+  </div>
+
+  <div class="side-label">⬇️ CHECKLIST SHORT — tương tự</div>
+  <div class="title bear">🔍 CHECKLIST SHORT — 3 dấu hiệu KHÔNG nên bán</div>
+  <div class="sub ok">✅ 0/3 dấu hiệu xấu → Có thể SHORT an toàn</div>
+
+  <div class="side-label">⬇️ INDICATOR LIVE — có phân tích</div>
+  <div class="title">📡 INDICATOR LIVE — PHÂN TÍCH</div>
+  <div class="snap-card">
+    <div class="snap-row"><div class="snap-label">1h RSI</div><div class="snap-val">58.3</div><div class="snap-hint bull">mạnh · nghiêng mua</div></div>
+    <div class="snap-row"><div class="snap-label">1h MACD Hist</div><div class="snap-val">12.4</div><div class="snap-hint bull">bull momentum</div></div>
+    <div class="snap-row"><div class="snap-label">1h ATR%</div><div class="snap-val">0.24%</div><div class="snap-hint gold">rất thấp · golden zone</div></div>
+    <div class="snap-row"><div class="snap-label">4h ATR%</div><div class="snap-val">0.65%</div><div class="snap-hint">bình thường</div></div>
+    <div class="snap-row"><div class="snap-label">15m ATR%</div><div class="snap-val">0.92%</div><div class="snap-hint warn-c">cao · biến động mạnh</div></div>
+    <div class="snap-row"><div class="snap-label">1h EMA50 Δ</div><div class="snap-val">+0.85%</div><div class="snap-hint bull">xa vừa · trên EMA</div></div>
+    <div class="snap-row"><div class="snap-label">4h EMA50 Δ</div><div class="snap-val">+2.45%</div><div class="snap-hint warn-c">xa quá · coi chừng pullback</div></div>
+    <div class="snap-row"><div class="snap-label">HTF 4h state</div><div class="snap-val bull">UP</div><div class="snap-hint bull">trend UP rõ</div></div>
+  </div>
+</div>
+
+<div style="max-width:480px; margin:24px auto; color:#6b7280; font-size:11px;">
+  <p><b>Thay đổi chính:</b></p>
+  <ul>
+    <li>Title đổi từ "⛔ TRÁNH LONG — 5 điều kiện xấu" → "🔍 CHECKLIST LONG — 5 dấu hiệu KHÔNG nên mua" (rõ là checklist, không phải đang cảnh báo 5 cái xấu)</li>
+    <li>Sub-line đổi "Không có warning nào active — LONG OK" → "✅ 0/5 dấu hiệu xấu → Có thể LONG an toàn" (số đếm rõ, action rõ)</li>
+    <li>INDICATOR LIVE: mỗi dòng có 3 cột — Label · Value · Phân tích (in nghiêng, màu theo sentiment)</li>
+  </ul>
+</div>
+
+</body>
+</html>
