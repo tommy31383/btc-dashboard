@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T09:22:32.923Z",
+  "generated_at": "2026-04-24T09:36:00.911Z",
   "data_source": "Binance BTCUSDT (REST /klines) + scan-tpsl with fees + inject-feature-rules-v3.ts iter3 FINAL",
   "tfs": {
     "5m": {
@@ -3354,6 +3354,239 @@
             },
             "oosTestedAt": "2026-04-22T12:31:45.896Z"
           }
+        },
+        {
+          "rank": 11,
+          "source": "GPT_4H_v1",
+          "label": "[GPT 4H v1] MACD>100 + ATR1-2% + Body>2% + HTF1d UP — WR 60% n=36 NET +6640%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2.5,
+            "maxHoldBars": 50,
+            "forceSide": "LONG",
+            "minScore": 0,
+            "htfFilters": [
+              {
+                "type": "trend",
+                "tf": "1d",
+                "direction": "up"
+              }
+            ],
+            "macdHistFilter": {
+              "op": ">",
+              "value": 100
+            },
+            "atrFilter": {
+              "op": "between",
+              "min": 1,
+              "max": 2
+            },
+            "bodyPctFilter": {
+              "op": ">",
+              "value": 2
+            },
+            "gptFeatureRule": "macd:>100 & atr:1-2% & body:>2% & htf:UP",
+            "note": "Spec-aligned 3y scan TP=5% SL=2.5%. PF 3.00."
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 36,
+            "winRate": 60,
+            "profitFactor": 3,
+            "netPnL": 6640,
+            "verified": true,
+            "source": "GPT_4H_v1_specaligned_3y",
+            "injectedAt": "2026-04-24T09:33:00.585Z"
+          },
+          "compositeScore": 2.1665507475865344
+        },
+        {
+          "rank": 12,
+          "source": "GPT_4H_v1",
+          "label": "[GPT 4H v1] RSI45-55 + MACD0-100 + Body0.3-1% + HTF1d UP — WR 55% n=42 NET +6080%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2.5,
+            "maxHoldBars": 50,
+            "forceSide": "LONG",
+            "minScore": 0,
+            "htfFilters": [
+              {
+                "type": "trend",
+                "tf": "1d",
+                "direction": "up"
+              }
+            ],
+            "rsiFilter": {
+              "op": "between",
+              "min": 45,
+              "max": 55
+            },
+            "macdHistFilter": {
+              "op": "between",
+              "min": 0,
+              "max": 100
+            },
+            "bodyPctFilter": {
+              "op": "between",
+              "min": 0.3,
+              "max": 1
+            },
+            "gptFeatureRule": "rsi:45-55 & macd:0..100 & body:0.3-1% & htf:UP",
+            "note": "Spec-aligned 3y scan. PF 2.44."
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 42,
+            "winRate": 55,
+            "profitFactor": 2.44,
+            "netPnL": 6080,
+            "verified": true,
+            "source": "GPT_4H_v1_specaligned_3y",
+            "injectedAt": "2026-04-24T09:33:00.585Z"
+          },
+          "compositeScore": 2.0686600636314596
+        },
+        {
+          "rank": 13,
+          "source": "GPT_4H_v1",
+          "label": "[GPT 4H v1] BB%>100 + Body>2% + CONT + HTF1d UP — WR 56.3% n=34 NET +5160%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2.5,
+            "maxHoldBars": 50,
+            "forceSide": "LONG",
+            "minScore": 0,
+            "htfFilters": [
+              {
+                "type": "trend",
+                "tf": "1d",
+                "direction": "up"
+              }
+            ],
+            "bbPercentFilter": {
+              "op": ">",
+              "value": 1
+            },
+            "bodyPctFilter": {
+              "op": ">",
+              "value": 2
+            },
+            "reversalFilter": {
+              "kind": "CONT"
+            },
+            "gptFeatureRule": "bb%:>100 & body:>2% & rev:CONT & htf:UP",
+            "note": "Spec-aligned 3y scan. PF 2.57. BB %B > 1 = price above upper band."
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 34,
+            "winRate": 56.25,
+            "profitFactor": 2.57,
+            "netPnL": 5160,
+            "verified": true,
+            "source": "GPT_4H_v1_specaligned_3y",
+            "injectedAt": "2026-04-24T09:33:00.585Z"
+          },
+          "compositeScore": 1.999883284587795
+        },
+        {
+          "rank": 14,
+          "source": "GPT_4H_v1",
+          "label": "[GPT 4H v1] RSI>70 + BB%75-100 + DOWN_REV + HTF1d UP — WR 57.1% n=31 NET +4690%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2.5,
+            "maxHoldBars": 50,
+            "forceSide": "LONG",
+            "minScore": 0,
+            "htfFilters": [
+              {
+                "type": "trend",
+                "tf": "1d",
+                "direction": "up"
+              }
+            ],
+            "rsiFilter": {
+              "op": ">",
+              "value": 70
+            },
+            "bbPercentFilter": {
+              "op": "between",
+              "min": 0.75,
+              "max": 1
+            },
+            "reversalFilter": {
+              "kind": "DOWN_REV"
+            },
+            "gptFeatureRule": "rsi:>70 & bb%:75-100 & rev:DOWN_REV & htf:UP",
+            "note": "Spec-aligned 3y scan. PF 2.67. Mua khi pullback nhẹ trong xu thế tăng."
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 31,
+            "winRate": 57.14,
+            "profitFactor": 2.67,
+            "netPnL": 4690,
+            "verified": true,
+            "source": "GPT_4H_v1_specaligned_3y",
+            "injectedAt": "2026-04-24T09:33:00.585Z"
+          },
+          "compositeScore": 1.9803214948597638,
+          "disabled": true,
+          "disableReason": "n=9 too small (3y backtest)"
+        },
+        {
+          "rank": 15,
+          "source": "GPT_4H_v1",
+          "label": "[GPT 4H v1] RSI30-45 + MACD-100..0 + Body0.3-1% + HTF1d UP — WR 55.6% n=30 NET +4200%",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 2.5,
+            "maxHoldBars": 50,
+            "forceSide": "LONG",
+            "minScore": 0,
+            "htfFilters": [
+              {
+                "type": "trend",
+                "tf": "1d",
+                "direction": "up"
+              }
+            ],
+            "rsiFilter": {
+              "op": "between",
+              "min": 30,
+              "max": 45
+            },
+            "macdHistFilter": {
+              "op": "between",
+              "min": -100,
+              "max": 0
+            },
+            "bodyPctFilter": {
+              "op": "between",
+              "min": 0.3,
+              "max": 1
+            },
+            "gptFeatureRule": "rsi:30-45 & macd:-100..0 & body:0.3-1% & htf:UP",
+            "note": "Spec-aligned 3y scan. PF 2.50. Mua đáy trong xu thế tăng (RSI low + macd hist còn âm)."
+          },
+          "stats": {
+            "side": "LONG",
+            "trades": 30,
+            "winRate": 55.56,
+            "profitFactor": 2.5,
+            "netPnL": 4200,
+            "verified": true,
+            "source": "GPT_4H_v1_specaligned_3y",
+            "injectedAt": "2026-04-24T09:33:00.585Z"
+          },
+          "compositeScore": 1.9079232908119474
         }
       ]
     },

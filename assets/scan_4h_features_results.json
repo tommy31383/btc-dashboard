@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-04-24T09:28:07.150Z",
+  "period": "3y",
+  "spec": {
+    "fee_per_side": 0.05,
+    "sl_before_tp": true,
+    "one_position": true,
+    "htf": "1d EMA50"
+  },
+  "params": {
+    "tp": 5,
+    "sl": 2.5,
+    "hold": 50,
+    "lev": 100,
+    "minN": 30,
+    "minWR": 55
+  },
+  "totalCandidates": 5,
+  "topByNet": [
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "macd:>100 & atr:1-2% & body:>2% & htf:UP",
+      "n": 36,
+      "wr": 60,
+      "pf": 3,
+      "netPctLev": 6640
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "rsi:45-55 & macd:0..100 & body:0.3-1% & htf:UP",
+      "n": 42,
+      "wr": 55,
+      "pf": 2.44,
+      "netPctLev": 6080
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "bb%:>100 & body:>2% & rev:CONT & htf:UP",
+      "n": 34,
+      "wr": 56.25,
+      "pf": 2.57,
+      "netPctLev": 5160
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "rsi:>70 & bb%:75-100 & rev:DOWN_REV & htf:UP",
+      "n": 31,
+      "wr": 57.14,
+      "pf": 2.67,
+      "netPctLev": 4690
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "rsi:30-45 & macd:-100..0 & body:0.3-1% & htf:UP",
+      "n": 30,
+      "wr": 55.56,
+      "pf": 2.5,
+      "netPctLev": 4200
+    }
+  ],
+  "topByWR": [
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "macd:>100 & atr:1-2% & body:>2% & htf:UP",
+      "n": 36,
+      "wr": 60,
+      "pf": 3,
+      "netPctLev": 6640
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "rsi:>70 & bb%:75-100 & rev:DOWN_REV & htf:UP",
+      "n": 31,
+      "wr": 57.14,
+      "pf": 2.67,
+      "netPctLev": 4690
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "bb%:>100 & body:>2% & rev:CONT & htf:UP",
+      "n": 34,
+      "wr": 56.25,
+      "pf": 2.57,
+      "netPctLev": 5160
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "rsi:30-45 & macd:-100..0 & body:0.3-1% & htf:UP",
+      "n": 30,
+      "wr": 55.56,
+      "pf": 2.5,
+      "netPctLev": 4200
+    },
+    {
+      "side": "LONG",
+      "combo": "triple",
+      "rule": "rsi:45-55 & macd:0..100 & body:0.3-1% & htf:UP",
+      "n": 42,
+      "wr": 55,
+      "pf": 2.44,
+      "netPctLev": 6080
+    }
+  ]
+}

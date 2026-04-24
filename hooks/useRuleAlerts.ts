@@ -101,6 +101,12 @@ interface TFIndicatorCache {
   atrPct: number | null;
   /** Distance of price to EMA50 in % — for emaDistFilter (positive = above EMA) */
   emaDistPct: number | null;
+  /** Body % of last closed candle: |close-open|/open*100 — for bodyPctFilter */
+  bodyPct: number | null;
+  /** Bollinger %B at last close: (close-lower)/(upper-lower) — for bbPercentFilter */
+  bbPercent: number | null;
+  /** 2-candle reversal type comparing last 2 closed candles — for reversalFilter */
+  reversal2: "CONT" | "UP_REV" | "DOWN_REV" | null;
 }
 
 /** Compute raw indicator values at the LATEST candle (expensive, done once) */
@@ -146,6 +152,22 @@ function computeTFIndicators(klines: Kline[]): TFIndicatorCache | null {
     ema50,
     atrPct,
     emaDistPct,
+    bodyPct: (() => {
+      const last = klines[klines.length - 1];
+      if (!last || !last.open) return null;
+      return Math.abs(last.close - last.open) / last.open * 100;
+    })(),
+    bbPercent: (bb.upper != null && bb.lower != null && bb.upper !== bb.lower)
+      ? (price - bb.lower) / (bb.upper - bb.lower)
+      : null,
+    reversal2: (() => {
+      if (klines.length < 2) return null;
+      const prev = klines[klines.length - 2], curr = klines[klines.length - 1];
+      const prevBull = prev.close >= prev.open;
+      const currBull = curr.close >= curr.open;
+      if (prevBull === currBull) return "CONT";
+      return !prevBull && currBull ? "UP_REV" : "DOWN_REV";
+    })(),
   };
 }
 
@@ -582,6 +604,15 @@ function ruleMatchesSmart(
     if (cfg.atrFilter && !evalFeatFilter(ind.atrPct, cfg.atrFilter)) { setReason("atr", `ATR% ngoài range (đang ${ind.atrPct?.toFixed(2) ?? "—"}%)`, side); continue; }
     // rsiFilter on entry TF (range filter, used by GPT high-WR rules)
     if ((cfg as any).rsiFilter && !evalFeatFilter(ind.rsi, (cfg as any).rsiFilter)) { setReason("rsi", `RSI ngoài range (đang ${ind.rsi?.toFixed(1) ?? "—"})`, side); continue; }
+    // bodyPctFilter — % body của nến vừa đóng
+    if ((cfg as any).bodyPctFilter && !evalFeatFilter(ind.bodyPct, (cfg as any).bodyPctFilter)) { setReason("body", `Body% ngoài range (đang ${ind.bodyPct?.toFixed(2) ?? "—"}%)`, side); continue; }
+    // bbPercentFilter — Bollinger %B (0..1+)
+    if ((cfg as any).bbPercentFilter && !evalFeatFilter(ind.bbPercent, (cfg as any).bbPercentFilter)) { setReason("bbPct", `BB %B ngoài range (đang ${ind.bbPercent?.toFixed(2) ?? "—"})`, side); continue; }
+    // reversalFilter — kind: "CONT" | "UP_REV" | "DOWN_REV"
+    if ((cfg as any).reversalFilter) {
+      const want = (cfg as any).reversalFilter.kind;
+      if (ind.reversal2 !== want) { setReason("rev", `2-candle pattern cần ${want}, đang ${ind.reversal2 ?? "—"}`, side); continue; }
+    }
     // v4.3.15 — FAST PATH 2e: macdHistFilter on entry TF
     if (cfg.macdHistFilter && !evalFeatFilter(ind.macdHistogram, cfg.macdHistFilter)) { setReason("macdHist", `MACD hist ngoài range (đang ${ind.macdHistogram?.toFixed(1) ?? "—"})`, side); continue; }
     // v4.3.15 — FAST PATH 2f: emaDistFilter on entry TF

@@ -458,6 +458,26 @@ function backtestOneRule(
         const dist = ema !== null && ema > 0 ? ((price - ema) / ema) * 100 : null;
         if (!evalFeatFilter(dist, cfgX.emaDistFilter)) continue;
       }
+      // bodyPctFilter
+      if (cfgX.bodyPctFilter) {
+        const c2 = entryCandles[i];
+        const body = c2.open ? Math.abs(c2.close - c2.open) / c2.open * 100 : null;
+        if (!evalFeatFilter(body, cfgX.bodyPctFilter)) continue;
+      }
+      // bbPercentFilter
+      if (cfgX.bbPercentFilter) {
+        const u = entrySeries.bbUpper[i], l = entrySeries.bbLower[i];
+        const bbP = (u != null && l != null && u !== l) ? (price - l) / (u - l) : null;
+        if (!evalFeatFilter(bbP, cfgX.bbPercentFilter)) continue;
+      }
+      // reversalFilter — 2-candle pattern (CONT / UP_REV / DOWN_REV)
+      if (cfgX.reversalFilter && i >= 1) {
+        const prev = entryCandles[i - 1], curr = entryCandles[i];
+        const prevBull = prev.close >= prev.open;
+        const currBull = curr.close >= curr.open;
+        const rev = prevBull === currBull ? "CONT" : (!prevBull && currBull ? "UP_REV" : "DOWN_REV");
+        if (rev !== cfgX.reversalFilter.kind) continue;
+      }
 
       // Extensible htfFilters[]
       if (cfg.htfFilters?.length) {
