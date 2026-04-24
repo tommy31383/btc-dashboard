@@ -64,6 +64,16 @@ export async function loadTrades(): Promise<PaperTrade[]> {
 async function saveTrades(trades: PaperTrade[]): Promise<void> {
   if (trades.length > MAX_TRADES) trades.splice(0, trades.length - MAX_TRADES);
   await writeJson(TRADES_KEY, trades);
+  // v4.3.37 — push lên GitHub Gist (debounced 3s, no-op nếu chưa setup)
+  try {
+    const { schedulePush } = await import("./gistSync");
+    schedulePush(() => loadTrades());
+  } catch {}
+}
+
+/** Replace entire trades store (used by Pull-from-Gist sync). */
+export async function replaceTrades(trades: PaperTrade[]): Promise<void> {
+  await writeJson(TRADES_KEY, trades);
 }
 
 /**

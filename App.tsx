@@ -38,6 +38,9 @@ import GptRuleScreen from "./components/GptRuleScreen";
 import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 import PaperTradeJournal from "./components/PaperTradeJournal";
+import GistSyncPanel from "./components/GistSyncPanel";
+import { pullFromGist, mergeTrades } from "./utils/gistSync";
+import { loadTrades, replaceTrades } from "./utils/paperTrader";
 import { TopAppBar } from "./components/v2/TopAppBar";
 import { BottomNavBar, NavTab } from "./components/v2/BottomNavBar";
 import { useAppFonts } from "./components/v2/useAppFonts";
@@ -50,7 +53,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.36";
+const APP_VERSION = "4.3.37";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -151,6 +154,19 @@ export default function App() {
 
   // Learner + Paper Trader: log mỗi rule fire, resolve khi giá hit SL/TP/timeout
   const calib = useCalibration(activeAlerts, priceData?.price ?? null);
+
+  // v4.3.37 — Auto-pull paper trades từ Gist khi app mount (best-effort).
+  useEffect(() => {
+    (async () => {
+      try {
+        const remote = await pullFromGist();
+        if (!remote || !remote.trades) return;
+        const local = await loadTrades();
+        const merged = mergeTrades(local, remote.trades);
+        if (merged.length !== local.length) await replaceTrades(merged);
+      } catch {}
+    })();
+  }, []);
 
   // Risk Radar — compute lesson-learn warnings + golden opportunities from rawKlines
   const riskState = useRiskRadar(rawKlines);
@@ -346,6 +362,9 @@ export default function App() {
           ruleMatchDetails={ruleMatchDetails}
           tfData={tfData}
         />
+
+        {/* v4.3.37 — Gist sync cho paper journal (lưu cross-device) */}
+        <GistSyncPanel />
 
         {/* PAPER TRADE JOURNAL + LEARNER — auto log mỗi rule FIRE, học hit-rate live */}
         <PaperTradeJournal
