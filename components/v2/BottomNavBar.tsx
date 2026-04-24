@@ -16,12 +16,13 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { P } from "../../utils/v2Theme";
 import { MaterialIcon } from "./MaterialIcon";
 
-export type NavTab = "radar" | "trades" | "gptRule";
+export type NavTab = "radar" | "trades" | "gptRule" | "history";
 
 const TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"] }[] = [
   { key: "radar",   label: "CLAUDE",  icon: "radar" },
   { key: "trades",  label: "ALERT",   icon: "swap_horiz" },
   { key: "gptRule", label: "GPT RULE", icon: "analytics" },
+  { key: "history", label: "HISTORY", icon: "history" },
 ];
 
 export function BottomNavBar({

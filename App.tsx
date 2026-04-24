@@ -39,6 +39,9 @@ import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 import PaperTradeJournal from "./components/PaperTradeJournal";
 import GistSyncPanel from "./components/GistSyncPanel";
+import AutoTraderPanel from "./components/AutoTraderPanel";
+import HistoryScreen from "./components/HistoryScreen";
+import { useAutoTrader } from "./hooks/useAutoTrader";
 import { pullFromGist, mergeTrades } from "./utils/gistSync";
 import { loadTrades, replaceTrades } from "./utils/paperTrader";
 import { TopAppBar } from "./components/v2/TopAppBar";
@@ -53,7 +56,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.40";
+const APP_VERSION = "4.3.41";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -118,7 +121,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "history">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -155,6 +158,10 @@ export default function App() {
   // Learner + Paper Trader: log mỗi rule fire, resolve khi giá hit SL/TP/timeout
   const calib = useCalibration(activeAlerts, priceData?.price ?? null);
 
+  // v4.3.41 — Auto Trader: tự động vào lệnh khi rule fire (paper account
+  // 1000 USD, margin 30/lệnh, lev 100x, limit ±0.1% chờ tối đa 5p).
+  const autoTrader = useAutoTrader(activeAlerts, priceData?.price ?? null);
+
   // v4.3.37 — Auto-pull paper trades từ Gist khi app mount (best-effort).
   useEffect(() => {
     (async () => {
@@ -189,6 +196,14 @@ export default function App() {
   }, []);
 
   const error = priceError || klineError;
+
+  const handleNavSelect = useCallback((t: NavTab) => {
+    setNavTab(t);
+    if (t === "trades") setActiveTab("risk");
+    else if (t === "gptRule") setActiveTab("gptRule");
+    else if (t === "history") setActiveTab("history");
+    else setActiveTab("dashboard");
+  }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -232,10 +247,32 @@ export default function App() {
           <BottomNavBar
             active={navTab}
             tradesBadge={firingGoldensCount}
-            onSelect={(t) => {
-              setNavTab(t);
-              if (t !== "trades") setActiveTab("dashboard");
-            }}
+            onSelect={handleNavSelect}
+          />
+        </SafeAreaView>
+      </ErrorBoundary>
+    );
+  }
+
+  if (activeTab === "history") {
+    return (
+      <ErrorBoundary>
+        <SafeAreaView style={styles.safe}>
+          <StatusBar style="light" />
+          <TopAppBar
+            title="BTC DASHBOARD"
+            version={APP_VERSION}
+            buildDate={BUILD_DATE}
+            lastUpdate={lastUpdate}
+            onNotifications={() => {}}
+            onSettings={() => setShowSettings(true)}
+          />
+          <HistoryScreen account={autoTrader.account} summary={autoTrader.summary} />
+          <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
+          <BottomNavBar
+            active={navTab}
+            tradesBadge={firingGoldensCount}
+            onSelect={handleNavSelect}
           />
         </SafeAreaView>
       </ErrorBoundary>
@@ -264,12 +301,7 @@ export default function App() {
           <BottomNavBar
             active={navTab}
             tradesBadge={firingGoldensCount}
-            onSelect={(t) => {
-              setNavTab(t);
-              if (t === "trades") setActiveTab("risk");
-              else if (t === "gptRule") setActiveTab("gptRule");
-              else setActiveTab("dashboard");
-            }}
+            onSelect={handleNavSelect}
           />
         </SafeAreaView>
       </ErrorBoundary>
@@ -366,6 +398,14 @@ export default function App() {
         {/* v4.3.37 — Gist sync cho paper journal (lưu cross-device) */}
         <GistSyncPanel />
 
+        {/* v4.3.41 — AUTO TRADER: tự động vào lệnh khi rule fire (1000U cap, 30U margin, 100x lev) */}
+        <AutoTraderPanel
+          account={autoTrader.account}
+          summary={autoTrader.summary}
+          currentPrice={priceData?.price ?? null}
+          onReset={autoTrader.reset}
+        />
+
         {/* PAPER TRADE JOURNAL + LEARNER — auto log mỗi rule FIRE, học hit-rate live */}
         <PaperTradeJournal
           trades={calib.trades}
@@ -435,12 +475,7 @@ export default function App() {
       <BottomNavBar
         active={navTab}
         tradesBadge={firingGoldensCount}
-        onSelect={(t) => {
-          setNavTab(t);
-          if (t === "trades") setActiveTab("risk");
-          else if (t === "gptRule") setActiveTab("gptRule");
-          else setActiveTab("dashboard");
-        }}
+        onSelect={handleNavSelect}
       />
     </SafeAreaView>
     </ErrorBoundary>

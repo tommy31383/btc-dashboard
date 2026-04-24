@@ -233,6 +233,96 @@ export function mergeTrades(local: PaperTrade[], remote: PaperTrade[]): PaperTra
   return Array.from(byId.values()).sort((a, b) => b.openedMs - a.openedMs);
 }
 
+// ─── Generic file sync (used by auto-trader account state) ────────────────
+function fileContentsUrl(path: string) {
+  return `${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`;
+}
+
+export async function pullFile<T>(path: string): Promise<T | null> {
+  const cfg = await getGistConfig();
+  if (!cfg.pat) return null;
+  try {
+    const res = await fetch(fileContentsUrl(path), {
+      headers: { "Authorization": `token ${cfg.pat}`, "Accept": "application/vnd.github+json" },
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`pullFile ${path} fail: ${res.status}`);
+    const json = (await res.json()) as ContentsResponse;
+    if (!json.content) return null;
+    return JSON.parse(b64decode(json.content)) as T;
+  } catch (e) {
+    console.warn(`[repoSync] pullFile ${path} failed:`, e);
+    return null;
+  }
+}
+
+async function getFileShaAt(pat: string, path: string): Promise<string | null> {
+  try {
+    const res = await fetch(fileContentsUrl(path), {
+      headers: { "Authorization": `token ${pat}`, "Accept": "application/vnd.github+json" },
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) return null;
+    const json = (await res.json()) as ContentsResponse;
+    return json.sha || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function pushFile<T>(path: string, data: T, commitMsg: string): Promise<boolean> {
+  const cfg = await getGistConfig();
+  if (!cfg.pat) return false;
+  try {
+    await ensureBranch(cfg.pat);
+    const sha = await getFileShaAt(cfg.pat, path);
+    const body: any = {
+      message: commitMsg,
+      content: b64encode(JSON.stringify(data, null, 2)),
+      branch: BRANCH,
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(`${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `token ${cfg.pat}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`pushFile ${path} fail: ${res.status} ${await res.text()}`);
+    await markSynced(Date.now());
+    return true;
+  } catch (e) {
+    console.warn(`[repoSync] pushFile ${path} failed:`, e);
+    return false;
+  }
+}
+
+/** Delete file (used by reset). */
+export async function deleteFile(path: string, commitMsg: string): Promise<boolean> {
+  const cfg = await getGistConfig();
+  if (!cfg.pat) return false;
+  const sha = await getFileShaAt(cfg.pat, path);
+  if (!sha) return true; // already gone
+  try {
+    const res = await fetch(`${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `token ${cfg.pat}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: commitMsg, sha, branch: BRANCH }),
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn(`[repoSync] deleteFile ${path} failed:`, e);
+    return false;
+  }
+}
+
 // ─── Debounced push helper ─────────────────────────────────────────────────
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 const PUSH_DEBOUNCE_MS = 5000; // tăng lên 5s để gom nhiều thay đổi vào 1 commit
@@ -246,4 +336,22 @@ export function schedulePush(getTrades: () => Promise<PaperTrade[]>): void {
       await pushToGist(trades);
     } catch {}
   }, PUSH_DEBOUNCE_MS);
+}
+
+/** Generic debounced pusher for arbitrary file (used by auto-trader). */
+const customPushTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+export function scheduleFilePush<T>(
+  path: string,
+  getData: () => Promise<T>,
+  commitMsg: () => string,
+  debounceMs = PUSH_DEBOUNCE_MS,
+): void {
+  if (customPushTimers[path]) clearTimeout(customPushTimers[path]);
+  customPushTimers[path] = setTimeout(async () => {
+    delete customPushTimers[path];
+    try {
+      const data = await getData();
+      await pushFile(path, data, commitMsg());
+    } catch {}
+  }, debounceMs);
 }

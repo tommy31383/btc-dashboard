@@ -39,7 +39,8 @@ type StitchIconName =
   | "fullscreen"
   | "sentiment_neutral"
   | "gpp_maybe"
-  | "analytics";
+  | "analytics"
+  | "history";
 
 // Map Stitch names → @expo/vector-icons MaterialIcons names.
 // MaterialIcons uses snake_case same as Material Symbols for most icons,
@@ -74,6 +75,7 @@ const ICON_MAP: Record<StitchIconName, React.ComponentProps<typeof MaterialIcons
   sentiment_neutral: "sentiment-neutral",
   gpp_maybe: "gpp-maybe",
   analytics: "analytics",
+  history: "history",
 };
 
 export function MaterialIcon({
