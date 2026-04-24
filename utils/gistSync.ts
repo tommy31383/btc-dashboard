@@ -18,8 +18,10 @@ const LAST_SYNC_KEY = "@gist_last_sync";
 
 const REPO_OWNER = "tommy31383";
 const REPO_NAME = "btc-dashboard";
-const BRANCH = "master";
-const FILE_PATH = "data/paper_trades.json";
+/** v4.3.40: branch riêng cho data → KHÔNG trigger GitHub Pages rebuild. */
+const BRANCH = "paper-data";
+const BASE_BRANCH = "master"; // chỉ dùng khi cần tạo `paper-data` lần đầu
+const FILE_PATH = "paper_trades.json";
 const GH_API = "https://api.github.com";
 
 export interface GistConfig {
@@ -118,6 +120,50 @@ export async function pullFromGist(): Promise<GistPayload | null> {
   }
 }
 
+/** Đảm bảo branch `paper-data` tồn tại — nếu chưa thì tạo từ HEAD của master.
+ *  Trả về true nếu branch đã (hoặc vừa) tồn tại. */
+async function ensureBranch(pat: string): Promise<boolean> {
+  try {
+    // 1. Check branch tồn tại?
+    const checkRes = await fetch(
+      `${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/heads/${BRANCH}`,
+      { headers: { "Authorization": `token ${pat}`, "Accept": "application/vnd.github+json" } },
+    );
+    if (checkRes.ok) return true;
+    if (checkRes.status !== 404) {
+      console.warn("[repoSync] ensureBranch check fail:", checkRes.status);
+      return false;
+    }
+    // 2. Lấy SHA của HEAD master
+    const baseRes = await fetch(
+      `${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/heads/${BASE_BRANCH}`,
+      { headers: { "Authorization": `token ${pat}`, "Accept": "application/vnd.github+json" } },
+    );
+    if (!baseRes.ok) throw new Error(`Get base ref fail: ${baseRes.status}`);
+    const baseJson = await baseRes.json();
+    const baseSha = baseJson.object?.sha;
+    if (!baseSha) throw new Error("Base ref thiếu sha");
+    // 3. Tạo ref mới
+    const createRes = await fetch(
+      `${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/git/refs`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `token ${pat}`,
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ref: `refs/heads/${BRANCH}`, sha: baseSha }),
+      },
+    );
+    if (!createRes.ok) throw new Error(`Create branch fail: ${createRes.status} ${await createRes.text()}`);
+    return true;
+  } catch (e) {
+    console.warn("[repoSync] ensureBranch error:", e);
+    return false;
+  }
+}
+
 /** Get current file SHA (cần để PUT update). null = file chưa tồn tại. */
 async function getFileSha(pat: string): Promise<string | null> {
   try {
@@ -142,6 +188,7 @@ export async function pushToGist(trades: PaperTrade[]): Promise<boolean> {
   if (!cfg.pat) return false;
   const payload: GistPayload = { version: 1, updatedAt: Date.now(), trades };
   try {
+    await ensureBranch(cfg.pat);
     const sha = await getFileSha(cfg.pat);
     const body: any = {
       message: `data: paper trades · ${trades.length} lệnh · ${new Date(payload.updatedAt).toISOString()}`,

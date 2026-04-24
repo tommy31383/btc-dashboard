@@ -157,7 +157,8 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
 
           <Text style={styles.note}>
             Last sync: <Text style={styles.code}>{lastSyncText}</Text>
-            {"\n"}File: <Text style={styles.code}>tommy31383/btc-dashboard:data/paper_trades.json</Text>
+            {"\n"}File: <Text style={styles.code}>tommy31383/btc-dashboard@paper-data:paper_trades.json</Text>
+            {"\n"}(branch riêng → KHÔNG trigger Pages rebuild)
           </Text>
         </View>
       )}
