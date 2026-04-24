@@ -5,14 +5,160 @@
     "5m": {
       "interval": "5m",
       "label": "5M",
-      "candles_used": 10000,
+      "candles_used": 105120,
       "price_range": {
         "min": 70584,
         "max": 75855,
         "first": 72204,
         "last": 73855
       },
-      "rules": []
+      "rules": [
+        {
+          "rank": 1,
+          "source": "BASELINE_5M_STOCH_SR_v1",
+          "config": {
+            "leverage": 100,
+            "targetPct": 4,
+            "stopPct": 2,
+            "cooldownBars": 3,
+            "stochOSLevel": 10,
+            "stochOBLevel": 90,
+            "srPivotLookback15m": 50,
+            "srProximityPct": 0.3,
+            "strategy": "stoch_extreme_or_sr_fallback",
+            "tfBase": "5m",
+            "label": "Stoch 5m + S/R 15m fallback"
+          },
+          "stats": {
+            "winRate": 36.68,
+            "profitFactor": 2.05,
+            "trades": 17143,
+            "avgWinPct": 400,
+            "avgLossPct": -200,
+            "avgHoldBars": 697.6,
+            "wins": 6288,
+            "losses": 10855,
+            "timeouts": 107,
+            "grossPnL": 428910,
+            "feeCost": 51429,
+            "netPnL": 377481,
+            "finalEquityUsd": 378481,
+            "roiPct": 37748.1,
+            "liquidations": 10855,
+            "side": "BOTH",
+            "label": "Stoch 5m + S/R 15m fallback",
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T16:58:32.849Z",
+            "lastBacktestSource": "backtest_stoch_5m",
+            "equityCurve": [
+              0,
+              -3993,
+              -786,
+              2688,
+              9345,
+              5619,
+              2226,
+              9450,
+              16107,
+              15414,
+              24138,
+              22545,
+              32469,
+              37926,
+              40950,
+              40707,
+              40881,
+              51888,
+              48795,
+              46419,
+              49626,
+              55200,
+              72807,
+              76131,
+              73488,
+              71412,
+              67569,
+              80226,
+              99300,
+              105657,
+              108681,
+              116538,
+              123462,
+              124119,
+              138126,
+              139950,
+              141057,
+              142581,
+              141138,
+              144312,
+              148719,
+              160443,
+              156450,
+              158757,
+              159981,
+              175338,
+              175062,
+              181869,
+              185643,
+              184650,
+              189924,
+              196581,
+              200538,
+              205662,
+              206469,
+              213393,
+              214800,
+              224274,
+              225381,
+              230088,
+              236112,
+              241719,
+              242793,
+              244350,
+              253074,
+              254781,
+              258255,
+              259812,
+              264969,
+              260643,
+              256350,
+              258624,
+              275181,
+              278955,
+              278862,
+              284286,
+              290343,
+              298050,
+              297024,
+              298731,
+              304005,
+              309912,
+              312936,
+              315993,
+              318600,
+              320574,
+              327381,
+              330255,
+              334362,
+              334086,
+              337293,
+              345417,
+              349524,
+              353931,
+              351705,
+              351162,
+              361236,
+              362043,
+              368517,
+              374274,
+              377481
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 420,
+            "maxDrawdownUsd": 10947
+          }
+        }
+      ]
     },
     "15m": {
       "interval": "15m",
@@ -26,7 +172,7 @@
       },
       "rules": [
         {
-          "rank": 6,
+          "rank": 2,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -182,7 +328,7 @@
           "compositeScore": 46700
         },
         {
-          "rank": 7,
+          "rank": 8,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -335,7 +481,7 @@
           "compositeScore": 42330
         },
         {
-          "rank": 8,
+          "rank": 11,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -488,7 +634,7 @@
           "compositeScore": 39450
         },
         {
-          "rank": 9,
+          "rank": 12,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -645,7 +791,7 @@
           "compositeScore": 38250
         },
         {
-          "rank": 10,
+          "rank": 9,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -802,7 +948,7 @@
           "compositeScore": 35880
         },
         {
-          "rank": 11,
+          "rank": 22,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -955,7 +1101,7 @@
           "compositeScore": 34460
         },
         {
-          "rank": 12,
+          "rank": 23,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -1116,7 +1262,7 @@
           "compositeScore": 34160
         },
         {
-          "rank": 16,
+          "rank": 3,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -1276,7 +1422,7 @@
           "compositeScore": 5068
         },
         {
-          "rank": 26,
+          "rank": 16,
           "source": "flipped-from-15m-rank12",
           "label": "[FLIPPED] SHORT→LONG [HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
           "config": {
@@ -1446,7 +1592,7 @@
       },
       "rules": [
         {
-          "rank": 1,
+          "rank": 43,
           "source": "FEATURE_SCAN_v4.3.15_iter3",
           "label": "LONG Widened EMA+FLAT",
           "config": {
@@ -1601,7 +1747,7 @@
           }
         },
         {
-          "rank": 2,
+          "rank": 29,
           "source": "FEATURE_SCAN_v4.3.15_iter3",
           "label": "Golden ATR+EMA+FLAT",
           "config": {
@@ -1723,7 +1869,7 @@
           }
         },
         {
-          "rank": 3,
+          "rank": 28,
           "source": "FEATURE_SCAN_v4.3.15_iter3",
           "label": "Golden ATR+FLAT",
           "config": {
@@ -1845,7 +1991,7 @@
           }
         },
         {
-          "rank": 5,
+          "rank": 30,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -1902,7 +2048,7 @@
           "compositeScore": 840
         },
         {
-          "rank": 6,
+          "rank": 48,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -1973,7 +2119,7 @@
           "compositeScore": 450
         },
         {
-          "rank": 7,
+          "rank": 33,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2030,7 +2176,7 @@
           "compositeScore": 240
         },
         {
-          "rank": 8,
+          "rank": 31,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2087,7 +2233,7 @@
           "compositeScore": 140
         },
         {
-          "rank": 9,
+          "rank": 39,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2146,7 +2292,7 @@
           "compositeScore": 90
         },
         {
-          "rank": 10,
+          "rank": 27,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2267,7 +2413,7 @@
           "compositeScore": 30070
         },
         {
-          "rank": 11,
+          "rank": 7,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2425,7 +2571,7 @@
           "compositeScore": 24980
         },
         {
-          "rank": 12,
+          "rank": 10,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2741,7 +2887,7 @@
           "compositeScore": 23930
         },
         {
-          "rank": 14,
+          "rank": 4,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -2897,7 +3043,7 @@
           "compositeScore": 22130
         },
         {
-          "rank": 15,
+          "rank": 35,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3023,7 +3169,7 @@
           "compositeScore": 19970
         },
         {
-          "rank": 16,
+          "rank": 21,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3181,7 +3327,7 @@
           "compositeScore": 14890
         },
         {
-          "rank": 17,
+          "rank": 32,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3289,7 +3435,7 @@
           "compositeScore": 13810
         },
         {
-          "rank": 18,
+          "rank": 14,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3445,7 +3591,7 @@
           "compositeScore": 11680
         },
         {
-          "rank": 19,
+          "rank": 18,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3571,7 +3717,7 @@
           "compositeScore": 10470
         },
         {
-          "rank": 24,
+          "rank": 5,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3731,7 +3877,7 @@
           "compositeScore": 2673
         },
         {
-          "rank": 27,
+          "rank": 15,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -3891,7 +4037,7 @@
           "compositeScore": 1549
         },
         {
-          "rank": 29,
+          "rank": 17,
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
@@ -4053,7 +4199,7 @@
           "compositeScore": 1252
         },
         {
-          "rank": 42,
+          "rank": 6,
           "source": "flipped-from-1h-rank29",
           "label": "[FLIPPED] SHORT→LONG [HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
           "config": {
@@ -4210,7 +4356,7 @@
           }
         },
         {
-          "rank": 43,
+          "rank": 26,
           "source": "GPT_HIGHWR_1H_v2",
           "label": "[GPT-V2 1H] EMA0.5-2% & ATR<0.3% & HTF4h UP — WR 71.7% n=245 NET +329%",
           "config": {
@@ -4288,7 +4434,7 @@
           "compositeScore": 3.95007537703147
         },
         {
-          "rank": 44,
+          "rank": 25,
           "source": "GPT_HIGHWR_1H_v2",
           "label": "[GPT-V2 1H] RSI55-70 & EMA0.5-2% & ATR<0.3% & HTF4h UP — WR 73.4% n=183 NET +264%",
           "config": {
@@ -4369,7 +4515,7 @@
           "compositeScore": 3.826198365357713
         },
         {
-          "rank": 45,
+          "rank": 24,
           "source": "GPT_HIGHWR_1H_v2",
           "label": "[GPT-V2 1H] RSI55-70 & ATR<0.3% & HTF4h UP — WR 65.7% n=312 NET +321%",
           "config": {
@@ -4467,7 +4613,7 @@
       },
       "rules": [
         {
-          "rank": 5,
+          "rank": 57,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -4540,7 +4686,7 @@
           }
         },
         {
-          "rank": 6,
+          "rank": 54,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -4614,7 +4760,7 @@
           }
         },
         {
-          "rank": 11,
+          "rank": 19,
           "source": "GPT_4H_v1",
           "label": "[GPT 4H v1] MACD>100 + ATR1-2% + Body>2% + HTF1d UP — WR 60% n=36 NET +6640%",
           "config": {
@@ -4732,7 +4878,7 @@
           "compositeScore": 2.1665507475865344
         },
         {
-          "rank": 12,
+          "rank": 46,
           "source": "GPT_4H_v1",
           "label": "[GPT 4H v1] RSI45-55 + MACD0-100 + Body0.3-1% + HTF1d UP — WR 55% n=42 NET +6080%",
           "config": {
@@ -4859,7 +5005,7 @@
           "compositeScore": 2.0686600636314596
         },
         {
-          "rank": 13,
+          "rank": 20,
           "source": "GPT_4H_v1",
           "label": "[GPT 4H v1] BB%>100 + Body>2% + CONT + HTF1d UP — WR 56.3% n=34 NET +5160%",
           "config": {
@@ -4948,7 +5094,7 @@
           "compositeScore": 1.999883284587795
         },
         {
-          "rank": 14,
+          "rank": 37,
           "source": "GPT_4H_v1",
           "label": "[GPT 4H v1] RSI>70 + BB%75-100 + DOWN_REV + HTF1d UP — WR 57.1% n=31 NET +4690%",
           "config": {
@@ -5015,7 +5161,7 @@
           "compositeScore": 1.9803214948597638
         },
         {
-          "rank": 15,
+          "rank": 40,
           "source": "GPT_4H_v1",
           "label": "[GPT 4H v1] RSI30-45 + MACD-100..0 + Body0.3-1% + HTF1d UP — WR 55.6% n=30 NET +4200%",
           "config": {
@@ -5151,7 +5297,7 @@
       },
       "rules": [
         {
-          "rank": 1,
+          "rank": 45,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5210,7 +5356,7 @@
           }
         },
         {
-          "rank": 2,
+          "rank": 49,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5262,7 +5408,7 @@
           }
         },
         {
-          "rank": 3,
+          "rank": 52,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5322,7 +5468,7 @@
           }
         },
         {
-          "rank": 4,
+          "rank": 47,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5374,7 +5520,7 @@
           }
         },
         {
-          "rank": 5,
+          "rank": 36,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5434,7 +5580,7 @@
           }
         },
         {
-          "rank": 6,
+          "rank": 53,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5496,7 +5642,7 @@
           }
         },
         {
-          "rank": 7,
+          "rank": 38,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5553,7 +5699,7 @@
           }
         },
         {
-          "rank": 8,
+          "rank": 42,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5614,7 +5760,7 @@
           }
         },
         {
-          "rank": 10,
+          "rank": 44,
           "source": "flipped-selected-live",
           "label": "[FLIPPED LIVE] LONG rank1 ? SHORT",
           "config": {
@@ -5681,7 +5827,7 @@
           }
         },
         {
-          "rank": 11,
+          "rank": 50,
           "source": "flipped-selected-live",
           "label": "[FLIPPED LIVE] LONG rank3 ? SHORT",
           "config": {
@@ -5743,7 +5889,7 @@
           }
         },
         {
-          "rank": 12,
+          "rank": 34,
           "source": "flipped-selected-live",
           "label": "[FLIPPED LIVE] LONG rank5 ? SHORT",
           "config": {
@@ -5806,7 +5952,7 @@
           }
         },
         {
-          "rank": 13,
+          "rank": 51,
           "source": "flipped-selected-live",
           "label": "[FLIPPED LIVE] LONG rank6 ? SHORT",
           "config": {
@@ -5870,7 +6016,7 @@
           }
         },
         {
-          "rank": 14,
+          "rank": 41,
           "source": "flipped-selected-live",
           "label": "[FLIPPED LIVE] LONG rank8 ? SHORT",
           "config": {
@@ -5947,7 +6093,7 @@
       },
       "rules": [
         {
-          "rank": 1,
+          "rank": 55,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -5995,7 +6141,7 @@
           }
         },
         {
-          "rank": 2,
+          "rank": 56,
           "source": "GRID",
           "config": {
             "leverage": 100,
@@ -6066,5 +6212,6 @@
     "appended": 7,
     "backup": "assets/hard_rules.backup-flipped-live-2026-04-23T10-06-10-455Z.json",
     "updatedAt": "2026-04-23T10:06:10.455Z"
-  }
+  },
+  "last_baseline_5m_injected_at": "2026-04-24T17:24:26.038Z"
 }
