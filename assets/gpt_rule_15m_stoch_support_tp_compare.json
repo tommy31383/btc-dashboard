@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2026-04-24T05:41:16.416Z",
+  "ruleId": "gpt-long-15m-stoch-support-1h-sr-v1-tp-compare",
+  "assumptions": {
+    "period": "1 year",
+    "dateRange": {
+      "from": "2025-04-24T05:41:04.674Z",
+      "to": "2026-04-24T05:41:04.674Z"
+    },
+    "entry": "15m StochRSI K < 95 and price touches/is near 1h support",
+    "supportLookback1h": 20,
+    "feePctPerSide": 0.05
+  },
+  "comparison": {
+    "baseline": {
+      "label": "Baseline: SR or Stoch>90",
+      "config": {
+        "key": "baseline",
+        "label": "Baseline: SR or Stoch>90",
+        "stopPct": 1,
+        "maxHoldBars": 32,
+        "resistanceBufferPct": 0.25,
+        "supportAtrMult": 0.35,
+        "supportMinPct": 0.2,
+        "stochExitK": 90,
+        "stochMinProfitPct": 0
+      },
+      "summary": {
+        "trades": 675,
+        "wins": 482,
+        "losses": 176,
+        "timeouts": 17,
+        "winRate": 71.41,
+        "netPct": -5.09,
+        "avgNetPct": -0.008,
+        "avgHoldBars": 9.9,
+        "profitFactor": 0.98
+      }
+    },
+    "wr70_best": {
+      "label": "Best high-WR tuned",
+      "config": {
+        "key": "wr70_best",
+        "label": "Best high-WR tuned",
+        "stopPct": 0.85,
+        "maxHoldBars": 40,
+        "resistanceBufferPct": 0.2,
+        "supportAtrMult": 0.35,
+        "supportMinPct": 0.25,
+        "stochExitK": 90,
+        "stochMinProfitPct": 0
+      },
+      "summary": {
+        "trades": 710,
+        "wins": 497,
+        "losses": 206,
+        "timeouts": 7,
+        "winRate": 70,
+        "netPct": 8.84,
+        "avgNetPct": 0.012,
+        "avgHoldBars": 10,
+        "profitFactor": 1.04
+      }
+    },
+    "resistance_only_40": {
+      "label": "TP only at 1h resistance, hold 40",
+      "config": {
+        "key": "resistance_only_40",
+        "label": "TP only at 1h resistance, hold 40",
+        "stopPct": 0.85,
+        "maxHoldBars": 40,
+        "resistanceBufferPct": 0.2,
+        "supportAtrMult": 0.35,
+        "supportMinPct": 0.25
+      },
+      "summary": {
+        "trades": 570,
+        "wins": 102,
+        "losses": 247,
+        "timeouts": 221,
+        "winRate": 17.89,
+        "netPct": -3.89,
+        "avgNetPct": -0.007,
+        "avgHoldBars": 23.9,
+        "profitFactor": 0.98
+      }
+    },
+    "resistance_only_48_tighter": {
+      "label": "TP only at 1h resistance, hold 48, tighter buffer",
+      "config": {
+        "key": "resistance_only_48_tighter",
+        "label": "TP only at 1h resistance, hold 48, tighter buffer",
+        "stopPct": 0.85,
+        "maxHoldBars": 48,
+        "resistanceBufferPct": 0.15,
+        "supportAtrMult": 0.35,
+        "supportMinPct": 0.25
+      },
+      "summary": {
+        "trades": 528,
+        "wins": 87,
+        "losses": 257,
+        "timeouts": 184,
+        "winRate": 16.48,
+        "netPct": 1.17,
+        "avgNetPct": 0.002,
+        "avgHoldBars": 28.1,
+        "profitFactor": 1
+      }
+    },
+    "resistance_only_60_tightest": {
+      "label": "TP only at 1h resistance, hold 60, tightest buffer",
+      "config": {
+        "key": "resistance_only_60_tightest",
+        "label": "TP only at 1h resistance, hold 60, tightest buffer",
+        "stopPct": 0.85,
+        "maxHoldBars": 60,
+        "resistanceBufferPct": 0.1,
+        "supportAtrMult": 0.35,
+        "supportMinPct": 0.25
+      },
+      "summary": {
+        "trades": 507,
+        "wins": 80,
+        "losses": 266,
+        "timeouts": 161,
+        "winRate": 15.78,
+        "netPct": 14.49,
+        "avgNetPct": 0.029,
+        "avgHoldBars": 32.5,
+        "profitFactor": 1.06
+      }
+    }
+  }
+}

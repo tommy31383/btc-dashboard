@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-04-23T00:00:00.000Z",
+  "rules": [
+    {
+      "id": "gpt-long-every-candle-1h-up-15m-v2-optimized",
+      "name": "GPT LONG EVERY CANDLE 1H UP 15M V2 OPTIMIZED",
+      "side": "LONG",
+      "thesis": "LONG o moi nen 15m nhung chi khi 1h dang tang. Chi trade TREND_RESUME va SQUEEZE. SL/TP toi uu theo structure + ATR tu grid-search.",
+      "timeframes": {
+        "context": ["1h"],
+        "setup": ["15m"],
+        "trigger": "15m"
+      },
+      "entryRules": [
+        "Moi nen moi tao tren 15m deu co the vao LONG",
+        "Chi vao khi 1h = UP",
+        "Chi giu 2 context: TREND_RESUME va SQUEEZE"
+      ],
+      "entry": "Vao LONG tai moi nen 15m khi trend 1h dang UP. Bo qua PULLBACK_BUY.",
+      "stopLoss": "SL = max(structure low, ATR15m*1.3) roi clamp toi thieu 0.55%. Structure lay 15m lookback 6 nen va 1h lookback 4 nen, cong them buffer 0.12%.",
+      "takeProfit": [
+        "TREND_RESUME: TP = max(SL*1.3, ATR15m*1.6)",
+        "SQUEEZE: TP = max(SL*1.6, ATR15m*1.2)",
+        "Max hold = 12 nen 15m"
+      ],
+      "cancelRules": [
+        "Bo qua neu 1h khong con UP",
+        "Bo qua neu context la PULLBACK_BUY",
+        "Dong lenh neu het 12 nen 15m"
+      ],
+      "notes": [
+        "Grid-search 378000 combo tren du lieu 1 nam.",
+        "Best by net: +141.95%, PF 1.69, 922 trades.",
+        "Context SQUEEZE dong gop manh hon TREND_RESUME.",
+        "Bai hoc: maxHold ngan va TP gan hon giup rule nay tang PNL."
+      ]
+    }
+  ]
+}

@@ -83,3 +83,56 @@ Primary references:
 1. Validate on device that intrabar rule-fire banners update after a 60s refresh without waiting for the next candle.
 2. Consider adding a visible "live/intrabar" label so users know signals can move before candle close.
 3. If exit-result notifications are needed again, reintroduce them with a mounted signal lifecycle tracker instead of a dormant settings toggle.
+
+## Lesson Learned
+
+Date: 2026-04-24
+
+Scope: GPT rule experiments and 1h feature-scan/backtest work through `2026-04-24`.
+
+### 1h quality setups are not "oversold bounces"
+
+The strongest 1h LONG setups found in scan/backtest were not deep-oversold reversal catches. The durable cluster was low volatility plus price already slightly above EMA50, not panic RSI or knife-catch behavior. The best pair over the 3-year retest was `ema:0.5..2% & atr:<0.3%` with `306` trades, `67.03%` win rate, and `3.05` profit factor.
+
+### Sample-scan winners can collapse on long retest
+
+Several combos that looked excellent in the initial scan did not hold up when expanded to the 3-year retest. In particular, many `htf:FLAT` combinations that showed `70%+` scan win rate fell back to about `48-52%` in the larger sample. Lesson: treat scan output as hypothesis generation only, not promotion-ready truth.
+
+### The durable 1h GPT edge cluster is narrow
+
+The combinations that survived re-test concentrated around a very specific context:
+
+- `ATR < 0.3%`
+- price `0.5%..2%` above EMA50
+- optional confirmation from `RSI 55-70` or `MACD > 50`
+- bearish candle retrace can improve entry quality inside the same cluster
+
+This is a continuation/resume context, not a broad "buy every dip" rule.
+
+### Feature-only GPT rules should be archived before they are live-ready
+
+The current live rule engine still expects classic condition triggers such as `macdCross`, `divergence`, or reversal logic. Pure feature-filter GPT rules can be stored in `hard_rules.json`, but they should remain disabled until the runtime can fire on feature-only states reliably. For that reason, the new `GPT_HIGHWR_1H` rules were saved as archive metadata, not enabled live monitors.
+
+### Win rate alone is not enough
+
+This round reinforced the earlier lesson from 15m testing: high win rate can still hide a weak or fake edge, and lower win rate can still be profitable if the reward/risk structure is better. Promotion decisions should continue to use at least:
+
+- retest sample size
+- profit factor
+- net expectancy / net result
+- whether the setup survives a longer date range
+
+### 3-year retest confirms a narrow 1h LONG cluster and adds a real 1h SHORT cluster
+
+The second-stage 3-year retest on selected 1h rules confirmed that the durable LONG cluster is still the same one found earlier: low ATR with price slightly above EMA50. The cleanest surviving pair was `ema:0.5..2% & atr:<0.3%` with `306` trades, `67.03%` win rate, and `3.05` profit factor. This is the highest-confidence 1h LONG family found so far.
+
+The 3-year retest also surfaced a real SHORT family on 1h that was not just sample noise. The strongest durable short cluster was centered around weak RSI plus moderate/low volatility, especially when HTF was down. The best retested example was `rsi:<30 & atr:0.3-0.6% & htf:DOWN` with `258` trades, `60.26%` win rate, and `2.27` profit factor, while `rsi:30-45 & macd:0..50 & atr:<0.3%` reached `74.73%` win rate over `145` trades.
+
+### Promotion rule: 3-year retest beats sample beauty
+
+After this pass, feature combos should not be promoted because they look extreme in a scan output. Promotion should prefer combinations that survive the 3-year retest with all of:
+
+- sufficient trade count
+- profit factor comfortably above `1.0`
+- win rate that still clears the intended threshold after retest
+- behavior that still makes market-structure sense, not only statistical novelty

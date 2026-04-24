@@ -34,6 +34,7 @@ import RuleAlertBanner from "./components/RuleAlertBanner";
 import LiveFeatureSnapshot from "./components/LiveFeatureSnapshot";
 import LiveRulesSummary from "./components/LiveRulesSummary";
 import RiskRadar from "./components/RiskRadar";
+import GptRuleScreen from "./components/GptRuleScreen";
 import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 import PaperTradeJournal from "./components/PaperTradeJournal";
@@ -114,7 +115,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -215,6 +216,37 @@ export default function App() {
             onSelect={(t) => {
               setNavTab(t);
               if (t !== "trades") setActiveTab("dashboard");
+            }}
+          />
+        </SafeAreaView>
+      </ErrorBoundary>
+    );
+  }
+
+  if (activeTab === "gptRule") {
+    return (
+      <ErrorBoundary>
+        <SafeAreaView style={styles.safe}>
+          <StatusBar style="light" />
+          <TopAppBar
+            title="BTC DASHBOARD"
+            onNotifications={() => {}}
+            onSettings={() => setShowSettings(true)}
+          />
+          <GptRuleScreen />
+          <SettingsPanel
+            visible={showSettings}
+            settings={settings}
+            onUpdate={updateSettings}
+          />
+          <BottomNavBar
+            active={navTab}
+            tradesBadge={firingGoldensCount}
+            onSelect={(t) => {
+              setNavTab(t);
+              if (t === "trades") setActiveTab("risk");
+              else if (t === "gptRule") setActiveTab("gptRule");
+              else setActiveTab("dashboard");
             }}
           />
         </SafeAreaView>
@@ -372,6 +404,8 @@ export default function App() {
         onSelect={(t) => {
           setNavTab(t);
           if (t === "trades") setActiveTab("risk");
+          else if (t === "gptRule") setActiveTab("gptRule");
+          else setActiveTab("dashboard");
         }}
       />
     </SafeAreaView>

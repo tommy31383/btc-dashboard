@@ -1,0 +1,5489 @@
+{
+  "generatedAt": "2026-04-24T04:59:26.894Z",
+  "ruleId": "gpt-long-every-candle-1h-up-15m-v1",
+  "assumptions": {
+    "period": "1 year",
+    "allowedContexts": [
+      "TREND_RESUME",
+      "SQUEEZE"
+    ],
+    "entry": "LONG every 15m candle only when 1h trend is UP",
+    "trendMethod": "5-candle percent change",
+    "trendThresholdPct": 0.6,
+    "feePctPerSide": 0.05,
+    "onePositionAtATime": true
+  },
+  "sample": {
+    "startTime": "2025-04-24T04:49:33.258Z",
+    "endTime": "2026-04-24T04:59:26.896Z",
+    "candidateSetups": 6763,
+    "candlesFetched": {
+      "15m": 35052,
+      "1h": 8772
+    }
+  },
+  "searchSpace": {
+    "stopModes": [
+      "atr_only",
+      "structure_atr"
+    ],
+    "lookbacks15": [
+      6,
+      8,
+      10
+    ],
+    "lookbacks1h": [
+      2,
+      3,
+      4
+    ],
+    "pads": [
+      0.04,
+      0.08,
+      0.12
+    ],
+    "atrStopMults": [
+      1,
+      1.15,
+      1.3,
+      1.45
+    ],
+    "minStops": [
+      0.35,
+      0.45,
+      0.55
+    ],
+    "rrResumeList": [
+      1.3,
+      1.5,
+      1.7,
+      1.9,
+      2.1
+    ],
+    "rrSqueezeList": [
+      1,
+      1.15,
+      1.3,
+      1.45,
+      1.6
+    ],
+    "atrFloorResumeList": [
+      1.6,
+      2,
+      2.4
+    ],
+    "atrFloorSqueezeList": [
+      1.2,
+      1.5,
+      1.8
+    ],
+    "maxHoldList": [
+      12,
+      16,
+      20,
+      24,
+      32
+    ]
+  },
+  "totalCombos": 378000,
+  "bestByNet": {
+    "cfg": {
+      "stopMode": "structure_atr",
+      "lookback15": 6,
+      "lookback1h": 4,
+      "padPct": 0.12,
+      "atrStopMult": 1.3,
+      "minStopPct": 0.55,
+      "maxStopPct": 2.8,
+      "rrResume": 1.3,
+      "rrSqueeze": 1.6,
+      "atrFloorResume": 1.6,
+      "atrFloorSqueeze": 1.2,
+      "maxHoldBars15m": 12
+    },
+    "summary": {
+      "trades": 922,
+      "wins": 162,
+      "losses": 72,
+      "timeouts": 688,
+      "winRate": 17.57,
+      "netPct": 141.95,
+      "avgNetPct": 0.154,
+      "avgHoldBars": 10.5,
+      "profitFactor": 1.69,
+      "avgStopPct": 1.213,
+      "avgTargetPct": 1.74
+    },
+    "breakdown": {
+      "TREND_RESUME": {
+        "trades": 388,
+        "wins": 64,
+        "losses": 34,
+        "timeouts": 290,
+        "winRate": 16.49,
+        "netPct": 56.36,
+        "avgNetPct": 0.145,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.51,
+        "avgStopPct": 1.588,
+        "avgTargetPct": 2.064
+      },
+      "SQUEEZE": {
+        "trades": 534,
+        "wins": 98,
+        "losses": 38,
+        "timeouts": 398,
+        "winRate": 18.35,
+        "netPct": 85.59,
+        "avgNetPct": 0.16,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.89,
+        "avgStopPct": 0.94,
+        "avgTargetPct": 1.505
+      }
+    },
+    "score": 184.2
+  },
+  "bestByScore": {
+    "cfg": {
+      "stopMode": "structure_atr",
+      "lookback15": 6,
+      "lookback1h": 4,
+      "padPct": 0.12,
+      "atrStopMult": 1.3,
+      "minStopPct": 0.55,
+      "maxStopPct": 2.8,
+      "rrResume": 1.3,
+      "rrSqueeze": 1.6,
+      "atrFloorResume": 1.6,
+      "atrFloorSqueeze": 1.2,
+      "maxHoldBars15m": 12
+    },
+    "summary": {
+      "trades": 922,
+      "wins": 162,
+      "losses": 72,
+      "timeouts": 688,
+      "winRate": 17.57,
+      "netPct": 141.95,
+      "avgNetPct": 0.154,
+      "avgHoldBars": 10.5,
+      "profitFactor": 1.69,
+      "avgStopPct": 1.213,
+      "avgTargetPct": 1.74
+    },
+    "breakdown": {
+      "TREND_RESUME": {
+        "trades": 388,
+        "wins": 64,
+        "losses": 34,
+        "timeouts": 290,
+        "winRate": 16.49,
+        "netPct": 56.36,
+        "avgNetPct": 0.145,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.51,
+        "avgStopPct": 1.588,
+        "avgTargetPct": 2.064
+      },
+      "SQUEEZE": {
+        "trades": 534,
+        "wins": 98,
+        "losses": 38,
+        "timeouts": 398,
+        "winRate": 18.35,
+        "netPct": 85.59,
+        "avgNetPct": 0.16,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.89,
+        "avgStopPct": 0.94,
+        "avgTargetPct": 1.505
+      }
+    },
+    "score": 184.2
+  },
+  "bestByProfitFactor": {
+    "cfg": {
+      "stopMode": "structure_atr",
+      "lookback15": 6,
+      "lookback1h": 4,
+      "padPct": 0.08,
+      "atrStopMult": 1,
+      "minStopPct": 0.55,
+      "maxStopPct": 2.8,
+      "rrResume": 1.5,
+      "rrSqueeze": 1.6,
+      "atrFloorResume": 2,
+      "atrFloorSqueeze": 1.2,
+      "maxHoldBars15m": 20
+    },
+    "summary": {
+      "trades": 689,
+      "wins": 166,
+      "losses": 104,
+      "timeouts": 419,
+      "winRate": 24.09,
+      "netPct": 134.89,
+      "avgNetPct": 0.196,
+      "avgHoldBars": 15.9,
+      "profitFactor": 1.7,
+      "avgStopPct": 1.154,
+      "avgTargetPct": 1.791
+    },
+    "breakdown": {
+      "TREND_RESUME": {
+        "trades": 272,
+        "wins": 61,
+        "losses": 45,
+        "timeouts": 166,
+        "winRate": 22.43,
+        "netPct": 57.6,
+        "avgNetPct": 0.212,
+        "avgHoldBars": 16.1,
+        "profitFactor": 1.57,
+        "avgStopPct": 1.519,
+        "avgTargetPct": 2.289
+      },
+      "SQUEEZE": {
+        "trades": 417,
+        "wins": 105,
+        "losses": 59,
+        "timeouts": 253,
+        "winRate": 25.18,
+        "netPct": 77.29,
+        "avgNetPct": 0.185,
+        "avgHoldBars": 15.7,
+        "profitFactor": 1.85,
+        "avgStopPct": 0.916,
+        "avgTargetPct": 1.465
+      }
+    },
+    "score": 177.39
+  },
+  "topByNet": [
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 140.96,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.215,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 56.41,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.592,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 182.96
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 140.96,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.215,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 56.41,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.592,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 182.96
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 140.96,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.215,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 56.41,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.592,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 182.96
+    }
+  ],
+  "topByScore": [
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 162,
+        "losses": 72,
+        "timeouts": 688,
+        "winRate": 17.57,
+        "netPct": 141.95,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.69,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.74
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 64,
+          "losses": 34,
+          "timeouts": 290,
+          "winRate": 16.49,
+          "netPct": 56.36,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.588,
+          "avgTargetPct": 2.064
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 85.59,
+          "avgNetPct": 0.16,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.89,
+          "avgStopPct": 0.94,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 184.2
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.3,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 141.55,
+        "avgNetPct": 0.154,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.213,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 57,
+          "avgNetPct": 0.147,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.587,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.55
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 73,
+        "timeouts": 689,
+        "winRate": 17.35,
+        "netPct": 141.34,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.5,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.211,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 35,
+          "timeouts": 291,
+          "winRate": 15.98,
+          "netPct": 56.78,
+          "avgNetPct": 0.146,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.52,
+          "avgStopPct": 1.582,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 183.34
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 140.96,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.215,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 56.41,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.592,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 182.96
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 140.96,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.215,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 56.41,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.592,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 182.96
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.12,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.3,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 12
+      },
+      "summary": {
+        "trades": 922,
+        "wins": 160,
+        "losses": 72,
+        "timeouts": 690,
+        "winRate": 17.35,
+        "netPct": 140.96,
+        "avgNetPct": 0.153,
+        "avgHoldBars": 10.6,
+        "profitFactor": 1.68,
+        "avgStopPct": 1.215,
+        "avgTargetPct": 1.745
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 388,
+          "wins": 62,
+          "losses": 34,
+          "timeouts": 292,
+          "winRate": 15.98,
+          "netPct": 56.41,
+          "avgNetPct": 0.145,
+          "avgHoldBars": 10.6,
+          "profitFactor": 1.51,
+          "avgStopPct": 1.592,
+          "avgTargetPct": 2.077
+        },
+        "SQUEEZE": {
+          "trades": 534,
+          "wins": 98,
+          "losses": 38,
+          "timeouts": 398,
+          "winRate": 18.35,
+          "netPct": 84.56,
+          "avgNetPct": 0.158,
+          "avgHoldBars": 10.5,
+          "profitFactor": 1.87,
+          "avgStopPct": 0.941,
+          "avgTargetPct": 1.505
+        }
+      },
+      "score": 182.96
+    }
+  ],
+  "topByProfitFactor": [
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.89,
+        "avgNetPct": 0.196,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.154,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.6,
+          "avgNetPct": 0.212,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.519,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.39
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.15,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 689,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 419,
+        "winRate": 24.09,
+        "netPct": 134.61,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.155,
+        "avgTargetPct": 1.791
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 57.32,
+          "avgNetPct": 0.211,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.57,
+          "avgStopPct": 1.521,
+          "avgTargetPct": 2.289
+        },
+        "SQUEEZE": {
+          "trades": 417,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 253,
+          "winRate": 25.18,
+          "netPct": 77.29,
+          "avgNetPct": 0.185,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.85,
+          "avgStopPct": 0.916,
+          "avgTargetPct": 1.465
+        }
+      },
+      "score": 177.11
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.5,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 1.6,
+        "atrFloorSqueeze": 1.8,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 6,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 8,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    },
+    {
+      "cfg": {
+        "stopMode": "structure_atr",
+        "lookback15": 10,
+        "lookback1h": 4,
+        "padPct": 0.08,
+        "atrStopMult": 1.45,
+        "minStopPct": 0.55,
+        "maxStopPct": 2.8,
+        "rrResume": 1.5,
+        "rrSqueeze": 1.6,
+        "atrFloorResume": 2,
+        "atrFloorSqueeze": 1.2,
+        "maxHoldBars15m": 20
+      },
+      "summary": {
+        "trades": 688,
+        "wins": 166,
+        "losses": 104,
+        "timeouts": 418,
+        "winRate": 24.13,
+        "netPct": 134.4,
+        "avgNetPct": 0.195,
+        "avgHoldBars": 15.9,
+        "profitFactor": 1.7,
+        "avgStopPct": 1.158,
+        "avgTargetPct": 1.793
+      },
+      "breakdown": {
+        "TREND_RESUME": {
+          "trades": 272,
+          "wins": 61,
+          "losses": 45,
+          "timeouts": 166,
+          "winRate": 22.43,
+          "netPct": 56.76,
+          "avgNetPct": 0.209,
+          "avgHoldBars": 16.1,
+          "profitFactor": 1.56,
+          "avgStopPct": 1.531,
+          "avgTargetPct": 2.296
+        },
+        "SQUEEZE": {
+          "trades": 416,
+          "wins": 105,
+          "losses": 59,
+          "timeouts": 252,
+          "winRate": 25.24,
+          "netPct": 77.64,
+          "avgNetPct": 0.187,
+          "avgHoldBars": 15.7,
+          "profitFactor": 1.86,
+          "avgStopPct": 0.915,
+          "avgTargetPct": 1.463
+        }
+      },
+      "score": 176.9
+    }
+  ]
+}

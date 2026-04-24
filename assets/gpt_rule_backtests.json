@@ -1,0 +1,251 @@
+{
+  "ruleId": "gpt-long-1h-stoch-support-4h-sr-sl-compare-3y",
+  "generatedAt": "2026-04-24T04:14:23.654Z",
+  "assumptions": {
+    "period": "3 years",
+    "dateRange": {
+      "from": "2023-04-25T04:14:14.776Z",
+      "to": "2026-04-24T04:14:14.776Z"
+    },
+    "entry": "1h StochRSI K < 95 and price touches/is near 4h support",
+    "takeProfit": "near 4h resistance OR 1h StochRSI K > 90",
+    "modes": {
+      "fixed_1pct": "SL fixed 1%",
+      "atr_1p2": "SL = 1.2 * ATR1h",
+      "support4h_atr_buffer": "SL = max(distance to 4h support + 0.15*ATR1h, 1.0*ATR1h), clamped"
+    },
+    "maxHoldBars1h": 8,
+    "feePctPerSide": 0.05
+  },
+  "sample": {
+    "candles1h": 26310,
+    "candles4h": 6600,
+    "candidateSetups": 1044
+  },
+  "comparison": {
+    "fixed_1pct": {
+      "trades": 574,
+      "wins": 176,
+      "losses": 219,
+      "timeouts": 179,
+      "winRate": 30.66,
+      "netPct": 53.69,
+      "avgNetPct": 0.094,
+      "avgHoldBars": 5.2,
+      "profitFactor": 1.21,
+      "avgStopPct": 1
+    },
+    "atr_1p2": {
+      "trades": 595,
+      "wins": 181,
+      "losses": 242,
+      "timeouts": 172,
+      "winRate": 30.42,
+      "netPct": 66.67,
+      "avgNetPct": 0.112,
+      "avgHoldBars": 5.1,
+      "profitFactor": 1.26,
+      "avgStopPct": 0.941
+    },
+    "support4h_atr_buffer": {
+      "trades": 593,
+      "wins": 186,
+      "losses": 228,
+      "timeouts": 179,
+      "winRate": 31.37,
+      "netPct": 68.6,
+      "avgNetPct": 0.116,
+      "avgHoldBars": 5.3,
+      "profitFactor": 1.27,
+      "avgStopPct": 1.023
+    }
+  },
+  "recentTradesByMode": {
+    "fixed_1pct": [
+      {
+        "mode": "fixed_1pct",
+        "entryTime": 1775134800000,
+        "entryPrice": 66270.87,
+        "exitTime": 1775145600000,
+        "exitPrice": 67095.85,
+        "holdBars": 3,
+        "outcome": "WIN",
+        "stopPct": 1,
+        "rawPct": 1.2448606755879477,
+        "netPct": 1.1448606755879476
+      },
+      {
+        "mode": "fixed_1pct",
+        "entryTime": 1776006000000,
+        "entryPrice": 70892.03,
+        "exitTime": 1776020400000,
+        "exitPrice": 71084.18,
+        "holdBars": 4,
+        "outcome": "WIN",
+        "stopPct": 1,
+        "rawPct": 0.27104598358940235,
+        "netPct": 0.17104598358940235
+      },
+      {
+        "mode": "fixed_1pct",
+        "entryTime": 1776031200000,
+        "entryPrice": 70912.73,
+        "exitTime": 1776045600000,
+        "exitPrice": 71073.14,
+        "holdBars": 4,
+        "outcome": "WIN",
+        "stopPct": 1,
+        "rawPct": 0.22620762167808728,
+        "netPct": 0.12620762167808727
+      },
+      {
+        "mode": "fixed_1pct",
+        "entryTime": 1776067200000,
+        "entryPrice": 70680.7,
+        "exitTime": 1776085200000,
+        "exitPrice": 71662.65,
+        "holdBars": 5,
+        "outcome": "WIN",
+        "stopPct": 1,
+        "rawPct": 1.3892759975495392,
+        "netPct": 1.2892759975495391
+      },
+      {
+        "mode": "fixed_1pct",
+        "entryTime": 1776636000000,
+        "entryPrice": 74047.34,
+        "exitTime": 1776664800000,
+        "exitPrice": 74786.59,
+        "holdBars": 8,
+        "outcome": "TIMEOUT",
+        "stopPct": 1,
+        "rawPct": 0.9983478137094459,
+        "netPct": 0.8983478137094459
+      }
+    ],
+    "atr_1p2": [
+      {
+        "mode": "atr_1p2",
+        "entryTime": 1775134800000,
+        "entryPrice": 66270.87,
+        "exitTime": 1775145600000,
+        "exitPrice": 67095.85,
+        "holdBars": 3,
+        "outcome": "WIN",
+        "stopPct": 0.819,
+        "rawPct": 1.2448606755879477,
+        "netPct": 1.1448606755879476
+      },
+      {
+        "mode": "atr_1p2",
+        "entryTime": 1776006000000,
+        "entryPrice": 70892.03,
+        "exitTime": 1776020400000,
+        "exitPrice": 71084.18,
+        "holdBars": 4,
+        "outcome": "WIN",
+        "stopPct": 0.645,
+        "rawPct": 0.27104598358940235,
+        "netPct": 0.17104598358940235
+      },
+      {
+        "mode": "atr_1p2",
+        "entryTime": 1776031200000,
+        "entryPrice": 70912.73,
+        "exitTime": 1776045600000,
+        "exitPrice": 71073.14,
+        "holdBars": 4,
+        "outcome": "WIN",
+        "stopPct": 0.514,
+        "rawPct": 0.22620762167808728,
+        "netPct": 0.12620762167808727
+      },
+      {
+        "mode": "atr_1p2",
+        "entryTime": 1776067200000,
+        "entryPrice": 70680.7,
+        "exitTime": 1776085200000,
+        "exitPrice": 71662.65,
+        "holdBars": 5,
+        "outcome": "WIN",
+        "stopPct": 0.55,
+        "rawPct": 1.3892759975495392,
+        "netPct": 1.2892759975495391
+      },
+      {
+        "mode": "atr_1p2",
+        "entryTime": 1776636000000,
+        "entryPrice": 74047.34,
+        "exitTime": 1776664800000,
+        "exitPrice": 74786.59,
+        "holdBars": 8,
+        "outcome": "TIMEOUT",
+        "stopPct": 0.709,
+        "rawPct": 0.9983478137094459,
+        "netPct": 0.8983478137094459
+      }
+    ],
+    "support4h_atr_buffer": [
+      {
+        "mode": "support4h_atr_buffer",
+        "entryTime": 1775134800000,
+        "entryPrice": 66270.87,
+        "exitTime": 1775145600000,
+        "exitPrice": 67095.85,
+        "holdBars": 3,
+        "outcome": "WIN",
+        "stopPct": 0.945,
+        "rawPct": 1.2448606755879477,
+        "netPct": 1.1448606755879476
+      },
+      {
+        "mode": "support4h_atr_buffer",
+        "entryTime": 1776006000000,
+        "entryPrice": 70892.03,
+        "exitTime": 1776020400000,
+        "exitPrice": 71084.18,
+        "holdBars": 4,
+        "outcome": "WIN",
+        "stopPct": 0.602,
+        "rawPct": 0.27104598358940235,
+        "netPct": 0.17104598358940235
+      },
+      {
+        "mode": "support4h_atr_buffer",
+        "entryTime": 1776031200000,
+        "entryPrice": 70912.73,
+        "exitTime": 1776045600000,
+        "exitPrice": 71073.14,
+        "holdBars": 4,
+        "outcome": "WIN",
+        "stopPct": 0.638,
+        "rawPct": 0.22620762167808728,
+        "netPct": 0.12620762167808727
+      },
+      {
+        "mode": "support4h_atr_buffer",
+        "entryTime": 1776067200000,
+        "entryPrice": 70680.7,
+        "exitTime": 1776085200000,
+        "exitPrice": 71662.65,
+        "holdBars": 5,
+        "outcome": "WIN",
+        "stopPct": 0.6,
+        "rawPct": 1.3892759975495392,
+        "netPct": 1.2892759975495391
+      },
+      {
+        "mode": "support4h_atr_buffer",
+        "entryTime": 1776636000000,
+        "entryPrice": 74047.34,
+        "exitTime": 1776664800000,
+        "exitPrice": 74786.59,
+        "holdBars": 8,
+        "outcome": "TIMEOUT",
+        "stopPct": 0.6,
+        "rawPct": 0.9983478137094459,
+        "netPct": 0.8983478137094459
+      }
+    ]
+  }
+}
