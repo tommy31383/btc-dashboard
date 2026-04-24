@@ -14,7 +14,7 @@ import { P } from "../utils/v2Theme";
 import {
   All15mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE, NOTIONAL,
-  TP_PCT, SL_PCT, STOCH_OS_LEVEL, PENDING_TIMEOUT_MS, FEE_PER_TRADE,
+  TP_PCT, SL_PCT, STOCH_OS_LEVEL, PENDING_TIMEOUT_MS, FEE_PER_TRADE, FEE_PER_SIDE,
 } from "../utils/all15mAccount";
 
 interface Props {
@@ -92,7 +92,8 @@ export default function All15mPanel({ account, summary, currentPrice, stoch5mK, 
   const closedAll = account.positions.filter((p) => p.status === "WIN" || p.status === "LOSS");
   const closed = filter === "ALL" ? closedAll : closedAll.filter((p) => p.status === filter);
 
-  // Unrealized PnL từ open positions
+  // Unrealized NET PnL từ open positions (đã trừ exit fee chưa thanh toán;
+  // entry fee đã trừ khỏi capital lúc fill rồi).
   const unrealized = useMemo(() => {
     if (currentPrice === null) return 0;
     let s = 0;
@@ -101,7 +102,7 @@ export default function All15mPanel({ account, summary, currentPrice, stoch5mK, 
       const pct = (currentPrice - p.entryPrice) / p.entryPrice * 100;
       let pnl = MARGIN_PER_TRADE * pct * LEVERAGE / 100;
       if (pnl < -MARGIN_PER_TRADE) pnl = -MARGIN_PER_TRADE;
-      s += pnl;
+      s += pnl - FEE_PER_SIDE;
     }
     return s;
   }, [open, currentPrice]);
@@ -169,9 +170,11 @@ export default function All15mPanel({ account, summary, currentPrice, stoch5mK, 
               const upnlPct = currentPrice !== null
                 ? (currentPrice - p.entryPrice) / p.entryPrice * 100 * LEVERAGE
                 : 0;
-              const upnlUsd = currentPrice !== null
+              const grossUsd = currentPrice !== null
                 ? Math.max(-MARGIN_PER_TRADE, MARGIN_PER_TRADE * (currentPrice - p.entryPrice) / p.entryPrice * LEVERAGE)
                 : 0;
+              // NET = gross − exit fee (entry fee đã trừ rồi)
+              const upnlUsd = grossUsd - FEE_PER_SIDE;
               const color = upnlUsd >= 0 ? P.green : P.error;
               return (
                 <View key={p.id} style={styles.row}>
@@ -180,6 +183,7 @@ export default function All15mPanel({ account, summary, currentPrice, stoch5mK, 
                   <Text style={[styles.cellW, { color: P.text }]}>${p.entryPrice.toFixed(0)}</Text>
                   <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice!.toFixed(0)}</Text>
                   <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice!.toFixed(0)}</Text>
+                  <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>fee -${(p.entryFeeUsd ?? FEE_PER_SIDE).toFixed(2)}</Text>
                   <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
                   <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
                 </View>
@@ -209,7 +213,8 @@ export default function All15mPanel({ account, summary, currentPrice, stoch5mK, 
                   <Text style={[styles.cellNarrow, { color, fontWeight: "700" }]}>{p.status}</Text>
                   <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>{p.entryMode === "stoch_dep" ? "stoch" : "force"}</Text>
                   <Text style={[styles.cellW, { color: P.text }]}>${p.entryPrice!.toFixed(0)} → ${p.exitPrice!.toFixed(0)}</Text>
-                  <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(p.pnlUsd!, true)}</Text>
+                  <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>fee -${(((p.entryFeeUsd ?? FEE_PER_SIDE) + (p.exitFeeUsd ?? FEE_PER_SIDE))).toFixed(2)}</Text>
+                  <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(p.pnlNetUsd ?? p.pnlUsd!, true)}</Text>
                 </View>
               );
             })}

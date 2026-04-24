@@ -25,7 +25,8 @@ export const SL_PCT = 2;
 export const PENDING_TIMEOUT_MS = 7 * 60 * 1000; // 7 phút
 export const STOCH_OS_LEVEL = 20;
 export const FEE_PER_SIDE_PCT = 0.05;
-export const FEE_PER_TRADE = NOTIONAL * (FEE_PER_SIDE_PCT / 100) * 2; // = 3 USD/lệnh
+export const FEE_PER_SIDE = NOTIONAL * (FEE_PER_SIDE_PCT / 100); // = 1.5 USD/side
+export const FEE_PER_TRADE = FEE_PER_SIDE * 2;                   // = 3 USD/lệnh (entry + exit)
 
 export type EntryMode = "stoch_dep" | "force_timeout";
 export type Outcome = "PENDING" | "OPEN" | "WIN" | "LOSS";
@@ -44,10 +45,13 @@ export interface Position {
   entryMode?: EntryMode;
   tpPrice?: number;
   slPrice?: number;
+  entryFeeUsd?: number;       // trừ ngay khi fill (1 side)
   // Closed
   exitPrice?: number;
   exitMs?: number;
-  pnlUsd?: number;
+  exitFeeUsd?: number;        // trừ khi close (1 side)
+  pnlUsd?: number;            // pnl GROSS (chưa trừ fee)
+  pnlNetUsd?: number;         // pnl NET = gross − entryFee − exitFee
 }
 
 export interface AccountStats {
@@ -138,6 +142,7 @@ function fillPosition(pos: Position, fillPrice: number, mode: EntryMode, nowMs: 
   pos.entryMode = mode;
   pos.tpPrice = fillPrice * (1 + TP_PCT / 100);
   pos.slPrice = fillPrice * (1 - SL_PCT / 100);
+  pos.entryFeeUsd = FEE_PER_SIDE;
 }
 
 /** Process pending: fill nếu (5m K < 20) hoặc deadline. Return số lệnh đã fill. */
@@ -152,7 +157,15 @@ export async function processPending(currentPrice: number, stoch5mK: number | nu
     if (stochOk) { fillPosition(p, currentPrice, "stoch_dep", now); filled++; }
     else if (expired) { fillPosition(p, currentPrice, "force_timeout", now); filled++; }
   }
-  if (filled > 0) await saveAccount(acc);
+  if (filled > 0) {
+    // Trừ entry fee NGAY khi mở lệnh (như sàn thật)
+    const totalEntryFee = filled * FEE_PER_SIDE;
+    acc.capital -= totalEntryFee;
+    acc.stats.totalFeeUsd += totalEntryFee;
+    acc.equityHistory.push({ t: Date.now(), equity: acc.capital });
+    if (acc.equityHistory.length > 1000) acc.equityHistory = acc.equityHistory.slice(-1000);
+    await saveAccount(acc);
+  }
   return filled;
 }
 
@@ -170,20 +183,25 @@ export async function processOpen(currentPrice: number): Promise<number> {
     if (!outcome) continue;
 
     const rawPct = ((exitPrice - p.entryPrice) / p.entryPrice) * 100;
-    let pnlUsd = MARGIN_PER_TRADE * rawPct * LEVERAGE / 100;
-    if (pnlUsd < -MARGIN_PER_TRADE) pnlUsd = -MARGIN_PER_TRADE;
-    pnlUsd -= FEE_PER_TRADE;
+    let grossPnl = MARGIN_PER_TRADE * rawPct * LEVERAGE / 100;
+    if (grossPnl < -MARGIN_PER_TRADE) grossPnl = -MARGIN_PER_TRADE;
+    const exitFee = FEE_PER_SIDE;
+    const entryFee = p.entryFeeUsd ?? FEE_PER_SIDE;
+    const netPnl = grossPnl - entryFee - exitFee;
 
     p.status = outcome;
     p.exitPrice = exitPrice;
     p.exitMs = now;
-    p.pnlUsd = pnlUsd;
+    p.exitFeeUsd = exitFee;
+    p.pnlUsd = grossPnl;
+    p.pnlNetUsd = netPnl;
 
-    acc.capital += pnlUsd;
+    // Capital đã trừ entryFee lúc fill — giờ chỉ +grossPnl − exitFee
+    acc.capital += grossPnl - exitFee;
     acc.stats.totalClosed++;
     if (outcome === "WIN") acc.stats.wins++; else acc.stats.losses++;
-    acc.stats.totalPnlUsd += pnlUsd;
-    acc.stats.totalFeeUsd += FEE_PER_TRADE;
+    acc.stats.totalPnlUsd += netPnl;
+    acc.stats.totalFeeUsd += exitFee;
     acc.equityHistory.push({ t: now, equity: acc.capital });
     closed++;
   }
