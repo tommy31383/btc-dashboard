@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T09:45:31.846Z",
+  "generated_at": "2026-04-24T10:02:12.020Z",
   "data_source": "Binance BTCUSDT (REST /klines) + scan-tpsl with fees + inject-feature-rules-v3.ts iter3 FINAL",
   "tfs": {
     "5m": {
@@ -12,406 +12,7 @@
         "first": 72204,
         "last": 73855
       },
-      "rules": [
-        {
-          "rank": 1,
-          "source": "VERIFIED",
-          "config": {
-            "leverage": 100,
-            "targetPct": 1,
-            "stopPct": 0.5,
-            "maxHoldBars": 100,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "divergence",
-              "macdCross"
-            ],
-            "disabled": false,
-            "revivedAt": "2026-04-24T09:21:35.962Z",
-            "revivedNote": "enable-safe-rules: n=433 WR=34.1% PF=1.36 (source=stored)"
-          },
-          "stats": {
-            "winRate": 34.1,
-            "profitFactor": 1.36,
-            "trades": 433,
-            "avgWinPct": 100,
-            "avgLossPct": -50,
-            "avgHoldBars": 0,
-            "wins": 143,
-            "losses": 211,
-            "timeouts": 79,
-            "grossPnL": 3750,
-            "feeCost": 1732,
-            "netPnL": 346,
-            "side": "SHORT",
-            "deadAt": "2026-04-22T11:15:16.911Z",
-            "bestAttempt": {
-              "tp": 1,
-              "sl": 0.5,
-              "wr": 29.5,
-              "net": -1888
-            }
-          }
-        },
-        {
-          "rank": 2,
-          "source": "VERIFIED",
-          "config": {
-            "leverage": 100,
-            "targetPct": 2,
-            "stopPct": 1,
-            "maxHoldBars": 100,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "rsiExtreme",
-              "macdCross"
-            ],
-            "disabled": true
-          },
-          "stats": {
-            "winRate": 47.1,
-            "profitFactor": 1.78,
-            "trades": 30,
-            "avgWinPct": 200,
-            "avgLossPct": -100,
-            "avgHoldBars": 0,
-            "wins": 8,
-            "losses": 9,
-            "timeouts": 13,
-            "grossPnL": 700,
-            "feeCost": 120,
-            "netPnL": 580,
-            "side": "SHORT",
-            "needsReview": true,
-            "improvedSuggestion": {
-              "tp": 2,
-              "sl": 2,
-              "wr": 21.6,
-              "net": 792
-            }
-          }
-        },
-        {
-          "rank": 3,
-          "source": "VERIFIED",
-          "config": {
-            "leverage": 100,
-            "targetPct": 1,
-            "stopPct": 0.5,
-            "maxHoldBars": 100,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "stochExtreme",
-              "macdCross"
-            ]
-          },
-          "stats": {
-            "winRate": 40.2,
-            "profitFactor": 1.34,
-            "trades": 116,
-            "avgWinPct": 100,
-            "avgLossPct": -50,
-            "avgHoldBars": 0,
-            "wins": 39,
-            "losses": 58,
-            "timeouts": 19,
-            "grossPnL": 1000,
-            "feeCost": 464,
-            "netPnL": 536,
-            "side": "LONG",
-            "needsReview": true,
-            "improvedSuggestion": {
-              "tp": 1,
-              "sl": 1,
-              "wr": 37.6,
-              "net": 528
-            }
-          }
-        },
-        {
-          "rank": 4,
-          "source": "VERIFIED",
-          "config": {
-            "leverage": 100,
-            "targetPct": 5,
-            "stopPct": 3,
-            "maxHoldBars": 100,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "stochExtreme",
-              "rsiExtreme"
-            ],
-            "disabled": false,
-            "revivedAt": "2026-04-24T09:21:35.962Z",
-            "revivedNote": "enable-safe-rules: n=56 WR=100% PF=999 (source=stored)"
-          },
-          "stats": {
-            "winRate": 100,
-            "profitFactor": 999,
-            "trades": 56,
-            "avgWinPct": 500,
-            "avgLossPct": -300,
-            "avgHoldBars": 0,
-            "wins": 1,
-            "losses": 0,
-            "timeouts": 55,
-            "grossPnL": 500,
-            "feeCost": 224,
-            "netPnL": 276,
-            "side": "LONG",
-            "needsReview": true,
-            "improvedSuggestion": {
-              "tp": 1.5,
-              "sl": 1.5,
-              "wr": 28.3,
-              "net": 870
-            }
-          }
-        },
-        {
-          "rank": 5,
-          "source": "GA",
-          "config": {
-            "leverage": 100,
-            "targetPct": 0.76,
-            "stopPct": 0.35,
-            "maxHoldBars": 50,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 80,
-            "rsiOSLevel": 20,
-            "requiredConditions": [],
-            "weights": {
-              "stochExtreme": 1,
-              "rsiExtreme": 1,
-              "divergence": 0,
-              "bollingerTouch": 1,
-              "macdCross": 3
-            },
-            "minWeightedScore": 4,
-            "disabled": true
-          },
-          "stats": {
-            "winRate": 46.2,
-            "profitFactor": 2.61,
-            "trades": 13,
-            "avgWinPct": 76,
-            "avgLossPct": 35,
-            "avgHoldBars": 19,
-            "wins": 6,
-            "losses": 5,
-            "timeouts": 2,
-            "needsReview": true,
-            "improvedSuggestion": {
-              "tp": 1.5,
-              "sl": 1.5,
-              "wr": 12.3,
-              "net": -19866
-            },
-            "flippedAt": "2026-04-22T12:29:51.040Z",
-            "flippedTo": {
-              "rank": null,
-              "side": "SHORT",
-              "reason": "loss_gt_70_flipped"
-            }
-          }
-        },
-        {
-          "rank": 6,
-          "source": "GA",
-          "config": {
-            "leverage": 100,
-            "targetPct": 0.76,
-            "stopPct": 0.35,
-            "maxHoldBars": 50,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 80,
-            "rsiOSLevel": 20,
-            "requiredConditions": [],
-            "weights": {
-              "stochExtreme": 1,
-              "rsiExtreme": 1,
-              "divergence": 2,
-              "bollingerTouch": 1,
-              "macdCross": 3
-            },
-            "minWeightedScore": 4,
-            "disabled": true
-          },
-          "stats": {
-            "winRate": 40,
-            "profitFactor": 1.86,
-            "trades": 15,
-            "avgWinPct": 76,
-            "avgLossPct": 35,
-            "avgHoldBars": 16.7,
-            "wins": 6,
-            "losses": 7,
-            "timeouts": 2,
-            "needsReview": true,
-            "improvedSuggestion": {
-              "tp": 1.5,
-              "sl": 1.5,
-              "wr": 12.3,
-              "net": -19866
-            }
-          }
-        },
-        {
-          "rank": 7,
-          "source": "VERIFIED",
-          "config": {
-            "leverage": 100,
-            "targetPct": 5,
-            "stopPct": 3,
-            "maxHoldBars": 100,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "stochExtreme",
-              "bollingerTouch"
-            ],
-            "disabled": false,
-            "revivedAt": "2026-04-24T09:21:35.962Z",
-            "revivedNote": "enable-safe-rules: n=236 WR=50% PF=1.67 (source=stored)"
-          },
-          "stats": {
-            "winRate": 50,
-            "profitFactor": 1.67,
-            "trades": 236,
-            "avgWinPct": 500,
-            "avgLossPct": -300,
-            "avgHoldBars": 0,
-            "wins": 5,
-            "losses": 5,
-            "timeouts": 226,
-            "grossPnL": 1000,
-            "feeCost": 944,
-            "netPnL": 56,
-            "side": "LONG",
-            "needsReview": true,
-            "improvedSuggestion": {
-              "tp": 2,
-              "sl": 2,
-              "wr": 14.2,
-              "net": 1176
-            }
-          }
-        },
-        {
-          "rank": 8,
-          "source": "VERIFIED",
-          "config": {
-            "leverage": 100,
-            "targetPct": 1,
-            "stopPct": 0.5,
-            "maxHoldBars": 100,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "divergence"
-            ],
-            "disabled": true
-          },
-          "stats": {
-            "winRate": 29.6,
-            "profitFactor": 1.16,
-            "trades": 788,
-            "avgWinPct": 100,
-            "avgLossPct": -50,
-            "avgHoldBars": 0,
-            "wins": 232,
-            "losses": 400,
-            "timeouts": 156,
-            "grossPnL": 3200,
-            "feeCost": 3152,
-            "netPnL": -4194,
-            "side": "SHORT",
-            "deadAt": "2026-04-22T11:15:16.911Z",
-            "bestAttempt": {
-              "tp": 1,
-              "sl": 0.5,
-              "wr": 26.8,
-              "net": -5768
-            }
-          }
-        },
-        {
-          "rank": 9,
-          "source": "flipped-from-5m-rank5",
-          "label": "[FLIPPED] LONG→SHORT LONG rank5",
-          "config": {
-            "leverage": 100,
-            "targetPct": 0.5,
-            "stopPct": 7,
-            "maxHoldBars": 50,
-            "minScore": 1,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 80,
-            "rsiOSLevel": 20,
-            "requiredConditions": [],
-            "weights": {
-              "stochExtreme": 1,
-              "rsiExtreme": 1,
-              "divergence": 0,
-              "bollingerTouch": 1,
-              "macdCross": 3
-            },
-            "minWeightedScore": 4,
-            "disabled": false,
-            "forceSide": "SHORT",
-            "revivedAt": "2026-04-24T09:21:35.962Z",
-            "revivedNote": "enable-safe-rules: n=6325 WR=49.1% PF=999 (source=stored)"
-          },
-          "stats": {
-            "side": "SHORT",
-            "trades": 6325,
-            "wins": 3106,
-            "losses": 3219,
-            "winRate": 49.1,
-            "netPnL": 104750,
-            "profitFactor": 999,
-            "verified": true,
-            "source": "flip-grid-search-2.3Y-fullgrid",
-            "flippedFrom": {
-              "tfKey": "5m",
-              "rank": 5,
-              "origSide": "LONG",
-              "origWR": 25.5
-            },
-            "tier": "BRONZE",
-            "injectedAt": "2026-04-22T12:29:51.040Z",
-            "disabledAt": "2026-04-22T12:30:01.040Z",
-            "disabledReason": "post-flip-review: edge âm hoặc overfit"
-          }
-        }
-      ]
+      "rules": []
     },
     "15m": {
       "interval": "15m",
@@ -470,8 +71,8 @@
             },
             "avgHold": 55.1,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44% · NET +46700%",
           "compositeScore": 46700
@@ -519,8 +120,8 @@
             "rescueSource": "grid-search-2.3Y",
             "avgHold": 49.9,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +42330%",
           "compositeScore": 42330
@@ -568,8 +169,8 @@
             "rescueSource": "grid-search-2.3Y",
             "avgHold": 47.8,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 44.9% · NET +39450%",
           "compositeScore": 39450
@@ -595,7 +196,6 @@
               "mode": "both_match",
               "label": "cả 1h + 4h cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -622,8 +222,8 @@
             "dedupeReason": "dup-of-rank-8",
             "avgHold": 47.8,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.3% · NET +38250%",
           "compositeScore": 38250
@@ -649,7 +249,6 @@
               "mode": "far_match",
               "label": "4h cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -676,8 +275,8 @@
             "dedupeReason": "dup-of-rank-7",
             "avgHold": 49.9,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.3% · NET +35880%",
           "compositeScore": 35880
@@ -725,8 +324,8 @@
             "rescueSource": "grid-search-2.3Y",
             "avgHold": 50.9,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +34460%",
           "compositeScore": 34460
@@ -752,7 +351,6 @@
               "mode": "near_match",
               "label": "1h cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T09:21:35.962Z",
             "revivedNote": "enable-safe-rules: n=1053 WR=41.3% PF=1.18 (source=backtest_3y)"
           },
@@ -783,8 +381,8 @@
             },
             "avgHold": 50.9,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
           "compositeScore": 34160
@@ -810,7 +408,6 @@
               "mode": "both_match",
               "label": "cả 1h + 4h cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.600Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -840,8 +437,8 @@
             "dedupeReason": "dup-of-rank-6",
             "avgHold": 55.1,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44.1% · NET +5068%",
           "compositeScore": 5068
@@ -869,7 +466,6 @@
               "label": "1h cùng chiều",
               "invertedFromFlip": true
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -894,8 +490,8 @@
             "disabledAt": "2026-04-22T12:30:01.040Z",
             "disabledReason": "post-flip-review: edge âm hoặc overfit",
             "avgHold": 63.5,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         }
       ]
@@ -933,8 +529,7 @@
             },
             "htfTrendFilter": {
               "mode": "far_flat"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 22.3,
@@ -959,8 +554,8 @@
             },
             "avgHold": 46,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -989,8 +584,7 @@
             },
             "htfTrendFilter": {
               "mode": "far_flat"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 23,
@@ -1017,8 +611,8 @@
             "dedupeReason": "dup-of-rank-1",
             "avgHold": 63.8,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -1042,8 +636,7 @@
             },
             "htfTrendFilter": {
               "mode": "far_flat"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 22.7,
@@ -1070,8 +663,8 @@
             "dedupeReason": "dup-of-rank-1",
             "avgHold": 63.4,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -1091,8 +684,7 @@
               "rsiExtreme",
               "divergence"
             ],
-            "forceSide": "LONG",
-            "disabled": true
+            "forceSide": "LONG"
           },
           "stats": {
             "winRate": 8.3,
@@ -1110,8 +702,8 @@
             "side": "LONG",
             "avgHold": 89.1,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[LONG] RSI+Div TP+10% SL-5% · WR 50% · NET +840%",
           "compositeScore": 840
@@ -1151,8 +743,8 @@
             "side": "SHORT",
             "avgHold": 3.7,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[SHORT] RSI+Div TP+1% SL-0.5% · WR 55% · NET +450%",
           "compositeScore": 450
@@ -1192,8 +784,8 @@
             "side": "LONG",
             "avgHold": 66.8,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[LONG] RSI+Div TP+5% SL-3% · WR 41.7% · NET +240%",
           "compositeScore": 240
@@ -1215,8 +807,7 @@
               "rsiExtreme",
               "divergence"
             ],
-            "forceSide": "LONG",
-            "disabled": true
+            "forceSide": "LONG"
           },
           "stats": {
             "winRate": 16.7,
@@ -1234,8 +825,8 @@
             "side": "LONG",
             "avgHold": 79.2,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[LONG] RSI+Div TP+8% SL-3% · WR 30% · NET +140%",
           "compositeScore": 140
@@ -1275,8 +866,8 @@
             "side": "LONG",
             "avgHold": 60.9,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[LONG] RSI+Div TP+5% SL-2.5% · WR 35.7% · NET +90%",
           "compositeScore": 90
@@ -1301,8 +892,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d cùng chiều"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 26.2,
@@ -1328,8 +918,8 @@
             },
             "avgHold": 61.6,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +30070%",
           "compositeScore": 30070
@@ -1355,7 +945,6 @@
               "mode": "both_match",
               "label": "cả 4h + 1d cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -1383,8 +972,8 @@
             },
             "avgHold": 14.5,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +24980%",
           "compositeScore": 24980
@@ -1410,7 +999,6 @@
               "mode": "near_match",
               "label": "4h cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -1438,8 +1026,8 @@
             },
             "avgHold": 20.5,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +24180%",
           "compositeScore": 24180
@@ -1465,7 +1053,6 @@
               "mode": "both_match",
               "label": "cả 4h + 1d cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -1493,8 +1080,8 @@
             },
             "avgHold": 19,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +23930%",
           "compositeScore": 23930
@@ -1545,8 +1132,8 @@
             },
             "avgHold": 15.3,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +22130%",
           "compositeScore": 22130
@@ -1571,8 +1158,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d cùng chiều"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 24.3,
@@ -1598,8 +1184,8 @@
             },
             "avgHold": 46.8,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +19970%",
           "compositeScore": 19970
@@ -1625,7 +1211,6 @@
               "mode": "far_match",
               "label": "1d cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T09:21:35.962Z",
             "revivedNote": "enable-safe-rules: n=481 WR=37% PF=1.23 (source=backtest_3y)"
           },
@@ -1653,8 +1238,8 @@
             },
             "avgHold": 20.2,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +14890%",
           "compositeScore": 14890
@@ -1680,8 +1265,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d cùng chiều"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 25.5,
@@ -1707,8 +1291,8 @@
             },
             "avgHold": 63.4,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +13810%",
           "compositeScore": 13810
@@ -1759,8 +1343,8 @@
             },
             "avgHold": 10.6,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +11680%",
           "compositeScore": 11680
@@ -1785,8 +1369,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d cùng chiều"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 20.3,
@@ -1818,8 +1401,8 @@
             },
             "avgHold": 71,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
           "compositeScore": 10470
@@ -1845,7 +1428,6 @@
               "mode": "near_match",
               "label": "4h cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -1875,8 +1457,8 @@
             "dedupeReason": "dup-of-rank-14",
             "avgHold": 15.3,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +2673%",
           "compositeScore": 2673
@@ -1902,7 +1484,6 @@
               "mode": "both_match",
               "label": "cả 4h + 1d cùng chiều"
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -1932,8 +1513,8 @@
             "dedupeReason": "dup-of-rank-18",
             "avgHold": 10.6,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +1549%",
           "compositeScore": 1549
@@ -1958,8 +1539,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d cùng chiều"
-            },
-            "disabled": true
+            }
           },
           "stats": {
             "winRate": 29.7,
@@ -1991,8 +1571,8 @@
             },
             "avgHold": 15.3,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
           "compositeScore": 1252
@@ -2017,8 +1597,7 @@
               "macdBull",
               "emaNear",
               "atrLow"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2033,8 +1612,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2056,8 +1635,7 @@
             "features": [
               "macdBull",
               "emaNear"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2072,8 +1650,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2095,8 +1673,7 @@
             "features": [
               "macdBull",
               "atrLow"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2111,8 +1688,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2134,8 +1711,7 @@
             "features": [
               "atrLow",
               "emaNear"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2150,8 +1726,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2172,8 +1748,7 @@
             },
             "features": [
               "atrLow"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2188,8 +1763,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2211,8 +1786,7 @@
             "features": [
               "emaCrossBull",
               "atrLow"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2227,8 +1801,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2250,8 +1824,7 @@
             "features": [
               "bodySmall",
               "macdBull"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2266,8 +1839,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2289,8 +1862,7 @@
             "features": [
               "bbSqueeze",
               "macdBull"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "side": "LONG",
@@ -2305,8 +1877,8 @@
             "source": "forward-test-2.3Y",
             "injectedAt": "2026-04-22T11:21:04.005Z",
             "avgHold": 39.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2332,7 +1904,6 @@
               "label": "1d cùng chiều",
               "invertedFromFlip": true
             },
-            "disabled": false,
             "revivedAt": "2026-04-24T08:21:25.601Z",
             "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
@@ -2357,8 +1928,8 @@
             "disabledAt": "2026-04-22T12:30:01.040Z",
             "disabledReason": "post-flip-review: edge âm hoặc overfit",
             "avgHold": 60,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2401,8 +1972,8 @@
             "source": "GPT_HIGHWR_1H_v2_specaligned_3y",
             "injectedAt": "2026-04-24T08:05:56.302Z",
             "avgHold": 39.1,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 3.95007537703147
         },
@@ -2451,8 +2022,8 @@
             "source": "GPT_HIGHWR_1H_v2_specaligned_3y",
             "injectedAt": "2026-04-24T08:05:56.302Z",
             "avgHold": 37.4,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 3.826198365357713
         },
@@ -2496,8 +2067,8 @@
             "source": "GPT_HIGHWR_1H_v2_specaligned_3y",
             "injectedAt": "2026-04-24T08:05:56.302Z",
             "avgHold": 43.5,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 3.774680875865826
         }
@@ -2529,8 +2100,7 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "macdCross"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "winRate": 40.7,
@@ -2552,8 +2122,8 @@
             "netPnL": 80,
             "avgHold": 8.3,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2572,8 +2142,7 @@
             "requiredConditions": [
               "macdCross",
               "rsiExtreme"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
             "winRate": 33.3,
@@ -2595,8 +2164,8 @@
             "netPnL": 180,
             "avgHold": 3.3,
             "verified": true,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2643,8 +2212,8 @@
             "source": "GPT_4H_v1_specaligned_3y",
             "injectedAt": "2026-04-24T09:33:00.585Z",
             "avgHold": 14.2,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 2.1665507475865344
         },
@@ -2694,8 +2263,8 @@
             "source": "GPT_4H_v1_specaligned_3y",
             "injectedAt": "2026-04-24T09:33:00.585Z",
             "avgHold": 19.9,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 2.0686600636314596
         },
@@ -2741,8 +2310,8 @@
             "source": "GPT_4H_v1_specaligned_3y",
             "injectedAt": "2026-04-24T09:33:00.585Z",
             "avgHold": 14.6,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 1.999883284587795
         },
@@ -2789,8 +2358,8 @@
             "source": "GPT_4H_v1_specaligned_3y",
             "injectedAt": "2026-04-24T09:33:00.585Z",
             "avgHold": 11.2,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned",
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
             "reEnabledAt": "2026-04-24T09:40:43.140Z",
             "reEnableReason": "NET +1410% > 0 (3y replay)"
           },
@@ -2842,8 +2411,8 @@
             "source": "GPT_4H_v1_specaligned_3y",
             "injectedAt": "2026-04-24T09:33:00.585Z",
             "avgHold": 15.4,
-            "lastBacktestAt": "2026-04-24T09:40:43.140Z",
-            "lastBacktestSource": "backtest_active_3y_specaligned"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           },
           "compositeScore": 1.9079232908119474
         }
@@ -2875,13 +2444,12 @@
             "rsiOSLevel": 25,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 71.4,
-            "profitFactor": 6.25,
-            "trades": 7,
+            "winRate": 66.7,
+            "profitFactor": 5,
+            "trades": 6,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1.4,
@@ -2901,7 +2469,12 @@
               "side": "SHORT",
               "at": "2026-04-23T10:06:10.455Z",
               "reason": "positive_flip_backtest"
-            }
+            },
+            "netPnL": 740,
+            "avgHold": 1.5,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2919,13 +2492,12 @@
             "rsiOSLevel": 25,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 71.4,
-            "profitFactor": 5,
-            "trades": 7,
+            "winRate": 66.7,
+            "profitFactor": 4,
+            "trades": 6,
             "avgWinPct": 200,
             "avgLossPct": 100,
             "avgHoldBars": 1.3,
@@ -2938,7 +2510,12 @@
               "sl": 1.5,
               "wr": 24.2,
               "net": -220
-            }
+            },
+            "netPnL": 540,
+            "avgHold": 1.3,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2957,13 +2534,12 @@
             "requiredConditions": [
               "bollingerTouch",
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 66.7,
-            "profitFactor": 5,
-            "trades": 6,
+            "winRate": 35.7,
+            "profitFactor": 1.39,
+            "trades": 14,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1.5,
@@ -2975,7 +2551,12 @@
               "side": "SHORT",
               "at": "2026-04-23T10:06:10.455Z",
               "reason": "positive_flip_backtest"
-            }
+            },
+            "netPnL": 210,
+            "avgHold": 1.3,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -2993,13 +2574,12 @@
             "rsiOSLevel": 25,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 71.4,
-            "profitFactor": 4.17,
-            "trades": 7,
+            "winRate": 66.7,
+            "profitFactor": 3.33,
+            "trades": 6,
             "avgWinPct": 250,
             "avgLossPct": 150,
             "avgHoldBars": 1.4,
@@ -3012,7 +2592,12 @@
               "sl": 1.5,
               "wr": 24.2,
               "net": -220
-            }
+            },
+            "netPnL": 640,
+            "avgHold": 1.5,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3030,13 +2615,12 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 66.7,
-            "profitFactor": 4,
-            "trades": 12,
+            "winRate": 75,
+            "profitFactor": 6,
+            "trades": 8,
             "avgWinPct": 300,
             "avgLossPct": 150,
             "avgHoldBars": 1.9,
@@ -3055,7 +2639,12 @@
               "side": "SHORT",
               "at": "2026-04-23T10:06:10.455Z",
               "reason": "positive_flip_backtest"
-            }
+            },
+            "netPnL": 1420,
+            "avgHold": 1.9,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3074,13 +2663,12 @@
             "requiredConditions": [
               "bollingerTouch",
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 62.5,
-            "profitFactor": 4.17,
-            "trades": 8,
+            "winRate": 35.7,
+            "profitFactor": 1.39,
+            "trades": 14,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1.5,
@@ -3094,7 +2682,12 @@
               "side": "SHORT",
               "at": "2026-04-23T10:06:10.455Z",
               "reason": "positive_flip_backtest"
-            }
+            },
+            "netPnL": 210,
+            "avgHold": 1.3,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3112,13 +2705,12 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 69.2,
-            "profitFactor": 3.75,
-            "trades": 13,
+            "winRate": 77.8,
+            "profitFactor": 5.83,
+            "trades": 9,
             "avgWinPct": 250,
             "avgLossPct": 150,
             "avgHoldBars": 1.6,
@@ -3133,7 +2725,12 @@
               "net": -220
             },
             "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
-            "dedupeReason": "dup-of-rank-4"
+            "dedupeReason": "dup-of-rank-4",
+            "netPnL": 1360,
+            "avgHold": 1.4,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3151,13 +2748,12 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 61.5,
-            "profitFactor": 4,
-            "trades": 13,
+            "winRate": 66.7,
+            "profitFactor": 5,
+            "trades": 9,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1.5,
@@ -3176,60 +2772,12 @@
               "side": "SHORT",
               "at": "2026-04-23T10:06:10.455Z",
               "reason": "positive_flip_backtest"
-            }
-          }
-        },
-        {
-          "rank": 9,
-          "source": "flipped-from-1d-rank1",
-          "label": "[FLIPPED] LONG→SHORT LONG rank1",
-          "config": {
-            "leverage": 100,
-            "targetPct": 10,
-            "stopPct": 10,
-            "maxHoldBars": 50,
-            "minScore": 3,
-            "stochOBLevel": 95,
-            "stochOSLevel": 5,
-            "rsiOBLevel": 75,
-            "rsiOSLevel": 25,
-            "requiredConditions": [
-              "divergence"
-            ],
-            "disabled": false,
-            "forceSide": "SHORT"
-          },
-          "stats": {
-            "side": "SHORT",
-            "trades": 240,
-            "wins": 132,
-            "losses": 108,
-            "winRate": 55,
-            "netPnL": 25080,
-            "profitFactor": 1.26,
+            },
+            "netPnL": 1110,
+            "avgHold": 1.4,
             "verified": true,
-            "source": "flip-grid-search-2.3Y-fullgrid",
-            "flippedFrom": {
-              "tfKey": "1d",
-              "rank": 1,
-              "origSide": "LONG",
-              "origWR": 23.5
-            },
-            "tier": "SILVER",
-            "injectedAt": "2026-04-22T12:29:51.040Z",
-            "oos": {
-              "days": 90,
-              "N": 1,
-              "WR": 100,
-              "BE": 50,
-              "edge": 50,
-              "PF": 999,
-              "finalEquity": 992,
-              "maxDD": 0,
-              "maxConsL": 0,
-              "note": "N=1, không đủ tin cậy"
-            },
-            "oosTestedAt": "2026-04-22T12:31:45.896Z"
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3249,13 +2797,12 @@
             "requiredConditions": [
               "divergence"
             ],
-            "disabled": false,
             "forceSide": "SHORT"
           },
           "stats": {
-            "winRate": 32,
-            "profitFactor": 6.25,
-            "trades": 219,
+            "winRate": 80,
+            "profitFactor": 10,
+            "trades": 5,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1.4,
@@ -3276,7 +2823,7 @@
               "reason": "loss_gt_70_flipped"
             },
             "side": "SHORT",
-            "netPnL": 848,
+            "netPnL": 850,
             "verified": true,
             "source": "flipped-selected-backtest",
             "injectedAt": "2026-04-23T10:06:10.455Z",
@@ -3284,7 +2831,10 @@
               "tfKey": "1d",
               "rank": 1,
               "originalSide": "LONG"
-            }
+            },
+            "avgHold": 1.6,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3305,13 +2855,12 @@
               "bollingerTouch",
               "divergence"
             ],
-            "disabled": false,
             "forceSide": "SHORT"
           },
           "stats": {
-            "winRate": 42.9,
-            "profitFactor": 5,
-            "trades": 21,
+            "winRate": 41.7,
+            "profitFactor": 1.79,
+            "trades": 12,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1,
@@ -3319,7 +2868,7 @@
             "losses": 12,
             "timeouts": 0,
             "side": "SHORT",
-            "netPnL": 882,
+            "netPnL": 430,
             "verified": true,
             "source": "flipped-selected-backtest",
             "injectedAt": "2026-04-23T10:06:10.455Z",
@@ -3327,7 +2876,10 @@
               "tfKey": "1d",
               "rank": 3,
               "originalSide": "LONG"
-            }
+            },
+            "avgHold": 1.3,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3347,13 +2899,12 @@
             "requiredConditions": [
               "divergence"
             ],
-            "disabled": false,
             "forceSide": "SHORT"
           },
           "stats": {
-            "winRate": 36.1,
-            "profitFactor": 4,
-            "trades": 219,
+            "winRate": 85.7,
+            "profitFactor": 12,
+            "trades": 7,
             "avgWinPct": 300,
             "avgLossPct": 150,
             "avgHoldBars": 1.7,
@@ -3368,7 +2919,7 @@
               "net": -220
             },
             "side": "SHORT",
-            "netPnL": 948,
+            "netPnL": 1580,
             "verified": true,
             "source": "flipped-selected-backtest",
             "injectedAt": "2026-04-23T10:06:10.455Z",
@@ -3376,7 +2927,10 @@
               "tfKey": "1d",
               "rank": 5,
               "originalSide": "LONG"
-            }
+            },
+            "avgHold": 2,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3397,13 +2951,12 @@
               "bollingerTouch",
               "divergence"
             ],
-            "disabled": false,
             "forceSide": "SHORT"
           },
           "stats": {
-            "winRate": 42.9,
-            "profitFactor": 4.17,
-            "trades": 21,
+            "winRate": 41.7,
+            "profitFactor": 1.79,
+            "trades": 12,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1,
@@ -3413,7 +2966,7 @@
             "dedupeDisabledAt": "2026-04-22T12:29:54.615Z",
             "dedupeReason": "dup-of-rank-3",
             "side": "SHORT",
-            "netPnL": 882,
+            "netPnL": 430,
             "verified": true,
             "source": "flipped-selected-backtest",
             "injectedAt": "2026-04-23T10:06:10.455Z",
@@ -3421,7 +2974,10 @@
               "tfKey": "1d",
               "rank": 6,
               "originalSide": "LONG"
-            }
+            },
+            "avgHold": 1.3,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3441,13 +2997,12 @@
             "requiredConditions": [
               "divergence"
             ],
-            "disabled": false,
             "forceSide": "SHORT"
           },
           "stats": {
-            "winRate": 32,
-            "profitFactor": 4,
-            "trades": 219,
+            "winRate": 75,
+            "profitFactor": 7.5,
+            "trades": 8,
             "avgWinPct": 250,
             "avgLossPct": 100,
             "avgHoldBars": 1.4,
@@ -3462,7 +3017,7 @@
               "net": -220
             },
             "side": "SHORT",
-            "netPnL": 848,
+            "netPnL": 1220,
             "verified": true,
             "source": "flipped-selected-backtest",
             "injectedAt": "2026-04-23T10:06:10.455Z",
@@ -3470,7 +3025,10 @@
               "tfKey": "1d",
               "rank": 8,
               "originalSide": "LONG"
-            }
+            },
+            "avgHold": 1.5,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         }
       ]
@@ -3501,13 +3059,12 @@
             "rsiOSLevel": 25,
             "requiredConditions": [
               "stochExtreme"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 33.3,
-            "profitFactor": 1.5,
-            "trades": 12,
+            "winRate": 50,
+            "profitFactor": 3,
+            "trades": 2,
             "avgWinPct": 300,
             "avgLossPct": 100,
             "avgHoldBars": 1,
@@ -3520,7 +3077,12 @@
               "sl": 0.5,
               "wr": 7.3,
               "net": -728
-            }
+            },
+            "netPnL": 180,
+            "avgHold": 1,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         },
         {
@@ -3539,19 +3101,23 @@
             "requiredConditions": [
               "rsiExtreme",
               "stochExtreme"
-            ],
-            "disabled": true
+            ]
           },
           "stats": {
-            "winRate": 30.8,
-            "profitFactor": 1.33,
-            "trades": 13,
+            "winRate": 50,
+            "profitFactor": 3,
+            "trades": 2,
             "avgWinPct": 300,
             "avgLossPct": 100,
             "avgHoldBars": 1,
             "wins": 4,
             "losses": 9,
-            "timeouts": 0
+            "timeouts": 0,
+            "netPnL": 180,
+            "avgHold": 1,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
           }
         }
       ]

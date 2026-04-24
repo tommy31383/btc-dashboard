@@ -32,12 +32,15 @@ const args = process.argv.slice(2);
 const YEARS = parseFloat(args.find((a) => a.startsWith("--years="))?.replace("--years=", "") || "3");
 const FEE_PER_SIDE = parseFloat(args.find((a) => a.startsWith("--fee="))?.replace("--fee=", "") || "0.05");
 
-const ENTRY_TFS = ["15m", "1h", "4h"];
+const ENTRY_TFS = ["5m", "15m", "1h", "4h", "1d", "1w"];
 // HTF map (must match scan-tpsl-htf.ts + useRuleAlerts.ts)
 const HTF_MAP: Record<string, [string, string]> = {
+  "5m": ["15m", "1h"],
   "15m": ["1h", "4h"],
   "1h": ["4h", "1d"],
   "4h": ["1d", "1w"],
+  "1d": ["1w", "1w"],
+  "1w": ["1w", "1w"],
 };
 // Set of every TF needed (entry + all HTFs)
 const ALL_TFS = new Set<string>();
@@ -614,9 +617,10 @@ NET PnL = grossPnL × leverage - (trades × fee × 2 × leverage). Có thể âm
 
   const allRules: { tf: string; rule: RuleEntry }[] = [];
   for (const tf of ENTRY_TFS) {
+    if (!hard.tfs[tf]?.rules) continue;
     for (const r of hard.tfs[tf].rules) allRules.push({ tf, rule: r });
   }
-  console.log(`Active rules: ${allRules.length} (${ENTRY_TFS.map((tf) => `${tf}:${hard.tfs[tf].rules.length}`).join(", ")})`);
+  console.log(`Active rules: ${allRules.length} (${ENTRY_TFS.map((tf) => `${tf}:${hard.tfs[tf]?.rules?.length ?? 0}`).join(", ")})`);
 
   // ─── Fetch all needed TFs ─────────────────────────────────────────────────
   const tfsToFetch = Array.from(ALL_TFS);

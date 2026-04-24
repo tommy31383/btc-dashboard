@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T09:45:31.846Z",
+  "generated_at": "2026-04-24T10:02:12.020Z",
   "note": "Disabled rules archived from hard_rules.json",
   "tfs": {
     "15m": {
@@ -1068,6 +1068,536 @@
           "disabled": true,
           "disableReason": "NET -12904% <= 0 (3y replay 2026-04-24)",
           "archivedAt": "2026-04-24T09:45:31.846Z"
+        }
+      ]
+    },
+    "5m": {
+      "rules": [
+        {
+          "rank": 1,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence",
+              "macdCross"
+            ],
+            "disabled": true,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=433 WR=34.1% PF=1.36 (source=stored)"
+          },
+          "stats": {
+            "winRate": 24.8,
+            "profitFactor": 0.9,
+            "trades": 4424,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 0,
+            "wins": 143,
+            "losses": 211,
+            "timeouts": 79,
+            "grossPnL": 3750,
+            "feeCost": 1732,
+            "netPnL": -58649,
+            "side": "SHORT",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 1,
+              "sl": 0.5,
+              "wr": 29.5,
+              "net": -1888
+            },
+            "avgHold": 36.4,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -58649% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 2,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "macdCross"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 15.1,
+            "profitFactor": 0.95,
+            "trades": 687,
+            "avgWinPct": 200,
+            "avgLossPct": -100,
+            "avgHoldBars": 0,
+            "wins": 8,
+            "losses": 9,
+            "timeouts": 13,
+            "grossPnL": 700,
+            "feeCost": 120,
+            "netPnL": -8546,
+            "side": "SHORT",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 21.6,
+              "net": 792
+            },
+            "avgHold": 60.5,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -8546% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 3,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme",
+              "macdCross"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 25.6,
+            "profitFactor": 1,
+            "trades": 2841,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 0,
+            "wins": 39,
+            "losses": 58,
+            "timeouts": 19,
+            "grossPnL": 1000,
+            "feeCost": 464,
+            "netPnL": -28525,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1,
+              "sl": 1,
+              "wr": 37.6,
+              "net": 528
+            },
+            "avgHold": 41.6,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -28525% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 4,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme",
+              "rsiExtreme"
+            ],
+            "disabled": true,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=56 WR=100% PF=999 (source=stored)"
+          },
+          "stats": {
+            "winRate": 1.9,
+            "profitFactor": 0.9,
+            "trades": 1334,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 0,
+            "wins": 1,
+            "losses": 0,
+            "timeouts": 55,
+            "grossPnL": 500,
+            "feeCost": 224,
+            "netPnL": -21190,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1.5,
+              "sl": 1.5,
+              "wr": 28.3,
+              "net": 870
+            },
+            "avgHold": 94,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -21190% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 5,
+          "source": "GA",
+          "config": {
+            "leverage": 100,
+            "targetPct": 0.76,
+            "stopPct": 0.35,
+            "maxHoldBars": 50,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 80,
+            "rsiOSLevel": 20,
+            "requiredConditions": [],
+            "weights": {
+              "stochExtreme": 1,
+              "rsiExtreme": 1,
+              "divergence": 0,
+              "bollingerTouch": 1,
+              "macdCross": 3
+            },
+            "minWeightedScore": 4,
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 21.3,
+            "profitFactor": 0.96,
+            "trades": 3561,
+            "avgWinPct": 76,
+            "avgLossPct": 35,
+            "avgHoldBars": 19,
+            "wins": 6,
+            "losses": 5,
+            "timeouts": 2,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1.5,
+              "sl": 1.5,
+              "wr": 12.3,
+              "net": -19866
+            },
+            "flippedAt": "2026-04-22T12:29:51.040Z",
+            "flippedTo": {
+              "rank": null,
+              "side": "SHORT",
+              "reason": "loss_gt_70_flipped"
+            },
+            "netPnL": -38782,
+            "avgHold": 22.9,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -38782% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 6,
+          "source": "GA",
+          "config": {
+            "leverage": 100,
+            "targetPct": 0.76,
+            "stopPct": 0.35,
+            "maxHoldBars": 50,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 80,
+            "rsiOSLevel": 20,
+            "requiredConditions": [],
+            "weights": {
+              "stochExtreme": 1,
+              "rsiExtreme": 1,
+              "divergence": 2,
+              "bollingerTouch": 1,
+              "macdCross": 3
+            },
+            "minWeightedScore": 4,
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 23.3,
+            "profitFactor": 0.98,
+            "trades": 7895,
+            "avgWinPct": 76,
+            "avgLossPct": 35,
+            "avgHoldBars": 16.7,
+            "wins": 6,
+            "losses": 7,
+            "timeouts": 2,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 1.5,
+              "sl": 1.5,
+              "wr": 12.3,
+              "net": -19866
+            },
+            "netPnL": -81775,
+            "avgHold": 20,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -81775% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 7,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "stochExtreme",
+              "bollingerTouch"
+            ],
+            "disabled": true,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=236 WR=50% PF=1.67 (source=stored)"
+          },
+          "stats": {
+            "winRate": 1.1,
+            "profitFactor": 0.95,
+            "trades": 2603,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 0,
+            "wins": 5,
+            "losses": 5,
+            "timeouts": 226,
+            "grossPnL": 1000,
+            "feeCost": 944,
+            "netPnL": -32648,
+            "side": "LONG",
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 2,
+              "sl": 2,
+              "wr": 14.2,
+              "net": 1176
+            },
+            "avgHold": 96,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -32648% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 8,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 1,
+            "stopPct": 0.5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true
+          },
+          "stats": {
+            "winRate": 25.8,
+            "profitFactor": 0.93,
+            "trades": 5247,
+            "avgWinPct": 100,
+            "avgLossPct": -50,
+            "avgHoldBars": 0,
+            "wins": 232,
+            "losses": 400,
+            "timeouts": 156,
+            "grossPnL": 3200,
+            "feeCost": 3152,
+            "netPnL": -63934,
+            "side": "SHORT",
+            "deadAt": "2026-04-22T11:15:16.911Z",
+            "bestAttempt": {
+              "tp": 1,
+              "sl": 0.5,
+              "wr": 26.8,
+              "net": -5768
+            },
+            "avgHold": 34.6,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -63934% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        },
+        {
+          "rank": 9,
+          "source": "flipped-from-5m-rank5",
+          "label": "[FLIPPED] LONG→SHORT LONG rank5",
+          "config": {
+            "leverage": 100,
+            "targetPct": 0.5,
+            "stopPct": 7,
+            "maxHoldBars": 50,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 80,
+            "rsiOSLevel": 20,
+            "requiredConditions": [],
+            "weights": {
+              "stochExtreme": 1,
+              "rsiExtreme": 1,
+              "divergence": 0,
+              "bollingerTouch": 1,
+              "macdCross": 3
+            },
+            "minWeightedScore": 4,
+            "disabled": true,
+            "forceSide": "SHORT",
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=6325 WR=49.1% PF=999 (source=stored)"
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 1852,
+            "wins": 3106,
+            "losses": 3219,
+            "winRate": 45,
+            "netPnL": -20534,
+            "profitFactor": 0.96,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "5m",
+              "rank": 5,
+              "origSide": "LONG",
+              "origWR": 25.5
+            },
+            "tier": "BRONZE",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "disabledAt": "2026-04-22T12:30:01.040Z",
+            "disabledReason": "post-flip-review: edge âm hoặc overfit",
+            "avgHold": 36.1,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -20534% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
+        }
+      ]
+    },
+    "1d": {
+      "rules": [
+        {
+          "rank": 9,
+          "source": "flipped-from-1d-rank1",
+          "label": "[FLIPPED] LONG→SHORT LONG rank1",
+          "config": {
+            "leverage": 100,
+            "targetPct": 10,
+            "stopPct": 10,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true,
+            "forceSide": "SHORT"
+          },
+          "stats": {
+            "side": "SHORT",
+            "trades": 4,
+            "wins": 132,
+            "losses": 108,
+            "winRate": 50,
+            "netPnL": -40,
+            "profitFactor": 1,
+            "verified": true,
+            "source": "flip-grid-search-2.3Y-fullgrid",
+            "flippedFrom": {
+              "tfKey": "1d",
+              "rank": 1,
+              "origSide": "LONG",
+              "origWR": 23.5
+            },
+            "tier": "SILVER",
+            "injectedAt": "2026-04-22T12:29:51.040Z",
+            "oos": {
+              "days": 90,
+              "N": 1,
+              "WR": 100,
+              "BE": 50,
+              "edge": 50,
+              "PF": 999,
+              "finalEquity": 992,
+              "maxDD": 0,
+              "maxConsL": 0,
+              "note": "N=1, không đủ tin cậy"
+            },
+            "oosTestedAt": "2026-04-22T12:31:45.896Z",
+            "avgHold": 18.5,
+            "lastBacktestAt": "2026-04-24T10:02:05.950Z",
+            "lastBacktestSource": "backtest_active_3y_6tf"
+          },
+          "disabled": true,
+          "disableReason": "NET -40% <= 0 (3y replay 6-TF)",
+          "archivedAt": "2026-04-24T10:02:12.020Z"
         }
       ]
     }
