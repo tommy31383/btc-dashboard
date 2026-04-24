@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T08:25:26.044Z",
+  "generated_at": "2026-04-24T09:22:32.923Z",
   "data_source": "Binance BTCUSDT (REST /klines) + scan-tpsl with fees + inject-feature-rules-v3.ts iter3 FINAL",
   "tfs": {
     "5m": {
@@ -30,7 +30,9 @@
               "divergence",
               "macdCross"
             ],
-            "disabled": true
+            "disabled": false,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=433 WR=34.1% PF=1.36 (source=stored)"
           },
           "stats": {
             "winRate": 34.1,
@@ -155,7 +157,9 @@
               "stochExtreme",
               "rsiExtreme"
             ],
-            "disabled": true
+            "disabled": false,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=56 WR=100% PF=999 (source=stored)"
           },
           "stats": {
             "winRate": 100,
@@ -289,7 +293,9 @@
               "stochExtreme",
               "bollingerTouch"
             ],
-            "disabled": true
+            "disabled": false,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=236 WR=50% PF=1.67 (source=stored)"
           },
           "stats": {
             "winRate": 50,
@@ -378,8 +384,10 @@
               "macdCross": 3
             },
             "minWeightedScore": 4,
-            "disabled": true,
-            "forceSide": "SHORT"
+            "disabled": false,
+            "forceSide": "SHORT",
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=6325 WR=49.1% PF=999 (source=stored)"
           },
           "stats": {
             "side": "SHORT",
@@ -433,7 +441,10 @@
               "divergence",
               "bollingerTouch"
             ],
-            "forceSide": "SHORT"
+            "forceSide": "SHORT",
+            "disabled": true,
+            "disabledReason": "hide-trash: WR=24.7% < 25%; 3y NET=-5238% < -2000%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 41.9,
@@ -624,7 +635,10 @@
               "rsiExtreme",
               "macdCross"
             ],
-            "forceSide": "SHORT"
+            "forceSide": "SHORT",
+            "disabled": true,
+            "disabledReason": "hide-trash: 3y NET=-3285% < -2000%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 43.3,
@@ -955,7 +969,9 @@
               "mode": "near_match",
               "label": "1h cùng chiều"
             },
-            "disabled": true
+            "disabled": false,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=1053 WR=41.3% PF=1.18 (source=backtest_3y)"
           },
           "stats": {
             "winRate": 48.4,
@@ -1107,7 +1123,9 @@
               "bollingerTouch"
             ],
             "forceSide": "LONG",
-            "disabled": false
+            "disabled": true,
+            "disabledReason": "hide-trash: WR=15.4% < 25%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 27.9,
@@ -1159,7 +1177,9 @@
               "bollingerTouch"
             ],
             "forceSide": "LONG",
-            "disabled": false
+            "disabled": true,
+            "disabledReason": "hide-trash: WR=18.3% < 25%; 3y NET=-2390% < -2000%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 31.1,
@@ -1907,7 +1927,9 @@
               "mode": "far_match",
               "label": "1d cùng chiều"
             },
-            "disabled": true
+            "disabled": false,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=481 WR=37% PF=1.23 (source=backtest_3y)"
           },
           "stats": {
             "winRate": 36.3,
@@ -2910,7 +2932,10 @@
             },
             "forceSide": "LONG",
             "minScore": 0,
-            "requiredConditions": []
+            "requiredConditions": [],
+            "disabled": true,
+            "disabledReason": "hide-trash: 3y NET=-2784% < -2000%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 36.1,
@@ -3004,7 +3029,11 @@
             "forceSide": "LONG",
             "minScore": 0,
             "requiredConditions": [],
-            "disabled": true
+            "disabled": true,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=362 WR=34% PF=1.01 (source=backtest_3y)",
+            "disabledReason": "hide-trash: 3y NET=-2784% < -2000%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 38.2,
@@ -3048,7 +3077,11 @@
             "forceSide": "LONG",
             "minScore": 0,
             "requiredConditions": [],
-            "disabled": true
+            "disabled": true,
+            "revivedAt": "2026-04-24T09:21:35.962Z",
+            "revivedNote": "enable-safe-rules: n=709 WR=34.4% PF=1.05 (source=backtest_3y)",
+            "disabledReason": "hide-trash: 3y NET=-3434% < -2000%",
+            "disabledAt": "2026-04-24T09:22:32.923Z"
           },
           "stats": {
             "winRate": 37,
