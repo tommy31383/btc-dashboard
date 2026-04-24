@@ -27,6 +27,7 @@ import BinanceChart from "./components/BinanceChart";
 import SettingsPanel from "./components/SettingsPanel";
 import AlertBanner from "./components/AlertBanner";
 import TimeframeTable from "./components/TimeframeTable";
+import ConfluenceScore from "./components/ConfluenceScore";
 import AlertLog from "./components/AlertLog";
 import OverallVerdict from "./components/OverallVerdict";
 import TradingRulesPanel from "./components/TradingRulesPanel";
@@ -55,7 +56,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.42";
+const APP_VERSION = "4.3.43";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -435,12 +436,8 @@ export default function App() {
             {/* Chart */}
             <BinanceChart rawKlines={rawKlines} selectedTF={selectedTF} onSelectTF={setSelectedTF} />
 
-            {/* Multi-TF Table */}
-            <TimeframeTable
-              tfData={tfData}
-              overboughtLevel={settings.overboughtLevel}
-              oversoldLevel={settings.oversoldLevel}
-            />
+            {/* v4.3.43 — Multi-TF gộp thành 1 confluence score (-100..+100) */}
+            <ConfluenceScore tfData={tfData} />
 
             {/* Verdict */}
             <OverallVerdict
