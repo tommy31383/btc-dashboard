@@ -12,8 +12,8 @@ export type IndKey = "atr" | "macdH" | "emaDist" | "rsi";
 export interface IndSample { t: number; v: number }
 export type IndHistory = Record<string /* tfKey */, Record<IndKey, IndSample[]>>;
 
-const SAMPLE_INTERVAL_MS = 5 * 60 * 1000; // 5 min
-const MAX_SAMPLES = 12;                   // ≈1h rolling window
+const SAMPLE_INTERVAL_MS = 20 * 1000;     // 20s
+const MAX_SAMPLES = 60;                   // ≈20 phút rolling window (60 × 20s)
 
 function pushSample(arr: IndSample[], t: number, v: number | null) {
   if (v === null || !isFinite(v)) return;

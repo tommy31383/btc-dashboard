@@ -95,7 +95,7 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
 
       {failsWithETA.length > 0 && (
         <View style={styles.quote}>
-          <Text style={styles.quoteCaption}>ĐANG CHỜ TÍN HIỆU · ETA refresh mỗi 5'</Text>
+          <Text style={styles.quoteCaption}>ĐANG CHỜ TÍN HIỆU · ETA refresh mỗi 20s</Text>
           {failsWithETA.map((f) => (
             <View key={`${f.label}|${f.tfKey}`} style={styles.quoteRow}>
               <Text style={styles.quoteLine} numberOfLines={1}>
