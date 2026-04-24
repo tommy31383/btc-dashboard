@@ -380,8 +380,62 @@ interface RuleResult {
   trades: number; wins: number; losses: number; timeouts: number;
   winRate: number; profitFactor: number; avgHold: number;
   netPnL: number; grossPnL: number;
+  equityCurve: number[];           // cumulative NET % per trade, downsampled to ≤100 pts
+  equityTrend: "UP" | "FLAT" | "DOWN"; // slope of last 30% vs earlier
+  maxDrawdownPct: number;          // largest peak-to-trough drop in NET %
   // Compare with stored stats from hard_rules.json
   storedWR: number | null; storedPF: number | null; storedTrades: number | null;
+}
+
+/** Build equity curve, drawdown, and trend label from raw trade list. */
+function computeEquityStats(
+  trades: { pnlPct: number }[],
+  leverage: number,
+  feePerSide: number,
+): { curve: number[]; trend: "UP" | "FLAT" | "DOWN"; maxDD: number } {
+  if (trades.length === 0) return { curve: [], trend: "FLAT", maxDD: 0 };
+  const perTradeNet = trades.map((t) => t.pnlPct * leverage - feePerSide * 2 * leverage);
+  const cum: number[] = [];
+  let running = 0;
+  for (const v of perTradeNet) { running += v; cum.push(running); }
+
+  // Drawdown
+  let peak = cum[0], maxDD = 0;
+  for (const v of cum) {
+    if (v > peak) peak = v;
+    const dd = peak - v;
+    if (dd > maxDD) maxDD = dd;
+  }
+
+  // Trend: compare avg slope of last 30% vs first 70%
+  const n = cum.length;
+  let trend: "UP" | "FLAT" | "DOWN" = "FLAT";
+  if (n >= 6) {
+    const splitIdx = Math.floor(n * 0.7);
+    const earlySlope = (cum[splitIdx - 1] - cum[0]) / Math.max(1, splitIdx - 1);
+    const lateSlope = (cum[n - 1] - cum[splitIdx - 1]) / Math.max(1, n - splitIdx);
+    const range = Math.max(1, Math.abs(cum[n - 1]));
+    const lateNorm = lateSlope / range * 100; // % of total per trade
+    if (lateSlope > earlySlope * 0.5 && lateNorm > 0.05) trend = "UP";
+    else if (lateSlope < 0 && Math.abs(lateNorm) > 0.05) trend = "DOWN";
+    else trend = "FLAT";
+  } else {
+    trend = cum[n - 1] > 0 ? "UP" : cum[n - 1] < 0 ? "DOWN" : "FLAT";
+  }
+
+  // Downsample to ≤100 points
+  const MAX_PTS = 100;
+  let curve: number[];
+  if (n <= MAX_PTS) {
+    curve = cum.map((v) => Math.round(v));
+  } else {
+    curve = [];
+    for (let i = 0; i < MAX_PTS; i++) {
+      const idx = Math.floor((i / (MAX_PTS - 1)) * (n - 1));
+      curve.push(Math.round(cum[idx]));
+    }
+  }
+  return { curve, trend, maxDD: Math.round(maxDD) };
 }
 
 function backtestOneRule(
@@ -528,6 +582,7 @@ function backtestOneRule(
   const grossPnL = trades.reduce((s, t) => s + t.pnlPct * cfg.leverage, 0);
   const fee = trades.length * FEE_PER_SIDE * 2 * cfg.leverage;
   const netPnL = grossPnL - fee;
+  const eq = computeEquityStats(trades, cfg.leverage, FEE_PER_SIDE);
 
   return {
     rank: rule.rank,
@@ -541,6 +596,9 @@ function backtestOneRule(
     avgHold: parseFloat(avgHold.toFixed(1)),
     grossPnL: Math.round(grossPnL),
     netPnL: Math.round(netPnL),
+    equityCurve: eq.curve,
+    equityTrend: eq.trend,
+    maxDrawdownPct: eq.maxDD,
     storedWR: rule.stats?.winRate ?? null,
     storedPF: rule.stats?.profitFactor ?? null,
     storedTrades: rule.stats?.trades ?? null,

@@ -4,6 +4,28 @@
 
 ---
 
+## 📈 BACKTEST PHẢI LƯU EQUITY CURVE (PnL CHART)
+
+Mỗi lần chạy backtest cho 1 rule, **BẮT BUỘC** lưu equity curve (cumulative PnL theo
+trade index) vào `rule.stats.equityCurve` trong `assets/hard_rules.json`.
+
+**Format:**
+- `rule.stats.equityCurve`: array số (cumulative NET PnL %) sau mỗi trade, max 100 điểm (downsample nếu trade > 100)
+- `rule.stats.equityTrend`: `"UP"` | `"FLAT"` | `"DOWN"` — slope của 30% trades cuối so với đoạn đầu
+- `rule.stats.maxDrawdownPct`: drawdown lớn nhất từ peak (NET %)
+
+**Mục đích:** Tommy nhìn vào panel rule là biết rule **đang lên (UP)** hay **đang xuống (DOWN)**.
+Rule có NET tổng dương nhưng equityTrend=DOWN nghĩa là **đã hết edge** → cần disable.
+
+**Tools nào phải tuân:**
+- `tools/backtest-active-3y.ts` (và mọi script backtest khác) phải emit `equityCurve`,
+  `equityTrend`, `maxDrawdownPct` trong output JSON
+- `tools/sync-rules-from-backtest.ts` phải copy 3 field này vào `rule.stats`
+- `components/TradingRulesPanel.tsx` (RuleCard) phải render mini sparkline + badge
+  UP/DOWN dựa trên 3 field này
+
+---
+
 ## 🚫 CẤM TỰ Ý BUILD APK
 
 - **KHÔNG bao giờ** tự chạy `./gradlew assembleRelease` hoặc build APK

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from "react-native";
+import Svg, { Polyline, Line } from "react-native-svg";
 import { COLORS, TIMEFRAMES } from "../utils/constants";
 import { P } from "../utils/v2Theme";
 import { getHardRules, hasHardRules, HardRule, isRuleMonitorable } from "../utils/hardRules";
@@ -82,6 +83,33 @@ function condLive(k: string, conds: Record<string, any>, ind?: { rsi?: number | 
   if (k === "stochExtreme" && ind?.stochK != null) return `K=${ind.stochK.toFixed(1)}`;
   if (k === "macdCross") return conds[k] ? "cross ✓" : "—";
   return conds[k] ? "✓" : "—";
+}
+
+/** Mini equity curve sparkline. Color = trend (UP/FLAT/DOWN). */
+function EquitySparkline({ curve, trend, width = 90, height = 26 }: {
+  curve: number[]; trend: "UP" | "FLAT" | "DOWN"; width?: number; height?: number;
+}) {
+  if (!curve || curve.length < 2) return null;
+  const min = Math.min(0, ...curve);
+  const max = Math.max(0, ...curve);
+  const range = max - min || 1;
+  const pad = 2;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const pts = curve.map((v, i) => {
+    const x = pad + (i / (curve.length - 1)) * w;
+    const y = pad + h - ((v - min) / range) * h;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const color = trend === "UP" ? COLORS.bull : trend === "DOWN" ? COLORS.bear : COLORS.textDim;
+  // zero baseline
+  const yZero = pad + h - ((0 - min) / range) * h;
+  return (
+    <Svg width={width} height={height}>
+      <Line x1={0} y1={yZero} x2={width} y2={yZero} stroke="#ffffff20" strokeWidth={0.5} strokeDasharray="2,2" />
+      <Polyline points={pts} fill="none" stroke={color} strokeWidth={1.5} />
+    </Svg>
+  );
 }
 
 interface RuleCardProps {
@@ -239,6 +267,28 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
             </Text>
           )}
         </View>
+
+        {/* Equity curve sparkline + trend badge + max drawdown */}
+        {stats.equityCurve && stats.equityCurve.length >= 2 && (() => {
+          const trend = (stats.equityTrend as "UP" | "FLAT" | "DOWN") || "FLAT";
+          const trendCfg = trend === "UP"
+            ? { icon: "📈", label: "UP", color: COLORS.bull }
+            : trend === "DOWN"
+              ? { icon: "📉", label: "DOWN", color: COLORS.bear }
+              : { icon: "➡️", label: "FLAT", color: COLORS.textDim };
+          const dd = stats.maxDrawdownPct ?? 0;
+          return (
+            <View style={styles.rcEquityRow}>
+              <EquitySparkline curve={stats.equityCurve} trend={trend} />
+              <View style={styles.rcTrendCol}>
+                <View style={[styles.rcTrendBadge, { backgroundColor: trendCfg.color + "20", borderColor: trendCfg.color + "60" }]}>
+                  <Text style={[styles.rcTrendText, { color: trendCfg.color }]}>{trendCfg.icon} {trendCfg.label}</Text>
+                </View>
+                <Text style={styles.rcDdText}>DD -{Math.abs(dd) >= 1000 ? `${(dd/1000).toFixed(1)}K` : dd}%</Text>
+              </View>
+            </View>
+          );
+        })()}
 
         {/* Live status + condition match detail */}
         {isTracked && liveStatus && (
@@ -831,6 +881,11 @@ const styles = StyleSheet.create({
   rcMetaTp: { color: COLORS.bull, fontWeight: "800" },
   rcMetaSl: { color: COLORS.bear, fontWeight: "800" },
   rcNet: { fontSize: 11, fontWeight: "900", fontFamily: "monospace", marginLeft: 8 },
+  rcEquityRow: { flexDirection: "row" as const, alignItems: "center" as const, marginBottom: 6, gap: 8 },
+  rcTrendCol: { flexDirection: "column" as const, alignItems: "flex-start" as const, gap: 2 },
+  rcTrendBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 3, borderWidth: 1 },
+  rcTrendText: { fontSize: 9, fontWeight: "800" as const, fontFamily: "monospace", letterSpacing: 0.5 },
+  rcDdText: { fontSize: 9, color: COLORS.textMuted, fontFamily: "monospace" },
   rcStatus: {
     flexDirection: "row",
     alignItems: "center",
