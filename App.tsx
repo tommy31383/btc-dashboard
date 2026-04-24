@@ -50,7 +50,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.4.0";
+const APP_VERSION = "4.3.23";
 const BUILD_DATE = "2026-04-24";
 
 /**
@@ -201,6 +201,9 @@ export default function App() {
           <StatusBar style="light" />
           <TopAppBar
             title="BTC DASHBOARD"
+            version={APP_VERSION}
+            buildDate={BUILD_DATE}
+            lastUpdate={lastUpdate}
             onNotifications={() => {}}
             onSettings={() => setShowSettings(true)}
           />
@@ -230,6 +233,9 @@ export default function App() {
           <StatusBar style="light" />
           <TopAppBar
             title="BTC DASHBOARD"
+            version={APP_VERSION}
+            buildDate={BUILD_DATE}
+            lastUpdate={lastUpdate}
             onNotifications={() => {}}
             onSettings={() => setShowSettings(true)}
           />
@@ -260,6 +266,9 @@ export default function App() {
       <StatusBar style="light" />
       <TopAppBar
         title="BTC DASHBOARD"
+        version={APP_VERSION}
+        buildDate={BUILD_DATE}
+        lastUpdate={lastUpdate}
         onNotifications={() => {}}
         onSettings={() => setShowSettings((v) => !v)}
       />

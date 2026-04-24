@@ -15,25 +15,41 @@ import { MaterialIcon } from "./MaterialIcon";
 
 export function TopAppBar({
   title = "BTC DASHBOARD",
+  version,
+  buildDate,
+  lastUpdate,
   onMenu,
   onNotifications,
   onSettings,
 }: {
   title?: string;
+  version?: string;
+  buildDate?: string;
+  lastUpdate?: number | null;
   onMenu?: () => void;
   onNotifications?: () => void;
   onSettings?: () => void;
 }) {
+  const updateStr = lastUpdate ? new Date(lastUpdate).toLocaleTimeString() : "—";
   return (
     <View style={styles.bar}>
       <View style={styles.left}>
         <TouchableOpacity onPress={onMenu} hitSlop={8} style={styles.iconBtn}>
           <MaterialIcon name="menu" size={22} color={P.primaryContainer} />
         </TouchableOpacity>
-        <Text style={styles.title}>
-          <Text style={styles.bitcoin}>₿ </Text>
-          {title}
-        </Text>
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.title}>
+            <Text style={styles.bitcoin}>₿ </Text>
+            {title}
+          </Text>
+          {(version || buildDate || lastUpdate) && (
+            <Text style={styles.meta}>
+              {version ? `v${version}` : ""}
+              {buildDate ? ` · ${buildDate}` : ""}
+              {lastUpdate ? ` · upd ${updateStr}` : ""}
+            </Text>
+          )}
+        </View>
       </View>
       <View style={styles.right}>
         {onNotifications && (
@@ -84,5 +100,12 @@ const styles = StyleSheet.create({
   },
   bitcoin: {
     color: P.bitcoinOrange,
+  },
+  meta: {
+    color: P.fade,
+    fontSize: 9,
+    fontFamily: "monospace",
+    letterSpacing: 1,
+    marginTop: 1,
   },
 });
