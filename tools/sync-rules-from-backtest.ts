@@ -33,9 +33,13 @@ function main() {
       rule.stats = rule.stats || {};
       Object.assign(rule.stats, {
         trades: r.trades,
+        wins: r.wins,
+        losses: r.losses,
+        timeouts: r.timeouts,
         winRate: r.winRate,
         profitFactor: r.profitFactor,
         netPnL: r.netPnL,
+        grossPnL: r.grossPnL,
         avgHold: r.avgHold,
         equityCurve: r.equityCurve ?? [],
         equityTrend: r.equityTrend ?? "FLAT",

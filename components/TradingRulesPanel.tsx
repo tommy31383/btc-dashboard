@@ -243,7 +243,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
             <Text style={[styles.rcRarityText, { color: accentColor }]}>{rarity.label}</Text>
           </View>
           <View style={[styles.rcWrPill, { backgroundColor: wrBg, borderColor: wrBorder }]}>
-            <Text style={[styles.rcWrText, { color: wrColor }]}>{stats.winRate}%</Text>
+            <Text style={[styles.rcWrText, { color: wrColor }]}>WR {stats.winRate}%</Text>
           </View>
         </View>
 
