@@ -22,6 +22,15 @@ export default function PaperTradeJournal({ trades, summary, stats, pendingCount
     return [...trades].sort((a, b) => (b.openedMs - a.openedMs)).slice(0, 20);
   }, [trades]);
 
+  // Δ prev = openedMs[i] - openedMs[i+1] (mảng đã sort desc theo openedMs)
+  const recentWithDelta = useMemo(() => {
+    return recent.map((t, i) => {
+      const prev = recent[i + 1];
+      const deltaMs = prev ? t.openedMs - prev.openedMs : null;
+      return { trade: t, deltaMs };
+    });
+  }, [recent]);
+
   const ruleHealthRows = useMemo(() => {
     const rows = Object.entries(stats.rules)
       .map(([ruleId, s]) => ({
@@ -91,9 +100,9 @@ export default function PaperTradeJournal({ trades, summary, stats, pendingCount
               Chưa có lệnh. App sẽ tự ghi lại khi có rule FIRE.
             </Text>
           ) : (
-            <ScrollView style={{ maxHeight: 220 }} nestedScrollEnabled>
-              {recent.map((t) => (
-                <TradeRow key={t.id} t={t} />
+            <ScrollView style={{ maxHeight: 320 }} nestedScrollEnabled>
+              {recentWithDelta.map(({ trade, deltaMs }) => (
+                <TradeRow key={trade.id} t={trade} deltaMs={deltaMs} />
               ))}
             </ScrollView>
           )}
@@ -119,7 +128,28 @@ function Stat({ label, value, color }: { label: string; value: string; color: st
   );
 }
 
-function TradeRow({ t }: { t: PaperTrade }) {
+function fmtTime(ms: number): string {
+  const d = new Date(ms);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+function fmtDuration(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  return `${h}h${m % 60}m`;
+}
+
+function fmtPrice(p: number): string {
+  return "$" + p.toFixed(0);
+}
+
+function TradeRow({ t, deltaMs }: { t: PaperTrade; deltaMs: number | null }) {
+  const [expanded, setExpanded] = useState(false);
   const sideColor = t.side === "LONG" ? P.green : P.error;
   const statusColor =
     t.status === "WIN" ? P.green :
@@ -127,17 +157,50 @@ function TradeRow({ t }: { t: PaperTrade }) {
     t.status === "TIMEOUT" ? P.dim :
     P.primaryContainer;
   const pnl = t.leveragedPnlPct ?? 0;
+  const now = Date.now();
+  const ageMs = (t.closedMs ?? now) - t.openedMs;
+  // Cột "Time": OPEN → "OPEN +Xm" / closed → "HH:mm"
+  const timeText =
+    t.status === "OPEN"
+      ? `OPEN +${fmtDuration(now - t.openedMs)}`
+      : fmtTime(t.closedMs ?? t.openedMs);
+  const deltaText = deltaMs !== null ? `+${fmtDuration(deltaMs)}` : "—";
+
   return (
-    <View style={styles.tradeRow}>
-      <Text style={[styles.tradeCell, { color: P.dim, width: 110 }]} numberOfLines={1}>
-        {t.ruleId}
-      </Text>
-      <Text style={[styles.tradeCell, { color: sideColor, width: 50, fontWeight: "700" }]}>{t.side}</Text>
-      <Text style={[styles.tradeCell, { color: statusColor, width: 70, fontWeight: "700" }]}>{t.status}</Text>
-      <Text style={[styles.tradeCell, { color: pnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right" }]}>
-        {t.status === "OPEN" ? "—" : `${pnl >= 0 ? "+" : ""}${pnl.toFixed(1)}%`}
-      </Text>
-    </View>
+    <TouchableOpacity onPress={() => setExpanded((v) => !v)} activeOpacity={0.7}>
+      <View style={styles.tradeRow}>
+        <Text style={[styles.tradeCell, { color: P.dim, width: 90 }]} numberOfLines={1}>
+          {t.ruleId}
+        </Text>
+        <Text style={[styles.tradeCell, { color: sideColor, width: 44, fontWeight: "700" }]}>{t.side}</Text>
+        <Text style={[styles.tradeCell, { color: statusColor, width: 60, fontWeight: "700" }]}>{t.status}</Text>
+        <Text style={[styles.tradeCell, { color: P.dim, width: 86 }]} numberOfLines={1}>
+          {timeText}
+        </Text>
+        <Text style={[styles.tradeCell, { color: P.dim, width: 56 }]} numberOfLines={1}>
+          Δ {deltaText}
+        </Text>
+        <Text style={[styles.tradeCell, { color: pnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right" }]}>
+          {t.status === "OPEN" ? "—" : `${pnl >= 0 ? "+" : ""}${pnl.toFixed(1)}%`}
+        </Text>
+      </View>
+      {expanded && (
+        <View style={styles.tradeDetail}>
+          <Text style={styles.detailLine}>
+            Entry {fmtPrice(t.entryPrice)} → {t.exitPrice ? `Exit ${fmtPrice(t.exitPrice)}` : "—"}
+            {"   "}TP {fmtPrice(t.tpPrice)} / SL {fmtPrice(t.slPrice)}
+          </Text>
+          <Text style={styles.detailLine}>
+            Open {fmtTime(t.openedMs)}
+            {t.closedMs ? `  →  Close ${fmtTime(t.closedMs)}` : `  (đang chạy ${fmtDuration(now - t.openedMs)})`}
+            {"   "}Hold {fmtDuration(ageMs)}
+          </Text>
+          <Text style={styles.detailLine}>
+            Lev {t.leverage}x · TP {t.targetPct}% · SL {t.stopPct}% · maxHold {t.maxHoldBars} bars
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 }
 
@@ -170,6 +233,19 @@ const styles = StyleSheet.create({
     borderBottomColor: alpha(P.borderSoft, 0.5),
   },
   tradeCell: { fontFamily: "monospace", fontSize: 10 },
+  tradeDetail: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    backgroundColor: alpha(P.borderSoft, 0.25),
+    borderBottomWidth: 1,
+    borderBottomColor: alpha(P.borderSoft, 0.5),
+  },
+  detailLine: {
+    color: P.text2,
+    fontFamily: "monospace",
+    fontSize: 10,
+    lineHeight: 16,
+  },
   healthRow: {
     flexDirection: "row",
     alignItems: "center",
