@@ -435,7 +435,8 @@ function OpenOrdersCard({ live }: Props) {
 // ── RECENT FILLS ────────────────────────────────────────────────────────────
 
 function RecentFillsCard({ live }: Props) {
-  const trades = [...live.recentTrades].reverse().slice(0, 30);
+  // Sort newest first by time (Binance trả oldest first)
+  const trades = [...live.recentTrades].sort((a, b) => b.time - a.time).slice(0, 30);
   return (
     <Card title={`💱 RECENT FILLS · ${live.recentTrades.length}`}>
       {trades.length === 0 ? (
@@ -443,15 +444,20 @@ function RecentFillsCard({ live }: Props) {
       ) : (
         trades.map((t) => {
           const pnl = parseFloat(t.realizedPnl);
+          const qty = parseFloat(t.qty);
+          const price = parseFloat(t.price);
+          const notional = qty * price;
           const time = new Date(t.time);
+          const dd = String(time.getDate()).padStart(2, "0");
+          const mo = String(time.getMonth() + 1).padStart(2, "0");
           const hh = String(time.getHours()).padStart(2, "0");
-          const mm = String(time.getMinutes()).padStart(2, "0");
+          const mi = String(time.getMinutes()).padStart(2, "0");
           return (
             <View key={t.id} style={styles.posRow}>
-              <Text style={[styles.posCell, { width: 50, color: P.dim }]}>{hh}:{mm}</Text>
+              <Text style={[styles.posCell, { width: 78, color: P.dim }]}>{dd}/{mo} {hh}:{mi}</Text>
               <Text style={[styles.posCell, { width: 50, color: t.side === "BUY" ? P.green : P.error, fontWeight: "700" }]}>{t.side}</Text>
-              <Text style={[styles.posCell, { width: 70 }]}>qty {t.qty}</Text>
-              <Text style={[styles.posCell, { width: 90 }]}>@ ${parseFloat(t.price).toFixed(1)}</Text>
+              <Text style={[styles.posCell, { width: 80 }]}>${notional.toFixed(2)}</Text>
+              <Text style={[styles.posCell, { width: 90 }]}>@ ${price.toFixed(1)}</Text>
               {pnl !== 0 && (
                 <Text style={[styles.posCell, { color: pnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "700" }]}>
                   {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
