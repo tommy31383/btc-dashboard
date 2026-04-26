@@ -1003,12 +1003,31 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
 
   const hard = JSON.parse(readFileSync(join(__dirname, "..", "assets", "hard_rules.json"), "utf8"));
 
+  // Anh Tommy v4.6.7: mô phỏng LIVE excludedTfs default ["5m"] - rule 5m KHÔNG vào lệnh
+  // Override: --includeAll để backtest cả 5m
+  const INCLUDE_ALL = args.includes("--includeAll");
+  const EXCLUDED_TFS = INCLUDE_ALL ? new Set<string>() : new Set(["5m"]);
+
   const allRules: { tf: string; rule: RuleEntry }[] = [];
+  let disabledSkipped = 0;
+  let excludedTfSkipped = 0;
   for (const tf of ENTRY_TFS) {
     if (!hard.tfs[tf]?.rules) continue;
-    for (const r of hard.tfs[tf].rules) allRules.push({ tf, rule: r });
+    for (const r of hard.tfs[tf].rules) {
+      const cfg = r.config as any;
+      if (cfg.disabled === true || cfg.delegatedTo) { disabledSkipped++; continue; }
+      if ((r as any).stats?.disabledAt) { disabledSkipped++; continue; }
+      if (EXCLUDED_TFS.has(tf)) { excludedTfSkipped++; continue; }
+      allRules.push({ tf, rule: r });
+    }
   }
-  console.log(`Active rules: ${allRules.length} (${ENTRY_TFS.map((tf) => `${tf}:${hard.tfs[tf]?.rules?.length ?? 0}`).join(", ")})`);
+  const activeByTf = ENTRY_TFS.map((tf) => {
+    const list = hard.tfs[tf]?.rules || [];
+    const cnt = list.filter((r: any) => !r.config?.disabled && !r.config?.delegatedTo && !r.stats?.disabledAt && !EXCLUDED_TFS.has(tf)).length;
+    return `${tf}:${cnt}`;
+  }).join(", ");
+  console.log(`Active rules: ${allRules.length} (${activeByTf}) · Skipped ${disabledSkipped} disabled, ${excludedTfSkipped} in excludedTfs (${[...EXCLUDED_TFS].join(",") || "none"})`);
+  if (!INCLUDE_ALL) console.log(`  → Use --includeAll to backtest 5m rules too`);
 
   // Fetch all TFs (with cache)
   const tfsToFetch = Array.from(ALL_TFS);
