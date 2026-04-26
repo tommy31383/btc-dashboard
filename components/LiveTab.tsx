@@ -458,6 +458,45 @@ function SettingsCard({ live }: Props) {
     });
   }
 
+  // Anh Tommy v4.7.0: Apply Best preset từ backtest 3y (PRESET B + DD Protection).
+  // Backtest results: NET +937k%, MaxDD -46k%, PF 1.54 (best risk-adjusted).
+  function applyBest() {
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(
+        "🚀 APPLY BEST PRESET?\n\n" +
+        "Áp config tốt nhất từ backtest 3y (NET +937k%, PF 1.54, MaxDD -46k%):\n\n" +
+        "• Margin $1, Leverage 100x, Max Open 100\n" +
+        "• Daily cap -$50, Cooldown 4h\n" +
+        "• Stack max 50/side, spacing 0, dist 0%, notional $200k\n" +
+        "• LTF confirm: Stoch 20/80, S/R proximity 0.4%\n" +
+        "• Equity DD Protection: drop 30% → pause 4h\n" +
+        "• Excluded TFs: 5m\n\n" +
+        "Override settings hiện tại. Tiếp tục?"
+      );
+      if (!ok) return;
+    }
+    const best: LiveSettings = {
+      symbol: draft.symbol,
+      leverage: 100,
+      marginUsd: 1,
+      maxOpen: 100,
+      dailyLossCapUsd: -50,
+      cooldownMinutes: 240,
+      excludedTfs: ["5m"],
+      confirmStochOsLevel: 20,
+      confirmStochObLevel: 80,
+      confirmSrProximityPct: 0.4,
+      stackMaxPerSide: 50,
+      stackPerSideSpacingMin: 0,
+      stackMinEntryDistPct: 0,
+      stackMaxNotionalUsd: 200000,
+      equityDdPausePct: 30,
+      equityDdPauseHours: 4,
+    };
+    setDirty(true);
+    setDraft(best);
+  }
+
   const allTfs = ["5m", "15m", "1h", "4h", "1d"];
 
   return (
@@ -540,10 +579,18 @@ function SettingsCard({ live }: Props) {
           <TouchableOpacity onPress={commit} style={styles.btnPrimary}>
             <Text style={styles.btnPrimaryText}>SAVE + SYNC GIT</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={applyBest} style={[styles.btnPrimary, { backgroundColor: P.green }]}>
+            <Text style={[styles.btnPrimaryText, { color: "#fff" }]}>🚀 APPLY BEST</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={live.resetSettings} style={styles.btnGhost}>
             <Text style={styles.btnGhostText}>RESET DEFAULT</Text>
           </TouchableOpacity>
         </View>
+      )}
+      {dirty && (
+        <Text style={[styles.note, { color: P.bitcoinOrange, fontSize: 10, marginTop: 4 }]}>
+          ⚠️ Có thay đổi chưa save. Bấm SAVE + SYNC GIT để áp dụng + push lên gist.
+        </Text>
       )}
       <Text style={styles.note}>
         Notional/lệnh = ${(draft.marginUsd * draft.leverage).toFixed(0)} ·
