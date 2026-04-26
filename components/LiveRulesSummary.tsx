@@ -7,7 +7,7 @@
  *   - useIndicatorHistory cung cấp slope/min → ETA tới ngưỡng
  *   - Format: "(~12m)" / "(~2.3h)" / "↗ đang đi xa" / "đang gom mẫu..."
  */
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { P } from "../utils/v2Theme";
 import { RuleMatchDetail } from "../hooks/useRuleAlerts";
@@ -66,10 +66,18 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
 
   // ETA per fail row — recomputed when history ref tick changes (every 5 min)
   // or when topFails list itself changes.
+  // Animated dots for "đang gom mẫu..." state — cycle every 500ms
+  const [dotPhase, setDotPhase] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setDotPhase((p) => (p + 1) % 3), 500);
+    return () => clearInterval(id);
+  }, []);
+  const dots = ".".repeat(dotPhase + 1).padEnd(3, " ");
+
   const failsWithETA = useMemo(() => {
     return stats.topFails.map((f) => {
       const parsed = parseFilterLabel(f.label);
-      if (!parsed) return { ...f, etaText: "", etaColor: P.dim };
+      if (!parsed) return { ...f, etaText: "", etaColor: P.dim, eta: null as any, parsed: null };
       const eta = estimateETA(history, f.tfKey, parsed);
       const etaText = formatETA(eta);
       const etaColor =
@@ -77,9 +85,17 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
         : eta.direction === "approaching" ? P.bitcoinOrange
         : eta.direction === "away" ? P.error
         : P.dim;
-      return { ...f, etaText, etaColor };
+      return { ...f, etaText, etaColor, eta, parsed };
     });
   }, [stats.topFails, history]);
+
+  function fmtVal(v: number): string {
+    return Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(1);
+  }
+  function targetText(p: NonNullable<ReturnType<typeof parseFilterLabel>>): string {
+    if (p.op === "between") return `${fmtVal(p.min!)}–${fmtVal(p.max!)}`;
+    return `${p.op} ${fmtVal(p.val!)}`;
+  }
 
   if (stats.total === 0) return null;
 
@@ -96,17 +112,33 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
       {failsWithETA.length > 0 && (
         <View style={styles.quote}>
           <Text style={styles.quoteCaption}>ĐANG CHỜ TÍN HIỆU · ETA refresh mỗi 20s</Text>
-          {failsWithETA.map((f) => (
-            <View key={`${f.label}|${f.tfKey}`} style={styles.quoteRow}>
-              <Text style={styles.quoteLine} numberOfLines={1}>
-                · {f.count} rule [{f.tfKey.toUpperCase()}] chờ{" "}
-                <Text style={styles.quoteLabel}>{f.label}</Text>
-              </Text>
-              {f.etaText ? (
-                <Text style={[styles.etaText, { color: f.etaColor }]}>{f.etaText}</Text>
-              ) : null}
-            </View>
-          ))}
+          {failsWithETA.map((f) => {
+            const isInsuf = f.eta?.direction === "insufficient";
+            const cur = f.eta?.current;
+            const have = f.eta?.samplesCount ?? 0;
+            const need = f.eta?.samplesNeeded ?? 3;
+            return (
+              <View key={`${f.label}|${f.tfKey}`} style={styles.quoteRow}>
+                <Text style={styles.quoteLine} numberOfLines={1}>
+                  · {f.count} rule [{f.tfKey.toUpperCase()}] chờ{" "}
+                  <Text style={styles.quoteLabel}>{f.label}</Text>
+                  {isInsuf && f.parsed && cur !== undefined ? (
+                    <Text style={styles.quoteSub}>
+                      {"  "}now <Text style={{ color: P.text2 }}>{fmtVal(cur)}</Text>
+                    </Text>
+                  ) : null}
+                </Text>
+                {isInsuf ? (
+                  <Text style={[styles.etaText, { color: P.dim }]}>
+                    gom {have}/{need}
+                    <Text style={{ color: P.bitcoinOrange }}>{dots}</Text>
+                  </Text>
+                ) : f.etaText ? (
+                  <Text style={[styles.etaText, { color: f.etaColor }]}>{f.etaText}</Text>
+                ) : null}
+              </View>
+            );
+          })}
         </View>
       )}
     </View>
@@ -163,6 +195,10 @@ const styles = StyleSheet.create({
   quoteLabel: {
     color: P.tertiary, fontWeight: "700", fontStyle: "normal",
     fontFamily: "SpaceGrotesk_700Bold",
+  },
+  quoteSub: {
+    color: P.dim, fontSize: 10, fontStyle: "normal",
+    fontFamily: "JetBrainsMono_500Medium",
   },
   etaText: {
     fontSize: 10, fontWeight: "700", letterSpacing: 0.5,

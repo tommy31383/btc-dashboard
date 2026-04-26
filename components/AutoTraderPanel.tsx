@@ -30,6 +30,7 @@ interface Props {
 
 export default function AutoTraderPanel({ account, summary, currentPrice, onReset }: Props) {
   const [collapsed, setCollapsed] = useState(false);
+  const [showSpec, setShowSpec] = useState(false);
 
   const handleReset = () => {
     if (typeof window !== "undefined") {
@@ -137,13 +138,18 @@ export default function AutoTraderPanel({ account, summary, currentPrice, onRese
             </Text>
           )}
 
-          {/* Spec note */}
-          <Text style={styles.note}>
-            Capital ban đầu: <Text style={styles.code}>${INITIAL_CAPITAL_USD}</Text>
-            {" · "}Margin/lệnh: <Text style={styles.code}>${MARGIN_PER_TRADE_USD}</Text>
-            {" · "}Notional: <Text style={styles.code}>${NOTIONAL_USD}</Text>
-            {"\n"}Limit ±0.1% · auto fill nếu hết 5p · no limit concurrent (chỉ giới hạn margin)
-          </Text>
+          {/* Spec note — collapsible */}
+          {showSpec && (
+            <Text style={styles.note}>
+              Capital ban đầu: <Text style={styles.code}>${INITIAL_CAPITAL_USD}</Text>
+              {" · "}Margin/lệnh: <Text style={styles.code}>${MARGIN_PER_TRADE_USD}</Text>
+              {" · "}Notional: <Text style={styles.code}>${NOTIONAL_USD}</Text>
+              {"\n"}Limit ±0.1% · auto fill nếu hết 5p · no limit concurrent (chỉ giới hạn margin)
+            </Text>
+          )}
+          <TouchableOpacity onPress={() => setShowSpec((v) => !v)} style={styles.specToggle}>
+            <Text style={styles.specToggleText}>{showSpec ? "▴ ẩn spec" : "▾ xem spec"}</Text>
+          </TouchableOpacity>
 
           {/* Reset button */}
           <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
@@ -256,6 +262,8 @@ const styles = StyleSheet.create({
   tag: { fontWeight: "800", fontSize: 10, letterSpacing: 0.5 },
   emptyText: { color: P.dim, fontSize: 11, lineHeight: 16, fontFamily: "Inter_400Regular", marginTop: 12, fontStyle: "italic" },
   note: { color: P.dim, fontSize: 10, lineHeight: 14, fontFamily: "JetBrainsMono_500Medium", marginTop: 14 },
+  specToggle: { alignSelf: "flex-start", paddingVertical: 4, marginTop: 6 },
+  specToggleText: { color: P.dim, fontSize: 10, fontFamily: "JetBrainsMono_500Medium", letterSpacing: 0.5 },
   code: { color: P.bitcoinOrange, fontFamily: "JetBrainsMono_700Bold" },
   resetBtn: {
     marginTop: 14, paddingVertical: 10, alignItems: "center",

@@ -109,6 +109,8 @@ export interface ETAResult {
   etaMinutes?: number;          // only when "approaching"
   current?: number;
   slopePerHour?: number;
+  samplesCount?: number;        // số sample đã thu thập (cho hiển thị progress)
+  samplesNeeded?: number;       // ngưỡng để fit được slope (default 3)
 }
 
 function linearSlope(samples: IndSample[]): { slope: number; intercept: number } | null {
@@ -135,11 +137,15 @@ export function estimateETA(
   parsed: ParsedLabel,
 ): ETAResult {
   const tfHist = history[tfKey];
-  if (!tfHist) return { direction: "insufficient" };
+  const NEEDED = 3;
+  if (!tfHist) return { direction: "insufficient", samplesCount: 0, samplesNeeded: NEEDED };
   const samples = tfHist[parsed.ind];
-  if (!samples || samples.length < 3) return { direction: "insufficient" };
+  const lastVal = samples && samples.length > 0 ? samples[samples.length - 1].v : undefined;
+  if (!samples || samples.length < NEEDED) {
+    return { direction: "insufficient", samplesCount: samples?.length ?? 0, samplesNeeded: NEEDED, current: lastVal };
+  }
   const fit = linearSlope(samples);
-  if (!fit) return { direction: "insufficient" };
+  if (!fit) return { direction: "insufficient", samplesCount: samples.length, samplesNeeded: NEEDED, current: lastVal };
   const current = samples[samples.length - 1].v;
   const slopePerMin = fit.slope;
   const slopePerHour = slopePerMin * 60;

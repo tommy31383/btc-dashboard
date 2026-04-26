@@ -40,11 +40,13 @@ import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 import PaperTradeJournal from "./components/PaperTradeJournal";
 import AutoTraderPanel from "./components/AutoTraderPanel";
+// LiveTradingPanel moved to dedicated LiveTab
 import HistoryScreen from "./components/HistoryScreen";
-import All15mPanel from "./components/All15mPanel";
+import LiveTab from "./components/LiveTab";
 import All5mPanel from "./components/All5mPanel";
 import { useAutoTrader } from "./hooks/useAutoTrader";
-import { use15mAllTrader } from "./hooks/use15mAllTrader";
+import { useBinanceLive } from "./hooks/useBinanceLive";
+// import { use15mAllTrader } from "./hooks/use15mAllTrader"; // disabled — replaced by LIVE tab
 import { use5mAllTrader } from "./hooks/use5mAllTrader";
 import { pullFromGist, mergeTrades } from "./utils/gistSync";
 import { loadTrades, replaceTrades } from "./utils/paperTrader";
@@ -60,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.49";
+const APP_VERSION = "4.3.53";
 const BUILD_DATE = "2026-04-25";
 
 /**
@@ -125,7 +127,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "history" | "all15m" | "all5m">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "history" | "live" | "all5m">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -166,8 +168,12 @@ export default function App() {
   // 1000 USD, margin 30/lệnh, lev 100x, limit ±0.1% chờ tối đa 5p).
   const autoTrader = useAutoTrader(activeAlerts, priceData?.price ?? null);
 
+  // v4.3.52 — Binance Live (Phase 1 DRY RUN)
+  const live = useBinanceLive(activeAlerts);
+
   // v4.3.44 — 15m All trader: PC-only, local AsyncStorage, LONG every closed 15m bar
-  const all15m = use15mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all15m");
+  // 15m All trader disabled — replaced by LIVE tab
+  // const all15m = use15mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all15m");
 
   // v4.3.47 — 5m All trader: PC-only, StochRSI 5m + S/R 15m fallback, cooldown 15m
   const all5m = use5mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all5m");
@@ -212,7 +218,7 @@ export default function App() {
     if (t === "trades") setActiveTab("risk");
     else if (t === "gptRule") setActiveTab("gptRule");
     else if (t === "history") setActiveTab("history");
-    else if (t === "all15m") setActiveTab("all15m");
+    else if (t === "live") setActiveTab("live");
     else if (t === "all5m") setActiveTab("all5m");
     else setActiveTab("dashboard");
   }, []);
@@ -322,7 +328,7 @@ export default function App() {
     );
   }
 
-  if (activeTab === "all15m") {
+  if (activeTab === "live") {
     return (
       <ErrorBoundary>
         <SafeAreaView style={styles.safe}>
@@ -335,13 +341,7 @@ export default function App() {
             onNotifications={() => {}}
             onSettings={() => setShowSettings(true)}
           />
-          <All15mPanel
-            account={all15m.account}
-            summary={all15m.summary}
-            currentPrice={priceData?.price ?? null}
-            stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
-            onReset={all15m.reset}
-          />
+          <LiveTab live={live} />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}
@@ -468,6 +468,8 @@ export default function App() {
           ruleMatchDetails={ruleMatchDetails}
           tfData={tfData}
         />
+
+        {/* LIVE TRADING moved to dedicated tab (BottomNav → LIVE) */}
 
         {/* v4.3.41 — AUTO TRADER: tự động vào lệnh khi rule fire (1000U cap, 30U margin, 100x lev) */}
         <AutoTraderPanel
