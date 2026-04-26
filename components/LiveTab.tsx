@@ -35,12 +35,12 @@ export default function LiveTab({ live }: Props) {
       <StatusBar live={live} />
 
       <View style={[styles.grid, isWide && styles.gridWide]}>
-        <View style={styles.col}>
+        <View style={[isWide && styles.col]}>
           <ControlsCard live={live} />
           <CredentialsCard live={live} />
           <SettingsCard live={live} />
         </View>
-        <View style={styles.col}>
+        <View style={[isWide && styles.col]}>
           <TrackedPositionsCard live={live} />
           <PositionsCard live={live} />
           <OpenOrdersCard live={live} />
@@ -92,8 +92,12 @@ function StatusBar({ live }: Props) {
     if (isLeader && !live.hasPat) {
       return `👉 BẠN (${live.deviceLabel || "?"}) — LOCAL mode (chưa có GitHub Token để sync multi-device. Vào DASHBOARD → SETTINGS → GitHub PAT)`;
     }
+    if (isLeader && live.hasPat && live.verifyLeftMs > 0) {
+      return `👉 BẠN (${live.deviceLabel || "?"}) — đang push leader file lên gist, còn ${verifyLeftSec}s nữa hiển thị info đầy đủ`;
+    }
     if (isLeader && live.hasPat) {
-      return `👉 BẠN (${live.deviceLabel || "?"}) — đang push lên GitHub gist lần đầu, chờ vài giây refresh...`;
+      // Edge case: đã verify xong nhưng gist trả null (API delay) — auto-retry trong tick 20s tới
+      return `👉 BẠN (${live.deviceLabel || "?"}) — gist info chưa nhận được, auto-pull lại trong tick kế (mỗi 20s). Bấm 🔄 RECHECK PAT để pull ngay.`;
     }
     if (isBoot && live.verifyLeftMs > 0) {
       return `⏳ Đang verify leader claim trên gist · còn ${verifyLeftSec}s · sau đó hiển thị LEADER hoặc FOLLOWER chính xác`;
@@ -531,6 +535,7 @@ function TrackedPositionsCard({ live }: Props) {
     <Card title={`🎯 SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
       <Text style={styles.note}>
         Mỗi virtual lệnh có entry/TP/SL/qty riêng. App tự đóng đúng qty của lệnh khi mark price hit (Plan B).
+        {"\n"}⚠️ CHỈ count lệnh APP MỞ qua rule. Lệnh anh tự đặt trên Binance (manual) KHÔNG hiện ở đây.
       </Text>
       {sorted.length === 0 ? (
         <Text style={styles.note}>Chưa có virtual lệnh nào đang theo dõi.</Text>
