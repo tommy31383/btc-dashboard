@@ -114,8 +114,8 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
       <DebugLabel name="All5mPanel" />
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.h1}>⚡ 5m ALL — RULE: BINANCE HEDGE</Text>
-          <Text style={styles.subtitle}>Paper test · SMART STACK max {STACK_MAX_PER_SIDE} per side · spacing {STACK_PER_SIDE_SPACING_MS / 60000}m · min dist {STACK_MIN_ENTRY_DIST_PCT}%</Text>
+          <Text style={styles.h1}>⚡ 5m ALL — RULE: SMART STACK</Text>
+          <Text style={styles.subtitle}>Paper test · max {STACK_MAX_PER_SIDE} per side · spacing {STACK_PER_SIDE_SPACING_MS / 60000}m · min dist {STACK_MIN_ENTRY_DIST_PCT}%</Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
           <Text style={styles.resetBtnText}>🗑 RESET</Text>
@@ -124,9 +124,12 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
 
       {/* RULE LOGIC */}
       <View style={styles.ruleBox}>
-        <Text style={styles.ruleTitle}>📋 RULE: BINANCE HEDGE — giả lập Cross + Hedge + Single Asset</Text>
+        <Text style={styles.ruleTitle}>📋 RULE: SMART STACK — nhiều lệnh cùng side, mỗi lệnh TP/SL riêng</Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Mode:</Text> max <Text style={[styles.ruleNum, { color: P.green }]}>1 LONG</Text> + <Text style={[styles.ruleNum, { color: P.error }]}>1 SHORT</Text> cùng lúc (Hedge). Nếu đã có cùng side OPEN → skip entry.
+          <Text style={styles.ruleStrong}>Stack gates per side (anh Tommy v4.3.87+):</Text>
+          {"\n"}  • Tối đa <Text style={[styles.ruleNum, { color: P.bitcoinOrange }]}>{STACK_MAX_PER_SIDE}</Text> lệnh OPEN cùng side (LONG / SHORT đếm riêng)
+          {"\n"}  • Tối thiểu <Text style={styles.ruleNum}>{STACK_PER_SIDE_SPACING_MS / 60000} phút</Text> giữa 2 entry CÙNG side
+          {"\n"}  • Entry mới phải xa entry gần nhất CÙNG side ≥ <Text style={styles.ruleNum}>{STACK_MIN_ENTRY_DIST_PCT}%</Text> (tránh nhồi 1 vùng)
         </Text>
         <Text style={styles.ruleLine}>
           <Text style={styles.ruleStrong}>Trigger:</Text> mỗi cây 5m vừa đóng (close-bar evaluate)
@@ -142,16 +145,17 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROXIMITY_PCT}%</Text> dưới Resistance → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Exit:</Text> TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> (raw price, kiểm tra mỗi tick)
+          <Text style={styles.ruleStrong}>Exit (per-lệnh):</Text> TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> raw price.
+          {"\n"}  Mỗi tick scan TỪNG lệnh OPEN riêng, hit TP/SL → close độc lập (không ảnh hưởng lệnh khác).
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Risk:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
+          <Text style={styles.ruleStrong}>Risk per lệnh:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Cooldown:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MS / 60000} phút</Text> giữa các entry · không vào trùng cây 5m
+          <Text style={styles.ruleStrong}>Cooldown chung:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MS / 60000} phút</Text> giữa các entry (mọi side) · không vào trùng cây 5m
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Tên rule:</Text> <Text style={[styles.ruleNum, { color: P.tertiary }]}>BINANCE_HEDGE_5M_v1</Text> (paper test, mô phỏng exact setup live của Tommy)
+          <Text style={styles.ruleStrong}>Tên rule:</Text> <Text style={[styles.ruleNum, { color: P.tertiary }]}>SMART_STACK_5M_v1</Text> · UI có nút ✕ CLOSE từng lệnh
         </Text>
       </View>
 
