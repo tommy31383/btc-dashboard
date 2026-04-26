@@ -76,6 +76,18 @@ export interface AccountSnapshot {
   totalUnrealizedProfit: string;
   totalMarginBalance: string;
   availableBalance: string;
+  feeTier?: number;
+  canTrade?: boolean;
+  canDeposit?: boolean;
+  canWithdraw?: boolean;
+  multiAssetsMargin?: boolean;
+  totalInitialMargin?: string;
+  totalMaintMargin?: string;
+}
+
+export async function getMultiAssetsMode(cred: Credentials): Promise<boolean> {
+  const res = await signedRequest<{ multiAssetsMargin: boolean }>(cred, "GET", "/fapi/v1/multiAssetsMargin");
+  return res.multiAssetsMargin === true;
 }
 
 export interface PositionRisk {

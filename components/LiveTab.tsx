@@ -79,6 +79,19 @@ function StatusBar({ live }: Props) {
           <BigPill label="PAUSED" value={`${cooldownLeftM}m`} color={P.bitcoinOrange} />
         )}
         <BigPill label="POS MODE" value={live.state.hedgeMode ? "HEDGE" : "ONE-WAY"} color={live.state.hedgeMode ? P.tertiary : P.text2} />
+        {live.account?.multiAssetsMargin !== undefined && (
+          <BigPill
+            label="ASSET MODE"
+            value={live.account.multiAssetsMargin ? "MULTI" : "SINGLE"}
+            color={live.account.multiAssetsMargin ? P.error : P.text2}
+          />
+        )}
+        {live.account?.feeTier !== undefined && (
+          <BigPill label="FEE TIER" value={`VIP ${live.account.feeTier}`} color={P.dim} />
+        )}
+        {live.account?.canTrade === false && (
+          <BigPill label="TRADE" value="LOCKED" color={P.error} />
+        )}
       </View>
       {live.lastError && (
         <Text style={[styles.errorBar, { color: live.lastError.startsWith("✅") ? P.green : P.error }]}>
