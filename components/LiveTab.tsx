@@ -16,6 +16,7 @@ import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions,
 } from "react-native";
 import { P } from "../utils/v2Theme";
+import { MaterialIcon } from "./v2/MaterialIcon";
 import { UseBinanceLiveResult } from "../hooks/useBinanceLive";
 import { LiveSettings } from "../utils/liveTraderEngine";
 
@@ -193,17 +194,35 @@ function StatusBar({ live }: Props) {
           ⛔ DISCONNECTED — device này chưa có Binance API key, không tham gia leader/follower election. Nhập key ở CREDENTIALS để connect.
         </Text>
       )}
+      {/* TOP KPI 3-col compact (Stitch inspiration v4.6.0) — quan trọng nhất, hiện luôn */}
+      <View style={styles.kpiTop}>
+        <View style={styles.kpiTopCell}>
+          <Text style={styles.kpiTopLabel}>MODE</Text>
+          <Text style={[styles.kpiTopValue, { color: live.state.dryRun ? P.dim : P.error }]}>
+            {live.state.dryRun ? "DRY" : "REAL"}
+          </Text>
+        </View>
+        <View style={styles.kpiTopDivider} />
+        <View style={styles.kpiTopCell}>
+          <Text style={styles.kpiTopLabel}>AUTO</Text>
+          <Text style={[styles.kpiTopValue, { color: live.state.autoEnabled ? P.green : P.dim }]}>
+            {live.state.autoEnabled ? "ON" : "OFF"}
+          </Text>
+        </View>
+        <View style={styles.kpiTopDivider} />
+        <View style={styles.kpiTopCell}>
+          <Text style={styles.kpiTopLabel}>PnL TODAY</Text>
+          <Text style={[styles.kpiTopValue, { color: live.dailyPnl >= 0 ? P.green : P.error }]}>
+            {live.dailyPnl >= 0 ? "+" : ""}${live.dailyPnl.toFixed(2)}
+          </Text>
+        </View>
+      </View>
+
+      {/* Secondary KPIs — pill row scroll horizontal, info phụ */}
       <View style={styles.statusRow}>
-        <BigPill label="MODE" value={live.state.dryRun ? "DRY" : "REAL"} color={live.state.dryRun ? P.dim : P.error} />
-        <BigPill label="AUTO" value={live.state.autoEnabled ? "ON" : "OFF"} color={live.state.autoEnabled ? P.green : P.dim} />
         <BigPill label="OPEN" value={`${live.openCount}/${live.state.settings.maxOpen}`} color={P.text} />
         <BigPill label="TRACKED" value={`${live.state.trackedPositions.length}`} color={P.tertiary} />
         <BigPill label="PENDING" value={`${live.state.pendingAlerts.length}`} color={P.bitcoinOrange} />
-        <BigPill
-          label="PnL TODAY"
-          value={`${live.dailyPnl >= 0 ? "+" : ""}$${live.dailyPnl.toFixed(2)}`}
-          color={live.dailyPnl >= 0 ? P.green : P.error}
-        />
         {wallet !== null && (
           <BigPill label="WALLET" value={`$${wallet.toFixed(2)}`} color={P.bitcoinOrange} />
         )}
@@ -257,7 +276,7 @@ function ControlsCard({ live }: Props) {
   const isFollower = live.role === "FOLLOWER";
   const canControl = !isFollower; // anh Tommy: follower chỉ XEM, không bật AUTO/REAL
   return (
-    <CollapsibleCard storageKey="@live_card_controls" title={`⚡ CONTROLS${isFollower ? " · 👁 READ-ONLY (FOLLOWER)" : ""}`}>
+    <CollapsibleCard storageKey="@live_card_controls" icon="bolt" title={`CONTROLS${isFollower ? " · READ-ONLY (FOLLOWER)" : ""}`}>
       {isFollower && (
         <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
           🔒 Bạn đang ở FOLLOWER mode — KHÔNG được bật AUTO / đổi DRY/REAL / reset / clear / close.
@@ -346,7 +365,7 @@ function CredentialsCard({ live }: Props) {
   };
 
   return (
-    <CollapsibleCard storageKey="@live_card_credentials" title="🔐 CREDENTIALS (local only — KHÔNG sync)">
+    <CollapsibleCard storageKey="@live_card_credentials" icon="lock" title="CREDENTIALS (local only — KHÔNG sync)">
       <Text style={styles.warn}>
         ⚠️ DISABLE quyền "Withdrawal" trên API key. Chỉ enable Futures + Trading.
         {"\n"}🔒 Nhập / paste vào được, KHÔNG show / copy ra để tránh lộ key.
@@ -430,7 +449,7 @@ function SettingsCard({ live }: Props) {
   const allTfs = ["5m", "15m", "1h", "4h", "1d"];
 
   return (
-    <CollapsibleCard storageKey="@live_card_settings" title="⚙️ SETTINGS (sync git)" defaultCollapsed>
+    <CollapsibleCard storageKey="@live_card_settings" icon="settings" title="SETTINGS (sync git)" defaultCollapsed>
       <View style={styles.fieldRow}>
         <NumField label="Symbol (lock)" value={draft.symbol} disabled />
         <NumField label="Leverage (info, set trên Binance)" value={draft.leverage} onChangeNum={(v) => field("leverage", v)} />
@@ -564,7 +583,7 @@ function TrackedPositionsCard({ live }: Props) {
     stt: 32, side: 56, rule: 110, entry: 80, qty: 60, tp: 130, sl: 130, held: 56, upnl: 70, action: 80,
   };
   return (
-    <Card title={`🎯 SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
+    <Card icon="track_changes" title={`SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
       <Text style={styles.note}>
         Mỗi virtual lệnh có entry/TP/SL/qty riêng. App tự đóng đúng qty của lệnh khi mark price hit (Plan B).
         {"\n"}⚠️ CHỈ count lệnh APP MỞ qua rule. Lệnh anh tự đặt trên Binance (manual) KHÔNG hiện ở đây.
@@ -643,7 +662,7 @@ function PositionsCard({ live }: Props) {
   }
   // Mobile-friendly card stacking layout
   return (
-    <Card title={`📍 OPEN POSITIONS · ${open.length}`}>
+    <Card icon="location_on" title={`OPEN POSITIONS · ${open.length}`}>
       {open.length === 0 ? (
         <Text style={styles.note}>Không có position nào mở trên Binance.</Text>
       ) : (
@@ -716,7 +735,7 @@ function Detail({ label, value, sub, subColor }: { label: string; value: string;
 function OpenOrdersCard({ live }: Props) {
   const orders = live.openOrders;
   return (
-    <Card title={`📋 OPEN ORDERS · ${orders.length}`}>
+    <Card icon="list_alt" title={`OPEN ORDERS · ${orders.length}`}>
       {orders.length === 0 ? (
         <Text style={styles.note}>
           Không có order pending trên Binance.{"\n"}
@@ -828,7 +847,7 @@ function HistoryCard({ live }: Props) {
   }
 
   return (
-    <Card title={`📜 HISTORY · ${live.state.journal.length} total`}>
+    <Card icon="history" title={`HISTORY · ${live.state.journal.length} total`}>
       <View style={styles.row}>
         {(["ALL", "ENTRY", "CLOSE", "PENDING", "BLOCK", "ERROR"] as const).map((f) => (
           <TouchableOpacity key={f} onPress={() => setFilter(f)}
@@ -895,10 +914,23 @@ function JournalRow({ j }: { j: any }) {
 
 // ── SHARED ──────────────────────────────────────────────────────────────────
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+type IconName = React.ComponentProps<typeof MaterialIcon>["name"];
+
+function CardHeader({ icon, title }: { icon?: IconName; title: string }) {
+  return (
+    <View style={styles.cardHeader}>
+      {icon && <MaterialIcon name={icon} size={16} color={P.bitcoinOrange} />}
+      <Text style={styles.cardTitleText}>{title}</Text>
+    </View>
+  );
+}
+
+function Card({ title, icon, children }: { title: string; icon?: IconName; children: React.ReactNode }) {
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{title}</Text>
+      <View style={styles.cardTitleWrap}>
+        <CardHeader icon={icon} title={title} />
+      </View>
       <View style={styles.cardBody}>{children}</View>
     </View>
   );
@@ -911,17 +943,18 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function CollapsibleCard({
   storageKey,
   title,
+  icon,
   defaultCollapsed = false,
   children,
 }: {
   storageKey: string;
   title: string;
+  icon?: IconName;
   defaultCollapsed?: boolean;
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState<boolean>(defaultCollapsed);
   const [hydrated, setHydrated] = useState(false);
-  // Hydrate từ AsyncStorage 1 lần khi mount
   React.useEffect(() => {
     let alive = true;
     AsyncStorage.getItem(storageKey).then((v) => {
@@ -941,33 +974,42 @@ function CollapsibleCard({
 
   return (
     <View style={styles.card}>
-      <TouchableOpacity onPress={toggle} activeOpacity={0.7}>
-        <Text style={styles.cardTitle}>{collapsed ? "▶" : "▼"} {title}</Text>
+      <TouchableOpacity onPress={toggle} activeOpacity={0.7} style={styles.cardTitleWrap}>
+        <View style={styles.cardHeader}>
+          {icon && <MaterialIcon name={icon} size={16} color={P.bitcoinOrange} />}
+          <Text style={styles.cardTitleText}>{title}</Text>
+          <Text style={styles.cardChevron}>{collapsed ? "▶" : "▼"}</Text>
+        </View>
       </TouchableOpacity>
-      {!collapsed && hydrated && <View style={styles.cardBody}>{children}</View>}
-      {!collapsed && !hydrated && <View style={styles.cardBody}>{children}</View>}
+      {!collapsed && <View style={styles.cardBody}>{children}</View>}
     </View>
   );
 }
 
+/** Stitch-style toggle (rounded switch + label). Card-style hộp với label trên + switch dưới (Stitch v4.6.0). */
 function Toggle({ label, on, onPress, disabled, color, solidWhenOn }:
   { label: string; on: boolean; onPress: () => void; disabled?: boolean; color: string; solidWhenOn?: boolean }) {
   const filled = on && solidWhenOn;
   return (
     <TouchableOpacity
-      onPress={onPress} disabled={disabled}
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={0.7}
       style={[
-        styles.toggle,
+        styles.toggleCard,
         {
-          borderColor: on ? color : P.border,
-          backgroundColor: filled ? color : on ? color + "22" : "transparent",
+          borderColor: on ? color : P.borderSoft,
+          backgroundColor: filled ? color + "11" : on ? color + "08" : P.surface,
           opacity: disabled ? 0.4 : 1,
         },
       ]}
     >
-      <Text style={[styles.toggleText, { color: filled ? "#fff" : on ? color : P.dim }]}>
+      <Text style={[styles.toggleCardLabel, { color: on ? color : P.dim }]} numberOfLines={1}>
         {label}
       </Text>
+      <View style={[styles.switchTrack, { backgroundColor: on ? color + "33" : P.borderSoft, borderColor: on ? color : P.border }]}>
+        <View style={[styles.switchThumb, { backgroundColor: on ? color : P.dim, alignSelf: on ? "flex-end" : "flex-start" }]} />
+      </View>
     </TouchableOpacity>
   );
 }
@@ -997,6 +1039,22 @@ const styles = StyleSheet.create({
   statusRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   roleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 8 },
   roleInfo: { flex: 1, minWidth: 140 },
+
+  // Top KPI 3-col compact (Stitch v4.6.0)
+  kpiTop: {
+    flexDirection: "row",
+    backgroundColor: P.surface,
+    borderWidth: 1,
+    borderColor: P.borderSoft,
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginVertical: 8,
+  },
+  kpiTopCell: { flex: 1, alignItems: "flex-start" },
+  kpiTopDivider: { width: 1, backgroundColor: P.borderSoft, marginHorizontal: 8 },
+  kpiTopLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, fontWeight: "800", letterSpacing: 1.5 },
+  kpiTopValue: { fontFamily: "monospace", fontSize: 16, fontWeight: "800", marginTop: 4 },
   pill: {
     backgroundColor: P.elevated, borderWidth: 1, borderColor: P.border,
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 4, minWidth: 76, alignItems: "center",
@@ -1015,6 +1073,15 @@ const styles = StyleSheet.create({
     padding: 10, borderBottomWidth: 1, borderBottomColor: P.borderSoft,
   },
   cardBody: { padding: 10 },
+
+  // Stitch-style header (icon + title + optional chevron)
+  cardTitleWrap: { borderBottomWidth: 1, borderBottomColor: P.borderSoft, paddingHorizontal: 10, paddingVertical: 10 },
+  cardHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  cardTitleText: {
+    color: P.text2, fontFamily: "monospace", fontSize: 11, fontWeight: "900", letterSpacing: 1,
+    flex: 1,
+  },
+  cardChevron: { color: P.dim, fontSize: 11, fontWeight: "700" },
 
   row: { flexDirection: "row", gap: 8, flexWrap: "wrap", alignItems: "center", marginVertical: 4 },
   fieldRow: { flexDirection: "row", gap: 8, marginVertical: 4 },
@@ -1040,6 +1107,22 @@ const styles = StyleSheet.create({
 
   toggle: { borderWidth: 2, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 4 },
   toggleText: { fontFamily: "monospace", fontWeight: "900", fontSize: 11, letterSpacing: 1 },
+
+  // Stitch-style toggle card (v4.6.0)
+  toggleCard: {
+    flex: 1, minWidth: 130,
+    borderWidth: 1, borderRadius: 6,
+    paddingHorizontal: 12, paddingVertical: 10,
+    gap: 10,
+  },
+  toggleCardLabel: { fontFamily: "monospace", fontSize: 10, fontWeight: "800", letterSpacing: 1 },
+  switchTrack: {
+    width: 40, height: 20, borderRadius: 999,
+    borderWidth: 1, padding: 2, justifyContent: "center",
+  },
+  switchThumb: {
+    width: 14, height: 14, borderRadius: 999,
+  },
 
   tfChip: { borderWidth: 1, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 4 },
 
