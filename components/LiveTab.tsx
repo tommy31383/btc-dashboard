@@ -243,8 +243,12 @@ function SettingsCard({ live }: Props) {
     <Card title="⚙️ SETTINGS (sync git)">
       <View style={styles.fieldRow}>
         <NumField label="Symbol (lock)" value={draft.symbol} disabled />
-        <NumField label="Leverage" value={draft.leverage} onChangeNum={(v) => field("leverage", v)} />
+        <NumField label="Leverage (info, set trên Binance)" value={draft.leverage} onChangeNum={(v) => field("leverage", v)} />
       </View>
+      <Text style={styles.note}>
+        💡 Leverage chỉ là info (để tính notional/margin hiển thị). App KHÔNG tự set leverage trên Binance.
+        Anh muốn đổi → vào Binance Futures → BTCUSDT → đổi leverage thủ công.
+      </Text>
       <View style={styles.fieldRow}>
         <NumField label="Margin (USD)" value={draft.marginUsd} onChangeNum={(v) => field("marginUsd", v)} step={0.5} />
         <NumField label="Max OPEN" value={draft.maxOpen} onChangeNum={(v) => field("maxOpen", Math.max(1, Math.round(v)))} />
@@ -527,7 +531,7 @@ function JournalRow({ j }: { j: any }) {
     <View style={styles.histRow}>
       <Text style={styles.histTime}>{dd}/{mm} {hh}:{mi}</Text>
       <Text style={[styles.histRule, { color: P.dim }]} numberOfLines={1}>{j.ruleId}</Text>
-      <Text style={[styles.histText, { color }]} numberOfLines={2}>
+      <Text style={[styles.histText, { color }]} numberOfLines={6}>
         {j.dryRun && a.kind === "ENTRY" ? "[DRY] " : ""}{text}
       </Text>
     </View>

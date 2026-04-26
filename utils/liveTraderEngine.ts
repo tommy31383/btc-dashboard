@@ -217,21 +217,42 @@ export async function executeAction(
   }
 
   const cred: Credentials = { apiKey: s.apiKey, apiSecret: s.apiSecret };
+  // KHÔNG gọi setLeverage — dùng leverage hiện tại trên Binance (Tommy set thủ công).
+  // Lý do: Isolated Margin với open position không cho phép giảm leverage → gây lỗi -4161.
+  // Anh muốn đổi leverage → vào Binance app → BTCUSDT Futures → đóng position rồi đổi.
   try {
-    if (!s.leverageSetForSession) {
-      await setLeverage(cred, s.settings.symbol, s.settings.leverage);
-      next = { ...next, leverageSetForSession: true };
-    }
     const buySell: "BUY" | "SELL" = action.side === "LONG" ? "BUY" : "SELL";
     const closeSide: "BUY" | "SELL" = action.side === "LONG" ? "SELL" : "BUY";
     await placeMarketOrder(cred, s.settings.symbol, buySell, action.qty);
     await placeTakeProfitMarket(cred, s.settings.symbol, closeSide, action.tpPrice, true);
     await placeStopMarket(cred, s.settings.symbol, closeSide, action.slPrice, true);
   } catch (e: any) {
-    next = await logAction(next, alert.id, alert.tfKey, { kind: "ERROR", message: e?.message ?? String(e) });
+    const msg = e?.message ?? String(e);
+    next = await logAction(next, alert.id, alert.tfKey, { kind: "ERROR", message: msg + explainBinanceError(msg) });
   }
   await saveState(next);
   return next;
+}
+
+/**
+ * Map mã lỗi Binance → giải thích tiếng Việt + hint khắc phục.
+ * Ghép sau message gốc để user hiểu vì sao + sửa thế nào.
+ */
+export function explainBinanceError(msg: string): string {
+  const m = msg.toLowerCase();
+  if (msg.includes("-4161")) return "\n💡 Leverage giảm không cho phép khi đang có position mở (Isolated). Hoặc đóng position, hoặc đổi setting.leverage cho khớp với leverage hiện tại trên Binance.";
+  if (msg.includes("-4046") || m.includes("no need to change")) return "\n💡 Leverage hiện tại đã = setting, không cần đổi (an toàn).";
+  if (msg.includes("-2014")) return "\n💡 API key sai format. Check lại đã paste đúng chưa.";
+  if (msg.includes("-2015")) return "\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures.";
+  if (msg.includes("-1021")) return "\n💡 Timestamp lệch. Check đồng hồ máy đúng giờ chưa.";
+  if (msg.includes("-1022")) return "\n💡 Signature sai. Có thể secret key copy thiếu/lệch ký tự.";
+  if (msg.includes("-2019")) return "\n💡 Margin không đủ. Account avail balance không đủ cho lệnh này.";
+  if (msg.includes("-4131") || m.includes("price filter")) return "\n💡 Giá order ngoài range cho phép. Có thể price stale.";
+  if (msg.includes("-1111") || m.includes("precision")) return "\n💡 Quantity precision sai. BTCUSDT yêu cầu 3 chữ số (vd 0.001).";
+  if (msg.includes("-1013") || m.includes("filter failure: notional")) return "\n💡 Notional quá nhỏ. BTCUSDT min notional ~$5 — tăng margin × lev.";
+  if (msg.includes("-2027") || m.includes("max position")) return "\n💡 Đã đạt max position size cho symbol. Đóng bớt position rồi thử lại.";
+  if (msg.includes("418") || m.includes("banned")) return "\n💡 IP bị Binance ban tạm thời (rate limit). Chờ vài phút.";
+  return "";
 }
 
 export async function maybeTriggerCooldown(s: LiveTraderState, dailyPnl: number): Promise<LiveTraderState> {
