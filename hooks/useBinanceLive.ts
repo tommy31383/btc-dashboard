@@ -80,50 +80,48 @@ export function useBinanceLive(
   const lastAlertSeenRef = useRef<Set<string>>(new Set());
   const deviceLabelRef = useRef<string>(autoDeviceLabel());
 
-  // Boot: deviceId + check leader + load state
+  // Boot: deviceId + decide role + load state.
+  // KHÔNG kẹt ở BOOTING — set role ngay, claim leader ở background.
   useEffect(() => {
     (async () => {
       const myId = await getDeviceId();
       setDeviceId(myId);
       let s = await loadState();
       setState(s);
-      // Nếu chưa nhập GitHub PAT → không thể sync gist → fallback LOCAL LEADER (single-device mode).
-      // Mọi action vẫn chạy bình thường, chỉ là không có lock multi-device.
       const cfg = await getGistConfig();
+      // Không có PAT → LOCAL LEADER (single-device, không lock multi-device).
       if (!cfg.pat) {
         setRole("LEADER");
         setLeader(null);
-        setLastError("ℹ️ LOCAL LEADER — chưa có GitHub PAT để sync multi-device. Nhập PAT ở Dashboard → SETTINGS để bật chế độ multi-device.");
+        setLastError("ℹ️ LOCAL LEADER — chưa có GitHub PAT. Nhập ở Dashboard → SETTINGS để bật multi-device sync.");
         return;
       }
-      // Có PAT → check leader trên gist
+      // Có PAT → pull leader info từ gist hiện tại
       const info = await getLeaderInfo();
       setLeader(info);
-      const myRole: LiveRole = !info || info.deviceId === myId
-        ? (info?.deviceId === myId ? "LEADER" : "BOOTING")
-        : "FOLLOWER";
+      const now = Date.now();
+      const iAmLeader = canClaim(info, myId, now); // true nếu file rỗng / leader cũ chết / mình đã là leader
+      // Pull state ngay với mode đúng (mirror nếu là follower)
       try {
-        s = await pullRemote(s, myRole === "FOLLOWER" ? "follower" : "boot");
+        s = await pullRemote(s, iAmLeader ? "boot" : "follower");
         await saveState(s, { sync: false });
         setState(s);
         setLastSyncMs(Date.now());
       } catch {}
-      // Default: nếu chưa có leader → tự claim
-      if (!info) {
-        const ok = await pushLeader(myId, deviceLabelRef.current);
-        if (ok) {
-          await new Promise((r) => setTimeout(r, 800));
-          const verify = await getLeaderInfo();
-          setLeader(verify);
-          if (verify?.deviceId === myId) setRole("LEADER");
-          else setRole("FOLLOWER");
-        } else {
-          // Push fail (PAT lỗi / network) → fallback LOCAL LEADER
-          setRole("LEADER");
-          setLastError("⚠️ Không push được leader file (PAT sai? network?). Fallback LOCAL LEADER.");
-        }
-      } else if (info.deviceId === myId) {
+      // Set role ngay — KHÔNG đợi pushLeader (background)
+      if (iAmLeader) {
         setRole("LEADER");
+        // Background: push heartbeat để các device khác biết. Fail cũng không sao (LOCAL LEADER).
+        pushLeader(myId, deviceLabelRef.current).then(async (ok) => {
+          if (ok) {
+            const verify = await getLeaderInfo();
+            setLeader(verify);
+            // Nếu device khác giành leader trong race window → demote follower
+            if (verify && verify.deviceId !== myId && Date.now() - verify.lastBeatMs < 30_000) {
+              setRole("FOLLOWER");
+            }
+          }
+        }).catch(() => {});
       } else {
         setRole("FOLLOWER");
       }
