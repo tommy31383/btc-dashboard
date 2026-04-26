@@ -47,38 +47,30 @@ function useDebugLabelsEnabled(): boolean {
 interface Props {
   /** Tên component / file để Tommy chỉ rõ — vd "RuleAlertBanner", "LiveTab > SettingsCard" */
   name: string;
-  /** Không floating — render inline ở đầu panel (dùng khi parent có overflow:hidden) */
-  inline?: boolean;
 }
 
-export default function DebugLabel({ name, inline }: Props) {
+/**
+ * Render inline ở đầu panel — đẩy content xuống một chút thay vì floating đè title.
+ * Style: tag nhỏ, alignSelf flex-start, không chiếm full width.
+ */
+export default function DebugLabel({ name }: Props) {
   const enabled = useDebugLabelsEnabled();
   if (!enabled) return null;
   return (
-    <View style={inline ? styles.inline : styles.floating} pointerEvents="none">
+    <View style={styles.tag} pointerEvents="none">
       <Text style={styles.text}>[{name}]</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  floating: {
-    position: "absolute",
-    top: 2,
-    left: 4,
-    zIndex: 999,
+  tag: {
+    alignSelf: "flex-start",
     backgroundColor: "rgba(0,0,0,0.55)",
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 3,
-  },
-  inline: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 3,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   text: {
     color: "#ffd166",
