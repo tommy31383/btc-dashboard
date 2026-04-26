@@ -43,12 +43,35 @@ function buildQuery(params: Record<string, string | number | undefined>): string
   return parts.join("&");
 }
 
+/**
+ * Rate-limit guard: if Binance returns 429 (rate limit) or 418 (IP banned),
+ * `bannedUntilMs` blocks all signedRequest calls until that wall-clock time.
+ * Subsequent callers get a clear error instead of stacking more banned requests.
+ */
+let bannedUntilMs = 0;
+
+function parseRetryAfterMs(res: Response, fallbackMs: number): number {
+  const h = res.headers.get("Retry-After");
+  if (!h) return fallbackMs;
+  const sec = parseFloat(h);
+  if (!isFinite(sec) || sec <= 0) return fallbackMs;
+  return Math.min(sec * 1000, 10 * 60_000); // cap 10m
+}
+
+export function getBinanceBackoffMsLeft(): number {
+  return Math.max(0, bannedUntilMs - Date.now());
+}
+
 async function signedRequest<T>(
   cred: Credentials,
   method: "GET" | "POST" | "DELETE",
   path: string,
   params: Record<string, string | number | undefined> = {},
 ): Promise<T> {
+  const leftMs = getBinanceBackoffMsLeft();
+  if (leftMs > 0) {
+    throw new Error(`Binance rate-limit backoff active (${Math.ceil(leftMs / 1000)}s left). Skipping ${method} ${path}.`);
+  }
   const ts = Date.now();
   const allParams = { ...params, timestamp: ts, recvWindow: 5000 };
   const query = buildQuery(allParams);
@@ -58,6 +81,13 @@ async function signedRequest<T>(
     method,
     headers: { "X-MBX-APIKEY": cred.apiKey },
   });
+  // 429 = rate limit (retry after Retry-After). 418 = IP banned (longer ban).
+  if (res.status === 429 || res.status === 418) {
+    const fallback = res.status === 418 ? 5 * 60_000 : 60_000;
+    const waitMs = parseRetryAfterMs(res, fallback);
+    bannedUntilMs = Date.now() + waitMs;
+    throw new Error(`Binance ${res.status} rate-limit/banned. Backoff ${Math.ceil(waitMs / 1000)}s. ${method} ${path}`);
+  }
   const text = await res.text();
   let data: any = {};
   try { data = JSON.parse(text); } catch { /* keep text */ }

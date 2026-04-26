@@ -295,7 +295,8 @@ export async function processOpen(currentPrice: number): Promise<number> {
 
     const tpHit = p.side === "LONG" ? currentPrice >= p.tpPrice : currentPrice <= p.tpPrice;
     const slHit = p.side === "LONG" ? currentPrice <= p.slPrice : currentPrice >= p.slPrice;
-    const deadline = p.openedMs + p.maxHoldBars * p.barMs;
+    // Recompute from tfKey so deadline reflects current TF_MS, not stale cached barMs from creation time.
+    const deadline = p.openedMs + p.maxHoldBars * tfMs(p.tfKey);
     const timedOut = now >= deadline;
 
     if (slHit) {

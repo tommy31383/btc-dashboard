@@ -106,7 +106,7 @@ function simulate(c: Candle[], i: number, side: "LONG" | "SHORT"): { o: Outcome;
   return { o: "TIMEOUT", holdBars: Math.min(MAX_HOLD, c.length - i - 1) };
 }
 
-interface Record { idx: number; outcome: Outcome; holdBars: number; features: Record<string, string> }
+interface FeatureRow { idx: number; outcome: Outcome; holdBars: number; features: Record<string, string> }
 
 function summarize(outcomes: Outcome[]) {
   const wins = outcomes.filter((o) => o === "WIN").length;
@@ -140,7 +140,7 @@ async function main() {
   const ema50 = calcEMASeries(closes, 50);
   const ema1d = calcEMASeries(c1d.map((c) => c.close), 50);
 
-  const records: Record[] = [];
+  const records: FeatureRow[] = [];
   const startIdx = 50, endIdx = c4.length - MAX_HOLD - 1;
 
   for (let i = startIdx; i < endIdx; i++) {

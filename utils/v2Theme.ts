@@ -43,6 +43,7 @@ export const P = {
   tertiary: "#b5ebff",              // ice blue (info / waiting states)
   tertiaryContainer: "#84d1ec",
   onTertiary: "#003543",
+  onTertiaryContainer: "#001f29",   // dark text on tertiaryContainer (cooldown banner)
 
   error: "#ffb4ab",                 // soft coral (error text)
   errorContainer: "#93000a",        // deep red bg

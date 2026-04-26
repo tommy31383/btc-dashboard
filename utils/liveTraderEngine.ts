@@ -31,6 +31,10 @@ export interface LiveSettings {
   confirmSrProximityPct: number; // close ≤ N% từ S/R → confirm (default 0.4)
 }
 
+/** Hard timeouts to prevent state from growing unbounded if data feeds stall. */
+const PENDING_MAX_AGE_MS = 24 * 60 * 60 * 1000;       // 24h
+const TRACKED_POSITION_MAX_AGE_MS = 72 * 60 * 60 * 1000; // 72h
+
 export const DEFAULT_SETTINGS: LiveSettings = {
   symbol: "BTCUSDT",
   leverage: 100,
@@ -290,10 +294,19 @@ export async function confirmPending(
   const remaining: PendingAlert[] = [];
   let next = s;
 
+  const now = Date.now();
   for (const p of s.pendingAlerts) {
     // Discard nếu rule không còn ARMED/FIRED (Tommy: "miễn rule còn fire")
     if (!ctx.activeAlertIds.has(p.id)) {
       next = await logAction(next, p.id, p.tfKey, { kind: "DISCARD", reason: "rule no longer firing" });
+      continue;
+    }
+    // Hard timeout: nếu pending quá 24h (data feed lỗi / rule armed mãi) → discard tránh state phình
+    if (now - p.addedMs > PENDING_MAX_AGE_MS) {
+      next = await logAction(next, p.id, p.tfKey, {
+        kind: "DISCARD",
+        reason: `pending expired (>24h, addedMs=${new Date(p.addedMs).toISOString()})`,
+      });
       continue;
     }
     // Confirm condition
@@ -430,7 +443,17 @@ export async function monitorTrackedPositions(s: LiveTraderState, markPrice: num
   const cred: Credentials = { apiKey: s.apiKey, apiSecret: s.apiSecret };
   let next = s;
   const remaining: TrackedPosition[] = [];
+  const now = Date.now();
   for (const pos of s.trackedPositions) {
+    // Hard timeout: tracked position quá 72h (mark price feed chết / app restart mất state)
+    // → log + drop khỏi list để khỏi monitor sai. User cần check Binance manual để close nếu còn.
+    if (now - pos.entryMs > TRACKED_POSITION_MAX_AGE_MS) {
+      next = await logAction(next, pos.id, "live", {
+        kind: "ERROR",
+        message: `tracked position expired (>72h, entryMs=${new Date(pos.entryMs).toISOString()}). Check Binance manually — app stopped monitoring TP/SL.`,
+      });
+      continue;
+    }
     let trigger: "TP" | "SL" | null = null;
     if (pos.side === "LONG") {
       if (markPrice >= pos.tpPrice) trigger = "TP";

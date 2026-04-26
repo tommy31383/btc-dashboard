@@ -64,6 +64,20 @@ async function markSynced(ms: number) {
   await AsyncStorage.setItem(LAST_SYNC_KEY, String(ms));
 }
 
+/** Strip any token-like substrings from a value before logging. */
+function sanitizeForLog(v: unknown): string {
+  let s: string;
+  try {
+    s = typeof v === "string" ? v : v instanceof Error ? v.message : JSON.stringify(v);
+  } catch {
+    s = String(v);
+  }
+  return s
+    .replace(/gh[pousr]_[A-Za-z0-9_]{20,}/g, "[REDACTED_PAT]")
+    .replace(/Bearer\s+[A-Za-z0-9_\-.]+/gi, "Bearer [REDACTED]")
+    .replace(/token\s+[A-Za-z0-9_\-.]+/gi, "token [REDACTED]");
+}
+
 /** Stub — không cần tạo gist nữa, file path đã cố định trong repo. */
 export async function createNewGist(_pat: string): Promise<string> {
   return `${REPO_OWNER}/${REPO_NAME}:${FILE_PATH}`;
@@ -93,6 +107,16 @@ function b64decode(b64: string): string {
   return Buffer.from(cleaned, "base64").toString("utf8");
 }
 
+function isGistPayload(v: unknown): v is GistPayload {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  return (
+    typeof o.version === "number" &&
+    typeof o.updatedAt === "number" &&
+    Array.isArray(o.trades)
+  );
+}
+
 /** Pull file content + sha. Returns null if not configured / file not found. */
 export async function pullFromGist(): Promise<GistPayload | null> {
   const cfg = await getGistConfig();
@@ -112,10 +136,14 @@ export async function pullFromGist(): Promise<GistPayload | null> {
     const json = (await res.json()) as ContentsResponse;
     if (!json.content) return { version: 1, updatedAt: 0, trades: [] };
     const text = b64decode(json.content);
-    const payload = JSON.parse(text) as GistPayload;
-    return payload;
+    const raw: unknown = JSON.parse(text);
+    if (!isGistPayload(raw)) {
+      console.warn("[repoSync] pullFromGist: invalid payload shape — rejected");
+      return null;
+    }
+    return raw;
   } catch (e) {
-    console.warn("[repoSync] pull failed:", e);
+    console.warn("[repoSync] pull failed:", sanitizeForLog(e));
     return null;
   }
 }
@@ -159,7 +187,7 @@ async function ensureBranch(pat: string): Promise<boolean> {
     if (!createRes.ok) throw new Error(`Create branch fail: ${createRes.status} ${await createRes.text()}`);
     return true;
   } catch (e) {
-    console.warn("[repoSync] ensureBranch error:", e);
+    console.warn("[repoSync] ensureBranch error:", sanitizeForLog(e));
     return false;
   }
 }
@@ -189,27 +217,25 @@ export async function pushToGist(trades: PaperTrade[]): Promise<boolean> {
   const payload: GistPayload = { version: 1, updatedAt: Date.now(), trades };
   try {
     await ensureBranch(cfg.pat);
-    const sha = await getFileSha(cfg.pat);
-    const body: any = {
-      message: `data: paper trades · ${trades.length} lệnh · ${new Date(payload.updatedAt).toISOString()}`,
-      content: b64encode(JSON.stringify(payload, null, 2)),
-      branch: BRANCH,
-    };
-    if (sha) body.sha = sha;
-    const res = await fetch(`${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
-      method: "PUT",
-      headers: {
-        "Authorization": `token ${cfg.pat}`,
-        "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json",
+    await putContentsWithRetry(
+      cfg.pat,
+      FILE_PATH,
+      () => getFileSha(cfg.pat!),
+      (sha) => {
+        const body: any = {
+          message: `data: paper trades · ${trades.length} lệnh · ${new Date(payload.updatedAt).toISOString()}`,
+          content: b64encode(JSON.stringify(payload, null, 2)),
+          branch: BRANCH,
+        };
+        if (sha) body.sha = sha;
+        return body;
       },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(`Push fail: ${res.status} ${await res.text()}`);
+      "Push",
+    );
     await markSynced(payload.updatedAt);
     return true;
   } catch (e) {
-    console.warn("[repoSync] push failed:", e);
+    console.warn("[repoSync] push failed:", sanitizeForLog(e));
     return false;
   }
 }
@@ -238,7 +264,15 @@ function fileContentsUrl(path: string) {
   return `${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`;
 }
 
-export async function pullFile<T>(path: string): Promise<T | null> {
+/**
+ * pullFile<T>(path, validate?) — fetch JSON file from repo.
+ * Pass `validate` to enforce shape; if it returns false, payload is rejected and null is returned.
+ * Without `validate`, callers must trust shape (kept for backwards compat).
+ */
+export async function pullFile<T>(
+  path: string,
+  validate?: (raw: unknown) => raw is T,
+): Promise<T | null> {
   const cfg = await getGistConfig();
   if (!cfg.pat) return null;
   try {
@@ -249,11 +283,58 @@ export async function pullFile<T>(path: string): Promise<T | null> {
     if (!res.ok) throw new Error(`pullFile ${path} fail: ${res.status}`);
     const json = (await res.json()) as ContentsResponse;
     if (!json.content) return null;
-    return JSON.parse(b64decode(json.content)) as T;
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(b64decode(json.content));
+    } catch (parseErr) {
+      console.warn(`[repoSync] pullFile ${path} parse error:`, sanitizeForLog(parseErr));
+      return null;
+    }
+    if (validate && !validate(parsed)) {
+      console.warn(`[repoSync] pullFile ${path} schema validation failed — payload rejected`);
+      return null;
+    }
+    return parsed as T;
   } catch (e) {
-    console.warn(`[repoSync] pullFile ${path} failed:`, e);
+    console.warn(`[repoSync] pullFile ${path} failed:`, sanitizeForLog(e));
     return null;
   }
+}
+
+/** PUT contents with auto-retry on SHA-mismatch (409/422) — handles concurrent writes from 2 devices. */
+async function putContentsWithRetry(
+  pat: string,
+  path: string,
+  shaProvider: () => Promise<string | null>,
+  buildBody: (sha: string | null) => Record<string, unknown>,
+  errLabel: string,
+  maxRetries = 3,
+): Promise<Response> {
+  let sha = await shaProvider();
+  let lastRes: Response | null = null;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const res = await fetch(`${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `token ${pat}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(buildBody(sha)),
+    });
+    if (res.ok) return res;
+    // 409 Conflict / 422 Unprocessable = stale sha → refetch + retry
+    if ((res.status === 409 || res.status === 422) && attempt < maxRetries) {
+      await new Promise((r) => setTimeout(r, 200 * (attempt + 1))); // 200/400/600ms backoff
+      sha = await shaProvider();
+      lastRes = res;
+      continue;
+    }
+    lastRes = res;
+    break;
+  }
+  const text = lastRes ? await lastRes.text() : "no response";
+  throw new Error(`${errLabel} fail: ${lastRes?.status ?? "?"} ${text}`);
 }
 
 async function getFileShaAt(pat: string, path: string): Promise<string | null> {
@@ -275,27 +356,25 @@ export async function pushFile<T>(path: string, data: T, commitMsg: string): Pro
   if (!cfg.pat) return false;
   try {
     await ensureBranch(cfg.pat);
-    const sha = await getFileShaAt(cfg.pat, path);
-    const body: any = {
-      message: commitMsg,
-      content: b64encode(JSON.stringify(data, null, 2)),
-      branch: BRANCH,
-    };
-    if (sha) body.sha = sha;
-    const res = await fetch(`${GH_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
-      method: "PUT",
-      headers: {
-        "Authorization": `token ${cfg.pat}`,
-        "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json",
+    await putContentsWithRetry(
+      cfg.pat,
+      path,
+      () => getFileShaAt(cfg.pat!, path),
+      (sha) => {
+        const body: any = {
+          message: commitMsg,
+          content: b64encode(JSON.stringify(data, null, 2)),
+          branch: BRANCH,
+        };
+        if (sha) body.sha = sha;
+        return body;
       },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(`pushFile ${path} fail: ${res.status} ${await res.text()}`);
+      `pushFile ${path}`,
+    );
     await markSynced(Date.now());
     return true;
   } catch (e) {
-    console.warn(`[repoSync] pushFile ${path} failed:`, e);
+    console.warn(`[repoSync] pushFile ${path} failed:`, sanitizeForLog(e));
     return false;
   }
 }
@@ -318,7 +397,7 @@ export async function deleteFile(path: string, commitMsg: string): Promise<boole
     });
     return res.ok;
   } catch (e) {
-    console.warn(`[repoSync] deleteFile ${path} failed:`, e);
+    console.warn(`[repoSync] deleteFile ${path} failed:`, sanitizeForLog(e));
     return false;
   }
 }

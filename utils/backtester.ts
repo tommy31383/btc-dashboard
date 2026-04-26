@@ -106,6 +106,77 @@ export const DEFAULT_BACKTEST_CONFIG: BacktestConfig = {
 };
 
 /**
+ * Phase 2 LTF confirm — match LIVE engine logic.
+ *
+ * LIVE engine (utils/liveTraderEngine.ts) does NOT enter on HTF rule fire alone.
+ * It pushes a PendingAlert and only executes ENTRY when a lower-TF condition confirms:
+ *   LONG  : Stoch5m K < 20  OR price within `srProximityPct%` above support15m
+ *   SHORT : Stoch5m K > 80  OR price within `srProximityPct%` below resistance15m
+ *
+ * Backtests for HTF rules (1h/4h) MUST simulate this confirm step or they will
+ * over-estimate edge. This helper finds the first LTF candle where the confirm
+ * fires (within `maxWaitBars` of HTF entry time). Returns null = no confirm = skip trade.
+ *
+ * Usage: tool/script first finds HTF entry signal → calls this with LTF candles →
+ * if non-null, simulateTrade() at returned LTF index using LTF candles.
+ */
+export interface LtfConfirmConfig {
+  stochOSLevel: number;       // K < N → confirm LONG (default 20)
+  stochObLevel: number;       // K > N → confirm SHORT (default 80)
+  srProximityPct: number;     // |price - S/R| / S/R × 100 ≤ N → confirm (default 0.4)
+  maxWaitBars: number;        // give up after N LTF candles (default 60 = 5h on 5m)
+}
+
+export const DEFAULT_LTF_CONFIRM: LtfConfirmConfig = {
+  stochOSLevel: 20,
+  stochObLevel: 80,
+  srProximityPct: 0.4,
+  maxWaitBars: 60,
+};
+
+/**
+ * Find the first LTF candle index ≥ startTime where Phase 2 confirm fires.
+ * Returns null if no confirm within maxWaitBars.
+ *
+ * `support15m` / `resistance15m` are precomputed S/R levels valid at the HTF entry
+ * (caller must compute these from 15m candles up to startTime). Pass null to skip S/R check.
+ *
+ * `stochSeries` must be aligned with `ltfCandles` — the StochRSI K value at each LTF candle.
+ */
+export function findLtfConfirmIndex(
+  ltfCandles: Candle[],
+  stochSeries: (number | null)[],
+  startTime: number,
+  side: "LONG" | "SHORT",
+  support15m: number | null,
+  resistance15m: number | null,
+  cfg: LtfConfirmConfig = DEFAULT_LTF_CONFIRM,
+): number | null {
+  // Find first LTF candle at or after HTF entry time
+  let startIdx = ltfCandles.findIndex((c) => c.time >= startTime);
+  if (startIdx < 0) return null;
+  const endIdx = Math.min(startIdx + cfg.maxWaitBars, ltfCandles.length - 1);
+  for (let i = startIdx; i <= endIdx; i++) {
+    const k = stochSeries[i];
+    const close = ltfCandles[i].close;
+    if (side === "LONG") {
+      if (k !== null && k < cfg.stochOSLevel) return i;
+      if (support15m !== null && support15m > 0) {
+        const distPct = ((close - support15m) / support15m) * 100;
+        if (distPct >= 0 && distPct <= cfg.srProximityPct) return i;
+      }
+    } else {
+      if (k !== null && k > cfg.stochObLevel) return i;
+      if (resistance15m !== null && resistance15m > 0) {
+        const distPct = ((resistance15m - close) / close) * 100;
+        if (distPct >= 0 && distPct <= cfg.srProximityPct) return i;
+      }
+    }
+  }
+  return null;
+}
+
+/**
  * Preset "rule shapes" the optimizer will try. Each is a distinct trading
  * philosophy — combined with threshold search these produce genuinely
  * different strategies, not just parameter tweaks.

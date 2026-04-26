@@ -248,17 +248,25 @@ function CredentialsCard({ live }: Props) {
 function SettingsCard({ live }: Props) {
   const s = live.state.settings;
   const [draft, setDraft] = useState<LiveSettings>(s);
-  React.useEffect(() => { setDraft(s); }, [s]);
+  // Track whether user has unsaved edits — if dirty, do NOT clobber with incoming `s`
+  // (would overwrite their input when gist sync arrives mid-edit).
+  const [dirty, setDirty] = useState(false);
+  React.useEffect(() => {
+    if (!dirty) setDraft(s);
+  }, [s, dirty]);
 
   function field<K extends keyof LiveSettings>(key: K, value: LiveSettings[K]) {
+    setDirty(true);
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
   function commit() {
     live.setSettings(draft);
+    setDirty(false);
   }
 
   function toggleTf(tf: string) {
+    setDirty(true);
     setDraft((d) => {
       const exists = d.excludedTfs.includes(tf);
       return { ...d, excludedTfs: exists ? d.excludedTfs.filter((x) => x !== tf) : [...d.excludedTfs, tf] };
