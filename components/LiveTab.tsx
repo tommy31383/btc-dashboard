@@ -443,7 +443,10 @@ function OpenOrdersCard({ live }: Props) {
   return (
     <Card title={`📋 OPEN ORDERS · ${orders.length}`}>
       {orders.length === 0 ? (
-        <Text style={styles.note}>Không có order nào pending.</Text>
+        <Text style={styles.note}>
+          Không có order pending trên Binance.{"\n"}
+          💡 App em chạy Plan B — KHÔNG đặt TP/SL trên Binance, mà tự monitor giá → gửi MARKET close khi hit. Xem TP/SL của các position đang chạy ở pill TRACKED + HISTORY.
+        </Text>
       ) : (
         orders.map((o) => {
           const isStop = o.type.includes("STOP");
