@@ -456,57 +456,70 @@ function TrackedPositionsCard({ live }: Props) {
     }
     live.closeTracked(id);
   };
+  // Sort: newest first
+  const sorted = tracked.slice().sort((a, b) => b.entryMs - a.entryMs);
+  // Column widths (px) — total ~880, scroll ngang trên mobile
+  const cols = {
+    stt: 32, side: 56, rule: 110, entry: 80, qty: 60, tp: 130, sl: 130, held: 56, upnl: 70, action: 80,
+  };
   return (
     <Card title={`🎯 SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
       <Text style={styles.note}>
         Mỗi virtual lệnh có entry/TP/SL/qty riêng. App tự đóng đúng qty của lệnh khi mark price hit (Plan B).
       </Text>
-      {tracked.length === 0 ? (
+      {sorted.length === 0 ? (
         <Text style={styles.note}>Chưa có virtual lệnh nào đang theo dõi.</Text>
       ) : (
-        tracked.slice().sort((a, b) => b.entryMs - a.entryMs).map((t) => {
-          const sideColor = t.side === "LONG" ? P.green : P.error;
-          const upnlPct = markPrice !== null
-            ? (t.side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) / t.entryPrice * 100
-            : 0;
-          const distTp = markPrice !== null ? Math.abs(t.tpPrice - markPrice) / markPrice * 100 : 0;
-          const distSl = markPrice !== null ? Math.abs(t.slPrice - markPrice) / markPrice * 100 : 0;
-          const heldMin = Math.floor((Date.now() - t.entryMs) / 60000);
-          const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
-          const upnlColor = upnlPct >= 0 ? P.green : P.error;
-          return (
-            <View key={t.id} style={styles.itemCard}>
-              <View style={styles.itemHeader}>
-                <Text style={[styles.itemSide, { color: sideColor }]}>{t.side}</Text>
-                <Text style={styles.itemRule}>{t.id}</Text>
-                <Text style={[styles.itemUpnl, { color: upnlColor }]}>{upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%</Text>
-                <TouchableOpacity onPress={() => handleClose(t.id, t.side, t.entryPrice)} style={styles.btnDanger}>
-                  <Text style={styles.btnDangerText}>✕ CLOSE</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.itemDetailGrid}>
-                <Detail label="ENTRY" value={`$${t.entryPrice.toFixed(1)}`} />
-                <Detail label="QTY" value={String(t.qty)} />
-                <Detail label="HELD" value={heldStr} />
-                <Detail label="TP" value={`$${t.tpPrice.toFixed(1)}`} sub={`${distTp.toFixed(2)}%`} subColor={P.green} />
-                <Detail label="SL" value={`$${t.slPrice.toFixed(1)}`} sub={`${distSl.toFixed(2)}%`} subColor={P.error} />
-              </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator>
+          <View>
+            {/* Header row */}
+            <View style={[styles.tblRow, styles.tblHeader]}>
+              <Text style={[styles.tblHeadCell, { width: cols.stt }]}>#</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.side }]}>SIDE</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.rule }]}>RULE</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.entry }]}>ENTRY</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.qty }]}>QTY</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.tp }]}>TP (dist%)</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.sl }]}>SL (dist%)</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.held }]}>HELD</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.upnl, textAlign: "right" }]}>uPnL</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.action, textAlign: "center" }]}>ACTION</Text>
             </View>
-          );
-        })
+            {sorted.map((t, idx) => {
+              const sideColor = t.side === "LONG" ? P.green : P.error;
+              const upnlPct = markPrice !== null
+                ? (t.side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) / t.entryPrice * 100
+                : 0;
+              const distTp = markPrice !== null ? Math.abs(t.tpPrice - markPrice) / markPrice * 100 : 0;
+              const distSl = markPrice !== null ? Math.abs(t.slPrice - markPrice) / markPrice * 100 : 0;
+              const heldMin = Math.floor((Date.now() - t.entryMs) / 60000);
+              const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
+              const upnlColor = upnlPct >= 0 ? P.green : P.error;
+              return (
+                <View key={t.id} style={styles.tblRow}>
+                  <Text style={[styles.tblCell, { width: cols.stt, color: P.dim }]}>{idx + 1}</Text>
+                  <Text style={[styles.tblCell, { width: cols.side, color: sideColor, fontWeight: "800" }]}>{t.side}</Text>
+                  <Text style={[styles.tblCell, { width: cols.rule, color: P.tertiary, fontWeight: "700" }]}>{t.id}</Text>
+                  <Text style={[styles.tblCell, { width: cols.entry }]}>${t.entryPrice.toFixed(1)}</Text>
+                  <Text style={[styles.tblCell, { width: cols.qty }]}>{t.qty}</Text>
+                  <Text style={[styles.tblCell, { width: cols.tp, color: P.green }]}>${t.tpPrice.toFixed(1)} ({distTp.toFixed(2)}%)</Text>
+                  <Text style={[styles.tblCell, { width: cols.sl, color: P.error }]}>${t.slPrice.toFixed(1)} ({distSl.toFixed(2)}%)</Text>
+                  <Text style={[styles.tblCell, { width: cols.held, color: P.dim }]}>{heldStr}</Text>
+                  <Text style={[styles.tblCell, { width: cols.upnl, textAlign: "right", color: upnlColor, fontWeight: "700" }]}>
+                    {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
+                  </Text>
+                  <View style={{ width: cols.action, alignItems: "center" }}>
+                    <TouchableOpacity onPress={() => handleClose(t.id, t.side, t.entryPrice)} style={styles.btnDanger}>
+                      <Text style={styles.btnDangerText}>✕ CLOSE</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
       )}
     </Card>
-  );
-}
-
-/** Compact label/value cell for mobile-friendly stacked detail grids. */
-function Detail({ label, value, sub, subColor }: { label: string; value: string; sub?: string; subColor?: string }) {
-  return (
-    <View style={styles.detailCell}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
-      {sub && <Text style={[styles.detailSub, { color: subColor || P.dim }]}>{sub}</Text>}
-    </View>
   );
 }
 
@@ -926,18 +939,9 @@ const styles = StyleSheet.create({
   // Collapsible header — toàn bộ title chứa cả ▼/▶ icon
   collapsibleHeader: { borderBottomWidth: 0 },
 
-  // SMART STACK card-style item layout (mobile-friendly stacked detail grid)
-  itemCard: {
-    borderBottomWidth: 1, borderBottomColor: P.borderSoft,
-    paddingVertical: 8, gap: 6,
-  },
-  itemHeader: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
-  itemSide: { fontFamily: "monospace", fontSize: 13, fontWeight: "900", letterSpacing: 1, minWidth: 56 },
-  itemRule: { color: P.tertiary, fontFamily: "monospace", fontSize: 11, fontWeight: "700", flexShrink: 1 },
-  itemUpnl: { fontFamily: "monospace", fontSize: 13, fontWeight: "800", marginLeft: "auto" },
-  itemDetailGrid: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
-  detailCell: { minWidth: 80, paddingVertical: 2 },
-  detailLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, letterSpacing: 1 },
-  detailValue: { color: P.text, fontFamily: "monospace", fontSize: 12, fontWeight: "700", marginTop: 1 },
-  detailSub: { fontFamily: "monospace", fontSize: 10, marginTop: 1 },
+  // Table-style (TrackedPositions) — header + STT, scroll ngang trên mobile
+  tblRow: { flexDirection: "row", alignItems: "center", paddingVertical: 6, gap: 4, borderBottomWidth: 1, borderBottomColor: P.borderSoft },
+  tblHeader: { backgroundColor: P.elevated, borderBottomColor: P.border, borderBottomWidth: 2 },
+  tblHeadCell: { color: P.dim, fontFamily: "monospace", fontSize: 9, fontWeight: "800", letterSpacing: 1 },
+  tblCell: { color: P.text2, fontFamily: "monospace", fontSize: 11 },
 });

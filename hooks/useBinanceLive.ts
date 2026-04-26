@@ -23,6 +23,7 @@ import {
   LiveRole, LeaderInfo, getDeviceId, autoDeviceLabel, getLeaderInfo, pushLeader, canClaim,
   HEARTBEAT_INTERVAL_MS, LEADER_CHECK_INTERVAL_MS,
 } from "../utils/leaderElection";
+import { getGistConfig } from "../utils/gistSync";
 
 const POLL_MS = 30 * 1000;
 const FOLLOWER_PULL_MS = 30 * 1000;     // follower pull live_trading.json mỗi 30s
@@ -86,7 +87,16 @@ export function useBinanceLive(
       setDeviceId(myId);
       let s = await loadState();
       setState(s);
-      // Check leader info trước khi merge — quyết định mode pullRemote
+      // Nếu chưa nhập GitHub PAT → không thể sync gist → fallback LOCAL LEADER (single-device mode).
+      // Mọi action vẫn chạy bình thường, chỉ là không có lock multi-device.
+      const cfg = await getGistConfig();
+      if (!cfg.pat) {
+        setRole("LEADER");
+        setLeader(null);
+        setLastError("ℹ️ LOCAL LEADER — chưa có GitHub PAT để sync multi-device. Nhập PAT ở Dashboard → SETTINGS để bật chế độ multi-device.");
+        return;
+      }
+      // Có PAT → check leader trên gist
       const info = await getLeaderInfo();
       setLeader(info);
       const myRole: LiveRole = !info || info.deviceId === myId
@@ -102,11 +112,15 @@ export function useBinanceLive(
       if (!info) {
         const ok = await pushLeader(myId, deviceLabelRef.current);
         if (ok) {
-          // Read-after-write verify
+          await new Promise((r) => setTimeout(r, 800));
           const verify = await getLeaderInfo();
           setLeader(verify);
           if (verify?.deviceId === myId) setRole("LEADER");
           else setRole("FOLLOWER");
+        } else {
+          // Push fail (PAT lỗi / network) → fallback LOCAL LEADER
+          setRole("LEADER");
+          setLastError("⚠️ Không push được leader file (PAT sai? network?). Fallback LOCAL LEADER.");
         }
       } else if (info.deviceId === myId) {
         setRole("LEADER");
