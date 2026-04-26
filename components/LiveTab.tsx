@@ -300,11 +300,10 @@ function ControlsCard({ live }: Props) {
         <TouchableOpacity onPress={live.pullFromRemote} style={styles.btnGhost}>
           <Text style={styles.btnGhostText}>PULL FROM GIT</Text>
         </TouchableOpacity>
-        {canControl && (
-          <TouchableOpacity onPress={live.testNow} style={styles.btnGhost}>
-            <Text style={styles.btnGhostText}>TEST CONNECTION</Text>
-          </TouchableOpacity>
-        )}
+        {/* TEST CONNECTION cho phép cả follower (chỉ verify key, không vào lệnh) */}
+        <TouchableOpacity onPress={live.testNow} style={styles.btnGhost}>
+          <Text style={styles.btnGhostText}>TEST CONNECTION</Text>
+        </TouchableOpacity>
       </View>
       <Text style={styles.note}>
         💡 RESET COOLDOWN: bỏ qua pause sau daily-cap, resume ngay.
@@ -371,19 +370,18 @@ function CredentialsCard({ live }: Props) {
         autoCapitalize="none" autoCorrect={false}
         {...noCopyProps}
       />
-      {live.role === "FOLLOWER" ? (
-        <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
-          🔒 FOLLOWER không cần nhập key (mirror state từ leader). CLAIM LEADER nếu muốn auto-trade ở máy này.
+      <View style={styles.row}>
+        <TouchableOpacity onPress={handleSave} style={styles.btnPrimary}>
+          <Text style={styles.btnPrimaryText}>SAVE</Text>
+        </TouchableOpacity>
+        {credsSet && (
+          <Text style={[styles.note, { color: P.green, marginLeft: 6 }]}>✓ key đã lưu</Text>
+        )}
+      </View>
+      {live.role === "FOLLOWER" && (
+        <Text style={[styles.note, { color: P.bitcoinOrange, fontSize: 10 }]}>
+          ℹ️ Bạn là FOLLOWER. Nhập key để sẵn sàng — khi anh CLAIM LEADER, app sẽ auto-trade với key này ngay.
         </Text>
-      ) : (
-        <View style={styles.row}>
-          <TouchableOpacity onPress={handleSave} style={styles.btnPrimary}>
-            <Text style={styles.btnPrimaryText}>SAVE</Text>
-          </TouchableOpacity>
-          {credsSet && (
-            <Text style={[styles.note, { color: P.green, marginLeft: 6 }]}>✓ key đã lưu</Text>
-          )}
-        </View>
       )}
       {savedFlash && (
         <Text style={[styles.note, { color: P.green, fontWeight: "700" }]}>
