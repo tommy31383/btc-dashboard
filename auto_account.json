@@ -3,6 +3,27 @@
   "capitalUsd": 1022.1753951091251,
   "positions": [
     {
+      "id": "auto_1777207846416_5ahhv5",
+      "ruleId": "5m:1",
+      "tfKey": "5m",
+      "side": "LONG",
+      "status": "PENDING",
+      "ruleEntryPrice": 77865.16,
+      "limitPrice": 77787.29484,
+      "slPrice": 79422.4632,
+      "tpPrice": 74750.5536,
+      "marginUsd": 30,
+      "leverage": 100,
+      "notionalUsd": 3000,
+      "targetPct": 4,
+      "stopPct": 2,
+      "maxHoldBars": 50,
+      "barMs": 300000,
+      "createdMs": 1777207846416,
+      "limitExpiresMs": 1777208146416,
+      "entryTfKey": "1m"
+    },
+    {
       "id": "auto_1777192243180_oqwjnp",
       "ruleId": "5m:1",
       "tfKey": "5m",
@@ -401,5 +422,5 @@
     "totalPnLUsd": 22.17539510912504,
     "lastResetMs": 1777052014772
   },
-  "updatedAt": 1777207547064
+  "updatedAt": 1777207846416
 }
