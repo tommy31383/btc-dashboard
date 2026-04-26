@@ -8,7 +8,8 @@
  *   - Format: "(~12m)" / "(~2.3h)" / "↗ đang đi xa" / "đang gom mẫu..."
  */
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { P } from "../utils/v2Theme";
 import { RuleMatchDetail } from "../hooks/useRuleAlerts";
 import { TFAnalysis } from "../hooks/useBinanceKlines";
@@ -101,9 +102,38 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
   if (stats.total === 0) return null;
 
   return (
+    <CollapsibleSummary
+      total={stats.total}
+      failCount={failsWithETA.length}
+      stats={stats}
+      failsWithETA={failsWithETA}
+      dots={dots}
+      fmtVal={fmtVal}
+    />
+  );
+}
+
+function CollapsibleSummary({
+  total, failCount, stats, failsWithETA, dots, fmtVal,
+}: any) {
+  const [collapsed, setCollapsed] = React.useState(false);
+  React.useEffect(() => {
+    AsyncStorage.getItem("@dashboard_card_rules_summary").then((v) => {
+      if (v === "1") setCollapsed(true);
+    }).catch(() => {});
+  }, []);
+  const toggle = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    AsyncStorage.setItem("@dashboard_card_rules_summary", next ? "1" : "0").catch(() => {});
+  };
+  return (
     <View style={styles.card}>
       <DebugLabel name="LiveRulesSummary" />
-      <Text style={styles.caption}>▼ LIVE RULES SUMMARY · {stats.total} TRACKED</Text>
+      <TouchableOpacity onPress={toggle} activeOpacity={0.7}>
+        <Text style={styles.caption}>{collapsed ? "▶" : "▼"} LIVE RULES SUMMARY · {total} TRACKED{failCount > 0 ? ` · ${failCount} chờ` : ""}</Text>
+      </TouchableOpacity>
+      {!collapsed && (<>
       <View style={styles.row}>
         <StatCell label="FIRED" value={stats.fired} color={P.error} />
         <StatCell label="ARMED" value={stats.armed} color={P.primaryContainer} divider />
@@ -114,7 +144,7 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
       {failsWithETA.length > 0 && (
         <View style={styles.quote}>
           <Text style={styles.quoteCaption}>ĐANG CHỜ TÍN HIỆU · ETA refresh mỗi 20s</Text>
-          {failsWithETA.map((f) => {
+          {failsWithETA.map((f: any) => {
             const isInsuf = f.eta?.direction === "insufficient";
             const cur = f.eta?.current;
             const have = f.eta?.samplesCount ?? 0;
@@ -143,6 +173,7 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
           })}
         </View>
       )}
+      </>)}
     </View>
   );
 }
