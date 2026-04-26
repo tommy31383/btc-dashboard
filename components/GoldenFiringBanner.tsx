@@ -19,7 +19,7 @@ interface Props {
   onPress?: () => void;
 }
 
-export function GoldenFiringBanner({ goldens, onPress }: Props) {
+function GoldenFiringBannerInner({ goldens, onPress }: Props) {
   const firing = goldens.filter((g) => g.allPass);
   const pulse = useRef(new Animated.Value(0)).current;
 
@@ -131,3 +131,6 @@ const styles = StyleSheet.create({
     color: P.bitcoinOrange,
   },
 });
+
+
+export const GoldenFiringBanner = React.memo(GoldenFiringBannerInner);

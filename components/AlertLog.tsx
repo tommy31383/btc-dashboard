@@ -14,7 +14,24 @@ import DebugLabel from "./DebugLabel";
 interface Props { alerts: Alert[]; }
 
 function AlertLogInner({ alerts }: Props) {
-  if (alerts.length === 0) return null;
+  // Empty state: thay vì return null (ẩn hoàn toàn), hiện card với hint nhẹ
+  // → user biết panel hoạt động, chưa có alert nào, không phải bug.
+  if (alerts.length === 0) {
+    return (
+      <View style={[styles.card, { maxHeight: undefined }]}>
+        <DebugLabel name="AlertLog" />
+        <View style={styles.header}>
+          <Text style={styles.caption}>ALERT LOG</Text>
+          <View style={styles.countBadge}>
+            <Text style={styles.countBadgeText}>0</Text>
+          </View>
+        </View>
+        <Text style={styles.emptyText}>
+          📭 Chưa có alert. Alert sẽ xuất hiện khi có rule fire / RSI cực trị / phân kỳ / chạm Bollinger.
+        </Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.card}>
       <DebugLabel name="AlertLog" />
@@ -106,5 +123,12 @@ const styles = StyleSheet.create({
     fontFamily: "JetBrainsMono_400Regular",
     marginLeft: 8,
     letterSpacing: 0.5,
+  },
+  emptyText: {
+    color: P.dim,
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 16,
+    paddingVertical: 4,
   },
 });

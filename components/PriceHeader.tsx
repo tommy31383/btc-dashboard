@@ -87,7 +87,7 @@ function formatNum(n: number, decimals = 2): string {
   return n.toFixed(decimals);
 }
 
-export default function PriceHeader({ priceData, priceHistory, connectionStatus }: Props) {
+function PriceHeaderInner({ priceData, priceHistory, connectionStatus }: Props) {
   const isUp = priceData ? priceData.changePct24h >= 0 : true;
   const trendColor = isUp ? P.green : P.error;
   const statusColor =
@@ -251,6 +251,9 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 });
+
+const PriceHeader = React.memo(PriceHeaderInner);
+export default PriceHeader;
 
 // Unused exports kept for backwards compat
 void Svg; void Polyline; void Circle; void Defs; void LinearGradient; void Stop;

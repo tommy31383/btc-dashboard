@@ -29,7 +29,7 @@ interface Props {
   onReset: () => Promise<void> | void;
 }
 
-export default function AutoTraderPanel({ account, summary, currentPrice, onReset }: Props) {
+function AutoTraderPanelInner({ account, summary, currentPrice, onReset }: Props) {
   const [collapsed, setCollapsed] = useState(false);
   const [showSpec, setShowSpec] = useState(false);
 
@@ -274,3 +274,7 @@ const styles = StyleSheet.create({
   },
   resetText: { color: P.error, fontSize: 11, fontWeight: "700", letterSpacing: 0.8, fontFamily: "SpaceGrotesk_700Bold" },
 });
+
+
+const AutoTraderPanel = React.memo(AutoTraderPanelInner);
+export default AutoTraderPanel;

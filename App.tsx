@@ -22,6 +22,7 @@ import { useRuleAlerts } from "./hooks/useRuleAlerts";
 import { useCalibration } from "./hooks/useCalibration";
 import { initNotifications } from "./utils/notifications";
 import { hydrateDebugLabels } from "./components/DebugLabel";
+import PanelBoundary from "./components/PanelBoundary";
 
 import PriceHeader from "./components/PriceHeader";
 import BinanceChart from "./components/BinanceChart";
@@ -63,7 +64,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.5.3";
+const APP_VERSION = "4.5.4";
 const BUILD_DATE = "2026-04-26";
 
 /**
@@ -440,11 +441,13 @@ export default function App() {
         )}
 
         {/* Price Header */}
-        <PriceHeader
-          priceData={priceData}
-          priceHistory={priceHistory}
-          connectionStatus={connectionStatus}
-        />
+        <PanelBoundary name="PriceHeader">
+          <PriceHeader
+            priceData={priceData}
+            priceHistory={priceHistory}
+            connectionStatus={connectionStatus}
+          />
+        </PanelBoundary>
 
         {/* Settings */}
         <SettingsPanel
@@ -454,50 +457,62 @@ export default function App() {
         />
 
         {/* RULE FIRE banner — TOP PRIORITY when any tracked rule matches */}
-        <RuleAlertBanner
-          alerts={activeAlerts}
-          liveConditions={liveConditions}
-          ruleMatchDetails={ruleMatchDetails}
-          onAlertTap={handleAlertTap}
-        />
+        <PanelBoundary name="RuleAlertBanner">
+          <RuleAlertBanner
+            alerts={activeAlerts}
+            liveConditions={liveConditions}
+            ruleMatchDetails={ruleMatchDetails}
+            onAlertTap={handleAlertTap}
+          />
+        </PanelBoundary>
 
         {/* GOLDEN FIRING banner — verified rule từ scan 2.3Y đang match ngay bây giờ */}
-        <GoldenFiringBanner
-          goldens={riskState.goldens}
-          onPress={() => {
-            setNavTab("trades");
-            setActiveTab("risk");
-          }}
-        />
+        <PanelBoundary name="GoldenFiringBanner">
+          <GoldenFiringBanner
+            goldens={riskState.goldens}
+            onPress={() => {
+              setNavTab("trades");
+              setActiveTab("risk");
+            }}
+          />
+        </PanelBoundary>
 
         {/* Critical Alerts */}
-        <AlertBanner alerts={criticalAlerts} />
+        <PanelBoundary name="AlertBanner">
+          <AlertBanner alerts={criticalAlerts} />
+        </PanelBoundary>
 
         {/* v4.3.16 — Live feature snapshot (B): show current RSI/MACD/ATR/EMA Dist/HTF */}
-        <LiveFeatureSnapshot
-          tfData={tfData}
-          trackedIds={tracked.trackedIds}
-          ruleStatus={ruleStatus}
-          ruleMatchDetails={ruleMatchDetails}
-        />
+        <PanelBoundary name="LiveFeatureSnapshot">
+          <LiveFeatureSnapshot
+            tfData={tfData}
+            trackedIds={tracked.trackedIds}
+            ruleStatus={ruleStatus}
+            ruleMatchDetails={ruleMatchDetails}
+          />
+        </PanelBoundary>
 
         {/* v4.3.16 — Live rules aggregate summary (C) */}
-        <LiveRulesSummary
-          trackedIds={tracked.trackedIds}
-          ruleStatus={ruleStatus}
-          ruleMatchDetails={ruleMatchDetails}
-          tfData={tfData}
-        />
+        <PanelBoundary name="LiveRulesSummary">
+          <LiveRulesSummary
+            trackedIds={tracked.trackedIds}
+            ruleStatus={ruleStatus}
+            ruleMatchDetails={ruleMatchDetails}
+            tfData={tfData}
+          />
+        </PanelBoundary>
 
         {/* LIVE TRADING moved to dedicated tab (BottomNav → LIVE) */}
 
         {/* v4.3.41 — AUTO TRADER: tự động vào lệnh khi rule fire (1000U cap, 30U margin, 100x lev) */}
-        <AutoTraderPanel
-          account={autoTrader.account}
-          summary={autoTrader.summary}
-          currentPrice={priceData?.price ?? null}
-          onReset={autoTrader.reset}
-        />
+        <PanelBoundary name="AutoTraderPanel">
+          <AutoTraderPanel
+            account={autoTrader.account}
+            summary={autoTrader.summary}
+            currentPrice={priceData?.price ?? null}
+            onReset={autoTrader.reset}
+          />
+        </PanelBoundary>
 
         {/* PAPER TRADE JOURNAL moved into 5m ALL tab footer */}
 
@@ -506,13 +521,15 @@ export default function App() {
         <View
           onLayout={(e) => { tradingPanelYRef.current = e.nativeEvent.layout.y; }}
         >
-          <TradingRulesPanel
-            tfFilter={["5m", "15m", "1h", "4h"]}
-            ruleStatus={ruleStatus}
-            ruleMatchDetails={ruleMatchDetails}
-            highlightedRuleId={highlightedRuleId}
-            globalTF={selectedTF}
-          />
+          <PanelBoundary name="TradingRulesPanel">
+            <TradingRulesPanel
+              tfFilter={["5m", "15m", "1h", "4h"]}
+              ruleStatus={ruleStatus}
+              ruleMatchDetails={ruleMatchDetails}
+              highlightedRuleId={highlightedRuleId}
+              globalTF={selectedTF}
+            />
+          </PanelBoundary>
         </View>
 
         {/* Loading */}
@@ -524,24 +541,32 @@ export default function App() {
         ) : (
           <>
             {/* Chart */}
-            <BinanceChart rawKlines={rawKlines} selectedTF={selectedTF} onSelectTF={setSelectedTF} />
+            <PanelBoundary name="BinanceChart">
+              <BinanceChart rawKlines={rawKlines} selectedTF={selectedTF} onSelectTF={setSelectedTF} />
+            </PanelBoundary>
 
             {/* v4.3.43 — Multi-TF gộp thành 1 confluence score (-100..+100) */}
-            <ConfluenceScore tfData={tfData} />
+            <PanelBoundary name="ConfluenceScore">
+              <ConfluenceScore tfData={tfData} />
+            </PanelBoundary>
 
             {/* Verdict */}
-            <OverallVerdict
-              verdict={verdict}
-              selectedTF={selectedTF}
-              onSelectTF={setSelectedTF}
-              tfData={tfData}
-              rawKlines={rawKlines}
-              price={priceData?.price ?? 0}
-              change24hPct={priceData?.changePct24h ?? 0}
-            />
+            <PanelBoundary name="OverallVerdict">
+              <OverallVerdict
+                verdict={verdict}
+                selectedTF={selectedTF}
+                onSelectTF={setSelectedTF}
+                tfData={tfData}
+                rawKlines={rawKlines}
+                price={priceData?.price ?? 0}
+                change24hPct={priceData?.changePct24h ?? 0}
+              />
+            </PanelBoundary>
 
             {/* Alert Log */}
-            <AlertLog alerts={normalAlerts} />
+            <PanelBoundary name="AlertLog">
+              <AlertLog alerts={normalAlerts} />
+            </PanelBoundary>
           </>
         )}
 

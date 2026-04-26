@@ -55,7 +55,7 @@ const COND_LABEL: Record<string, string> = {
  * + backtest stats). A small "Xem trong list" button inside the expanded area
  * scrolls to the matching rule in TradingRulesPanel below.
  */
-export default function RuleAlertBanner({ alerts, liveConditions = {}, ruleMatchDetails = {}, onAlertTap }: Props) {
+function RuleAlertBannerInner({ alerts, liveConditions = {}, ruleMatchDetails = {}, onAlertTap }: Props) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   if (alerts.length === 0) return null;
@@ -763,3 +763,6 @@ const styles = StyleSheet.create({
     fontFamily: "JetBrainsMono_500Medium",
   },
 });
+
+const RuleAlertBanner = React.memo(RuleAlertBannerInner);
+export default RuleAlertBanner;

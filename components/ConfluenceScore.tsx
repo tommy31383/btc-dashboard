@@ -74,7 +74,7 @@ function verdict(score: number): { text: string; color: string; emoji: string } 
   return                { text: "STRONG SELL",  color: P.error,           emoji: "🔴🔴" };
 }
 
-export default function ConfluenceScore({ tfData }: Props) {
+function ConfluenceScoreInner({ tfData }: Props) {
   if (!tfData || tfData.length === 0) return null;
 
   const leans = tfData.map(computeLean);
@@ -190,3 +190,7 @@ const styles = StyleSheet.create({
   tfContrib: { fontSize: 9, fontFamily: "JetBrainsMono_500Medium", width: 50, textAlign: "right" },
   note: { color: P.dim, fontSize: 9, lineHeight: 13, fontFamily: "JetBrainsMono_500Medium", marginTop: 12 },
 });
+
+
+const ConfluenceScore = React.memo(ConfluenceScoreInner);
+export default ConfluenceScore;
