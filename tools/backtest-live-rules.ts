@@ -47,11 +47,12 @@ const MAX_HOLD_OVERRIDE = parseFloat(args.find((a) => a.startsWith("--maxHold=")
 const CONFIRM_WINDOW = parseFloat(args.find((a) => a.startsWith("--confirmWindow="))?.replace("--confirmWindow=", "") || "60");
 
 // LIVE-matching defaults (xem utils/liveTraderEngine.ts DEFAULT_SETTINGS)
+// Anh Tommy có thể override qua CLI: --stackMax=30 --stackNotional=100000 ...
 const STACK_CFG = {
-  stackMaxPerSide: 15,
-  stackPerSideSpacingMin: 10,
-  stackMinEntryDistPct: 0.3,
-  stackMaxNotionalUsd: 50000,
+  stackMaxPerSide: parseFloat(args.find((a) => a.startsWith("--stackMax="))?.replace("--stackMax=", "") || "15"),
+  stackPerSideSpacingMin: parseFloat(args.find((a) => a.startsWith("--stackSpacing="))?.replace("--stackSpacing=", "") || "10"),
+  stackMinEntryDistPct: parseFloat(args.find((a) => a.startsWith("--stackDist="))?.replace("--stackDist=", "") || "0.3"),
+  stackMaxNotionalUsd: parseFloat(args.find((a) => a.startsWith("--stackNotional="))?.replace("--stackNotional=", "") || "50000"),
   perRuleCooldownMin: 10,
   marginUsd: 1,
   leverage: 100, // mỗi entry: 1 × 100 = $100 notional

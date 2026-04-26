@@ -44,21 +44,23 @@ const TRACKED_POSITION_MAX_AGE_MS = 72 * 60 * 60 * 1000; // 72h
 
 /** SMART STACK defaults — chỉ dùng khi settings chưa migrate (loadState merge với DEFAULT_SETTINGS). */
 
+// Anh Tommy v4.6.8: PRESET B sau backtest 3y compare (max NET 912k% với max=50)
+// + safety circuit breaker (cap -50$ + cooldown 4h) để tránh phá sản 2.5 tháng đầu
 export const DEFAULT_SETTINGS: LiveSettings = {
   symbol: "BTCUSDT",
   leverage: 100,
   marginUsd: 1,
-  maxOpen: 30,
-  dailyLossCapUsd: -15,
-  cooldownMinutes: 60,
+  maxOpen: 100,                  // tăng để stack 50/side LONG + 50/side SHORT
+  dailyLossCapUsd: -50,          // -15 → -50 (cap cao hơn để không hit liên tục)
+  cooldownMinutes: 240,          // 60 → 240 (4h pause sau cap hit)
   excludedTfs: ["5m"],
   confirmStochOsLevel: 20,
   confirmStochObLevel: 80,
   confirmSrProximityPct: 0.4,
-  stackMaxPerSide: 15,
-  stackPerSideSpacingMin: 10,
-  stackMinEntryDistPct: 0.3,
-  stackMaxNotionalUsd: 50000,
+  stackMaxPerSide: 50,           // 15 → 50 (sweet spot từ backtest)
+  stackPerSideSpacingMin: 0,     // 10 → 0 (giảm đáng kể bottleneck)
+  stackMinEntryDistPct: 0,       // 0.3 → 0 (giảm bottleneck chính)
+  stackMaxNotionalUsd: 200000,   // 50k → 200k (cho phép stack 50 lệnh)
 };
 
 export type LiveAction =
