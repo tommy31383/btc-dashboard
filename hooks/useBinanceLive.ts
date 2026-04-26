@@ -12,7 +12,7 @@ import { RuleAlert } from "./useRuleAlerts";
 import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
-  monitorTrackedPositions,
+  monitorTrackedPositions, addToPending, confirmPending,
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
@@ -42,7 +42,11 @@ export interface UseBinanceLiveResult {
   pullFromRemote: () => Promise<void>;
 }
 
-export function useBinanceLive(activeAlerts: RuleAlert[], currentPrice: number | null = null): UseBinanceLiveResult {
+export function useBinanceLive(
+  activeAlerts: RuleAlert[],
+  currentPrice: number | null = null,
+  ltfCtx: { stoch5m: number | null; support15m: number | null; resistance15m: number | null } = { stoch5m: null, support15m: null, resistance15m: null },
+): UseBinanceLiveResult {
   const [state, setState] = useState<LiveTraderState>(() => emptyState());
   const [account, setAccount] = useState<AccountSnapshot | null>(null);
   const [positions, setPositions] = useState<PositionRisk[]>([]);
@@ -84,13 +88,20 @@ export function useBinanceLive(activeAlerts: RuleAlert[], currentPrice: number |
       const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
       for (const a of fresh) {
         if (a.side === "BOTH") continue;
+        const tpPct = (Math.abs(a.tpPrice - a.entryPrice) / a.entryPrice) * 100;
+        const slPct = (Math.abs(a.entryPrice - a.slPrice) / a.entryPrice) * 100;
         const input: AlertInput = {
           id: a.id, tfKey: a.tfKey, side: a.side,
           entryPrice: a.entryPrice, tpPrice: a.tpPrice, slPrice: a.slPrice,
-          firedAt: a.firedAt,
+          firedAt: a.firedAt, tpPct, slPct,
         };
         const action = decideEntry(s, input, { dailyPnl, openCount, nowMs: Date.now() });
-        s = await executeAction(s, input, action);
+        if (action.kind === "PENDING") {
+          s = await executeAction(s, input, action);  // log PENDING
+          s = await addToPending(s, input);
+        } else {
+          s = await executeAction(s, input, action);
+        }
       }
       setState(s);
     })();
@@ -147,6 +158,26 @@ export function useBinanceLive(activeAlerts: RuleAlert[], currentPrice: number |
       if (next !== stateRef.current) setState(next);
     })();
   }, [currentPrice]);
+
+  // Phase 2: confirm pending alerts mỗi tick (LTF stoch + S/R check)
+  useEffect(() => {
+    if (currentPrice === null || currentPrice <= 0) return;
+    if (!stateRef.current.pendingAlerts.length) return;
+    const activeIds = new Set(activeAlerts.map((a) => a.id));
+    const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
+    (async () => {
+      const next = await confirmPending(stateRef.current, {
+        currentPrice,
+        stoch5m: ltfCtx.stoch5m,
+        support15m: ltfCtx.support15m,
+        resistance15m: ltfCtx.resistance15m,
+        activeAlertIds: activeIds,
+        dailyPnl,
+        openCount,
+      });
+      if (next !== stateRef.current) setState(next);
+    })();
+  }, [currentPrice, ltfCtx.stoch5m, ltfCtx.support15m, ltfCtx.resistance15m, activeAlerts, positions, dailyPnl]);
 
   const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
 

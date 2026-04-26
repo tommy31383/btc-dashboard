@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.80";
+const APP_VERSION = "4.3.83";
 const BUILD_DATE = "2026-04-25";
 
 /**
@@ -168,8 +168,22 @@ export default function App() {
   // 1000 USD, margin 30/lệnh, lev 100x, limit ±0.1% chờ tối đa 5p).
   const autoTrader = useAutoTrader(activeAlerts, priceData?.price ?? null);
 
-  // v4.3.52 — Binance Live (Phase 1 DRY RUN)
-  const live = useBinanceLive(activeAlerts, priceData?.price ?? null);
+  // v4.3.52 — Binance Live; v4.3.82 — pass LTF context (stoch5m + S/R 15m) cho confirm
+  const ltfCtx = (() => {
+    const stoch5m = tfData.find((t) => t.key === "5m")?.stochK ?? null;
+    const klines15m = rawKlines["15m"];
+    let support15m: number | null = null;
+    let resistance15m: number | null = null;
+    if (klines15m && klines15m.length > 51) {
+      const tail = klines15m.slice(-51, -1);
+      let lo = Infinity, hi = -Infinity;
+      for (const c of tail) { if (c.low < lo) lo = c.low; if (c.high > hi) hi = c.high; }
+      if (lo !== Infinity) support15m = lo;
+      if (hi !== -Infinity) resistance15m = hi;
+    }
+    return { stoch5m, support15m, resistance15m };
+  })();
+  const live = useBinanceLive(activeAlerts, priceData?.price ?? null, ltfCtx);
 
   // v4.3.44 — 15m All trader: PC-only, local AsyncStorage, LONG every closed 15m bar
   // 15m All trader disabled — replaced by LIVE tab

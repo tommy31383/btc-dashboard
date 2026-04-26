@@ -25,7 +25,10 @@ export interface LiveSettings {
   dailyLossCapUsd: number;     // âm, vd -15
   cooldownMinutes: number;
   excludedTfs: string[];        // ["5m"] etc
-  // TP/SL lấy theo rule (cfg.targetPct / cfg.stopPct), không cấu hình ở đây
+  // LTF confirm (Phase 2): khi rule HTF fire → đợi LTF confirm trước khi vào lệnh
+  confirmStochOsLevel: number;   // K < N → confirm LONG (default 20)
+  confirmStochObLevel: number;   // K > N → confirm SHORT (default 80)
+  confirmSrProximityPct: number; // close ≤ N% từ S/R → confirm (default 0.4)
 }
 
 export const DEFAULT_SETTINGS: LiveSettings = {
@@ -36,13 +39,29 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   dailyLossCapUsd: -15,
   cooldownMinutes: 60,
   excludedTfs: ["5m"],
+  confirmStochOsLevel: 20,
+  confirmStochObLevel: 80,
+  confirmSrProximityPct: 0.4,
 };
 
 export type LiveAction =
-  | { kind: "ENTRY"; side: "LONG" | "SHORT"; entryPrice: number; tpPrice: number; slPrice: number; qty: number }
+  | { kind: "ENTRY"; side: "LONG" | "SHORT"; entryPrice: number; tpPrice: number; slPrice: number; qty: number; confirmedBy?: string }
   | { kind: "CLOSE"; side: "LONG" | "SHORT"; closePrice: number; qty: number; trigger: "TP" | "SL" }
+  | { kind: "PENDING"; side: "LONG" | "SHORT"; htfEntryPrice: number; tpPct: number; slPct: number }
+  | { kind: "DISCARD"; reason: string }
   | { kind: "BLOCK"; reason: string }
   | { kind: "ERROR"; message: string };
+
+/** Alert HTF đang chờ LTF confirm. TP/SL pct lưu raw để recalc theo entry price khi confirm. */
+export interface PendingAlert {
+  id: string;
+  tfKey: string;
+  side: "LONG" | "SHORT";
+  htfEntryPrice: number;       // price tại lúc HTF fire (info)
+  tpPct: number;               // raw % từ rule
+  slPct: number;               // raw %
+  addedMs: number;
+}
 
 export interface TrackedPosition {
   id: string;
@@ -74,6 +93,8 @@ export interface LiveSyncState {
   firedIds: Record<string, number>;
   /** App tự monitor TP/SL (Plan B) — list các position đã mở chờ close khi giá hit */
   trackedPositions: TrackedPosition[];
+  /** HTF rule fire → đợi LTF confirm (Phase 2) */
+  pendingAlerts: PendingAlert[];
 }
 
 /** Full state in-memory (sync state + secrets) */
@@ -93,6 +114,7 @@ export function emptySyncState(): LiveSyncState {
     journal: [],
     firedIds: {},
     trackedPositions: [],
+    pendingAlerts: [],
   };
 }
 
@@ -181,8 +203,15 @@ export interface AlertInput {
   tpPrice: number;
   slPrice: number;
   firedAt: number;
+  /** Raw % từ rule.config — dùng để recalc TP/SL theo entry price khi LTF confirm */
+  tpPct: number;
+  slPct: number;
 }
 
+/**
+ * decideEntry: Phase 2 — không vào lệnh ngay. Chỉ check basic gate; pass → push vào pendingAlerts.
+ * ENTRY thực sự chỉ fire qua confirmPending() khi LTF condition đạt.
+ */
 export function decideEntry(
   s: LiveTraderState,
   alert: AlertInput,
@@ -201,20 +230,127 @@ export function decideEntry(
   if (ctx.openCount >= cfg.maxOpen) {
     return { kind: "BLOCK", reason: `max open ${cfg.maxOpen} reached` };
   }
-  if (s.firedIds[alert.id] && Date.now() - s.firedIds[alert.id] < 60_000) {
-    return { kind: "BLOCK", reason: "dedup (vừa fire)" };
+  // Per-rule cooldown 10 phút (sau lần ENTRY thật)
+  const PER_RULE_COOLDOWN_MS = 10 * 60_000;
+  const lastFire = s.firedIds[alert.id];
+  if (lastFire && ctx.nowMs - lastFire < PER_RULE_COOLDOWN_MS) {
+    const leftMin = Math.ceil((PER_RULE_COOLDOWN_MS - (ctx.nowMs - lastFire)) / 60000);
+    return { kind: "BLOCK", reason: `per-rule cooldown ${leftMin}m (rule ${alert.id})` };
+  }
+  // Đã pending rồi → skip
+  if (s.pendingAlerts.some((p) => p.id === alert.id && p.side === alert.side)) {
+    return { kind: "BLOCK", reason: `already pending (rule ${alert.id})` };
+  }
+  return {
+    kind: "PENDING",
+    side: alert.side,
+    htfEntryPrice: alert.entryPrice,
+    tpPct: alert.tpPct,
+    slPct: alert.slPct,
+  };
+}
+
+/**
+ * Push alert vào pending queue (gọi sau khi decideEntry trả PENDING).
+ */
+export async function addToPending(s: LiveTraderState, alert: AlertInput): Promise<LiveTraderState> {
+  const next: LiveTraderState = {
+    ...s,
+    pendingAlerts: [...s.pendingAlerts, {
+      id: alert.id, tfKey: alert.tfKey, side: alert.side,
+      htfEntryPrice: alert.entryPrice, tpPct: alert.tpPct, slPct: alert.slPct,
+      addedMs: Date.now(),
+    }],
+  };
+  await saveState(next);
+  return next;
+}
+
+/**
+ * confirmPending: kiểm tra mọi pending alert → nếu LTF confirm đạt → execute ENTRY.
+ *
+ * Confirm rule:
+ *   LONG: stoch5m K < confirmStochOsLevel (20) HOẶC price ≤ support15m × (1 + proximity%)
+ *   SHORT: K > confirmStochObLevel (80) HOẶC price ≥ resistance15m × (1 - proximity%)
+ */
+export async function confirmPending(
+  s: LiveTraderState,
+  ctx: {
+    currentPrice: number;
+    stoch5m: number | null;
+    support15m: number | null;
+    resistance15m: number | null;
+    activeAlertIds: Set<string>;
+    dailyPnl: number;
+    openCount: number;
+  },
+): Promise<LiveTraderState> {
+  if (!s.pendingAlerts.length) return s;
+  const cfg = s.settings;
+  const remaining: PendingAlert[] = [];
+  let next = s;
+
+  for (const p of s.pendingAlerts) {
+    // Discard nếu rule không còn ARMED/FIRED (Tommy: "miễn rule còn fire")
+    if (!ctx.activeAlertIds.has(p.id)) {
+      next = await logAction(next, p.id, p.tfKey, { kind: "DISCARD", reason: "rule no longer firing" });
+      continue;
+    }
+    // Confirm condition
+    let confirmedBy: string | null = null;
+    if (p.side === "LONG") {
+      if (ctx.stoch5m !== null && ctx.stoch5m < cfg.confirmStochOsLevel) {
+        confirmedBy = `Stoch5m K=${ctx.stoch5m.toFixed(1)} < ${cfg.confirmStochOsLevel}`;
+      } else if (ctx.support15m !== null) {
+        const distSup = ((ctx.currentPrice - ctx.support15m) / ctx.support15m) * 100;
+        if (distSup >= 0 && distSup <= cfg.confirmSrProximityPct) {
+          confirmedBy = `near support15m ${distSup.toFixed(2)}%`;
+        }
+      }
+    } else {
+      if (ctx.stoch5m !== null && ctx.stoch5m > cfg.confirmStochObLevel) {
+        confirmedBy = `Stoch5m K=${ctx.stoch5m.toFixed(1)} > ${cfg.confirmStochObLevel}`;
+      } else if (ctx.resistance15m !== null) {
+        const distRes = ((ctx.resistance15m - ctx.currentPrice) / ctx.currentPrice) * 100;
+        if (distRes >= 0 && distRes <= cfg.confirmSrProximityPct) {
+          confirmedBy = `near resistance15m ${distRes.toFixed(2)}%`;
+        }
+      }
+    }
+    if (!confirmedBy) {
+      remaining.push(p);
+      continue;
+    }
+    // Recheck per-rule cooldown + maxOpen + dailyPnl tại thời điểm confirm
+    const lastFire = next.firedIds[p.id];
+    if (lastFire && Date.now() - lastFire < 10 * 60_000) { remaining.push(p); continue; }
+    if (ctx.openCount >= cfg.maxOpen) { remaining.push(p); continue; }
+    if (ctx.dailyPnl <= cfg.dailyLossCapUsd) { remaining.push(p); continue; }
+
+    // Build ENTRY action với current price
+    const entryPrice = ctx.currentPrice;
+    const tpPrice = p.side === "LONG" ? entryPrice * (1 + p.tpPct / 100) : entryPrice * (1 - p.tpPct / 100);
+    const slPrice = p.side === "LONG" ? entryPrice * (1 - p.slPct / 100) : entryPrice * (1 + p.slPct / 100);
+    const notional = cfg.marginUsd * cfg.leverage;
+    const qty = notionalToQty(notional, entryPrice);
+    const action: LiveAction = {
+      kind: "ENTRY", side: p.side,
+      entryPrice, tpPrice, slPrice, qty,
+      confirmedBy,
+    };
+    const alertInput: AlertInput = {
+      id: p.id, tfKey: p.tfKey, side: p.side,
+      entryPrice, tpPrice, slPrice, firedAt: p.addedMs,
+      tpPct: p.tpPct, slPct: p.slPct,
+    };
+    next = await executeAction(next, alertInput, action);
   }
 
-  const notional = cfg.marginUsd * cfg.leverage;
-  const qty = notionalToQty(notional, alert.entryPrice);
-  return {
-    kind: "ENTRY",
-    side: alert.side,
-    entryPrice: alert.entryPrice,
-    tpPrice: alert.tpPrice,
-    slPrice: alert.slPrice,
-    qty,
-  };
+  if (remaining.length !== s.pendingAlerts.length) {
+    next = { ...next, pendingAlerts: remaining };
+    await saveState(next);
+  }
+  return next;
 }
 
 export async function executeAction(

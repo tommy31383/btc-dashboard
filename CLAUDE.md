@@ -135,3 +135,21 @@ App có **3 engine song song**, mỗi cái có nguồn trigger + account riêng.
 - **API key/secret KHÔNG bao giờ vào gist** — phải lưu key riêng `@live_trader_secret_v1`.
 - Engine chạy nền nếu cần history liên tục → pass `enabled=true` thay vì gate theo `activeTab`.
 - Mọi trigger lệnh thật trên Binance phải qua `decideEntry()` → check circuit breakers (auto, dryRun, paused, dailyCap, maxOpen, dedup).
+
+### CÁCH VÀO LỆNH LIVE (Phase 2 — v4.3.82+)
+
+**KHÔNG vào MARKET ngay khi rule HTF fire.** Flow:
+
+1. **Rule HTF fire** (vd `1h:24` LONG) → `decideEntry` kiểm tra basic blocks (auto, paused, capacity, cap, excludedTfs, per-rule cooldown 10m, đã pending chưa).
+2. **Pass tất cả** → return `PENDING` action → `addToPending()` push vào `state.pendingAlerts[]` (lưu `tpPct/slPct` raw từ rule).
+3. **Mỗi tick price + LTF data update** → `confirmPending()` quét pending list:
+   - **LONG confirm:** `Stoch5m K < confirmStochOsLevel (20)` HOẶC `price ≤ support15m × (1 + 0.4%)`
+   - **SHORT confirm:** `K > confirmStochObLevel (80)` HOẶC `price ≥ resistance15m × (1 - 0.4%)`
+4. **Confirmed** → recalc entry/TP/SL theo current price → `executeAction(ENTRY)` → MARKET vào.
+5. **Pending KHÔNG timeout** — miễn rule còn trong `activeAlerts` (vẫn FIRED). Khi rule chuyển OFF/ARMED → log `DISCARD` + remove khỏi pending.
+
+**Per-rule cooldown 10 phút** — sau ENTRY thành công, rule đó bị block 10m mới vào lại được (giảm nhồi cùng rule).
+
+**TP/SL tự monitor (Plan B):** entry chỉ gửi MARKET; TP/SL prices lưu trong `trackedPositions`; mỗi tick app check mark price → gửi MARKET reduceOnly khi hit.
+
+**Tools/backtest áp dụng cùng logic:** mọi backtest cho rule HTF từ giờ phải simulate logic confirm này (chờ LTF condition trước khi entry).

@@ -74,6 +74,7 @@ function StatusBar({ live }: Props) {
         <BigPill label="AUTO" value={live.state.autoEnabled ? "ON" : "OFF"} color={live.state.autoEnabled ? P.green : P.dim} />
         <BigPill label="OPEN" value={`${live.openCount}/${live.state.settings.maxOpen}`} color={P.text} />
         <BigPill label="TRACKED" value={`${live.state.trackedPositions.length}`} color={P.tertiary} />
+        <BigPill label="PENDING" value={`${live.state.pendingAlerts.length}`} color={P.bitcoinOrange} />
         <BigPill
           label="PnL TODAY"
           value={`${live.dailyPnl >= 0 ? "+" : ""}$${live.dailyPnl.toFixed(2)}`}
@@ -531,7 +532,7 @@ function RecentFillsCard({ live }: Props) {
 // ── HISTORY ─────────────────────────────────────────────────────────────────
 
 function HistoryCard({ live }: Props) {
-  const [filter, setFilter] = useState<"ALL" | "ENTRY" | "CLOSE" | "BLOCK" | "ERROR">("ALL");
+  const [filter, setFilter] = useState<"ALL" | "ENTRY" | "CLOSE" | "PENDING" | "BLOCK" | "ERROR">("ALL");
   const [copyFlash, setCopyFlash] = useState(false);
   const items = useMemo(() => {
     const all = [...live.state.journal].slice(-200).reverse();
@@ -550,6 +551,8 @@ function HistoryCard({ live }: Props) {
       let body = "";
       if (a.kind === "ENTRY") body = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
       else if (a.kind === "CLOSE") body = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
+      else if (a.kind === "PENDING") body = `PENDING ${a.side} (HTF @$${a.htfEntryPrice.toFixed(0)}) — chờ LTF confirm`;
+      else if (a.kind === "DISCARD") body = `DISCARD · ${a.reason}`;
       else if (a.kind === "BLOCK") body = `BLOCK · ${a.reason}`;
       else body = `ERROR · ${a.message}`;
       return `${dd}/${mo} ${hh}:${mi}  📌rule=${j.ruleId.padEnd(10)}  ${j.dryRun ? "[DRY] " : ""}${body}`;
@@ -567,7 +570,7 @@ function HistoryCard({ live }: Props) {
   return (
     <Card title={`📜 HISTORY · ${live.state.journal.length} total`}>
       <View style={styles.row}>
-        {(["ALL", "ENTRY", "CLOSE", "BLOCK", "ERROR"] as const).map((f) => (
+        {(["ALL", "ENTRY", "CLOSE", "PENDING", "BLOCK", "ERROR"] as const).map((f) => (
           <TouchableOpacity key={f} onPress={() => setFilter(f)}
             style={[styles.filterChip, filter === f && styles.filterChipActive]}>
             <Text style={[styles.filterText, filter === f && { color: P.bitcoinOrange }]}>{f}</Text>
@@ -599,10 +602,16 @@ function JournalRow({ j }: { j: any }) {
   let color = P.dim, text = "";
   if (a.kind === "ENTRY") {
     color = a.side === "LONG" ? P.green : P.error;
-    text = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
+    text = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}${a.confirmedBy ? `  ✓ ${a.confirmedBy}` : ""}`;
   } else if (a.kind === "CLOSE") {
     color = a.trigger === "TP" ? P.green : P.error;
     text = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
+  } else if (a.kind === "PENDING") {
+    color = P.tertiary;
+    text = `PENDING ${a.side} (rule fired @ $${a.htfEntryPrice.toFixed(0)}, TP ${a.tpPct.toFixed(2)}% / SL ${a.slPct.toFixed(2)}%) — chờ LTF confirm`;
+  } else if (a.kind === "DISCARD") {
+    color = P.dim;
+    text = `DISCARD · ${a.reason}`;
   } else if (a.kind === "BLOCK") {
     color = P.bitcoinOrange;
     text = `BLOCK · ${a.reason}`;

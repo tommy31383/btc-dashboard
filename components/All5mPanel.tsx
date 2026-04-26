@@ -161,14 +161,35 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <Kpi label="OPEN" value={`${summary.openCount}`} color={P.primaryContainer} sub={`free $${summary.freeMargin.toFixed(0)}`} />
       </View>
 
-      {/* Cooldown banner */}
-      {summary.cooldownRemainMs > 0 && (
-        <View style={styles.cdBanner}>
-          <Text style={styles.cdBannerText}>
-            ⏸ COOLDOWN — kế tiếp sau {fmtCountdown(summary.cooldownRemainMs)} · stoch5m K = {stoch5mK !== null ? stoch5mK.toFixed(1) : "—"}
-          </Text>
-        </View>
-      )}
+      {/* Status banner — engine đang chờ gì */}
+      {(() => {
+        const hasLong = open.some((p) => p.side === "LONG");
+        const hasShort = open.some((p) => p.side === "SHORT");
+        const k = stoch5mK !== null ? stoch5mK.toFixed(1) : "—";
+        let msg = "";
+        let bg = P.tertiaryContainer;
+        let fg = P.onTertiaryContainer;
+        if (summary.cooldownRemainMs > 0) {
+          msg = `⏸ COOLDOWN — entry kế sau ${fmtCountdown(summary.cooldownRemainMs)} · K=${k}`;
+        } else if (hasLong && hasShort) {
+          msg = `✅ ĐỦ 1 LONG + 1 SHORT — chờ TP/SL hit để slot trống · K=${k}`;
+          bg = P.surface; fg = P.green;
+        } else if (hasLong) {
+          msg = `🟢 ĐÃ CÓ LONG — đợi signal SHORT (K>${STOCH_SHORT_LEVEL} hoặc gần resistance) · K=${k}`;
+          bg = P.surface; fg = P.text;
+        } else if (hasShort) {
+          msg = `🔴 ĐÃ CÓ SHORT — đợi signal LONG (K<${STOCH_LONG_LEVEL} hoặc gần support) · K=${k}`;
+          bg = P.surface; fg = P.text;
+        } else {
+          msg = `🔍 ĐANG CHỜ TÍN HIỆU — cần K<${STOCH_LONG_LEVEL} (LONG) hoặc K>${STOCH_SHORT_LEVEL} (SHORT) · K=${k}`;
+          bg = P.surface; fg = P.dim;
+        }
+        return (
+          <View style={[styles.cdBanner, { backgroundColor: bg }]}>
+            <Text style={[styles.cdBannerText, { color: fg }]}>{msg}</Text>
+          </View>
+        );
+      })()}
 
       {/* Equity curve */}
       <View style={styles.section}>
