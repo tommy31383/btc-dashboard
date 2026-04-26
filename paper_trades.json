@@ -1,26 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1777219086598,
+  "updatedAt": 1777219326598,
   "trades": [
-    {
-      "id": "atswmamgenc",
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "side": "LONG",
-      "status": "TIMEOUT",
-      "entryPrice": 77373.92,
-      "slPrice": 69636.528,
-      "tpPrice": 78534.52879999999,
-      "leverage": 100,
-      "targetPct": 1.5,
-      "stopPct": 10,
-      "maxHoldBars": 100,
-      "openedMs": 1777072387425,
-      "deadlineMs": 1777161600000,
-      "exitPrice": 77625,
-      "leveragedPnlPct": 32.45,
-      "closedMs": 1777161600033
-    },
     {
       "id": "5pp9h09tp5",
       "ruleId": "5m:1",
@@ -3786,6 +3767,25 @@
       "exitPrice": 79588.4274,
       "leveragedPnlPct": -200,
       "closedMs": 1777219066063
+    },
+    {
+      "id": "2w8w6f9emev",
+      "ruleId": "5m:1",
+      "tfKey": "5m",
+      "side": "LONG",
+      "status": "LOSS",
+      "entryPrice": 78035.27,
+      "slPrice": 79595.97540000001,
+      "tpPrice": 74913.8592,
+      "leverage": 100,
+      "targetPct": 4,
+      "stopPct": 2,
+      "maxHoldBars": 50,
+      "openedMs": 1777219305656,
+      "deadlineMs": 1777234200000,
+      "exitPrice": 79595.97540000001,
+      "leveragedPnlPct": -200,
+      "closedMs": 1777219306084
     }
   ]
 }
