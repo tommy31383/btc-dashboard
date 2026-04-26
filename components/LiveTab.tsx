@@ -18,6 +18,9 @@ import { P } from "../utils/v2Theme";
 import { UseBinanceLiveResult } from "../hooks/useBinanceLive";
 import { LiveSettings } from "../utils/liveTraderEngine";
 
+/** Hard-roll password để force claim leader (anh Tommy đặt). */
+const CLAIM_LEADER_PASSWORD = "30318384";
+
 interface Props {
   live: UseBinanceLiveResult;
 }
@@ -59,6 +62,38 @@ function StatusBar({ live }: Props) {
   const upnl = live.account ? parseFloat(live.account.totalUnrealizedProfit) : null;
   const alias = live.account?.accountAlias;
 
+  // Leader/follower badge (anh Tommy: single-leader lock)
+  const isLeader = live.role === "LEADER";
+  const isFollower = live.role === "FOLLOWER";
+  const isBoot = live.role === "BOOTING";
+  const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : P.dim;
+  const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : "⏳ BOOTING";
+  const leaderTxt = live.leader
+    ? `${live.leader.deviceLabel} · beat ${Math.floor((Date.now() - live.leader.lastBeatMs) / 1000)}s ago`
+    : "(chưa có leader)";
+  const syncTxt = live.lastSyncMs > 0 ? `synced ${Math.floor((Date.now() - live.lastSyncMs) / 1000)}s ago` : "—";
+  const handleClaim = () => {
+    if (typeof window === "undefined") {
+      live.claimLeadership();
+      return;
+    }
+    // Hard-roll: phải nhập password đúng mới được takeover (anh Tommy spec)
+    const pwd = window.prompt(
+      `🔒 CLAIM LEADER — nhập password để force takeover từ ${live.leader?.deviceLabel ?? "device hiện tại"}:`
+    );
+    if (pwd === null) return; // user cancel
+    if (pwd !== CLAIM_LEADER_PASSWORD) {
+      window.alert("❌ Sai password — không được claim.");
+      return;
+    }
+    const ok = window.confirm(
+      `CLAIM LEADER?\n\nMáy này sẽ takeover auto-trade từ ${live.leader?.deviceLabel ?? "device hiện tại"}.\n` +
+      `Đảm bảo máy kia đã TẮT AUTO trước khi claim (tránh 2 máy cùng vào lệnh).`
+    );
+    if (!ok) return;
+    live.claimLeadership();
+  };
+
   return (
     <View style={styles.statusBar}>
       {alias && (
@@ -71,6 +106,26 @@ function StatusBar({ live }: Props) {
             <Text style={styles.profileAlias}>{alias}</Text>
           </View>
         </View>
+      )}
+      <View style={[styles.statusRow, { alignItems: "center" }]}>
+        <BigPill label="ROLE" value={roleLabel} color={roleColor} />
+        <View style={{ flex: 1, marginHorizontal: 8 }}>
+          <Text style={[styles.note, { fontSize: 10 }]}>
+            <Text style={{ color: roleColor, fontWeight: "700" }}>{leaderTxt}</Text>
+            {isFollower && ` · ${syncTxt}`}
+            {live.deviceId && ` · my id ${live.deviceId.slice(0, 6)}…`}
+          </Text>
+        </View>
+        {!isLeader && !isBoot && (
+          <TouchableOpacity onPress={handleClaim} style={styles.btnDanger}>
+            <Text style={styles.btnDangerText}>CLAIM LEADER</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {isFollower && (
+        <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
+          ⚠️ FOLLOWER MODE — không tự vào lệnh / close. Xem state mirror từ leader. Bấm CLAIM để takeover.
+        </Text>
       )}
       <View style={styles.statusRow}>
         <BigPill label="MODE" value={live.state.dryRun ? "DRY" : "REAL"} color={live.state.dryRun ? P.dim : P.error} />

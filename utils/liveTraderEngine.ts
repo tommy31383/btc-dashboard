@@ -173,8 +173,16 @@ export async function saveState(s: LiveTraderState, opts: { sync?: boolean } = {
   }
 }
 
-/** Pull remote sync state & merge journal entries (union by ts+ruleId). */
-export async function pullRemote(local: LiveTraderState): Promise<LiveTraderState> {
+/** Pull remote sync state & merge journal entries (union by ts+ruleId).
+ *  Mode "leader": chỉ merge journal + firedIds, KHÔNG đụng pendingAlerts/trackedPositions
+ *    (leader có local state authoritative).
+ *  Mode "follower": leader là nguồn truth → MIRROR trackedPositions + pendingAlerts từ remote.
+ *  Mode "boot" (default): merge journal nhưng ưu tiên local state — cho lần load đầu, chưa biết role.
+ */
+export async function pullRemote(
+  local: LiveTraderState,
+  mode: "leader" | "follower" | "boot" = "boot",
+): Promise<LiveTraderState> {
   const remote = await pullFile<LiveSyncState>(REMOTE_FILE);
   if (!remote) return local;
   const seen = new Set(local.journal.map((j) => `${j.ts}|${j.ruleId}|${j.action.kind}`));
@@ -184,7 +192,7 @@ export async function pullRemote(local: LiveTraderState): Promise<LiveTraderStat
     if (!seen.has(k)) merged.push(r);
   }
   merged.sort((a, b) => a.ts - b.ts);
-  return {
+  const base: LiveTraderState = {
     ...local,
     settings: { ...DEFAULT_SETTINGS, ...(remote.settings || local.settings) },
     autoEnabled: remote.autoEnabled ?? local.autoEnabled,
@@ -193,6 +201,15 @@ export async function pullRemote(local: LiveTraderState): Promise<LiveTraderStat
     journal: merged,
     firedIds: { ...local.firedIds, ...(remote.firedIds || {}) },
   };
+  if (mode === "follower") {
+    // Mirror leader's authoritative lists — follower KHÔNG được tự sửa.
+    return {
+      ...base,
+      trackedPositions: remote.trackedPositions || [],
+      pendingAlerts: remote.pendingAlerts || [],
+    };
+  }
+  return base;
 }
 
 // ── Decision + Execution ───────────────────────────────────────────────────
