@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.65";
+const APP_VERSION = "4.3.67";
 const BUILD_DATE = "2026-04-25";
 
 /**
@@ -175,8 +175,8 @@ export default function App() {
   // 15m All trader disabled — replaced by LIVE tab
   // const all15m = use15mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all15m");
 
-  // v4.3.47 — 5m All trader: PC-only, StochRSI 5m + S/R 15m fallback, cooldown 15m
-  const all5m = use5mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all5m");
+  // v4.3.47 — 5m All trader: chạy nền liên tục để tích luỹ history (không gate theo tab)
+  const all5m = use5mAllTrader(rawKlines, tfData, priceData?.price ?? null, true);
 
   // v4.3.37 — Auto-pull paper trades từ Gist khi app mount (best-effort).
   useEffect(() => {

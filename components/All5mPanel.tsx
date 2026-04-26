@@ -11,7 +11,7 @@ import { P } from "../utils/v2Theme";
 import {
   All5mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE,
-  TP_PCT, SL_PCT, STOCH_LONG_LEVEL, STOCH_SHORT_LEVEL, COOLDOWN_MS, FEE_PER_SIDE,
+  TP_PCT, SL_PCT, STOCH_LONG_LEVEL, STOCH_SHORT_LEVEL, COOLDOWN_MS, FEE_PER_SIDE, SR_PROXIMITY_PCT,
 } from "../utils/all5mAccount";
 
 interface Props {
@@ -105,16 +105,40 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
       <View style={styles.headerRow}>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.h1}>⚡ 5m ALL — STOCH + S/R</Text>
-          <Text style={styles.subtitle}>
-            5m closed → K&lt;{STOCH_LONG_LEVEL} LONG · K&gt;{STOCH_SHORT_LEVEL} SHORT · else S/R 15m fallback ·
-            TP +{TP_PCT}% / SL -{SL_PCT}% · cooldown {COOLDOWN_MS / 60000}m · margin ${MARGIN_PER_TRADE} × {LEVERAGE}x · fee ${FEE_PER_SIDE.toFixed(2)}/side
-          </Text>
+          <Text style={styles.subtitle}>Paper test — chạy nền liên tục, không liên quan Binance</Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
           <Text style={styles.resetBtnText}>🗑 RESET</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* RULE LOGIC */}
+      <View style={styles.ruleBox}>
+        <Text style={styles.ruleTitle}>📋 RULE LOGIC — cách vào lệnh</Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Trigger:</Text> mỗi cây 5m vừa đóng (close-bar evaluate)
+        </Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Primary signal — StochRSI 5m K(14,14,3,3):</Text>
+          {"\n"}  • K &lt; <Text style={styles.ruleNum}>{STOCH_LONG_LEVEL}</Text> → vào <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
+          {"\n"}  • K &gt; <Text style={styles.ruleNum}>{STOCH_SHORT_LEVEL}</Text> → vào <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
+        </Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Fallback — S/R 15m (pivot 50 cây gần nhất):</Text>
+          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROXIMITY_PCT}%</Text> trên Support → <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
+          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROXIMITY_PCT}%</Text> dưới Resistance → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
+        </Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Exit:</Text> TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> (raw price, kiểm tra mỗi tick)
+        </Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Risk:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
+        </Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Cooldown:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MS / 60000} phút</Text> giữa các entry · không vào trùng cây 5m · max parallel = capital / margin
+        </Text>
       </View>
 
       {/* KPI */}
@@ -231,6 +255,20 @@ const styles = StyleSheet.create({
   kpiLabel: { color: P.dim, fontSize: 9, letterSpacing: 1.2, fontFamily: "JetBrainsMono_500Medium" },
   kpiValue: { fontSize: 18, fontWeight: "800", marginTop: 4, fontFamily: "JetBrainsMono_700Bold" },
   kpiSub: { color: P.dim, fontSize: 10, marginTop: 2, fontFamily: "JetBrainsMono_400Regular" },
+  ruleBox: {
+    backgroundColor: P.elevated, borderWidth: 1, borderColor: P.border,
+    borderLeftWidth: 4, borderLeftColor: P.bitcoinOrange,
+    borderRadius: 4, padding: 12, marginBottom: 14,
+  },
+  ruleTitle: {
+    color: P.bitcoinOrange, fontFamily: "JetBrainsMono_700Bold",
+    fontSize: 12, fontWeight: "900", letterSpacing: 1, marginBottom: 8,
+  },
+  ruleLine: {
+    color: P.text2, fontFamily: "monospace", fontSize: 11, lineHeight: 16, marginBottom: 6,
+  },
+  ruleStrong: { color: P.text, fontWeight: "700" },
+  ruleNum: { color: P.bitcoinOrange, fontWeight: "700" },
   cdBanner: { backgroundColor: P.tertiaryContainer, padding: 10, borderRadius: 4, marginBottom: 12 },
   cdBannerText: { color: P.onTertiaryContainer, fontSize: 12, textAlign: "center", fontFamily: "JetBrainsMono_500Medium" },
   section: { marginBottom: 18 },

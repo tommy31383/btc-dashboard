@@ -91,3 +91,47 @@ cp android/app/build/outputs/apk/release/app-release.apk ../btc-dashboard-v<VERS
 - Rule **không** bắt buộc `stochExtreme` (K>95/K<5) — chỉ hiển thị StochK hiện tại cho user tham khảo
 - Default scan period = 10,000 candles (realistic, không survivorship bias)
 - TradingRulesPanel default `collapsed = true` — user tự bấm mở
+
+---
+
+## 🧠 ARCHITECTURE — 3 ENGINE TRADING ĐỘC LẬP
+
+App có **3 engine song song**, mỗi cái có nguồn trigger + account riêng. KHÔNG nhầm lẫn:
+
+### 1. `use5mAllTrader` — Tab 5m ALL (paper test, local)
+- File: `hooks/use5mAllTrader.ts` + `utils/all5mAccount.ts`
+- Storage: AsyncStorage `@all5m_data_v1` (KHÔNG sync git)
+- Trigger: **mỗi cây 5m close** → Stoch K<10 → LONG, K>90 → SHORT, fallback S/R 15m
+- Account: paper $1000, margin $30, lev 100x
+- Chạy nền **liên tục** (App.tsx pass `enabled=true`, không gate theo activeTab) — fix v4.3.66
+- KHÔNG liên quan rule trong `hard_rules.json`. KHÔNG liên quan Binance.
+
+### 2. `useAutoTrader` — Tab CLAUDE (paper, legacy)
+- File: `hooks/useAutoTrader.ts` + `utils/autoAccount.ts`
+- Storage: AsyncStorage `paper_trades.json` + sync gist
+- Trigger: subscribe `activeAlerts` từ `useRuleAlerts` (rule trong `hard_rules.json` fire)
+- Account: paper $1000 cap, $30 margin, 100x, limit ±0.1% chờ tối đa 5p
+- Render trong `AutoTraderPanel` (Dashboard tab)
+
+### 3. `useBinanceLive` — Tab LIVE (Binance real)
+- File: `hooks/useBinanceLive.ts` + `utils/liveTraderEngine.ts` + `utils/binanceLive.ts`
+- Storage: AsyncStorage `@live_trader_v2` (settings + journal — sync git via `live_trading.json`) + `@live_trader_secret_v1` (API key/secret — LOCAL ONLY, KHÔNG sync)
+- Trigger: subscribe `activeAlerts` từ `useRuleAlerts` (cùng nguồn AutoTrader)
+- Filter: `state.settings.excludedTfs` (default `["5m"]`)
+- 2 mode: **DRY RUN** (chỉ log) hoặc **REAL ORDERS** (POST /fapi/v1/order MARKET + STOP_MARKET + TAKE_PROFIT_MARKET)
+- Circuit breakers: maxOpen, dailyLossCapUsd → cooldownMinutes pause
+- Render trong `LiveTab` (BottomNav → LIVE)
+
+### Bảng trigger summary
+
+| Source event | 5m ALL | AutoTrader (CLAUDE) | LIVE (Binance) |
+|---|---|---|---|
+| Cây 5m close + Stoch <10 | ✅ paper | ❌ | ❌ |
+| Rule `1h:rank3` FIRE | ❌ | ✅ paper | ✅ real (nếu AUTO ON) |
+| Rule `5m:1` baseline FIRE | ❌ | ✅ paper | ❌ (TF 5m excluded mặc định) |
+
+### Quy tắc khi sửa engine
+- **KHÔNG cross-trigger**: 5m ALL không được fire vào LIVE (và ngược lại) trừ khi Tommy yêu cầu rõ.
+- **API key/secret KHÔNG bao giờ vào gist** — phải lưu key riêng `@live_trader_secret_v1`.
+- Engine chạy nền nếu cần history liên tục → pass `enabled=true` thay vì gate theo `activeTab`.
+- Mọi trigger lệnh thật trên Binance phải qua `decideEntry()` → check circuit breakers (auto, dryRun, paused, dailyCap, maxOpen, dedup).
