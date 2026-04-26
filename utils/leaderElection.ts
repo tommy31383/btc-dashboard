@@ -96,7 +96,7 @@ export async function setDeviceLabel(label: string): Promise<void> {
   else await AsyncStorage.removeItem(DEVICE_LABEL_KEY);
 }
 
-/** Fetch IP + location qua ipapi.co (free tier, no auth). Cache 1h ở local. */
+/** Fetch IP + location với 3 fallback APIs (tránh single point of failure). Cache 1h. */
 export async function fetchIpLocation(): Promise<IpLocation | null> {
   // Try cache trước
   try {
@@ -106,22 +106,55 @@ export async function fetchIpLocation(): Promise<IpLocation | null> {
       if (Date.now() - parsed.savedMs < IP_CACHE_TTL_MS) return parsed.loc;
     }
   } catch {}
-  // Fetch fresh
+
+  // Provider 1: ipapi.co (1000/day free, CORS-enabled, đầy đủ city+country)
   try {
     const res = await fetch("https://ipapi.co/json/");
-    if (!res.ok) return null;
-    const j = await res.json() as any;
-    if (!j || !j.ip) return null;
-    const loc: IpLocation = {
-      ip: String(j.ip),
-      country: String(j.country_code || j.country || ""),
-      city: String(j.city || ""),
-    };
-    await AsyncStorage.setItem(IP_LOC_CACHE_KEY, JSON.stringify({ savedMs: Date.now(), loc }));
-    return loc;
-  } catch {
-    return null;
-  }
+    if (res.ok) {
+      const j = await res.json() as any;
+      if (j && j.ip && !j.error) {
+        const loc: IpLocation = {
+          ip: String(j.ip),
+          country: String(j.country_code || j.country || "?"),
+          city: String(j.city || "?"),
+        };
+        await AsyncStorage.setItem(IP_LOC_CACHE_KEY, JSON.stringify({ savedMs: Date.now(), loc }));
+        return loc;
+      }
+    }
+  } catch { /* try next */ }
+
+  // Provider 2: ipwho.is (no auth, no rate limit announced, full data)
+  try {
+    const res = await fetch("https://ipwho.is/");
+    if (res.ok) {
+      const j = await res.json() as any;
+      if (j && j.success && j.ip) {
+        const loc: IpLocation = {
+          ip: String(j.ip),
+          country: String(j.country_code || j.country || "?"),
+          city: String(j.city || "?"),
+        };
+        await AsyncStorage.setItem(IP_LOC_CACHE_KEY, JSON.stringify({ savedMs: Date.now(), loc }));
+        return loc;
+      }
+    }
+  } catch { /* try next */ }
+
+  // Provider 3: ipify (only IP — location null)
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    if (res.ok) {
+      const j = await res.json() as any;
+      if (j && j.ip) {
+        const loc: IpLocation = { ip: String(j.ip), country: "?", city: "?" };
+        await AsyncStorage.setItem(IP_LOC_CACHE_KEY, JSON.stringify({ savedMs: Date.now(), loc }));
+        return loc;
+      }
+    }
+  } catch { /* give up */ }
+
+  return null;
 }
 
 export async function getLeaderInfo(): Promise<LeaderInfo | null> {

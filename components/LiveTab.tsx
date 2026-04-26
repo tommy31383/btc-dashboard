@@ -68,13 +68,19 @@ function StatusBar({ live }: Props) {
   const isBoot = live.role === "BOOTING";
   const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : P.dim;
   const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : "⏳ BOOTING";
-  // Leader info đầy đủ: tên + device type + IP + city
-  const leaderTxt = live.leader
-    ? `${live.leader.deviceLabel} (${live.leader.deviceType || "?"})` +
-      (live.leader.city ? ` · ${live.leader.city}, ${live.leader.country}` : "") +
-      (live.leader.ip ? ` · ${live.leader.ip}` : "") +
-      ` · beat ${Math.floor((Date.now() - live.leader.lastBeatMs) / 1000)}s ago`
-    : "(chưa có leader — bạn đang LOCAL)";
+  // Leader info: nếu mình là leader nhưng chưa có file gist (push lần đầu / LOCAL) → hiện rõ
+  const leaderTxt = (() => {
+    if (live.leader) {
+      const beatAgo = Math.floor((Date.now() - live.leader.lastBeatMs) / 1000);
+      const isMe = live.leader.deviceId === live.deviceId;
+      const cityCountry = live.leader.city && live.leader.city !== "?"
+        ? ` · ${live.leader.city}, ${live.leader.country}` : "";
+      const ip = live.leader.ip ? ` · ${live.leader.ip}` : "";
+      return `${isMe ? "👉 BẠN " : ""}${live.leader.deviceLabel} (${live.leader.deviceType || "?"})${cityCountry}${ip} · beat ${beatAgo}s ago`;
+    }
+    if (isLeader) return `👉 BẠN (${live.deviceLabel || "?"}) — đang push lần đầu hoặc LOCAL mode (chưa có PAT)`;
+    return "(chưa có leader)";
+  })();
   const meIpTxt = live.myIpLoc
     ? `${live.myIpLoc.ip} · ${live.myIpLoc.city}, ${live.myIpLoc.country}`
     : "—";
