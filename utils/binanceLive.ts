@@ -83,6 +83,7 @@ export interface PositionRisk {
   positionAmt: string;
   entryPrice: string;
   markPrice: string;
+  liquidationPrice: string;
   unRealizedProfit: string;
   leverage: string;
   positionSide: "BOTH" | "LONG" | "SHORT";

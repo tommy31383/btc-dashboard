@@ -157,6 +157,15 @@ function CredentialsCard({ live }: Props) {
   const [keyDraft, setKeyDraft] = useState(live.state.apiKey);
   const [secretDraft, setSecretDraft] = useState(live.state.apiSecret);
   const [show, setShow] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const credsSet = !!live.state.apiKey && !!live.state.apiSecret;
+
+  async function handleSave() {
+    await live.setCredentials(keyDraft.trim(), secretDraft.trim());
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 3000);
+  }
+
   return (
     <Card title="🔐 CREDENTIALS (local only — KHÔNG sync)">
       <Text style={styles.warn}>
@@ -184,13 +193,22 @@ function CredentialsCard({ live }: Props) {
         <TouchableOpacity onPress={() => setShow((v) => !v)} style={styles.btnGhost}>
           <Text style={styles.btnGhostText}>{show ? "👁 hide" : "👁 show"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => live.setCredentials(keyDraft.trim(), secretDraft.trim())}
-          style={styles.btnPrimary}
-        >
+        <TouchableOpacity onPress={handleSave} style={styles.btnPrimary}>
           <Text style={styles.btnPrimaryText}>SAVE</Text>
         </TouchableOpacity>
+        {credsSet && (
+          <Text style={[styles.note, { color: P.green, marginLeft: 6 }]}>✓ key đã lưu</Text>
+        )}
       </View>
+      {savedFlash && (
+        <Text style={[styles.note, { color: P.green, fontWeight: "700" }]}>
+          ✅ Đã lưu local. Bấm TEST CONNECTION để verify.
+        </Text>
+      )}
+      <Text style={styles.note}>
+        💡 Key chỉ lưu ở máy này (AsyncStorage). KHÔNG bao giờ sync git.
+        {"\n"}💡 Sang máy khác: phải nhập lại API key + secret. Nhưng SETTINGS + HISTORY thì sync (qua PULL FROM GIT).
+      </Text>
     </Card>
   );
 }
@@ -299,6 +317,17 @@ function NumField({
 
 function PositionsCard({ live }: Props) {
   const open = live.positions.filter((p) => parseFloat(p.positionAmt) !== 0);
+  // Pre-build TP/SL lookup from open orders (closePosition=true, side ngược position)
+  const tpslBySide: { LONG?: { tp?: number; sl?: number }; SHORT?: { tp?: number; sl?: number } } = {};
+  for (const o of live.openOrders) {
+    if (!o.closePosition) continue;
+    // SELL closePosition → close LONG; BUY closePosition → close SHORT
+    const positionSide: "LONG" | "SHORT" = o.side === "SELL" ? "LONG" : "SHORT";
+    if (!tpslBySide[positionSide]) tpslBySide[positionSide] = {};
+    const price = parseFloat(o.stopPrice || o.price || "0");
+    if (o.type.includes("TAKE_PROFIT")) tpslBySide[positionSide]!.tp = price;
+    else if (o.type.includes("STOP")) tpslBySide[positionSide]!.sl = price;
+  }
   return (
     <Card title={`📍 OPEN POSITIONS · ${open.length}`}>
       {open.length === 0 ? (
@@ -310,11 +339,14 @@ function PositionsCard({ live }: Props) {
           const mark = parseFloat(p.markPrice);
           const upnl = parseFloat(p.unRealizedProfit);
           const lev = parseInt(p.leverage, 10) || 1;
-          const side = amt > 0 ? "LONG" : "SHORT";
+          const side: "LONG" | "SHORT" = amt > 0 ? "LONG" : "SHORT";
           // ROE = uPnL / margin (margin = notional / lev)
           const notional = Math.abs(amt) * entry;
           const margin = notional / lev;
           const roe = margin > 0 ? (upnl / margin) * 100 : 0;
+          const tpsl = tpslBySide[side] || {};
+          const tpDist = tpsl.tp ? ((tpsl.tp - mark) / mark) * 100 : null;
+          const slDist = tpsl.sl ? ((tpsl.sl - mark) / mark) * 100 : null;
           return (
             <View key={i} style={styles.posCard}>
               <View style={styles.posRow}>
@@ -329,11 +361,40 @@ function PositionsCard({ live }: Props) {
                 </Text>
               </View>
               <View style={styles.posRow}>
-                <Text style={[styles.posCellSmall, { width: 86 }]}>qty {Math.abs(amt)}</Text>
-                <Text style={[styles.posCellSmall]}>entry ${entry.toFixed(1)}</Text>
-                <Text style={[styles.posCellSmall, { marginLeft: 10 }]}>mark ${mark.toFixed(1)}</Text>
-                <Text style={[styles.posCellSmall, { marginLeft: 10, flex: 1, textAlign: "right" }]}>margin ${margin.toFixed(2)}</Text>
+                <Text style={[styles.posCellSmall, { width: 110 }]}>
+                  size ${notional.toFixed(2)}
+                </Text>
+                <Text style={[styles.posCellSmall, { width: 70 }]}>
+                  ({Math.abs(amt)} BTC)
+                </Text>
+                <Text style={[styles.posCellSmall, { marginLeft: 10 }]}>margin ${margin.toFixed(2)}</Text>
               </View>
+              <View style={styles.posRow}>
+                <Text style={[styles.posCellSmall, { width: 110 }]}>entry ${entry.toFixed(1)}</Text>
+                <Text style={[styles.posCellSmall, { width: 110 }]}>mark ${mark.toFixed(1)}</Text>
+                <Text style={[styles.posCellSmall, { flex: 1, textAlign: "right", color: P.dim }]}>
+                  Δ {(((mark - entry) / entry) * 100).toFixed(3)}%
+                </Text>
+              </View>
+              {(tpsl.tp || tpsl.sl || parseFloat(p.liquidationPrice) > 0) && (
+                <View style={styles.posRow}>
+                  {tpsl.tp ? (
+                    <Text style={[styles.posCellSmall, { color: P.green, width: 130 }]}>
+                      TP ${tpsl.tp.toFixed(1)} ({tpDist! >= 0 ? "+" : ""}{tpDist!.toFixed(2)}%)
+                    </Text>
+                  ) : <View style={{ width: 130 }} />}
+                  {tpsl.sl ? (
+                    <Text style={[styles.posCellSmall, { color: P.error, width: 130 }]}>
+                      SL ${tpsl.sl.toFixed(1)} ({slDist! >= 0 ? "+" : ""}{slDist!.toFixed(2)}%)
+                    </Text>
+                  ) : <View style={{ width: 130 }} />}
+                  {parseFloat(p.liquidationPrice) > 0 && (
+                    <Text style={[styles.posCellSmall, { color: P.bitcoinOrange, flex: 1, textAlign: "right" }]}>
+                      LIQ ${parseFloat(p.liquidationPrice).toFixed(1)}
+                    </Text>
+                  )}
+                </View>
+              )}
             </View>
           );
         })
