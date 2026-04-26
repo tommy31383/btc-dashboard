@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "capitalUsd": 1028.608574803204,
+  "capitalUsd": 908.608574803204,
   "positions": [
     {
       "id": "auto_1777239705757_c1xr76",
@@ -211,7 +211,7 @@
       "ruleId": "15m:23",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "LOSS",
       "ruleEntryPrice": 77403.29,
       "limitPrice": 77480.69329,
       "slPrice": 78900.7026,
@@ -228,14 +228,17 @@
       "entryTfKey": "5m",
       "entryPrice": 77353.63,
       "openedMs": 1777174563032,
-      "entryMode": "auto_at_expiry"
+      "entryMode": "auto_at_expiry",
+      "exitPrice": 78900.7026,
+      "pnlUsd": -60,
+      "closedMs": 1777240508201
     },
     {
       "id": "auto_1777174261152_ln3kvl",
       "ruleId": "15m:22",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "LOSS",
       "ruleEntryPrice": 77403.29,
       "limitPrice": 77480.69329,
       "slPrice": 78900.7026,
@@ -252,7 +255,10 @@
       "entryTfKey": "5m",
       "entryPrice": 77353.63,
       "openedMs": 1777174563032,
-      "entryMode": "auto_at_expiry"
+      "entryMode": "auto_at_expiry",
+      "exitPrice": 78900.7026,
+      "pnlUsd": -60,
+      "closedMs": 1777240508201
     },
     {
       "id": "auto_1777160706659_hblchz",
@@ -472,12 +478,12 @@
     }
   ],
   "stats": {
-    "totalTrades": 12,
+    "totalTrades": 14,
     "wins": 0,
-    "losses": 0,
+    "losses": 2,
     "timeouts": 12,
-    "totalPnLUsd": 28.60857480320395,
+    "totalPnLUsd": -91.39142519679605,
     "lastResetMs": 1777052014772
   },
-  "updatedAt": 1777239931112
+  "updatedAt": 1777240508201
 }
