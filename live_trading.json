@@ -372,6 +372,16 @@
         "reason": "stack price too close (0.19% < 0.3%) to last LONG @77968.82"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777214505657,
+      "ruleId": "1h:24",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack price too close (0.16% < 0.3%) to last LONG @77968.82"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
