@@ -732,7 +732,7 @@ function HistoryCard({ live }: Props) {
       let body = "";
       if (a.kind === "ENTRY") body = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
       else if (a.kind === "CLOSE") body = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
-      else if (a.kind === "PENDING") body = `PENDING ${a.side} (HTF @$${a.htfEntryPrice.toFixed(0)}) — chờ LTF confirm`;
+      else if (a.kind === "PENDING") body = `PENDING ${a.side} (rule HTF fire @$${a.htfEntryPrice.toFixed(0)}) — chờ Stoch5m K<20 (LONG) / K>80 (SHORT) HOẶC giá chạm S/R 15m ±0.4% mới vào lệnh`;
       else if (a.kind === "DISCARD") body = `DISCARD · ${a.reason}`;
       else if (a.kind === "BLOCK") body = `BLOCK · ${a.reason}`;
       else body = `ERROR · ${a.message}`;
@@ -789,7 +789,7 @@ function JournalRow({ j }: { j: any }) {
     text = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
   } else if (a.kind === "PENDING") {
     color = P.tertiary;
-    text = `PENDING ${a.side} (rule fired @ $${a.htfEntryPrice.toFixed(0)}, TP ${a.tpPct.toFixed(2)}% / SL ${a.slPct.toFixed(2)}%) — chờ LTF confirm`;
+    text = `PENDING ${a.side} — rule HTF (1h/4h) đã fire @ $${a.htfEntryPrice.toFixed(0)} (TP ${a.tpPct.toFixed(2)}% / SL ${a.slPct.toFixed(2)}%). KHÔNG vào MARKET ngay. Đang chờ 1 trong 2 điều kiện trên TF nhỏ hơn (5m/15m): (1) Stoch 5m K<20 nếu LONG / K>80 nếu SHORT, HOẶC (2) giá chạm support/resistance 15m trong ±0.4%. Đạt → mới gửi MARKET vào.`;
   } else if (a.kind === "DISCARD") {
     color = P.dim;
     text = `DISCARD · ${a.reason}`;
