@@ -68,9 +68,22 @@ function StatusBar({ live }: Props) {
   const isBoot = live.role === "BOOTING";
   const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : P.dim;
   const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : "⏳ BOOTING";
+  // Leader info đầy đủ: tên + device type + IP + city
   const leaderTxt = live.leader
-    ? `${live.leader.deviceLabel} · beat ${Math.floor((Date.now() - live.leader.lastBeatMs) / 1000)}s ago`
-    : "(chưa có leader)";
+    ? `${live.leader.deviceLabel} (${live.leader.deviceType || "?"})` +
+      (live.leader.city ? ` · ${live.leader.city}, ${live.leader.country}` : "") +
+      (live.leader.ip ? ` · ${live.leader.ip}` : "") +
+      ` · beat ${Math.floor((Date.now() - live.leader.lastBeatMs) / 1000)}s ago`
+    : "(chưa có leader — bạn đang LOCAL)";
+  const meIpTxt = live.myIpLoc
+    ? `${live.myIpLoc.ip} · ${live.myIpLoc.city}, ${live.myIpLoc.country}`
+    : "—";
+  const handleRename = () => {
+    if (typeof window === "undefined") return;
+    const next = window.prompt(`Đặt tên device này (đang là "${live.deviceLabel}"):`, live.deviceLabel);
+    if (next === null) return;
+    live.setMyDeviceLabel(next);
+  };
   const syncTxt = live.lastSyncMs > 0 ? `synced ${Math.floor((Date.now() - live.lastSyncMs) / 1000)}s ago` : "—";
   const handleClaim = () => {
     if (typeof window === "undefined") {
@@ -110,17 +123,26 @@ function StatusBar({ live }: Props) {
       <View style={styles.roleRow}>
         <BigPill label="ROLE" value={roleLabel} color={roleColor} />
         <View style={styles.roleInfo}>
-          <Text style={[styles.note, { fontSize: 10 }]} numberOfLines={2}>
+          <Text style={[styles.note, { fontSize: 10, lineHeight: 14 }]}>
+            <Text style={{ color: P.dim, fontSize: 9, letterSpacing: 1 }}>LEADER:</Text>{" "}
             <Text style={{ color: roleColor, fontWeight: "700" }}>{leaderTxt}</Text>
+            {"\n"}
+            <Text style={{ color: P.dim, fontSize: 9, letterSpacing: 1 }}>ME:</Text>{" "}
+            <Text style={{ color: P.text2, fontWeight: "700" }}>{live.deviceLabel || "?"}</Text>{" "}
+            <Text style={{ color: P.dim }}>· {meIpTxt}</Text>
             {isFollower && ` · ${syncTxt}`}
-            {live.deviceId && `\nmy id ${live.deviceId.slice(0, 6)}…`}
           </Text>
         </View>
-        {!isLeader && !isBoot && (
-          <TouchableOpacity onPress={handleClaim} style={[styles.btnDanger, { marginLeft: 0 }]}>
-            <Text style={styles.btnDangerText}>🔒 CLAIM LEADER</Text>
+        <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
+          <TouchableOpacity onPress={handleRename} style={styles.btnGhost}>
+            <Text style={styles.btnGhostText}>✏️ RENAME</Text>
           </TouchableOpacity>
-        )}
+          {!isLeader && !isBoot && (
+            <TouchableOpacity onPress={handleClaim} style={styles.btnDanger}>
+              <Text style={styles.btnDangerText}>🔒 CLAIM LEADER</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
       {isFollower && (
         <Text style={[styles.warn, { color: P.bitcoinOrange }]}>

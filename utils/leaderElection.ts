@@ -1,28 +1,46 @@
 /**
  * leaderElection.ts — Single-leader lock cho LIVE auto-trade.
  *
- * Vấn đề: nhiều device cùng chạy app → cùng nghe rule fire → cùng vào lệnh trên Binance.
- * Giải pháp: chỉ 1 device được phép `decideEntry` / `executeAction` / `closeTracked`.
- *   - Leader: heartbeat mỗi 15s vào file `live_leader.json` trên gist.
- *   - Follower: pull file đó mỗi 20s. Nếu leader hiện tại không beat trong 30s → claim.
+ * PA B (anh Tommy chọn v4.3.96+):
+ *   - Heartbeat 15s + jitter ±2s (tránh 2 device push collision → SHA conflict)
+ *   - Mọi device check leader 20s
+ *   - Leader timeout 45s = 3-strike rule (miss 3 lần heartbeat → declare chết)
  *
- * Race: 2 device cùng claim → SHA conflict trong gist (đã có retry trong putContentsWithRetry).
- * Sau claim, device verify lại bằng pull (read-after-write); nếu deviceId không khớp → revert follower.
+ * Leader info trên gist (file `live_leader.json`):
+ *   - deviceId / deviceLabel (user-set name) / deviceType (auto-detect)
+ *   - ip / country / city (cached 1h)
+ *   - lastBeatMs
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { pullFile, pushFile } from "./gistSync";
 
 const DEVICE_ID_KEY = "@device_id";
+const DEVICE_LABEL_KEY = "@device_label";
+const IP_LOC_CACHE_KEY = "@ip_loc_cache";
 const LEADER_FILE = "live_leader.json";
 
+// PA B timing
 export const HEARTBEAT_INTERVAL_MS = 15_000;
+export const HEARTBEAT_JITTER_MS = 2_000;
 export const LEADER_CHECK_INTERVAL_MS = 20_000;
-export const LEADER_TIMEOUT_MS = 30_000; // không heartbeat > 30s → coi như chết
+export const LEADER_TIMEOUT_MS = 45_000; // 3-strike: leader phải miss 3 lần heartbeat 15s mới declare chết
+
+const IP_CACHE_TTL_MS = 60 * 60 * 1000; // 1h
+
+export interface IpLocation {
+  ip: string;
+  country: string;     // vd "VN", "US"
+  city: string;        // vd "Ho Chi Minh"
+}
 
 export interface LeaderInfo {
   deviceId: string;
-  deviceLabel: string;     // tự đặt, vd "MacBook Pro" — info hiển thị
+  deviceLabel: string;     // user-set name (vd "MacBook Tommy")
+  deviceType: string;      // auto-detect (Mac/iPhone/Android/Windows/Linux)
   lastBeatMs: number;
+  ip?: string;
+  country?: string;
+  city?: string;
 }
 
 function isLeaderInfo(v: unknown): v is LeaderInfo {
@@ -33,7 +51,7 @@ function isLeaderInfo(v: unknown): v is LeaderInfo {
     && typeof o.lastBeatMs === "number";
 }
 
-/** UUID-ish random — đủ unique cho personal use (không cần crypto-grade). */
+/** UUID-ish random — đủ unique cho personal use. */
 function randomId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
@@ -50,8 +68,8 @@ export async function getDeviceId(): Promise<string> {
   return id;
 }
 
-/** Default device label = userAgent platform — user có thể override sau (chưa làm UI). */
-export function autoDeviceLabel(): string {
+/** Auto-detect platform từ userAgent. */
+export function autoDeviceType(): string {
   if (typeof navigator !== "undefined" && navigator.userAgent) {
     const ua = navigator.userAgent;
     if (/iPhone|iPad/.test(ua)) return "iPhone/iPad";
@@ -63,16 +81,71 @@ export function autoDeviceLabel(): string {
   return "Unknown";
 }
 
+/** Backward-compat alias. */
+export function autoDeviceLabel(): string { return autoDeviceType(); }
+
+/** User-set device label (default = auto type). Lưu local. */
+export async function getDeviceLabel(): Promise<string> {
+  const saved = await AsyncStorage.getItem(DEVICE_LABEL_KEY);
+  return saved || autoDeviceType();
+}
+
+export async function setDeviceLabel(label: string): Promise<void> {
+  const trimmed = label.trim();
+  if (trimmed) await AsyncStorage.setItem(DEVICE_LABEL_KEY, trimmed);
+  else await AsyncStorage.removeItem(DEVICE_LABEL_KEY);
+}
+
+/** Fetch IP + location qua ipapi.co (free tier, no auth). Cache 1h ở local. */
+export async function fetchIpLocation(): Promise<IpLocation | null> {
+  // Try cache trước
+  try {
+    const raw = await AsyncStorage.getItem(IP_LOC_CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { savedMs: number; loc: IpLocation };
+      if (Date.now() - parsed.savedMs < IP_CACHE_TTL_MS) return parsed.loc;
+    }
+  } catch {}
+  // Fetch fresh
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    if (!res.ok) return null;
+    const j = await res.json() as any;
+    if (!j || !j.ip) return null;
+    const loc: IpLocation = {
+      ip: String(j.ip),
+      country: String(j.country_code || j.country || ""),
+      city: String(j.city || ""),
+    };
+    await AsyncStorage.setItem(IP_LOC_CACHE_KEY, JSON.stringify({ savedMs: Date.now(), loc }));
+    return loc;
+  } catch {
+    return null;
+  }
+}
+
 export async function getLeaderInfo(): Promise<LeaderInfo | null> {
   return await pullFile<LeaderInfo>(LEADER_FILE, isLeaderInfo);
 }
 
 /**
- * Push lock file với deviceId hiện tại. Caller PHẢI verify lại bằng getLeaderInfo()
- * sau ít nhất 1s để chắc chắn không bị race (2 device cùng claim).
+ * Push lock file với info đầy đủ. Caller PHẢI verify lại bằng getLeaderInfo() sau ~1s
+ * để chắc chắn không bị race (2 device cùng claim).
  */
-export async function pushLeader(deviceId: string, deviceLabel: string): Promise<boolean> {
-  const info: LeaderInfo = { deviceId, deviceLabel, lastBeatMs: Date.now() };
+export async function pushLeader(
+  deviceId: string,
+  deviceLabel: string,
+  loc: IpLocation | null = null,
+): Promise<boolean> {
+  const info: LeaderInfo = {
+    deviceId,
+    deviceLabel,
+    deviceType: autoDeviceType(),
+    lastBeatMs: Date.now(),
+    ip: loc?.ip,
+    country: loc?.country,
+    city: loc?.city,
+  };
   return await pushFile(LEADER_FILE, info, `live: leader heartbeat (${deviceLabel})`);
 }
 
@@ -81,6 +154,12 @@ export function canClaim(info: LeaderInfo | null, myDeviceId: string, nowMs: num
   if (!info) return true;
   if (info.deviceId === myDeviceId) return true;
   return nowMs - info.lastBeatMs > LEADER_TIMEOUT_MS;
+}
+
+/** Random jitter ±2s cho heartbeat — tránh 2 device push cùng lúc. */
+export function nextHeartbeatDelayMs(): number {
+  const jitter = (Math.random() * 2 - 1) * HEARTBEAT_JITTER_MS;
+  return HEARTBEAT_INTERVAL_MS + jitter;
 }
 
 export type LiveRole = "BOOTING" | "LEADER" | "FOLLOWER";

@@ -20,8 +20,10 @@ import {
 } from "../utils/binanceLive";
 import { saveState as engineSaveState } from "../utils/liveTraderEngine";
 import {
-  LiveRole, LeaderInfo, getDeviceId, autoDeviceLabel, getLeaderInfo, pushLeader, canClaim,
-  HEARTBEAT_INTERVAL_MS, LEADER_CHECK_INTERVAL_MS,
+  LiveRole, LeaderInfo, IpLocation,
+  getDeviceId, getDeviceLabel, setDeviceLabel, getLeaderInfo, pushLeader, canClaim,
+  fetchIpLocation, nextHeartbeatDelayMs,
+  LEADER_CHECK_INTERVAL_MS,
 } from "../utils/leaderElection";
 import { getGistConfig } from "../utils/gistSync";
 
@@ -41,8 +43,11 @@ export interface UseBinanceLiveResult {
   role: LiveRole;                    // BOOTING | LEADER | FOLLOWER
   leader: LeaderInfo | null;         // current leader info from gist
   deviceId: string;                  // mình
+  deviceLabel: string;               // tên hiển thị của mình
+  myIpLoc: IpLocation | null;        // IP + city/country của mình
   lastSyncMs: number;                // lần follower pull state cuối
   claimLeadership: () => Promise<void>; // force takeover
+  setMyDeviceLabel: (label: string) => Promise<void>;
   setCredentials: (apiKey: string, apiSecret: string) => Promise<void>;
   setAutoEnabled: (on: boolean) => Promise<void>;
   setDryRun: (on: boolean) => Promise<void>;
@@ -70,6 +75,8 @@ export function useBinanceLive(
   const [role, setRole] = useState<LiveRole>("BOOTING");
   const [leader, setLeader] = useState<LeaderInfo | null>(null);
   const [deviceId, setDeviceId] = useState<string>("");
+  const [deviceLabel, setDeviceLabelState] = useState<string>("");
+  const [myIpLoc, setMyIpLoc] = useState<IpLocation | null>(null);
   const [lastSyncMs, setLastSyncMs] = useState<number>(0);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -77,17 +84,25 @@ export function useBinanceLive(
   roleRef.current = role;
   const deviceIdRef = useRef(deviceId);
   deviceIdRef.current = deviceId;
+  const deviceLabelRef = useRef<string>("");
+  const myIpLocRef = useRef<IpLocation | null>(null);
+  myIpLocRef.current = myIpLoc;
   const lastAlertSeenRef = useRef<Set<string>>(new Set());
-  const deviceLabelRef = useRef<string>(autoDeviceLabel());
 
-  // Boot: deviceId + decide role + load state.
-  // KHÔNG kẹt ở BOOTING — set role ngay, claim leader ở background.
+  // Boot: deviceId + label + IP + decide role + load state.
   useEffect(() => {
     (async () => {
       const myId = await getDeviceId();
+      const label = await getDeviceLabel();
+      deviceLabelRef.current = label;
       setDeviceId(myId);
+      setDeviceLabelState(label);
       let s = await loadState();
       setState(s);
+      // IP + location fetch (background, cache 1h)
+      fetchIpLocation().then((loc) => {
+        if (loc) setMyIpLoc(loc);
+      }).catch(() => {});
       const cfg = await getGistConfig();
       // Không có PAT → LOCAL LEADER (single-device, không lock multi-device).
       if (!cfg.pat) {
@@ -100,7 +115,7 @@ export function useBinanceLive(
       const info = await getLeaderInfo();
       setLeader(info);
       const now = Date.now();
-      const iAmLeader = canClaim(info, myId, now); // true nếu file rỗng / leader cũ chết / mình đã là leader
+      const iAmLeader = canClaim(info, myId, now); // PA B: 45s timeout = 3-strike rule
       // Pull state ngay với mode đúng (mirror nếu là follower)
       try {
         s = await pullRemote(s, iAmLeader ? "boot" : "follower");
@@ -111,12 +126,11 @@ export function useBinanceLive(
       // Set role ngay — KHÔNG đợi pushLeader (background)
       if (iAmLeader) {
         setRole("LEADER");
-        // Background: push heartbeat để các device khác biết. Fail cũng không sao (LOCAL LEADER).
-        pushLeader(myId, deviceLabelRef.current).then(async (ok) => {
+        // Background: push heartbeat với IP + label
+        pushLeader(myId, label, myIpLocRef.current).then(async (ok) => {
           if (ok) {
             const verify = await getLeaderInfo();
             setLeader(verify);
-            // Nếu device khác giành leader trong race window → demote follower
             if (verify && verify.deviceId !== myId && Date.now() - verify.lastBeatMs < 30_000) {
               setRole("FOLLOWER");
             }
@@ -128,16 +142,21 @@ export function useBinanceLive(
     })();
   }, []);
 
-  // Leader: heartbeat mỗi 15s
+  // Leader: heartbeat 15s + jitter ±2s (PA B - tránh 2 device push collision)
   useEffect(() => {
     if (role !== "LEADER" || !deviceId) return;
     let alive = true;
-    const beat = async () => {
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+    const scheduleNext = () => {
       if (!alive) return;
-      await pushLeader(deviceId, deviceLabelRef.current);
+      timerId = setTimeout(async () => {
+        if (!alive) return;
+        await pushLeader(deviceId, deviceLabelRef.current, myIpLocRef.current);
+        scheduleNext();
+      }, nextHeartbeatDelayMs());
     };
-    const id = setInterval(beat, HEARTBEAT_INTERVAL_MS);
-    return () => { alive = false; clearInterval(id); };
+    scheduleNext();
+    return () => { alive = false; if (timerId) clearTimeout(timerId); };
   }, [role, deviceId]);
 
   // All devices: pull leader info mỗi 20s + auto-elect khi cần
@@ -153,8 +172,7 @@ export function useBinanceLive(
       const now = Date.now();
       if (canClaim(info, deviceId, now)) {
         if (myRole !== "LEADER") {
-          // Tự promote nếu leader cũ chết / chưa có leader
-          const ok = await pushLeader(deviceId, deviceLabelRef.current);
+          const ok = await pushLeader(deviceId, deviceLabelRef.current, myIpLocRef.current);
           if (ok) {
             const verify = await getLeaderInfo();
             if (alive && verify?.deviceId === deviceId) {
@@ -320,28 +338,36 @@ export function useBinanceLive(
 
   return {
     state, account, positions, openOrders, recentTrades, dailyPnl, openCount, lastError,
-    role, leader, deviceId, lastSyncMs,
+    role, leader, deviceId, deviceLabel, myIpLoc, lastSyncMs,
     async claimLeadership() {
       if (!deviceIdRef.current) return;
-      const ok = await pushLeader(deviceIdRef.current, deviceLabelRef.current);
+      const ok = await pushLeader(deviceIdRef.current, deviceLabelRef.current, myIpLocRef.current);
       if (!ok) {
         setLastError("❌ CLAIM LEADER fail (network / git lỗi).");
         return;
       }
-      // Read-after-write verify (chống race với device khác cùng claim)
       await new Promise((r) => setTimeout(r, 1000));
       const verify = await getLeaderInfo();
       setLeader(verify);
       if (verify?.deviceId === deviceIdRef.current) {
         setRole("LEADER");
-        setLastError("👑 CLAIMED LEADER — auto-trade sẽ chạy ở máy này từ giờ.");
-        // Pull state mới nhất + chuyển sang chế độ leader (giữ trackedPositions từ remote)
+        setLastError(`👑 CLAIMED LEADER — auto-trade chạy ở "${deviceLabelRef.current}" từ giờ.`);
         const merged = await pullRemote(stateRef.current, "follower");
         await saveState(merged, { sync: false });
         setState(merged);
         setLastSyncMs(Date.now());
       } else {
-        setLastError(`❌ CLAIM fail — device khác (${verify?.deviceLabel}) thắng race.`);
+        setLastError(`❌ CLAIM fail — device khác "${verify?.deviceLabel}" thắng race.`);
+      }
+    },
+    async setMyDeviceLabel(label: string) {
+      const trimmed = label.trim() || "Unknown";
+      await setDeviceLabel(trimmed);
+      deviceLabelRef.current = trimmed;
+      setDeviceLabelState(trimmed);
+      // Nếu mình đang là leader → push update ngay để các device khác thấy tên mới
+      if (roleRef.current === "LEADER") {
+        await pushLeader(deviceIdRef.current, trimmed, myIpLocRef.current);
       }
     },
     async setCredentials(apiKey, apiSecret) {
