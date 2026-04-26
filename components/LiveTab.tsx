@@ -66,10 +66,12 @@ function StatusBar({ live }: Props) {
   const isLeader = live.role === "LEADER";
   const isFollower = live.role === "FOLLOWER";
   const isBoot = live.role === "BOOTING";
-  const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : P.dim;
-  const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : "⏳ BOOTING";
+  const isDisconnected = live.role === "DISCONNECTED";
+  const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : isDisconnected ? P.error : P.dim;
+  const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : isDisconnected ? "⛔ DISCONNECTED" : "⏳ BOOTING";
   // Leader info: nếu mình là leader nhưng chưa có file gist (push lần đầu / LOCAL) → hiện rõ
   const leaderTxt = (() => {
+    if (isDisconnected) return "⛔ Chưa nhập API key — KHÔNG tham gia leader election. Connect ở section CREDENTIALS bên dưới.";
     if (live.leader) {
       const beatAgo = Math.floor((Date.now() - live.leader.lastBeatMs) / 1000);
       const isMe = live.leader.deviceId === live.deviceId;
@@ -143,7 +145,7 @@ function StatusBar({ live }: Props) {
           <TouchableOpacity onPress={handleRename} style={styles.btnGhost}>
             <Text style={styles.btnGhostText}>✏️ RENAME</Text>
           </TouchableOpacity>
-          {!isLeader && !isBoot && (
+          {!isLeader && !isBoot && !isDisconnected && (
             <TouchableOpacity onPress={handleClaim} style={styles.btnDanger}>
               <Text style={styles.btnDangerText}>🔒 CLAIM LEADER</Text>
             </TouchableOpacity>
@@ -153,6 +155,11 @@ function StatusBar({ live }: Props) {
       {isFollower && (
         <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
           ⚠️ FOLLOWER MODE — không tự vào lệnh / close. Xem state mirror từ leader. Bấm CLAIM để takeover.
+        </Text>
+      )}
+      {isDisconnected && (
+        <Text style={[styles.warn, { color: P.error }]}>
+          ⛔ DISCONNECTED — device này chưa có Binance API key, không tham gia leader/follower election. Nhập key ở CREDENTIALS để connect.
         </Text>
       )}
       <View style={styles.statusRow}>

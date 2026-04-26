@@ -89,7 +89,41 @@ export function useBinanceLive(
   myIpLocRef.current = myIpLoc;
   const lastAlertSeenRef = useRef<Set<string>>(new Set());
 
-  // Boot: deviceId + label + IP + decide role + load state.
+  /** Election logic dùng chung cho boot + sau khi setCredentials. */
+  const runElection = useRef(async (myId: string, label: string) => {
+    const cfg = await getGistConfig();
+    if (!cfg.pat) {
+      setRole("LEADER");
+      setLeader(null);
+      setLastError("ℹ️ LOCAL LEADER — chưa có GitHub PAT. Nhập ở Dashboard → SETTINGS để bật multi-device sync.");
+      return;
+    }
+    const info = await getLeaderInfo();
+    setLeader(info);
+    const iAmLeader = canClaim(info, myId, Date.now());
+    try {
+      const merged = await pullRemote(stateRef.current, iAmLeader ? "boot" : "follower");
+      await saveState(merged, { sync: false });
+      setState(merged);
+      setLastSyncMs(Date.now());
+    } catch {}
+    if (iAmLeader) {
+      setRole("LEADER");
+      pushLeader(myId, label, myIpLocRef.current).then(async (ok) => {
+        if (ok) {
+          const verify = await getLeaderInfo();
+          setLeader(verify);
+          if (verify && verify.deviceId !== myId && Date.now() - verify.lastBeatMs < 30_000) {
+            setRole("FOLLOWER");
+          }
+        }
+      }).catch(() => {});
+    } else {
+      setRole("FOLLOWER");
+    }
+  }).current;
+
+  // Boot: deviceId + label + IP + load state. Election CHỈ chạy khi đã connect (có API key).
   useEffect(() => {
     (async () => {
       const myId = await getDeviceId();
@@ -97,50 +131,27 @@ export function useBinanceLive(
       deviceLabelRef.current = label;
       setDeviceId(myId);
       setDeviceLabelState(label);
-      let s = await loadState();
+      const s = await loadState();
       setState(s);
-      // IP + location fetch (background, cache 1h)
-      fetchIpLocation().then((loc) => {
-        if (loc) setMyIpLoc(loc);
-      }).catch(() => {});
-      const cfg = await getGistConfig();
-      // Không có PAT → LOCAL LEADER (single-device, không lock multi-device).
-      if (!cfg.pat) {
-        setRole("LEADER");
+      // IP fetch background (cache 1h)
+      fetchIpLocation().then((loc) => { if (loc) setMyIpLoc(loc); }).catch(() => {});
+      // Anh Tommy: device chưa connect (chưa có API key) → KHÔNG tham gia leader election
+      if (!s.apiKey || !s.apiSecret) {
+        setRole("DISCONNECTED");
         setLeader(null);
-        setLastError("ℹ️ LOCAL LEADER — chưa có GitHub PAT. Nhập ở Dashboard → SETTINGS để bật multi-device sync.");
         return;
       }
-      // Có PAT → pull leader info từ gist hiện tại
-      const info = await getLeaderInfo();
-      setLeader(info);
-      const now = Date.now();
-      const iAmLeader = canClaim(info, myId, now); // PA B: 45s timeout = 3-strike rule
-      // Pull state ngay với mode đúng (mirror nếu là follower)
-      try {
-        s = await pullRemote(s, iAmLeader ? "boot" : "follower");
-        await saveState(s, { sync: false });
-        setState(s);
-        setLastSyncMs(Date.now());
-      } catch {}
-      // Set role ngay — KHÔNG đợi pushLeader (background)
-      if (iAmLeader) {
-        setRole("LEADER");
-        // Background: push heartbeat với IP + label
-        pushLeader(myId, label, myIpLocRef.current).then(async (ok) => {
-          if (ok) {
-            const verify = await getLeaderInfo();
-            setLeader(verify);
-            if (verify && verify.deviceId !== myId && Date.now() - verify.lastBeatMs < 30_000) {
-              setRole("FOLLOWER");
-            }
-          }
-        }).catch(() => {});
-      } else {
-        setRole("FOLLOWER");
-      }
+      await runElection(myId, label);
     })();
   }, []);
+
+  // Khi credentials được nhập (transition từ DISCONNECTED → có key) → trigger election
+  useEffect(() => {
+    if (!deviceId) return;
+    if (roleRef.current !== "DISCONNECTED") return;
+    if (!state.apiKey || !state.apiSecret) return;
+    runElection(deviceId, deviceLabelRef.current);
+  }, [deviceId, state.apiKey, state.apiSecret]);
 
   // Leader: heartbeat 15s + jitter ±2s (PA B - tránh 2 device push collision)
   useEffect(() => {
@@ -159,9 +170,10 @@ export function useBinanceLive(
     return () => { alive = false; if (timerId) clearTimeout(timerId); };
   }, [role, deviceId]);
 
-  // All devices: pull leader info mỗi 20s + auto-elect khi cần
+  // All CONNECTED devices: pull leader info mỗi 20s + auto-elect khi cần
   useEffect(() => {
     if (!deviceId) return;
+    if (role === "DISCONNECTED") return;
     let alive = true;
     const tick = async () => {
       if (!alive) return;
@@ -193,7 +205,7 @@ export function useBinanceLive(
     };
     const id = setInterval(tick, LEADER_CHECK_INTERVAL_MS);
     return () => { alive = false; clearInterval(id); };
-  }, [deviceId]);
+  }, [deviceId, role]);
 
   // Follower: pull live_trading.json mỗi 30s để mirror leader's state
   useEffect(() => {

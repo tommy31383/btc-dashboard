@@ -195,4 +195,4 @@ export function nextHeartbeatDelayMs(): number {
   return HEARTBEAT_INTERVAL_MS + jitter;
 }
 
-export type LiveRole = "BOOTING" | "LEADER" | "FOLLOWER";
+export type LiveRole = "DISCONNECTED" | "BOOTING" | "LEADER" | "FOLLOWER";
