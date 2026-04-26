@@ -54,9 +54,21 @@ function StatusBar({ live }: Props) {
   const wallet = live.account ? parseFloat(live.account.totalWalletBalance) : null;
   const avail = live.account ? parseFloat(live.account.availableBalance) : null;
   const upnl = live.account ? parseFloat(live.account.totalUnrealizedProfit) : null;
+  const alias = live.account?.accountAlias;
 
   return (
     <View style={styles.statusBar}>
+      {alias && (
+        <View style={styles.profileRow}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{alias.charAt(0).toUpperCase()}</Text>
+          </View>
+          <View>
+            <Text style={styles.profileLabel}>BINANCE FUTURES ACCOUNT</Text>
+            <Text style={styles.profileAlias}>{alias}</Text>
+          </View>
+        </View>
+      )}
       <View style={styles.statusRow}>
         <BigPill label="MODE" value={live.state.dryRun ? "DRY" : "REAL"} color={live.state.dryRun ? P.dim : P.error} />
         <BigPill label="AUTO" value={live.state.autoEnabled ? "ON" : "OFF"} color={live.state.autoEnabled ? P.green : P.dim} />
@@ -626,6 +638,20 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4, borderLeftColor: P.bitcoinOrange,
     borderRadius: 4, padding: 10, marginBottom: 12,
   },
+  profileRow: {
+    flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10,
+    paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: P.borderSoft,
+  },
+  avatar: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: P.bitcoinOrange,
+    alignItems: "center", justifyContent: "center",
+  },
+  avatarText: {
+    color: "#fff", fontFamily: "monospace", fontSize: 18, fontWeight: "900",
+  },
+  profileLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, letterSpacing: 1 },
+  profileAlias: { color: P.text, fontFamily: "monospace", fontSize: 14, fontWeight: "700", letterSpacing: 1, marginTop: 2 },
   statusRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   pill: {
     backgroundColor: P.elevated, borderWidth: 1, borderColor: P.border,

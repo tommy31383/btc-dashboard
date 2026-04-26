@@ -83,6 +83,7 @@ export interface AccountSnapshot {
   multiAssetsMargin?: boolean;
   totalInitialMargin?: string;
   totalMaintMargin?: string;
+  accountAlias?: string;     // Binance random 4-8 char ID per futures account
 }
 
 export async function getMultiAssetsMode(cred: Credentials): Promise<boolean> {

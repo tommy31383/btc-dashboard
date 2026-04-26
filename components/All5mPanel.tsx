@@ -191,12 +191,14 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
               const upnlUsd = grossUsd - FEE_PER_SIDE;
               const color = upnlUsd >= 0 ? P.green : P.error;
               const sideColor = p.side === "LONG" ? P.green : P.error;
+              const notional = MARGIN_PER_TRADE * LEVERAGE;
               return (
                 <View key={p.id} style={styles.row}>
                   <Text style={[styles.cellW, { color: P.tertiary }]}>{fmtTime(p.entryMs)}</Text>
                   <Text style={[styles.cellNarrow, { color: sideColor, fontWeight: "700" }]}>{p.side}</Text>
                   <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>{p.source.replace("_", " ")}</Text>
-                  <Text style={[styles.cellW, { color: P.text }]}>${p.entryPrice.toFixed(0)}</Text>
+                  <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
+                  <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
                   <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)}</Text>
                   <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)}</Text>
                   <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>fee -${p.entryFeeUsd.toFixed(2)}</Text>
@@ -230,6 +232,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
                   <Text style={[styles.cellNarrow, { color, fontWeight: "700" }]}>{p.status}</Text>
                   <Text style={[styles.cellNarrow, { color: sideColor, fontWeight: "700" }]}>{p.side}</Text>
                   <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>{p.source.replace("_", " ")}</Text>
+                  <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${MARGIN_PER_TRADE * LEVERAGE}</Text>
                   <Text style={[styles.cellW, { color: P.text }]}>${p.entryPrice.toFixed(0)} → ${p.exitPrice!.toFixed(0)}</Text>
                   <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>fee -${(p.entryFeeUsd + (p.exitFeeUsd ?? FEE_PER_SIDE)).toFixed(2)}</Text>
                   <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(p.pnlNetUsd ?? p.pnlUsd!, true)}</Text>
