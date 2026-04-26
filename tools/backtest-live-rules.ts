@@ -1146,13 +1146,22 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     );
 
     // Phase 2 LTF confirm — với mỗi raw signal, tìm 5m candle confirm
+    // Anh Tommy v4.6.7 (PA A2): rule 5m/15m SKIP LTF confirm → entry HTF close ngay
+    const useLtfConfirm = tf === "1h" || tf === "4h" || tf === "1d" || tf === "1w";
     const candidates: CandidateTrade[] = [];
     for (const sig of rawSignals) {
-      const { support, resistance } = srAtTime(candles15m, srSupport, srResistance, sig.htfTime);
-      const ltfIdx = findLtfConfirmIndex(
-        candles5m, stoch5mSeries, sig.htfTime, sig.side,
-        support, resistance, LTF_CFG,
-      );
+      let ltfIdx: number | null;
+      if (useLtfConfirm) {
+        const { support, resistance } = srAtTime(candles15m, srSupport, srResistance, sig.htfTime);
+        ltfIdx = findLtfConfirmIndex(
+          candles5m, stoch5mSeries, sig.htfTime, sig.side,
+          support, resistance, LTF_CFG,
+        );
+      } else {
+        // 5m/15m: entry tại 5m candle ≥ HTF close time (no Phase 2 wait)
+        ltfIdx = candles5m.findIndex((c) => c.time >= sig.htfTime);
+        if (ltfIdx < 0) ltfIdx = null;
+      }
       if (ltfIdx === null) continue;
       const ruleMaxHoldHtf = (rule.config as any).maxHoldBars || 100; // default 100 HTF bars
       const maxHold5m = ruleMaxHoldHtf * (TF_TO_5M_MULT[tf] || 12);

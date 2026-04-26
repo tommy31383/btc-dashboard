@@ -336,6 +336,20 @@ export function decideEntry(
   // SMART STACK gate (per side: max 15, spacing 10m, min dist 0.3%)
   const stackBlock = checkStackGate(s, alert.side, alert.entryPrice, ctx.nowMs);
   if (stackBlock) return { kind: "BLOCK", reason: stackBlock };
+  // Anh Tommy v4.6.7 (PA A2): rule 5m + 15m KHÔNG qua Phase 2 LTF confirm
+  // (backtest-compare-3y.ts cho thấy 15m LTF confirm tệ hơn NORMAL ~5k%/rule).
+  // → Entry MARKET ngay tại current price (chuyển về LIVE legacy behavior cho LTF rules)
+  if (!isHtfRuleForLtfConfirm(alert.tfKey)) {
+    const tpPrice = alert.side === "LONG" ? alert.entryPrice * (1 + alert.tpPct / 100) : alert.entryPrice * (1 - alert.tpPct / 100);
+    const slPrice = alert.side === "LONG" ? alert.entryPrice * (1 - alert.slPct / 100) : alert.entryPrice * (1 + alert.slPct / 100);
+    const notional = cfg.marginUsd * cfg.leverage;
+    const qty = notionalToQty(notional, alert.entryPrice);
+    return {
+      kind: "ENTRY", side: alert.side,
+      entryPrice: alert.entryPrice, tpPrice, slPrice, qty,
+      confirmedBy: `${alert.tfKey} skip-LTF (entry HTF close)`,
+    };
+  }
   return {
     kind: "PENDING",
     side: alert.side,
@@ -343,6 +357,11 @@ export function decideEntry(
     tpPct: alert.tpPct,
     slPct: alert.slPct,
   };
+}
+
+/** TF nào sẽ qua Phase 2 LTF confirm. 5m + 15m skip vì entry HTF close ngay tốt hơn. */
+function isHtfRuleForLtfConfirm(tfKey: string): boolean {
+  return tfKey === "1h" || tfKey === "4h" || tfKey === "1d" || tfKey === "1w";
 }
 
 /**
