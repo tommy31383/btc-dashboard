@@ -1113,6 +1113,8 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     slPct: number;
     /** Anh Tommy v4.6.5 fix BUG #1: rule.maxHoldBars (HTF unit) → 5m bars để match LIVE Plan B monitor */
     maxHold5m: number;
+    /** ATR% tại HTF candle (anh Tommy v4.7.0): dùng cho volatility filter */
+    atrPctAtEntry: number | null;
   }
   // Convert HTF maxHoldBars → 5m bars (LIVE Plan B monitor scan từng tick mark price)
   const TF_TO_5M_MULT: Record<string, number> = {
@@ -1166,6 +1168,7 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
       if (ltfIdx === null) continue;
       const ruleMaxHoldHtf = (rule.config as any).maxHoldBars || 100; // default 100 HTF bars
       const maxHold5m = ruleMaxHoldHtf * (TF_TO_5M_MULT[tf] || 12);
+      const atrPctAtEntry = entrySeries.atrPct[sig.htfIdx]; // ATR% tại HTF candle fire
       candidates.push({
         ruleId,
         tfKey: tf,
@@ -1178,6 +1181,7 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
         tpPct: rule.config.targetPct,
         slPct: rule.config.stopPct,
         maxHold5m,
+        atrPctAtEntry,
       });
     }
     perRuleData.push({
@@ -1253,6 +1257,16 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
   // Configurable via CLI: --ddPause=30 (default 30% drop) --ddHours=4 (default 4h pause)
   const EQUITY_DD_PAUSE_PCT = parseFloat(args.find((a) => a.startsWith("--ddPause="))?.replace("--ddPause=", "") || "30");
   const EQUITY_DD_PAUSE_HOURS = parseFloat(args.find((a) => a.startsWith("--ddHours="))?.replace("--ddHours=", "") || "4");
+
+  // Anh Tommy v4.7.0:
+  // (2) Volatility filter — block entry nếu ATR% > N (default 0 = off)
+  // (3) Correlation gate — max N entries CÙNG SIDE trong M phút (default 0 = off)
+  const ATR_FILTER_PCT = parseFloat(args.find((a) => a.startsWith("--atrFilter="))?.replace("--atrFilter=", "") || "0");
+  const CORR_LIMIT = parseFloat(args.find((a) => a.startsWith("--corrLimit="))?.replace("--corrLimit=", "") || "0");
+  const CORR_WINDOW_MIN = parseFloat(args.find((a) => a.startsWith("--corrWindow="))?.replace("--corrWindow=", "") || "60");
+  const corrEntries: { side: "LONG" | "SHORT"; ms: number }[] = [];
+  let atrBlocked = 0;
+  let corrBlocked = 0;
   const startCapital = STACK_CFG.marginUsd * 100; // $100 starting capital
   let cumPnlUsd = 0;
   let peakEquity = startCapital;
@@ -1280,6 +1294,24 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     if (lastFire && nowMs - lastFire < STACK_CFG.perRuleCooldownMin * 60_000) {
       blockedByRule[c.ruleId]++;
       continue;
+    }
+
+    // (2) Volatility filter — block nếu ATR% > threshold (default off=0)
+    if (ATR_FILTER_PCT > 0 && c.atrPctAtEntry !== null && c.atrPctAtEntry > ATR_FILTER_PCT) {
+      atrBlocked++;
+      blockedByRule[c.ruleId]++;
+      continue;
+    }
+
+    // (3) Correlation gate — max N entries CÙNG SIDE trong M phút (default off)
+    if (CORR_LIMIT > 0) {
+      const windowStart = nowMs - CORR_WINDOW_MIN * 60_000;
+      const recentSameSide = corrEntries.filter((e) => e.ms >= windowStart && e.side === c.side).length;
+      if (recentSameSide >= CORR_LIMIT) {
+        corrBlocked++;
+        blockedByRule[c.ruleId]++;
+        continue;
+      }
     }
 
     // SMART STACK gates
@@ -1315,6 +1347,7 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     };
     tradesByRule[c.ruleId].push(trade);
     allComboTrades.push(trade);
+    if (CORR_LIMIT > 0) corrEntries.push({ side: c.side, ms: nowMs });
 
     // Update equity tracking + check DD trigger sau khi trade close (exitMs)
     const pnlUsd = sim.pnlPct * STACK_CFG.leverage * STACK_CFG.marginUsd - 2 * FEE_PER_SIDE * STACK_CFG.leverage * STACK_CFG.marginUsd / 100;
@@ -1330,6 +1363,8 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     }
   }
   console.log(`  Equity DD: ${ddPauseTriggers} pause triggers, ${ddBlockedCount} candidates blocked by DD pause`);
+  if (ATR_FILTER_PCT > 0) console.log(`  ATR filter (>${ATR_FILTER_PCT}%): ${atrBlocked} candidates blocked`);
+  if (CORR_LIMIT > 0) console.log(`  Correlation gate (max ${CORR_LIMIT}/side per ${CORR_WINDOW_MIN}m): ${corrBlocked} candidates blocked`);
 
   const comboResults: RuleResult[] = perRuleData.map((pr) => summarizeTrades(
     pr.ruleId, pr.tfKey, pr.forceSide, pr.ruleName,
