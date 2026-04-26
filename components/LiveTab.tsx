@@ -220,10 +220,7 @@ function SettingsCard({ live }: Props) {
         <NumField label="Daily cap (USD, âm)" value={draft.dailyLossCapUsd} onChangeNum={(v) => field("dailyLossCapUsd", v)} step={1} />
         <NumField label="Cooldown (phút)" value={draft.cooldownMinutes} onChangeNum={(v) => field("cooldownMinutes", Math.max(1, Math.round(v)))} />
       </View>
-      <View style={styles.fieldRow}>
-        <NumField label="TP %" value={draft.tpPct} onChangeNum={(v) => field("tpPct", v)} step={0.5} />
-        <NumField label="SL %" value={draft.slPct} onChangeNum={(v) => field("slPct", v)} step={0.5} />
-      </View>
+      <Text style={styles.note}>TP/SL lấy theo từng rule (targetPct / stopPct trong hard_rules.json)</Text>
 
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>
       <View style={styles.row}>

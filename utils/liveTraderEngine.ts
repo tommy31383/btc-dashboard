@@ -25,8 +25,7 @@ export interface LiveSettings {
   dailyLossCapUsd: number;     // âm, vd -15
   cooldownMinutes: number;
   excludedTfs: string[];        // ["5m"] etc
-  tpPct: number;                // raw %
-  slPct: number;                // raw %
+  // TP/SL lấy theo rule (cfg.targetPct / cfg.stopPct), không cấu hình ở đây
 }
 
 export const DEFAULT_SETTINGS: LiveSettings = {
@@ -37,8 +36,6 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   dailyLossCapUsd: -15,
   cooldownMinutes: 60,
   excludedTfs: ["5m"],
-  tpPct: 4,
-  slPct: 2,
 };
 
 export type LiveAction =
