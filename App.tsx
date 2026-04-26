@@ -38,7 +38,7 @@ import RiskRadar from "./components/RiskRadar";
 import GptRuleScreen from "./components/GptRuleScreen";
 import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
-import PaperTradeJournal from "./components/PaperTradeJournal";
+// PaperTradeJournal removed (trùng với LIVE journal + 5m ALL panel)
 import AutoTraderPanel from "./components/AutoTraderPanel";
 // LiveTradingPanel moved to dedicated LiveTab
 import HistoryScreen from "./components/HistoryScreen";
@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.58";
+const APP_VERSION = "4.3.60";
 const BUILD_DATE = "2026-04-25";
 
 /**
@@ -316,14 +316,6 @@ export default function App() {
             currentPrice={priceData?.price ?? null}
             stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
             onReset={all5m.reset}
-            footer={
-              <PaperTradeJournal
-                trades={calib.trades}
-                summary={calib.summary}
-                stats={calib.stats}
-                pendingCount={calib.pendingCount}
-              />
-            }
           />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar

@@ -113,12 +113,18 @@ function ControlsCard({ live }: Props) {
         <Toggle
           label={live.state.dryRun ? "DRY RUN" : "REAL ORDERS"}
           on={!live.state.dryRun}
-          color={P.error}
+          color={P.green}
+          solidWhenOn
           onPress={() => live.setDryRun(!live.state.dryRun)}
         />
       </View>
+      <Text style={styles.note}>
+        💡 AUTO ON/OFF: bật/tắt engine. OFF → ignore mọi rule fire.
+        {"\n"}💡 DRY RUN: chỉ giả lập, log vào HISTORY, KHÔNG gửi lên Binance.
+        {"\n"}💡 REAL ORDERS (xanh): gửi MARKET + TP + SL thật, ăn tiền thật.
+      </Text>
       {!live.state.dryRun && (
-        <Text style={styles.warn}>🔴 REAL MODE — lệnh sẽ vào Binance bằng tiền thật.</Text>
+        <Text style={styles.warn}>🟢 REAL MODE — lệnh sẽ vào Binance bằng tiền thật.</Text>
       )}
       {!credsSet && (
         <Text style={styles.note}>Nhập API key trước khi bật AUTO.</Text>
@@ -136,6 +142,11 @@ function ControlsCard({ live }: Props) {
           <Text style={styles.btnGhostText}>TEST CONNECTION</Text>
         </TouchableOpacity>
       </View>
+      <Text style={styles.note}>
+        💡 RESET COOLDOWN: bỏ qua pause sau daily-cap, resume ngay.
+        {"\n"}💡 PULL FROM GIT: pull settings + history mới nhất từ GitHub (nếu đổi ở máy khác).
+        {"\n"}💡 TEST CONNECTION: gọi GET account để verify API key, hiện wallet ngay.
+      </Text>
     </Card>
   );
 }
@@ -465,18 +476,24 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function Toggle({ label, on, onPress, disabled, color }:
-  { label: string; on: boolean; onPress: () => void; disabled?: boolean; color: string }) {
+function Toggle({ label, on, onPress, disabled, color, solidWhenOn }:
+  { label: string; on: boolean; onPress: () => void; disabled?: boolean; color: string; solidWhenOn?: boolean }) {
+  const filled = on && solidWhenOn;
   return (
     <TouchableOpacity
       onPress={onPress} disabled={disabled}
       style={[
         styles.toggle,
-        { borderColor: on ? color : P.border, backgroundColor: on ? color + "22" : "transparent",
-          opacity: disabled ? 0.4 : 1 },
+        {
+          borderColor: on ? color : P.border,
+          backgroundColor: filled ? color : on ? color + "22" : "transparent",
+          opacity: disabled ? 0.4 : 1,
+        },
       ]}
     >
-      <Text style={[styles.toggleText, { color: on ? color : P.dim }]}>{label}</Text>
+      <Text style={[styles.toggleText, { color: filled ? "#fff" : on ? color : P.dim }]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
