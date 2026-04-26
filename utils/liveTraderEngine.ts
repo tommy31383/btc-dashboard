@@ -29,11 +29,17 @@ export interface LiveSettings {
   confirmStochOsLevel: number;   // K < N → confirm LONG (default 20)
   confirmStochObLevel: number;   // K > N → confirm SHORT (default 80)
   confirmSrProximityPct: number; // close ≤ N% từ S/R → confirm (default 0.4)
+  // SMART STACK (anh Tommy v4.3.87+): cho phép nhiều lệnh cùng side, mỗi lệnh TP/SL riêng
+  stackMaxPerSide: number;          // tối đa N lệnh cùng side (default 15)
+  stackPerSideSpacingMin: number;   // tối thiểu N phút giữa 2 entry CÙNG side (default 10)
+  stackMinEntryDistPct: number;     // entry mới xa entry gần nhất cùng side ≥ N% (default 0.3)
 }
 
 /** Hard timeouts to prevent state from growing unbounded if data feeds stall. */
 const PENDING_MAX_AGE_MS = 24 * 60 * 60 * 1000;       // 24h
 const TRACKED_POSITION_MAX_AGE_MS = 72 * 60 * 60 * 1000; // 72h
+
+/** SMART STACK defaults — chỉ dùng khi settings chưa migrate (loadState merge với DEFAULT_SETTINGS). */
 
 export const DEFAULT_SETTINGS: LiveSettings = {
   symbol: "BTCUSDT",
@@ -46,6 +52,9 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   confirmStochOsLevel: 20,
   confirmStochObLevel: 80,
   confirmSrProximityPct: 0.4,
+  stackMaxPerSide: 15,
+  stackPerSideSpacingMin: 10,
+  stackMinEntryDistPct: 0.3,
 };
 
 export type LiveAction =
@@ -216,6 +225,41 @@ export interface AlertInput {
  * decideEntry: Phase 2 — không vào lệnh ngay. Chỉ check basic gate; pass → push vào pendingAlerts.
  * ENTRY thực sự chỉ fire qua confirmPending() khi LTF condition đạt.
  */
+/**
+ * SMART STACK gate — kiểm tra giới hạn per-side cho 1 alert (LONG/SHORT).
+ * Trả về null nếu pass; trả về reason nếu block.
+ *
+ * Áp dụng dựa trên `trackedPositions` (virtual lệnh app đang theo dõi TP/SL),
+ * KHÔNG dựa trên Binance position aggregated.
+ */
+export function checkStackGate(
+  s: LiveTraderState,
+  side: "LONG" | "SHORT",
+  entryPrice: number,
+  nowMs: number,
+): string | null {
+  const cfg = s.settings;
+  const maxPerSide = cfg.stackMaxPerSide;
+  const spacingMs = cfg.stackPerSideSpacingMin * 60_000;
+  const minDistPct = cfg.stackMinEntryDistPct;
+  const sameSide = s.trackedPositions.filter((p) => p.side === side);
+  if (sameSide.length >= maxPerSide) {
+    return `stack full ${sameSide.length}/${maxPerSide} ${side}`;
+  }
+  if (sameSide.length > 0) {
+    const lastSame = sameSide.reduce((a, b) => (a.entryMs > b.entryMs ? a : b));
+    if (nowMs - lastSame.entryMs < spacingMs) {
+      const leftMin = Math.ceil((spacingMs - (nowMs - lastSame.entryMs)) / 60000);
+      return `stack spacing ${leftMin}m left (last ${side} ${new Date(lastSame.entryMs).toLocaleTimeString()})`;
+    }
+    const distPct = Math.abs(entryPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
+    if (distPct < minDistPct) {
+      return `stack price too close (${distPct.toFixed(2)}% < ${minDistPct}%) to last ${side} @${lastSame.entryPrice.toFixed(2)}`;
+    }
+  }
+  return null;
+}
+
 export function decideEntry(
   s: LiveTraderState,
   alert: AlertInput,
@@ -245,6 +289,9 @@ export function decideEntry(
   if (s.pendingAlerts.some((p) => p.id === alert.id && p.side === alert.side)) {
     return { kind: "BLOCK", reason: `already pending (rule ${alert.id})` };
   }
+  // SMART STACK gate (per side: max 15, spacing 10m, min dist 0.3%)
+  const stackBlock = checkStackGate(s, alert.side, alert.entryPrice, ctx.nowMs);
+  if (stackBlock) return { kind: "BLOCK", reason: stackBlock };
   return {
     kind: "PENDING",
     side: alert.side,
@@ -334,11 +381,16 @@ export async function confirmPending(
       remaining.push(p);
       continue;
     }
-    // Recheck per-rule cooldown + maxOpen + dailyPnl tại thời điểm confirm
+    // Recheck per-rule cooldown + maxOpen + dailyPnl + SMART STACK tại thời điểm confirm
     const lastFire = next.firedIds[p.id];
     if (lastFire && Date.now() - lastFire < 10 * 60_000) { remaining.push(p); continue; }
     if (ctx.openCount >= cfg.maxOpen) { remaining.push(p); continue; }
     if (ctx.dailyPnl <= cfg.dailyLossCapUsd) { remaining.push(p); continue; }
+    const stackBlock = checkStackGate(next, p.side, ctx.currentPrice, Date.now());
+    if (stackBlock) {
+      next = await logAction(next, p.id, p.tfKey, { kind: "DISCARD", reason: stackBlock });
+      continue;
+    }
 
     // Build ENTRY action với current price
     const entryPrice = ctx.currentPrice;
@@ -431,6 +483,39 @@ export function explainBinanceError(msg: string): string {
   if (msg.includes("-4120") || m.includes("algo order")) return "\n💡 Lỗi -4120: account đang ở Portfolio Margin hoặc Hedge Mode. Vào Binance: (1) Wallet → Portfolio Margin → DISABLE; (2) Trade → Position Mode → chọn 'One-way Mode'.";
   if (msg.includes("418") || m.includes("banned")) return "\n💡 IP bị Binance ban tạm thời (rate limit). Chờ vài phút.";
   return "";
+}
+
+/**
+ * Manual close 1 tracked position (anh Tommy: UI cho phép close từng lệnh riêng).
+ * REAL mode: gửi MARKET reduceOnly đúng qty của lệnh đó.
+ * DRY RUN: chỉ remove khỏi list + log CLOSE trigger=TP (manual).
+ */
+export async function closeTrackedManual(
+  s: LiveTraderState,
+  positionId: string,
+  markPrice: number,
+): Promise<LiveTraderState> {
+  const pos = s.trackedPositions.find((p) => p.id === positionId);
+  if (!pos) return s;
+  let next = s;
+  if (!s.dryRun && s.apiKey && s.apiSecret) {
+    const cred: Credentials = { apiKey: s.apiKey, apiSecret: s.apiSecret };
+    const closeSide: "BUY" | "SELL" = pos.side === "LONG" ? "SELL" : "BUY";
+    const posSide: "LONG" | "SHORT" | undefined = s.hedgeMode ? pos.side : undefined;
+    try {
+      await placeMarketOrder(cred, s.settings.symbol, closeSide, pos.qty, posSide);
+    } catch (e: any) {
+      const msg = e?.message ?? String(e);
+      next = await logAction(next, pos.id, "live", { kind: "ERROR", message: `manual close: ${msg}` + explainBinanceError(msg) });
+      return next; // KHÔNG remove khỏi list nếu API fail — user retry
+    }
+  }
+  next = await logAction(next, pos.id, "live", {
+    kind: "CLOSE", side: pos.side, closePrice: markPrice, qty: pos.qty, trigger: "TP",
+  });
+  next = { ...next, trackedPositions: next.trackedPositions.filter((p) => p.id !== positionId) };
+  await saveState(next);
+  return next;
 }
 
 /**

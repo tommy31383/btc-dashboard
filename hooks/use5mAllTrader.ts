@@ -10,7 +10,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import {
-  All5mAccount, AccountSummary, emptyAccount,
+  All5mAccount, AccountSummary, closePositionManual, emptyAccount,
   loadAccount, processOpen, resetAccount, summarize, tryEntry5mBar,
 } from "../utils/all5mAccount";
 import { TFAnalysis, Kline, RawKlinesMap } from "./useBinanceKlines";
@@ -22,6 +22,7 @@ export interface Use5mAllTraderResult {
   summary: AccountSummary;
   reset: () => Promise<void>;
   reload: () => Promise<void>;
+  closeManual: (positionId: string) => Promise<void>;
 }
 
 function pivotSR(klines15m: Kline[] | undefined): { support: number | null; resistance: number | null } {
@@ -83,6 +84,11 @@ export function use5mAllTrader(
     setAccount(fresh);
   };
   const reload = async () => setAccount(await loadAccount());
+  const closeManual = async (positionId: string) => {
+    if (currentPrice === null || currentPrice <= 0) return;
+    const ok = await closePositionManual(positionId, currentPrice);
+    if (ok) setAccount(await loadAccount());
+  };
 
-  return { account, summary: summarize(account), reset, reload };
+  return { account, summary: summarize(account), reset, reload, closeManual };
 }

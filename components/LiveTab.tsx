@@ -38,6 +38,7 @@ export default function LiveTab({ live }: Props) {
           <SettingsCard live={live} />
         </View>
         <View style={styles.col}>
+          <TrackedPositionsCard live={live} />
           <PositionsCard live={live} />
           <OpenOrdersCard live={live} />
           <RecentFillsCard live={live} />
@@ -301,6 +302,22 @@ function SettingsCard({ live }: Props) {
       </Text>
       <Text style={styles.note}>TP/SL lấy theo từng rule (targetPct / stopPct trong hard_rules.json)</Text>
 
+      <Text style={styles.subLabel}>🎯 SMART STACK (cùng side)</Text>
+      <View style={styles.fieldRow}>
+        <NumField label="Max per side" value={draft.stackMaxPerSide} onChangeNum={(v) => field("stackMaxPerSide", Math.max(1, Math.round(v)))} />
+        <NumField label="Spacing (phút)" value={draft.stackPerSideSpacingMin} onChangeNum={(v) => field("stackPerSideSpacingMin", Math.max(0, Math.round(v)))} />
+      </View>
+      <View style={styles.fieldRow}>
+        <NumField label="Min entry dist (%)" value={draft.stackMinEntryDistPct} onChangeNum={(v) => field("stackMinEntryDistPct", Math.max(0, v))} step={0.05} />
+        <View style={{ flex: 1 }} />
+      </View>
+      <Text style={styles.note}>
+        💡 Cho phép nhiều lệnh CÙNG side; mỗi lệnh TP/SL riêng (Plan B monitor).
+        {"\n"}   App tự đóng đúng qty của lệnh khi mark price hit (Binance gộp position nhưng phần đóng đúng).
+        {"\n"}💡 Spacing: tối thiểu N phút giữa 2 entry CÙNG side. 0 = tắt.
+        {"\n"}💡 Min entry dist: entry mới phải xa entry gần nhất CÙNG side ≥ N% (tránh nhồi 1 vùng).
+      </Text>
+
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>
       <View style={styles.row}>
         {allTfs.map((tf) => {
@@ -358,6 +375,73 @@ function NumField({
 }
 
 // ── POSITIONS ───────────────────────────────────────────────────────────────
+
+// ── TRACKED (Plan B virtual lệnh, mỗi lệnh TP/SL riêng) ──────────────────────
+
+function TrackedPositionsCard({ live }: Props) {
+  const tracked = live.state.trackedPositions;
+  const cfg = live.state.settings;
+  const longCount = tracked.filter((t) => t.side === "LONG").length;
+  const shortCount = tracked.filter((t) => t.side === "SHORT").length;
+  // Lấy mark price gần nhất từ Binance positions cho symbol chính
+  const markPrice = (() => {
+    const p = live.positions.find((x) => x.symbol === cfg.symbol);
+    return p ? parseFloat(p.markPrice) : null;
+  })();
+  const handleClose = (id: string, side: string, entry: number) => {
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(`Close ${side} @${entry.toFixed(0)} ngay tại $${markPrice?.toFixed(0) ?? "?"}? (sẽ gửi MARKET reduceOnly lên Binance)`);
+      if (!ok) return;
+    }
+    live.closeTracked(id);
+  };
+  return (
+    <Card title={`🎯 SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
+      <Text style={styles.note}>
+        Mỗi virtual lệnh có entry/TP/SL/qty riêng. App tự đóng đúng qty của lệnh khi mark price hit (Plan B).
+        Binance gộp position cùng side, nhưng phần đóng = đúng qty của virtual lệnh.
+      </Text>
+      {tracked.length === 0 ? (
+        <Text style={styles.note}>Chưa có virtual lệnh nào đang theo dõi.</Text>
+      ) : (
+        tracked
+          .slice()
+          .sort((a, b) => b.entryMs - a.entryMs)
+          .map((t) => {
+            const sideColor = t.side === "LONG" ? P.green : P.error;
+            const upnlPct = markPrice !== null
+              ? (t.side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) / t.entryPrice * 100
+              : 0;
+            const distTp = markPrice !== null
+              ? Math.abs(t.tpPrice - markPrice) / markPrice * 100
+              : 0;
+            const distSl = markPrice !== null
+              ? Math.abs(t.slPrice - markPrice) / markPrice * 100
+              : 0;
+            const heldMin = Math.floor((Date.now() - t.entryMs) / 60000);
+            const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
+            return (
+              <View key={t.id} style={styles.posRow}>
+                <Text style={[styles.posCell, { width: 60, color: sideColor, fontWeight: "800" }]}>{t.side}</Text>
+                <Text style={[styles.posCell, { width: 130, color: P.tertiary, fontSize: 11, fontWeight: "700" }]}>{t.id}</Text>
+                <Text style={[styles.posCell, { width: 80 }]}>qty {t.qty}</Text>
+                <Text style={[styles.posCell, { width: 90 }]}>@ ${t.entryPrice.toFixed(1)}</Text>
+                <Text style={[styles.posCell, { width: 130, color: P.green, fontSize: 11 }]}>TP ${t.tpPrice.toFixed(1)} ({distTp.toFixed(2)}%)</Text>
+                <Text style={[styles.posCell, { width: 130, color: P.error, fontSize: 11 }]}>SL ${t.slPrice.toFixed(1)} ({distSl.toFixed(2)}%)</Text>
+                <Text style={[styles.posCell, { width: 60, color: P.dim, fontSize: 11 }]}>held {heldStr}</Text>
+                <Text style={[styles.posCell, { flex: 1, textAlign: "right", color: upnlPct >= 0 ? P.green : P.error, fontWeight: "700" }]}>
+                  {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
+                </Text>
+                <TouchableOpacity onPress={() => handleClose(t.id, t.side, t.entryPrice)} style={styles.btnDanger}>
+                  <Text style={styles.btnDangerText}>✕ CLOSE</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })
+      )}
+    </Card>
+  );
+}
 
 function PositionsCard({ live }: Props) {
   const open = live.positions.filter((p) => parseFloat(p.positionAmt) !== 0);
@@ -736,6 +820,8 @@ const styles = StyleSheet.create({
   btnPrimaryText: { color: P.onPrimary, fontFamily: "monospace", fontWeight: "700", fontSize: 11, letterSpacing: 1 },
   btnGhost: { borderWidth: 1, borderColor: P.border, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 4 },
   btnGhostText: { color: P.text2, fontFamily: "monospace", fontWeight: "700", fontSize: 11, letterSpacing: 1 },
+  btnDanger: { backgroundColor: P.errorContainer, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 3, marginLeft: 6 },
+  btnDangerText: { color: P.onErrorContainer, fontFamily: "monospace", fontWeight: "800", fontSize: 10, letterSpacing: 0.5 },
 
   toggle: { borderWidth: 2, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 4 },
   toggleText: { fontFamily: "monospace", fontWeight: "900", fontSize: 11, letterSpacing: 1 },

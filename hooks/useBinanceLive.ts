@@ -12,7 +12,7 @@ import { RuleAlert } from "./useRuleAlerts";
 import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
-  monitorTrackedPositions, addToPending, confirmPending,
+  monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual,
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
@@ -40,6 +40,7 @@ export interface UseBinanceLiveResult {
   clearJournal: () => Promise<void>;
   testNow: () => Promise<void>;
   pullFromRemote: () => Promise<void>;
+  closeTracked: (positionId: string) => Promise<void>;
 }
 
 export function useBinanceLive(
@@ -229,6 +230,14 @@ export function useBinanceLive(
       const merged = await pullRemote(stateRef.current);
       await saveState(merged, { sync: false });
       setState(merged);
+    },
+    async closeTracked(positionId) {
+      if (currentPrice === null || currentPrice <= 0) {
+        setLastError("Không có mark price để close. Refresh thử lại.");
+        return;
+      }
+      const next = await closeTrackedManual(stateRef.current, positionId, currentPrice);
+      setState(next);
     },
   };
 }

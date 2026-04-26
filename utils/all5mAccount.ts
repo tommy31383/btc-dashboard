@@ -22,8 +22,12 @@ export const TP_PCT = 4;
 export const SL_PCT = 2;
 export const STOCH_LONG_LEVEL = 10;
 export const STOCH_SHORT_LEVEL = 90;
-export const COOLDOWN_MS = 10 * 60 * 1000;  // 10 phút giữa các entry
+export const COOLDOWN_MS = 10 * 60 * 1000;  // 10 phút giữa các entry (tổng, mọi side)
 export const SR_PROXIMITY_PCT = 0.3;
+// SMART STACK: cho phép nhiều lệnh cùng side, mỗi lệnh TP/SL riêng (anh Tommy v4.3.87+)
+export const STACK_MAX_PER_SIDE = 15;            // tối đa 15 LONG + 15 SHORT cùng lúc
+export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000; // tối thiểu 10m giữa 2 entry CÙNG side
+export const STACK_MIN_ENTRY_DIST_PCT = 0.3;     // entry mới phải xa entry gần nhất cùng side ≥ 0.3%
 export const FEE_PER_SIDE_PCT = 0.05;
 export const FEE_PER_SIDE = NOTIONAL * (FEE_PER_SIDE_PCT / 100);
 export const FEE_PER_TRADE = FEE_PER_SIDE * 2;
@@ -143,9 +147,18 @@ export async function tryEntry5mBar(
   }
   if (!side || !source) return null;
 
-  // HEDGE rule: max 1 LONG + 1 SHORT cùng lúc. Nếu đã có OPEN cùng side → skip.
-  const hasSameSideOpen = acc.positions.some((p) => p.status === "OPEN" && p.side === side);
-  if (hasSameSideOpen) return null;
+  // SMART STACK gates (anh Tommy v4.3.87+):
+  //   1. Max N OPEN cùng side
+  //   2. Min spacing 10m giữa 2 entry CÙNG side
+  //   3. Min distance 0.3% giữa entry mới và entry gần nhất cùng side (tránh nhồi 1 vùng)
+  const sameSideOpen = acc.positions.filter((p) => p.status === "OPEN" && p.side === side);
+  if (sameSideOpen.length >= STACK_MAX_PER_SIDE) return null;
+  if (sameSideOpen.length > 0) {
+    const lastSame = sameSideOpen.reduce((a, b) => (a.entryMs > b.entryMs ? a : b));
+    if (now - lastSame.entryMs < STACK_PER_SIDE_SPACING_MS) return null;
+    const distPct = Math.abs(fillPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
+    if (distPct < STACK_MIN_ENTRY_DIST_PCT) return null;
+  }
 
   const tpPrice = side === "LONG" ? fillPrice * (1 + TP_PCT / 100) : fillPrice * (1 - TP_PCT / 100);
   const slPrice = side === "LONG" ? fillPrice * (1 - SL_PCT / 100) : fillPrice * (1 + SL_PCT / 100);
@@ -216,6 +229,36 @@ export async function processOpen(currentPrice: number): Promise<number> {
     await saveAccount(acc);
   }
   return closed;
+}
+
+/** Manual close 1 lệnh OPEN tại currentPrice (anh Tommy yêu cầu UI close riêng từng lệnh). */
+export async function closePositionManual(positionId: string, currentPrice: number): Promise<boolean> {
+  const acc = await loadAccount();
+  const p = acc.positions.find((x) => x.id === positionId && x.status === "OPEN");
+  if (!p) return false;
+  const now = Date.now();
+  const rawPct = p.side === "LONG"
+    ? ((currentPrice - p.entryPrice) / p.entryPrice) * 100
+    : ((p.entryPrice - currentPrice) / p.entryPrice) * 100;
+  let grossPnl = MARGIN_PER_TRADE * rawPct * LEVERAGE / 100;
+  if (grossPnl < -MARGIN_PER_TRADE) grossPnl = -MARGIN_PER_TRADE;
+  const exitFee = FEE_PER_SIDE;
+  const netPnl = grossPnl - p.entryFeeUsd - exitFee;
+  p.status = grossPnl >= 0 ? "WIN" : "LOSS";
+  p.exitPrice = currentPrice;
+  p.exitMs = now;
+  p.exitFeeUsd = exitFee;
+  p.pnlUsd = grossPnl;
+  p.pnlNetUsd = netPnl;
+  acc.capital += grossPnl - exitFee;
+  acc.stats.totalClosed++;
+  if (p.status === "WIN") acc.stats.wins++; else acc.stats.losses++;
+  acc.stats.totalPnlUsd += netPnl;
+  acc.stats.totalFeeUsd += exitFee;
+  acc.equityHistory.push({ t: now, equity: acc.capital });
+  if (acc.equityHistory.length > 1000) acc.equityHistory = acc.equityHistory.slice(-1000);
+  await saveAccount(acc);
+  return true;
 }
 
 export interface AccountSummary {

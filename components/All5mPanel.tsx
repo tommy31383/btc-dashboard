@@ -13,6 +13,7 @@ import {
   All5mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE,
   TP_PCT, SL_PCT, STOCH_LONG_LEVEL, STOCH_SHORT_LEVEL, COOLDOWN_MS, FEE_PER_SIDE, SR_PROXIMITY_PCT,
+  STACK_MAX_PER_SIDE, STACK_PER_SIDE_SPACING_MS, STACK_MIN_ENTRY_DIST_PCT,
 } from "../utils/all5mAccount";
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
   currentPrice: number | null;
   stoch5mK: number | null;
   onReset: () => Promise<void> | void;
+  onCloseManual?: (positionId: string) => Promise<void> | void;
   /** Optional content rendered at bottom of the scroll (vd PaperTradeJournal) */
   footer?: React.ReactNode;
 }
@@ -73,7 +75,7 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
   );
 }
 
-export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, footer }: Props) {
+export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
 
   const handleReset = () => {
@@ -113,7 +115,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.h1}>⚡ 5m ALL — RULE: BINANCE HEDGE</Text>
-          <Text style={styles.subtitle}>Paper test giả lập Cross + Hedge + Single · max 1 LONG + 1 SHORT</Text>
+          <Text style={styles.subtitle}>Paper test · SMART STACK max {STACK_MAX_PER_SIDE} per side · spacing {STACK_PER_SIDE_SPACING_MS / 60000}m · min dist {STACK_MIN_ENTRY_DIST_PCT}%</Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
           <Text style={styles.resetBtnText}>🗑 RESET</Text>
@@ -163,28 +165,21 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <Kpi label="OPEN" value={`${summary.openCount}`} color={P.primaryContainer} sub={`free $${summary.freeMargin.toFixed(0)}`} />
       </View>
 
-      {/* Status banner — engine đang chờ gì */}
+      {/* Status banner — engine đang chờ gì + SMART STACK count */}
       {(() => {
-        const hasLong = open.some((p) => p.side === "LONG");
-        const hasShort = open.some((p) => p.side === "SHORT");
+        const longCount = open.filter((p) => p.side === "LONG").length;
+        const shortCount = open.filter((p) => p.side === "SHORT").length;
         const k = stoch5mK !== null ? stoch5mK.toFixed(1) : "—";
         let msg = "";
-        let bg = P.tertiaryContainer;
-        let fg = P.onTertiaryContainer;
+        let bg = P.surface; let fg = P.text;
         if (summary.cooldownRemainMs > 0) {
           msg = `⏸ COOLDOWN — entry kế sau ${fmtCountdown(summary.cooldownRemainMs)} · K=${k}`;
-        } else if (hasLong && hasShort) {
-          msg = `✅ ĐỦ 1 LONG + 1 SHORT — chờ TP/SL hit để slot trống · K=${k}`;
-          bg = P.surface; fg = P.green;
-        } else if (hasLong) {
-          msg = `🟢 ĐÃ CÓ LONG — đợi signal SHORT (K>${STOCH_SHORT_LEVEL} hoặc gần resistance) · K=${k}`;
-          bg = P.surface; fg = P.text;
-        } else if (hasShort) {
-          msg = `🔴 ĐÃ CÓ SHORT — đợi signal LONG (K<${STOCH_LONG_LEVEL} hoặc gần support) · K=${k}`;
-          bg = P.surface; fg = P.text;
+        } else if (longCount >= STACK_MAX_PER_SIDE && shortCount >= STACK_MAX_PER_SIDE) {
+          msg = `🚫 STACK FULL — ${longCount}/${STACK_MAX_PER_SIDE} LONG · ${shortCount}/${STACK_MAX_PER_SIDE} SHORT · K=${k}`;
+          fg = P.error;
         } else {
-          msg = `🔍 ĐANG CHỜ TÍN HIỆU — cần K<${STOCH_LONG_LEVEL} (LONG) hoặc K>${STOCH_SHORT_LEVEL} (SHORT) · K=${k}`;
-          bg = P.surface; fg = P.dim;
+          msg = `🎯 SMART STACK · ${longCount}/${STACK_MAX_PER_SIDE} LONG · ${shortCount}/${STACK_MAX_PER_SIDE} SHORT · K=${k}`;
+          fg = (longCount > 0 || shortCount > 0) ? P.green : P.dim;
         }
         return (
           <View style={[styles.cdBanner, { backgroundColor: bg }]}>
@@ -215,18 +210,38 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
               const color = upnlUsd >= 0 ? P.green : P.error;
               const sideColor = p.side === "LONG" ? P.green : P.error;
               const notional = MARGIN_PER_TRADE * LEVERAGE;
+              // Distance from current to TP/SL (%) — anh Tommy: hiện rõ rule + cách quản lý
+              const distTpPct = currentPrice !== null
+                ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
+              const distSlPct = currentPrice !== null
+                ? Math.abs(p.slPrice - currentPrice) / currentPrice * 100 : 0;
+              const heldMin = Math.floor((Date.now() - p.entryMs) / 60000);
+              const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
+              const handleClose = () => {
+                if (!onCloseManual) return;
+                if (typeof window !== "undefined") {
+                  const ok = window.confirm(`Close ${p.side} @${p.entryPrice.toFixed(0)} ngay tại $${currentPrice?.toFixed(0)}?`);
+                  if (!ok) return;
+                }
+                Promise.resolve(onCloseManual(p.id));
+              };
               return (
                 <View key={p.id} style={styles.row}>
                   <Text style={[styles.cellW, { color: P.tertiary }]}>{fmtTime(p.entryMs)}</Text>
                   <Text style={[styles.cellNarrow, { color: sideColor, fontWeight: "700" }]}>{p.side}</Text>
-                  <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>{p.source.replace("_", " ")}</Text>
+                  <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
                   <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
                   <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
-                  <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)}</Text>
-                  <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)}</Text>
-                  <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>fee -${p.entryFeeUsd.toFixed(2)}</Text>
+                  <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
+                  <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
+                  <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
                   <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
                   <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
+                  {onCloseManual && (
+                    <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
+                      <Text style={styles.closeBtnText}>✕</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               );
             })}
@@ -286,6 +301,8 @@ const styles = StyleSheet.create({
   subtitle: { color: P.dim, fontSize: 11, marginBottom: 14, fontFamily: "Inter_400Regular" },
   resetBtn: { backgroundColor: P.errorContainer, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 2 },
   resetBtnText: { color: P.onErrorContainer, fontSize: 11, fontWeight: "700", letterSpacing: 1 },
+  closeBtn: { backgroundColor: P.errorContainer, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 3, marginLeft: 6 },
+  closeBtnText: { color: P.onErrorContainer, fontSize: 11, fontWeight: "700" },
   kpiGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16 },
   kpi: { flexBasis: "15%", flexGrow: 1, backgroundColor: P.surface, borderColor: P.borderSoft, borderWidth: 1, borderRadius: 4, padding: 10, minWidth: 130 },
   kpiLabel: { color: P.dim, fontSize: 9, letterSpacing: 1.2, fontFamily: "JetBrainsMono_500Medium" },

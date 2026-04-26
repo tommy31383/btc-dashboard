@@ -63,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.86";
+const APP_VERSION = "4.3.87";
 const BUILD_DATE = "2026-04-26";
 
 /**
@@ -332,6 +332,7 @@ export default function App() {
             currentPrice={priceData?.price ?? null}
             stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
             onReset={all5m.reset}
+            onCloseManual={all5m.closeManual}
           />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
