@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "capitalUsd": 1022.1753951091251,
+  "capitalUsd": 1027.575857080535,
   "positions": [
     {
       "id": "auto_1777207846416_5ahhv5",
       "ruleId": "5m:1",
       "tfKey": "5m",
       "side": "LONG",
-      "status": "OPEN",
+      "status": "TIMEOUT",
       "ruleEntryPrice": 77865.16,
       "limitPrice": 77787.29484,
       "slPrice": 76253.80979999999,
@@ -24,7 +24,10 @@
       "entryTfKey": "1m",
       "entryPrice": 77810.01,
       "openedMs": 1777208148138,
-      "entryMode": "auto_at_expiry"
+      "entryMode": "auto_at_expiry",
+      "exitPrice": 77950.08,
+      "pnlUsd": 5.40046197140986,
+      "closedMs": 1777223151051
     },
     {
       "id": "auto_1777192243180_oqwjnp",
@@ -418,12 +421,12 @@
     }
   ],
   "stats": {
-    "totalTrades": 10,
+    "totalTrades": 11,
     "wins": 0,
     "losses": 0,
-    "timeouts": 10,
-    "totalPnLUsd": 22.17539510912504,
+    "timeouts": 11,
+    "totalPnLUsd": 27.575857080534902,
     "lastResetMs": 1777052014772
   },
-  "updatedAt": 1777208148138
+  "updatedAt": 1777223151051
 }
