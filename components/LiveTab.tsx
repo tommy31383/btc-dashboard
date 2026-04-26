@@ -377,11 +377,21 @@ function PositionsCard({ live }: Props) {
           const notional = Math.abs(amt) * entry;
           const margin = notional / lev;
           const roe = margin > 0 ? (upnl / margin) * 100 : 0;
-          const tpsl = tpslBySide[side] || {};
+          const trackedForSide = live.state.trackedPositions.filter((t) => t.side === side);
+          const ruleIds = trackedForSide.map((t) => t.id).join(", ");
+          // Plan B: TP/SL từ app trackedPositions (KHÔNG phải Binance order). Fallback Binance tpsl nếu có.
+          const trackedTpSl = trackedForSide.length > 0
+            ? { tp: trackedForSide[0].tpPrice, sl: trackedForSide[0].slPrice }
+            : null;
+          const tpsl = trackedTpSl ?? (tpslBySide[side] || {});
           const tpDist = tpsl.tp ? ((tpsl.tp - mark) / mark) * 100 : null;
           const slDist = tpsl.sl ? ((tpsl.sl - mark) / mark) * 100 : null;
+          const ctrlBy = trackedForSide.length > 0 ? "APP" : (tpslBySide[side]?.tp || tpslBySide[side]?.sl) ? "BINANCE" : "NONE";
           return (
             <View key={i} style={styles.posCard}>
+              <Text style={[styles.posCellSmall, { color: ruleIds ? P.tertiary : P.dim, marginBottom: 4 }]} numberOfLines={1}>
+                {ruleIds ? `📌 rule: ${ruleIds}` : "📌 manual / không track (đặt trước hoặc app restart)"}
+              </Text>
               <View style={styles.posRow}>
                 <Text style={[styles.posCell, { color: side === "LONG" ? P.green : P.error, width: 56, fontWeight: "800" }]}>{side}</Text>
                 <Text style={[styles.posCell, { width: 70 }]}>{p.symbol}</Text>
@@ -409,25 +419,36 @@ function PositionsCard({ live }: Props) {
                   Δ {(((mark - entry) / entry) * 100).toFixed(3)}%
                 </Text>
               </View>
-              {(tpsl.tp || tpsl.sl || parseFloat(p.liquidationPrice) > 0) && (
-                <View style={styles.posRow}>
-                  {tpsl.tp ? (
-                    <Text style={[styles.posCellSmall, { color: P.green, width: 130 }]}>
-                      TP ${tpsl.tp.toFixed(1)} ({tpDist! >= 0 ? "+" : ""}{tpDist!.toFixed(2)}%)
-                    </Text>
-                  ) : <View style={{ width: 130 }} />}
-                  {tpsl.sl ? (
-                    <Text style={[styles.posCellSmall, { color: P.error, width: 130 }]}>
-                      SL ${tpsl.sl.toFixed(1)} ({slDist! >= 0 ? "+" : ""}{slDist!.toFixed(2)}%)
-                    </Text>
-                  ) : <View style={{ width: 130 }} />}
-                  {parseFloat(p.liquidationPrice) > 0 && (
-                    <Text style={[styles.posCellSmall, { color: P.bitcoinOrange, flex: 1, textAlign: "right" }]}>
-                      LIQ ${parseFloat(p.liquidationPrice).toFixed(1)}
-                    </Text>
-                  )}
-                </View>
-              )}
+              <View style={styles.posRow}>
+                {tpsl.tp ? (
+                  <Text style={[styles.posCellSmall, { color: P.green, width: 140 }]}>
+                    TP ${tpsl.tp.toFixed(1)} ({tpDist! >= 0 ? "+" : ""}{tpDist!.toFixed(2)}%)
+                  </Text>
+                ) : <Text style={[styles.posCellSmall, { width: 140, color: P.dim }]}>TP —</Text>}
+                {tpsl.sl ? (
+                  <Text style={[styles.posCellSmall, { color: P.error, width: 140 }]}>
+                    SL ${tpsl.sl.toFixed(1)} ({slDist! >= 0 ? "+" : ""}{slDist!.toFixed(2)}%)
+                  </Text>
+                ) : <Text style={[styles.posCellSmall, { width: 140, color: P.dim }]}>SL —</Text>}
+                {parseFloat(p.liquidationPrice) > 0 && (
+                  <Text style={[styles.posCellSmall, { color: P.bitcoinOrange, flex: 1, textAlign: "right" }]}>
+                    LIQ ${parseFloat(p.liquidationPrice).toFixed(1)}
+                  </Text>
+                )}
+              </View>
+              <View style={styles.posRow}>
+                <Text style={[styles.posCellSmall, {
+                  color: ctrlBy === "APP" ? P.tertiary : ctrlBy === "BINANCE" ? P.bitcoinOrange : P.error,
+                  fontWeight: "700",
+                }]}>
+                  ⚙️ TP/SL controlled by: {ctrlBy === "APP" ? "APP (self-monitor)" : ctrlBy === "BINANCE" ? "BINANCE (orders)" : "NONE — không có TP/SL!"}
+                </Text>
+                {trackedForSide.length > 1 && (
+                  <Text style={[styles.posCellSmall, { color: P.dim, marginLeft: 8 }]}>
+                    ({trackedForSide.length} tracked)
+                  </Text>
+                )}
+              </View>
             </View>
           );
         })
@@ -531,7 +552,7 @@ function HistoryCard({ live }: Props) {
       else if (a.kind === "CLOSE") body = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
       else if (a.kind === "BLOCK") body = `BLOCK · ${a.reason}`;
       else body = `ERROR · ${a.message}`;
-      return `${dd}/${mo} ${hh}:${mi}  ${j.ruleId.padEnd(8)}  ${j.dryRun ? "[DRY] " : ""}${body}`;
+      return `${dd}/${mo} ${hh}:${mi}  📌rule=${j.ruleId.padEnd(10)}  ${j.dryRun ? "[DRY] " : ""}${body}`;
     });
     const txt = `LIVE TRADING LOG (${filter}) — ${items.length} entries\n` + lines.join("\n");
     try {
@@ -578,7 +599,7 @@ function JournalRow({ j }: { j: any }) {
   let color = P.dim, text = "";
   if (a.kind === "ENTRY") {
     color = a.side === "LONG" ? P.green : P.error;
-    text = `${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
+    text = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
   } else if (a.kind === "CLOSE") {
     color = a.trigger === "TP" ? P.green : P.error;
     text = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
@@ -592,7 +613,9 @@ function JournalRow({ j }: { j: any }) {
   return (
     <View style={styles.histRow}>
       <Text style={styles.histTime}>{dd}/{mm} {hh}:{mi}</Text>
-      <Text style={[styles.histRule, { color: P.dim }]} numberOfLines={1}>{j.ruleId}</Text>
+      <View style={styles.histRulePill}>
+        <Text style={styles.histRulePillText} numberOfLines={1}>📌 {j.ruleId}</Text>
+      </View>
       <Text style={[styles.histText, { color }]} numberOfLines={6}>
         {j.dryRun && a.kind === "ENTRY" ? "[DRY] " : ""}{text}
       </Text>
@@ -712,5 +735,10 @@ const styles = StyleSheet.create({
   histRow: { flexDirection: "row", paddingVertical: 6, gap: 8, alignItems: "flex-start", borderBottomWidth: 1, borderBottomColor: P.borderSoft },
   histTime: { color: P.dim, fontFamily: "monospace", fontSize: 10, width: 78 },
   histRule: { fontFamily: "monospace", fontSize: 10, width: 90 },
+  histRulePill: {
+    backgroundColor: P.bitcoinOrange + "22", borderWidth: 1, borderColor: P.bitcoinOrange,
+    borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, width: 100,
+  },
+  histRulePillText: { color: P.bitcoinOrange, fontFamily: "monospace", fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
   histText: { fontFamily: "monospace", fontSize: 11, flex: 1, lineHeight: 16 },
 });
