@@ -522,6 +522,16 @@
         "slPct": 2.0000000000000027
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777233765738,
+      "ruleId": "1h:24",
+      "tfKey": "1h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
@@ -605,17 +615,7 @@
       "entryMs": 1777188934835
     }
   ],
-  "pendingAlerts": [
-    {
-      "id": "1h:24",
-      "tfKey": "1h",
-      "side": "LONG",
-      "htfEntryPrice": 78240.52,
-      "tpPct": 2.9999999999999947,
-      "slPct": 2.0000000000000027,
-      "addedMs": 1777233705726
-    }
-  ],
+  "pendingAlerts": [],
   "binanceSnapshot": {
     "ts": 1777233706011,
     "account": {
