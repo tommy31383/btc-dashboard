@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1777208651668,
+  "updatedAt": 1777210013066,
   "trades": [
     {
       "id": "m7tjater5q",
@@ -3460,6 +3460,25 @@
       "exitPrice": 79353.9702,
       "leveragedPnlPct": -200,
       "closedMs": 1777208631665
+    },
+    {
+      "id": "bshgisi220b",
+      "ruleId": "5m:1",
+      "tfKey": "5m",
+      "side": "LONG",
+      "status": "LOSS",
+      "entryPrice": 77818.09,
+      "slPrice": 79374.4518,
+      "tpPrice": 74705.3664,
+      "leverage": 100,
+      "targetPct": 4,
+      "stopPct": 2,
+      "maxHoldBars": 50,
+      "openedMs": 1777209990798,
+      "deadlineMs": 1777224900000,
+      "exitPrice": 79374.4518,
+      "leveragedPnlPct": -200,
+      "closedMs": 1777209993063
     }
   ]
 }
