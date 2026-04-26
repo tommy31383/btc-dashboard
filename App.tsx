@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.55";
+const APP_VERSION = "4.3.58";
 const BUILD_DATE = "2026-04-25";
 
 /**
@@ -316,6 +316,14 @@ export default function App() {
             currentPrice={priceData?.price ?? null}
             stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
             onReset={all5m.reset}
+            footer={
+              <PaperTradeJournal
+                trades={calib.trades}
+                summary={calib.summary}
+                stats={calib.stats}
+                pendingCount={calib.pendingCount}
+              />
+            }
           />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
@@ -479,13 +487,7 @@ export default function App() {
           onReset={autoTrader.reset}
         />
 
-        {/* PAPER TRADE JOURNAL + LEARNER — auto log mỗi rule FIRE, học hit-rate live */}
-        <PaperTradeJournal
-          trades={calib.trades}
-          summary={calib.summary}
-          stats={calib.stats}
-          pendingCount={calib.pendingCount}
-        />
+        {/* PAPER TRADE JOURNAL moved into 5m ALL tab footer */}
 
         {/* RULE TRADING — main interaction. User picks which pre-baked rules
             to track; app monitors live and alerts when conditions match. */}

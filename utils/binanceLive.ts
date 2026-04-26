@@ -164,6 +164,39 @@ export async function placeTakeProfitMarket(
   });
 }
 
+export interface OpenOrder {
+  orderId: number;
+  symbol: string;
+  side: "BUY" | "SELL";
+  type: string;
+  origQty: string;
+  price: string;
+  stopPrice: string;
+  status: string;
+  reduceOnly: boolean;
+  closePosition: boolean;
+  time: number;
+}
+
+export interface UserTrade {
+  id: number;
+  symbol: string;
+  side: "BUY" | "SELL";
+  qty: string;
+  price: string;
+  realizedPnl: string;
+  commission: string;
+  time: number;
+}
+
+export async function getOpenOrders(cred: Credentials, symbol = "BTCUSDT"): Promise<OpenOrder[]> {
+  return signedRequest<OpenOrder[]>(cred, "GET", "/fapi/v1/openOrders", { symbol });
+}
+
+export async function getRecentTrades(cred: Credentials, symbol = "BTCUSDT", limit = 50): Promise<UserTrade[]> {
+  return signedRequest<UserTrade[]>(cred, "GET", "/fapi/v1/userTrades", { symbol, limit });
+}
+
 /** Realized PnL hôm nay (UTC). Sum incomeType=REALIZED_PNL + COMMISSION + FUNDING_FEE */
 export async function getDailyPnl(cred: Credentials, symbol = "BTCUSDT"): Promise<number> {
   const startOfDay = new Date();

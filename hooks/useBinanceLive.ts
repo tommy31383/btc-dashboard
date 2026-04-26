@@ -14,7 +14,8 @@ import {
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
 } from "../utils/liveTraderEngine";
 import {
-  AccountSnapshot, PositionRisk, getDailyPnl, getPositions, testConnection,
+  AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
+  getDailyPnl, getPositions, getOpenOrders, getRecentTrades, testConnection,
 } from "../utils/binanceLive";
 
 const POLL_MS = 30 * 1000;
@@ -23,6 +24,8 @@ export interface UseBinanceLiveResult {
   state: LiveTraderState;
   account: AccountSnapshot | null;
   positions: PositionRisk[];
+  openOrders: OpenOrder[];
+  recentTrades: UserTrade[];
   dailyPnl: number;
   openCount: number;
   lastError: string | null;
@@ -41,6 +44,8 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
   const [state, setState] = useState<LiveTraderState>(() => emptyState());
   const [account, setAccount] = useState<AccountSnapshot | null>(null);
   const [positions, setPositions] = useState<PositionRisk[]>([]);
+  const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
+  const [recentTrades, setRecentTrades] = useState<UserTrade[]>([]);
   const [dailyPnl, setDailyPnl] = useState(0);
   const [lastError, setLastError] = useState<string | null>(null);
   const stateRef = useRef(state);
@@ -97,15 +102,20 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
 
     async function poll() {
       try {
-        const [acc, pos, pnl] = await Promise.all([
+        const sym = stateRef.current.settings.symbol;
+        const [acc, pos, pnl, ords, trades] = await Promise.all([
           testConnection(cred),
-          getPositions(cred, stateRef.current.settings.symbol),
-          getDailyPnl(cred, stateRef.current.settings.symbol),
+          getPositions(cred, sym),
+          getDailyPnl(cred, sym),
+          getOpenOrders(cred, sym),
+          getRecentTrades(cred, sym, 50),
         ]);
         if (!alive) return;
         setAccount(acc);
         setPositions(pos);
         setDailyPnl(pnl);
+        setOpenOrders(ords);
+        setRecentTrades(trades);
         setLastError(null);
         const next = await maybeTriggerCooldown(stateRef.current, pnl);
         if (next !== stateRef.current) setState(next);
@@ -122,7 +132,7 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
   const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
 
   return {
-    state, account, positions, dailyPnl, openCount, lastError,
+    state, account, positions, openOrders, recentTrades, dailyPnl, openCount, lastError,
     async setCredentials(apiKey, apiSecret) {
       const next = { ...stateRef.current, apiKey, apiSecret, leverageSetForSession: false };
       await saveState(next); setState(next);

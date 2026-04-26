@@ -37,6 +37,8 @@ export default function LiveTab({ live }: Props) {
         </View>
         <View style={styles.col}>
           <PositionsCard live={live} />
+          <OpenOrdersCard live={live} />
+          <RecentFillsCard live={live} />
           <HistoryCard live={live} />
         </View>
       </View>
@@ -220,6 +222,10 @@ function SettingsCard({ live }: Props) {
         <NumField label="Daily cap (USD, âm)" value={draft.dailyLossCapUsd} onChangeNum={(v) => field("dailyLossCapUsd", v)} step={1} />
         <NumField label="Cooldown (phút)" value={draft.cooldownMinutes} onChangeNum={(v) => field("cooldownMinutes", Math.max(1, Math.round(v)))} />
       </View>
+      <Text style={styles.note}>
+        💡 Daily cap: dailyPnL ≤ ngưỡng này → tự pause auto-trade
+        {"\n"}💡 Cooldown: thời gian tạm dừng sau khi cap chạm. Hết cooldown → resume.
+      </Text>
       <Text style={styles.note}>TP/SL lấy theo từng rule (targetPct / stopPct trong hard_rules.json)</Text>
 
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>
@@ -289,17 +295,96 @@ function PositionsCard({ live }: Props) {
       ) : (
         open.map((p, i) => {
           const amt = parseFloat(p.positionAmt);
+          const entry = parseFloat(p.entryPrice);
+          const mark = parseFloat(p.markPrice);
           const upnl = parseFloat(p.unRealizedProfit);
+          const lev = parseInt(p.leverage, 10) || 1;
           const side = amt > 0 ? "LONG" : "SHORT";
+          // ROE = uPnL / margin (margin = notional / lev)
+          const notional = Math.abs(amt) * entry;
+          const margin = notional / lev;
+          const roe = margin > 0 ? (upnl / margin) * 100 : 0;
           return (
-            <View key={i} style={styles.posRow}>
-              <Text style={[styles.posCell, { color: side === "LONG" ? P.green : P.error, width: 50, fontWeight: "800" }]}>{side}</Text>
-              <Text style={[styles.posCell, { width: 80 }]}>{p.symbol}</Text>
-              <Text style={[styles.posCell, { width: 70 }]}>qty {Math.abs(amt)}</Text>
-              <Text style={[styles.posCell, { width: 90 }]}>@ ${parseFloat(p.entryPrice).toFixed(0)}</Text>
-              <Text style={[styles.posCell, { color: upnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "700" }]}>
-                {upnl >= 0 ? "+" : ""}${upnl.toFixed(2)}
+            <View key={i} style={styles.posCard}>
+              <View style={styles.posRow}>
+                <Text style={[styles.posCell, { color: side === "LONG" ? P.green : P.error, width: 56, fontWeight: "800" }]}>{side}</Text>
+                <Text style={[styles.posCell, { width: 70 }]}>{p.symbol}</Text>
+                <Text style={[styles.posCell, { width: 56, color: P.bitcoinOrange }]}>{lev}x</Text>
+                <Text style={[styles.posCell, { color: upnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "800", fontSize: 13 }]}>
+                  {upnl >= 0 ? "+" : ""}${upnl.toFixed(2)}
+                </Text>
+                <Text style={[styles.posCell, { color: roe >= 0 ? P.green : P.error, width: 70, textAlign: "right", fontWeight: "700" }]}>
+                  ({roe >= 0 ? "+" : ""}{roe.toFixed(1)}%)
+                </Text>
+              </View>
+              <View style={styles.posRow}>
+                <Text style={[styles.posCellSmall, { width: 86 }]}>qty {Math.abs(amt)}</Text>
+                <Text style={[styles.posCellSmall]}>entry ${entry.toFixed(1)}</Text>
+                <Text style={[styles.posCellSmall, { marginLeft: 10 }]}>mark ${mark.toFixed(1)}</Text>
+                <Text style={[styles.posCellSmall, { marginLeft: 10, flex: 1, textAlign: "right" }]}>margin ${margin.toFixed(2)}</Text>
+              </View>
+            </View>
+          );
+        })
+      )}
+    </Card>
+  );
+}
+
+// ── OPEN ORDERS (TP/SL pending) ─────────────────────────────────────────────
+
+function OpenOrdersCard({ live }: Props) {
+  const orders = live.openOrders;
+  return (
+    <Card title={`📋 OPEN ORDERS · ${orders.length}`}>
+      {orders.length === 0 ? (
+        <Text style={styles.note}>Không có order nào pending.</Text>
+      ) : (
+        orders.map((o) => {
+          const isStop = o.type.includes("STOP");
+          const isTP = o.type.includes("TAKE_PROFIT");
+          const color = isTP ? P.green : isStop ? P.error : P.text;
+          return (
+            <View key={o.orderId} style={styles.posRow}>
+              <Text style={[styles.posCell, { width: 56, color, fontWeight: "800" }]}>{o.side}</Text>
+              <Text style={[styles.posCell, { width: 110, color }]}>{o.type.replace("_MARKET", "")}</Text>
+              <Text style={[styles.posCell, { width: 80 }]}>qty {o.origQty}</Text>
+              <Text style={[styles.posCell, { flex: 1, textAlign: "right" }]}>
+                @ ${parseFloat(o.stopPrice || o.price).toFixed(1)}
               </Text>
+            </View>
+          );
+        })
+      )}
+    </Card>
+  );
+}
+
+// ── RECENT FILLS ────────────────────────────────────────────────────────────
+
+function RecentFillsCard({ live }: Props) {
+  const trades = [...live.recentTrades].reverse().slice(0, 30);
+  return (
+    <Card title={`💱 RECENT FILLS · ${live.recentTrades.length}`}>
+      {trades.length === 0 ? (
+        <Text style={styles.note}>Chưa có fill nào trong 50 lệnh gần nhất.</Text>
+      ) : (
+        trades.map((t) => {
+          const pnl = parseFloat(t.realizedPnl);
+          const time = new Date(t.time);
+          const hh = String(time.getHours()).padStart(2, "0");
+          const mm = String(time.getMinutes()).padStart(2, "0");
+          return (
+            <View key={t.id} style={styles.posRow}>
+              <Text style={[styles.posCell, { width: 50, color: P.dim }]}>{hh}:{mm}</Text>
+              <Text style={[styles.posCell, { width: 50, color: t.side === "BUY" ? P.green : P.error, fontWeight: "700" }]}>{t.side}</Text>
+              <Text style={[styles.posCell, { width: 70 }]}>qty {t.qty}</Text>
+              <Text style={[styles.posCell, { width: 90 }]}>@ ${parseFloat(t.price).toFixed(1)}</Text>
+              {pnl !== 0 && (
+                <Text style={[styles.posCell, { color: pnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "700" }]}>
+                  {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
+                </Text>
+              )}
             </View>
           );
         })
@@ -453,8 +538,10 @@ const styles = StyleSheet.create({
   filterChipActive: { borderColor: P.bitcoinOrange, backgroundColor: P.bitcoinOrange + "22" },
   filterText: { color: P.dim, fontFamily: "monospace", fontWeight: "700", fontSize: 10, letterSpacing: 1 },
 
-  posRow: { flexDirection: "row", paddingVertical: 6, gap: 6, alignItems: "center", borderBottomWidth: 1, borderBottomColor: P.borderSoft },
+  posCard: { borderBottomWidth: 1, borderBottomColor: P.borderSoft, paddingVertical: 6 },
+  posRow: { flexDirection: "row", paddingVertical: 4, gap: 6, alignItems: "center" },
   posCell: { color: P.text2, fontFamily: "monospace", fontSize: 11 },
+  posCellSmall: { color: P.dim, fontFamily: "monospace", fontSize: 10 },
 
   histRow: { flexDirection: "row", paddingVertical: 6, gap: 8, alignItems: "flex-start", borderBottomWidth: 1, borderBottomColor: P.borderSoft },
   histTime: { color: P.dim, fontFamily: "monospace", fontSize: 10, width: 78 },

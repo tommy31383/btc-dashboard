@@ -20,6 +20,8 @@ interface Props {
   currentPrice: number | null;
   stoch5mK: number | null;
   onReset: () => Promise<void> | void;
+  /** Optional content rendered at bottom of the scroll (vd PaperTradeJournal) */
+  footer?: React.ReactNode;
 }
 
 type Filter = "ALL" | "WIN" | "LOSS";
@@ -66,7 +68,7 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
   );
 }
 
-export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset }: Props) {
+export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
 
   const handleReset = () => {
@@ -201,6 +203,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
               );
             })}
       </View>
+      {footer ? <View style={{ marginTop: 16 }}>{footer}</View> : null}
     </ScrollView>
   );
 }
