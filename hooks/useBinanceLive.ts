@@ -23,7 +23,7 @@ import {
   LiveRole, LeaderInfo, IpLocation,
   getDeviceId, getDeviceLabel, setDeviceLabel, getLeaderInfo, pushLeader, canClaim,
   fetchIpLocation, nextHeartbeatDelayMs,
-  LEADER_CHECK_INTERVAL_MS,
+  LEADER_CHECK_INTERVAL_MS, LEADER_CHECK_BURST_MS, LEADER_CHECK_BURST_DURATION_MS,
 } from "../utils/leaderElection";
 import { getGistConfig } from "../utils/gistSync";
 import { ensureNotificationPermission } from "../utils/liveAlerts";
@@ -223,11 +223,18 @@ export function useBinanceLive(
     return () => { alive = false; if (timerId) clearTimeout(timerId); };
   }, [role, deviceId]);
 
-  // All CONNECTED devices: pull leader info mỗi 20s + auto-elect khi cần
+  // Burst-mode adaptive (anh Tommy v4.6.1): sau role change check nhanh hơn 60s.
+  // Track timestamp role change để biết đang trong burst window không.
+  const roleChangedMsRef = useRef<number>(0);
+  useEffect(() => { roleChangedMsRef.current = Date.now(); }, [role]);
+
+  // All CONNECTED devices: pull leader info adaptive (10s burst sau role change, 80s normal)
   useEffect(() => {
     if (!deviceId) return;
     if (role === "DISCONNECTED") return;
     let alive = true;
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+
     const tick = async () => {
       if (!alive) return;
       const info = await getLeaderInfo();
@@ -249,15 +256,26 @@ export function useBinanceLive(
       } else {
         // Có leader khác đang sống — mình phải là FOLLOWER
         if (myRole === "LEADER") {
-          // Hiếm: leader bị steal → revert
           setRole("FOLLOWER");
         } else if (myRole === "BOOTING") {
           setRole("FOLLOWER");
         }
       }
+      scheduleNext();
     };
-    const id = setInterval(tick, LEADER_CHECK_INTERVAL_MS);
-    return () => { alive = false; clearInterval(id); };
+
+    const scheduleNext = () => {
+      if (!alive) return;
+      const sinceRoleChange = Date.now() - roleChangedMsRef.current;
+      // Burst 10s trong 60s đầu sau role change, sau đó về 80s normal
+      const delay = sinceRoleChange < LEADER_CHECK_BURST_DURATION_MS
+        ? LEADER_CHECK_BURST_MS
+        : LEADER_CHECK_INTERVAL_MS;
+      timerId = setTimeout(tick, delay);
+    };
+
+    scheduleNext();
+    return () => { alive = false; if (timerId) clearTimeout(timerId); };
   }, [deviceId, role]);
 
   // Follower: pull live_trading.json mỗi 30s để mirror leader's state

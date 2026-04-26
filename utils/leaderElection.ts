@@ -22,8 +22,13 @@ const LEADER_FILE = "live_leader.json";
 // PA B timing — anh Tommy v4.5.3: tăng x2 nữa (tổng x4 so với original)
 export const HEARTBEAT_INTERVAL_MS = 60_000;       // 30s → 60s (1 phút)
 export const HEARTBEAT_JITTER_MS = 8_000;          // 4s → 8s
-export const LEADER_CHECK_INTERVAL_MS = 80_000;    // 40s → 80s
+export const LEADER_CHECK_INTERVAL_MS = 80_000;    // 40s → 80s (normal rate)
 export const LEADER_TIMEOUT_MS = 180_000;          // 90s → 180s (3 phút - 3-strike miss 3 heartbeat 60s)
+
+// Burst-mode adaptive (anh Tommy v4.6.1): sau role change, check leader nhanh hơn
+// trong 60s để phát hiện claim/demote sớm. Sau đó về 80s normal.
+export const LEADER_CHECK_BURST_MS = 10_000;       // 10s/lần khi vừa role change
+export const LEADER_CHECK_BURST_DURATION_MS = 60_000; // burst window 60s
 
 const IP_CACHE_TTL_MS = 60 * 60 * 1000; // 1h
 
