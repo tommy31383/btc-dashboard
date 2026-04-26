@@ -298,12 +298,20 @@ function CredentialsCard({ live }: Props) {
     setTimeout(() => setSavedFlash(false), 3000);
   }
 
-  // Web-only props ngăn copy/cut/right-click context menu trên RN-web → forward to <input>.
-  // Chỉ cho phép paste (default) + nhập tay. Không cho show, không cho copy ra.
+  // Web-only props: cho phép PASTE (anh Tommy yêu cầu giữ paste hoạt động),
+  // nhưng khi user copy/cut → clipboard chỉ chứa dấu **** (không có PAT thật).
+  // Right-click menu giữ nguyên để mobile có thể paste qua context menu.
   const noCopyProps: any = {
-    onCopy: (e: any) => e.preventDefault?.(),
-    onCut: (e: any) => e.preventDefault?.(),
-    onContextMenu: (e: any) => e.preventDefault?.(),
+    onCopy: (e: any) => {
+      e.preventDefault?.();
+      const len = (e.target?.value || "").length;
+      try { e.clipboardData?.setData?.("text/plain", "*".repeat(Math.max(8, len))); } catch {}
+    },
+    onCut: (e: any) => {
+      e.preventDefault?.();
+      const len = (e.target?.value || "").length;
+      try { e.clipboardData?.setData?.("text/plain", "*".repeat(Math.max(8, len))); } catch {}
+    },
   };
 
   return (
