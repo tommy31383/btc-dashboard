@@ -10,6 +10,7 @@
  *   6. HISTORY — journal đầy đủ với filter dry/real, action kind
  */
 import React, { useMemo, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DebugLabel from "./DebugLabel";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions,
@@ -256,7 +257,7 @@ function ControlsCard({ live }: Props) {
   const isFollower = live.role === "FOLLOWER";
   const canControl = !isFollower; // anh Tommy: follower chỉ XEM, không bật AUTO/REAL
   return (
-    <Card title={`⚡ CONTROLS${isFollower ? " · 👁 READ-ONLY (FOLLOWER)" : ""}`}>
+    <CollapsibleCard storageKey="@live_card_controls" title={`⚡ CONTROLS${isFollower ? " · 👁 READ-ONLY (FOLLOWER)" : ""}`}>
       {isFollower && (
         <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
           🔒 Bạn đang ở FOLLOWER mode — KHÔNG được bật AUTO / đổi DRY/REAL / reset / clear / close.
@@ -310,7 +311,7 @@ function ControlsCard({ live }: Props) {
         {"\n"}💡 PULL FROM GIT: pull settings + history mới nhất từ GitHub (nếu đổi ở máy khác).
         {"\n"}💡 TEST CONNECTION: gọi GET account để verify API key, hiện wallet ngay.
       </Text>
-    </Card>
+    </CollapsibleCard>
   );
 }
 
@@ -345,7 +346,7 @@ function CredentialsCard({ live }: Props) {
   };
 
   return (
-    <Card title="🔐 CREDENTIALS (local only — KHÔNG sync)">
+    <CollapsibleCard storageKey="@live_card_credentials" title="🔐 CREDENTIALS (local only — KHÔNG sync)">
       <Text style={styles.warn}>
         ⚠️ DISABLE quyền "Withdrawal" trên API key. Chỉ enable Futures + Trading.
         {"\n"}🔒 Nhập / paste vào được, KHÔNG show / copy ra để tránh lộ key.
@@ -392,7 +393,7 @@ function CredentialsCard({ live }: Props) {
         💡 Key chỉ lưu ở máy này (AsyncStorage). KHÔNG bao giờ sync git.
         {"\n"}💡 Sang máy khác: phải nhập lại API key + secret. Nhưng SETTINGS + HISTORY thì sync (qua PULL FROM GIT).
       </Text>
-    </Card>
+    </CollapsibleCard>
   );
 }
 
@@ -429,7 +430,7 @@ function SettingsCard({ live }: Props) {
   const allTfs = ["5m", "15m", "1h", "4h", "1d"];
 
   return (
-    <Card title="⚙️ SETTINGS (sync git)">
+    <CollapsibleCard storageKey="@live_card_settings" title="⚙️ SETTINGS (sync git)" defaultCollapsed>
       <View style={styles.fieldRow}>
         <NumField label="Symbol (lock)" value={draft.symbol} disabled />
         <NumField label="Leverage (info, set trên Binance)" value={draft.leverage} onChangeNum={(v) => field("leverage", v)} />
@@ -506,7 +507,7 @@ function SettingsCard({ live }: Props) {
         Notional/lệnh = ${(draft.marginUsd * draft.leverage).toFixed(0)} ·
         max margin lock = ${(draft.marginUsd * draft.maxOpen).toFixed(0)}
       </Text>
-    </Card>
+    </CollapsibleCard>
   );
 }
 
@@ -899,6 +900,52 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{title}</Text>
       <View style={styles.cardBody}>{children}</View>
+    </View>
+  );
+}
+
+/**
+ * CollapsibleCard — Card có nút toggle ▼/▶, lưu trạng thái local (AsyncStorage).
+ * Anh Tommy v4.5.5: dùng cho SETTINGS / CONTROLS / CREDENTIALS để hide/show + nhớ.
+ */
+function CollapsibleCard({
+  storageKey,
+  title,
+  defaultCollapsed = false,
+  children,
+}: {
+  storageKey: string;
+  title: string;
+  defaultCollapsed?: boolean;
+  children: React.ReactNode;
+}) {
+  const [collapsed, setCollapsed] = useState<boolean>(defaultCollapsed);
+  const [hydrated, setHydrated] = useState(false);
+  // Hydrate từ AsyncStorage 1 lần khi mount
+  React.useEffect(() => {
+    let alive = true;
+    AsyncStorage.getItem(storageKey).then((v) => {
+      if (!alive) return;
+      if (v === "1") setCollapsed(true);
+      else if (v === "0") setCollapsed(false);
+      setHydrated(true);
+    }).catch(() => setHydrated(true));
+    return () => { alive = false; };
+  }, [storageKey]);
+
+  const toggle = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    AsyncStorage.setItem(storageKey, next ? "1" : "0").catch(() => {});
+  };
+
+  return (
+    <View style={styles.card}>
+      <TouchableOpacity onPress={toggle} activeOpacity={0.7}>
+        <Text style={styles.cardTitle}>{collapsed ? "▶" : "▼"} {title}</Text>
+      </TouchableOpacity>
+      {!collapsed && hydrated && <View style={styles.cardBody}>{children}</View>}
+      {!collapsed && !hydrated && <View style={styles.cardBody}>{children}</View>}
     </View>
   );
 }
