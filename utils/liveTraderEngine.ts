@@ -58,6 +58,7 @@ export interface LiveSyncState {
   dryRun: boolean;
   pausedUntilMs: number;
   leverageSetForSession: boolean;
+  hedgeMode: boolean;       // detect từ /fapi/v1/positionSide/dual
   journal: LiveJournalEntry[];
   firedIds: Record<string, number>;
 }
@@ -75,6 +76,7 @@ export function emptySyncState(): LiveSyncState {
     dryRun: true,
     pausedUntilMs: 0,
     leverageSetForSession: false,
+    hedgeMode: false,
     journal: [],
     firedIds: {},
   };
@@ -223,9 +225,10 @@ export async function executeAction(
   try {
     const buySell: "BUY" | "SELL" = action.side === "LONG" ? "BUY" : "SELL";
     const closeSide: "BUY" | "SELL" = action.side === "LONG" ? "SELL" : "BUY";
-    await placeMarketOrder(cred, s.settings.symbol, buySell, action.qty);
-    await placeTakeProfitMarket(cred, s.settings.symbol, closeSide, action.tpPrice, true);
-    await placeStopMarket(cred, s.settings.symbol, closeSide, action.slPrice, true);
+    const posSide: "LONG" | "SHORT" | undefined = s.hedgeMode ? action.side : undefined;
+    await placeMarketOrder(cred, s.settings.symbol, buySell, action.qty, posSide);
+    await placeTakeProfitMarket(cred, s.settings.symbol, closeSide, action.tpPrice, action.qty, posSide);
+    await placeStopMarket(cred, s.settings.symbol, closeSide, action.slPrice, action.qty, posSide);
   } catch (e: any) {
     const msg = e?.message ?? String(e);
     next = await logAction(next, alert.id, alert.tfKey, { kind: "ERROR", message: msg + explainBinanceError(msg) });
@@ -251,6 +254,7 @@ export function explainBinanceError(msg: string): string {
   if (msg.includes("-1111") || m.includes("precision")) return "\n💡 Quantity precision sai. BTCUSDT yêu cầu 3 chữ số (vd 0.001).";
   if (msg.includes("-1013") || m.includes("filter failure: notional")) return "\n💡 Notional quá nhỏ. BTCUSDT min notional ~$5 — tăng margin × lev.";
   if (msg.includes("-2027") || m.includes("max position")) return "\n💡 Đã đạt max position size cho symbol. Đóng bớt position rồi thử lại.";
+  if (msg.includes("-4120") || m.includes("algo order")) return "\n💡 Lỗi -4120: account đang ở Portfolio Margin hoặc Hedge Mode. Vào Binance: (1) Wallet → Portfolio Margin → DISABLE; (2) Trade → Position Mode → chọn 'One-way Mode'.";
   if (msg.includes("418") || m.includes("banned")) return "\n💡 IP bị Binance ban tạm thời (rate limit). Chờ vài phút.";
   return "";
 }

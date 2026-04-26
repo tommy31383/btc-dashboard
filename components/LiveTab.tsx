@@ -78,6 +78,7 @@ function StatusBar({ live }: Props) {
         {isPaused && (
           <BigPill label="PAUSED" value={`${cooldownLeftM}m`} color={P.bitcoinOrange} />
         )}
+        <BigPill label="POS MODE" value={live.state.hedgeMode ? "HEDGE" : "ONE-WAY"} color={live.state.hedgeMode ? P.tertiary : P.text2} />
       </View>
       {live.lastError && (
         <Text style={[styles.errorBar, { color: live.lastError.startsWith("✅") ? P.green : P.error }]}>
@@ -481,11 +482,36 @@ function RecentFillsCard({ live }: Props) {
 
 function HistoryCard({ live }: Props) {
   const [filter, setFilter] = useState<"ALL" | "ENTRY" | "BLOCK" | "ERROR">("ALL");
+  const [copyFlash, setCopyFlash] = useState(false);
   const items = useMemo(() => {
     const all = [...live.state.journal].slice(-200).reverse();
     if (filter === "ALL") return all;
     return all.filter((j) => j.action.kind === filter);
   }, [live.state.journal, filter]);
+
+  async function handleCopyLog() {
+    const lines = items.map((j) => {
+      const t = new Date(j.ts);
+      const dd = String(t.getDate()).padStart(2, "0");
+      const mo = String(t.getMonth() + 1).padStart(2, "0");
+      const hh = String(t.getHours()).padStart(2, "0");
+      const mi = String(t.getMinutes()).padStart(2, "0");
+      const a: any = j.action;
+      let body = "";
+      if (a.kind === "ENTRY") body = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
+      else if (a.kind === "BLOCK") body = `BLOCK · ${a.reason}`;
+      else body = `ERROR · ${a.message}`;
+      return `${dd}/${mo} ${hh}:${mi}  ${j.ruleId.padEnd(8)}  ${j.dryRun ? "[DRY] " : ""}${body}`;
+    });
+    const txt = `LIVE TRADING LOG (${filter}) — ${items.length} entries\n` + lines.join("\n");
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(txt);
+        setCopyFlash(true);
+        setTimeout(() => setCopyFlash(false), 2000);
+      }
+    } catch {}
+  }
 
   return (
     <Card title={`📜 HISTORY · ${live.state.journal.length} total`}>
@@ -496,7 +522,10 @@ function HistoryCard({ live }: Props) {
             <Text style={[styles.filterText, filter === f && { color: P.bitcoinOrange }]}>{f}</Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity onPress={live.clearJournal} style={[styles.btnGhost, { marginLeft: "auto" }]}>
+        <TouchableOpacity onPress={handleCopyLog} style={[styles.btnGhost, { marginLeft: "auto" }]}>
+          <Text style={styles.btnGhostText}>{copyFlash ? "✓ COPIED" : "📋 COPY LOG"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={live.clearJournal} style={styles.btnGhost}>
           <Text style={styles.btnGhostText}>CLEAR</Text>
         </TouchableOpacity>
       </View>

@@ -15,8 +15,9 @@ import {
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
-  getDailyPnl, getPositions, getOpenOrders, getRecentTrades, testConnection,
+  getDailyPnl, getPositions, getOpenOrders, getRecentTrades, testConnection, getDualSidePosition,
 } from "../utils/binanceLive";
+import { saveState as engineSaveState } from "../utils/liveTraderEngine";
 
 const POLL_MS = 30 * 1000;
 
@@ -103,12 +104,13 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
     async function poll() {
       try {
         const sym = stateRef.current.settings.symbol;
-        const [acc, pos, pnl, ords, trades] = await Promise.all([
+        const [acc, pos, pnl, ords, trades, hedge] = await Promise.all([
           testConnection(cred),
           getPositions(cred, sym),
           getDailyPnl(cred, sym),
           getOpenOrders(cred, sym),
           getRecentTrades(cred, sym, 50),
+          getDualSidePosition(cred).catch(() => stateRef.current.hedgeMode),
         ]);
         if (!alive) return;
         setAccount(acc);
@@ -116,6 +118,11 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
         setDailyPnl(pnl);
         setOpenOrders(ords);
         setRecentTrades(trades);
+        if (hedge !== stateRef.current.hedgeMode) {
+          const next = { ...stateRef.current, hedgeMode: hedge };
+          await engineSaveState(next, { sync: false });
+          setState(next);
+        }
         setLastError(null);
         const next = await maybeTriggerCooldown(stateRef.current, pnl);
         if (next !== stateRef.current) setState(next);

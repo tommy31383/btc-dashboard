@@ -121,32 +121,50 @@ export async function setLeverage(cred: Credentials, symbol: string, leverage: n
   return signedRequest(cred, "POST", "/fapi/v1/leverage", { symbol, leverage });
 }
 
+/** Check account dual-side (Hedge Mode) — returns true nếu account ở Hedge Mode. */
+export async function getDualSidePosition(cred: Credentials): Promise<boolean> {
+  const res = await signedRequest<{ dualSidePosition: boolean }>(cred, "GET", "/fapi/v1/positionSide/dual");
+  return res.dualSidePosition === true;
+}
+
 export async function placeMarketOrder(
   cred: Credentials,
   symbol: string,
   side: "BUY" | "SELL",
   quantity: number,
+  positionSide?: "LONG" | "SHORT" | "BOTH",
 ): Promise<OrderResponse> {
-  return signedRequest<OrderResponse>(cred, "POST", "/fapi/v1/order", {
+  const params: Record<string, string | number> = {
     symbol, side, type: "MARKET",
     quantity: quantity.toString(),
-  });
+  };
+  if (positionSide) params.positionSide = positionSide;
+  return signedRequest<OrderResponse>(cred, "POST", "/fapi/v1/order", params);
 }
 
+/** STOP_MARKET dùng reduceOnly+quantity (One-way) hoặc positionSide (Hedge — không kèm reduceOnly) */
 export async function placeStopMarket(
   cred: Credentials,
   symbol: string,
   side: "BUY" | "SELL",
   stopPrice: number,
-  closePosition = true,
+  quantity: number,
+  positionSide?: "LONG" | "SHORT" | "BOTH",
 ): Promise<OrderResponse> {
-  return signedRequest<OrderResponse>(cred, "POST", "/fapi/v1/order", {
+  const params: Record<string, string | number> = {
     symbol, side,
     type: "STOP_MARKET",
     stopPrice: stopPrice.toString(),
-    closePosition: closePosition ? "true" : "false",
+    quantity: quantity.toString(),
     workingType: "MARK_PRICE",
-  });
+  };
+  if (positionSide && positionSide !== "BOTH") {
+    params.positionSide = positionSide;
+    // Hedge mode KHÔNG dùng reduceOnly (positionSide đã định nghĩa side)
+  } else {
+    params.reduceOnly = "true";
+  }
+  return signedRequest<OrderResponse>(cred, "POST", "/fapi/v1/order", params);
 }
 
 export async function placeTakeProfitMarket(
@@ -154,15 +172,22 @@ export async function placeTakeProfitMarket(
   symbol: string,
   side: "BUY" | "SELL",
   stopPrice: number,
-  closePosition = true,
+  quantity: number,
+  positionSide?: "LONG" | "SHORT" | "BOTH",
 ): Promise<OrderResponse> {
-  return signedRequest<OrderResponse>(cred, "POST", "/fapi/v1/order", {
+  const params: Record<string, string | number> = {
     symbol, side,
     type: "TAKE_PROFIT_MARKET",
     stopPrice: stopPrice.toString(),
-    closePosition: closePosition ? "true" : "false",
+    quantity: quantity.toString(),
     workingType: "MARK_PRICE",
-  });
+  };
+  if (positionSide && positionSide !== "BOTH") {
+    params.positionSide = positionSide;
+  } else {
+    params.reduceOnly = "true";
+  }
+  return signedRequest<OrderResponse>(cred, "POST", "/fapi/v1/order", params);
 }
 
 export interface OpenOrder {
