@@ -69,7 +69,7 @@ function StatusBar({ live }: Props) {
   const isDisconnected = live.role === "DISCONNECTED";
   const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : isDisconnected ? P.error : P.dim;
   const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : isDisconnected ? "⛔ DISCONNECTED" : "⏳ BOOTING";
-  // Leader info: nếu mình là leader nhưng chưa có file gist (push lần đầu / LOCAL) → hiện rõ
+  // Leader info — phân biệt rõ 3 case: disconnected / có PAT đang push / LOCAL không PAT
   const leaderTxt = (() => {
     if (isDisconnected) return "⛔ Chưa nhập API key — KHÔNG tham gia leader election. Connect ở section CREDENTIALS bên dưới.";
     if (live.leader) {
@@ -80,7 +80,12 @@ function StatusBar({ live }: Props) {
       const ip = live.leader.ip ? ` · ${live.leader.ip}` : "";
       return `${isMe ? "👉 BẠN " : ""}${live.leader.deviceLabel} (${live.leader.deviceType || "?"})${cityCountry}${ip} · beat ${beatAgo}s ago`;
     }
-    if (isLeader) return `👉 BẠN (${live.deviceLabel || "?"}) — đang push lần đầu hoặc LOCAL mode (chưa có PAT)`;
+    if (isLeader && !live.hasPat) {
+      return `👉 BẠN (${live.deviceLabel || "?"}) — LOCAL mode (chưa có GitHub Token để sync multi-device. Vào DASHBOARD → SETTINGS → GitHub PAT)`;
+    }
+    if (isLeader && live.hasPat) {
+      return `👉 BẠN (${live.deviceLabel || "?"}) — đang push lên GitHub gist lần đầu, chờ vài giây refresh...`;
+    }
     return "(chưa có leader)";
   })();
   const meIpTxt = live.myIpLoc

@@ -40,11 +40,12 @@ export interface UseBinanceLiveResult {
   openCount: number;
   lastError: string | null;
   // Single-leader lock
-  role: LiveRole;                    // BOOTING | LEADER | FOLLOWER
+  role: LiveRole;                    // DISCONNECTED | BOOTING | LEADER | FOLLOWER
   leader: LeaderInfo | null;         // current leader info from gist
   deviceId: string;                  // mình
   deviceLabel: string;               // tên hiển thị của mình
   myIpLoc: IpLocation | null;        // IP + city/country của mình
+  hasPat: boolean;                   // có GitHub Personal Access Token để sync multi-device không
   lastSyncMs: number;                // lần follower pull state cuối
   claimLeadership: () => Promise<void>; // force takeover
   setMyDeviceLabel: (label: string) => Promise<void>;
@@ -77,6 +78,7 @@ export function useBinanceLive(
   const [deviceId, setDeviceId] = useState<string>("");
   const [deviceLabel, setDeviceLabelState] = useState<string>("");
   const [myIpLoc, setMyIpLoc] = useState<IpLocation | null>(null);
+  const [hasPat, setHasPat] = useState<boolean>(false);
   const [lastSyncMs, setLastSyncMs] = useState<number>(0);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -92,10 +94,11 @@ export function useBinanceLive(
   /** Election logic dùng chung cho boot + sau khi setCredentials. */
   const runElection = useRef(async (myId: string, label: string) => {
     const cfg = await getGistConfig();
+    setHasPat(!!cfg.pat);
     if (!cfg.pat) {
       setRole("LEADER");
       setLeader(null);
-      setLastError("ℹ️ LOCAL LEADER — chưa có GitHub PAT. Nhập ở Dashboard → SETTINGS để bật multi-device sync.");
+      setLastError("ℹ️ LOCAL mode — chưa có GitHub Personal Access Token (PAT) để sync giữa các device. Vào DASHBOARD → SETTINGS → GitHub PAT để nhập.");
       return;
     }
     const info = await getLeaderInfo();
@@ -350,7 +353,7 @@ export function useBinanceLive(
 
   return {
     state, account, positions, openOrders, recentTrades, dailyPnl, openCount, lastError,
-    role, leader, deviceId, deviceLabel, myIpLoc, lastSyncMs,
+    role, leader, deviceId, deviceLabel, myIpLoc, hasPat, lastSyncMs,
     async claimLeadership() {
       if (!deviceIdRef.current) return;
       const ok = await pushLeader(deviceIdRef.current, deviceLabelRef.current, myIpLocRef.current);
