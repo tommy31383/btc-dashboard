@@ -394,6 +394,32 @@
         "reason": "stack price too close (0.14% < 0.3%) to last LONG @77968.82"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777227492272,
+      "ruleId": "1h:26",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "LONG",
+        "htfEntryPrice": 78294.04,
+        "tpPct": 3.0000000000000075,
+        "slPct": 1.9999999999999991
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777227492278,
+      "ruleId": "1h:25",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "LONG",
+        "htfEntryPrice": 78294.04,
+        "tpPct": 3.0000000000000075,
+        "slPct": 1.9999999999999991
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
@@ -477,7 +503,26 @@
       "entryMs": 1777188934835
     }
   ],
-  "pendingAlerts": [],
+  "pendingAlerts": [
+    {
+      "id": "1h:26",
+      "tfKey": "1h",
+      "side": "LONG",
+      "htfEntryPrice": 78294.04,
+      "tpPct": 3.0000000000000075,
+      "slPct": 1.9999999999999991,
+      "addedMs": 1777227492275
+    },
+    {
+      "id": "1h:25",
+      "tfKey": "1h",
+      "side": "LONG",
+      "htfEntryPrice": 78294.04,
+      "tpPct": 3.0000000000000075,
+      "slPct": 1.9999999999999991,
+      "addedMs": 1777227492281
+    }
+  ],
   "binanceSnapshot": {
     "ts": 1777227444913,
     "account": {
