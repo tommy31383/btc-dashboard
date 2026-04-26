@@ -18,6 +18,7 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { P } from "../utils/v2Theme";
 import { RiskRadarState, RiskWarning, GoldenOpportunity } from "../hooks/useRiskRadar";
+import DebugLabel from "./DebugLabel";
 
 interface Props {
   state: RiskRadarState;
@@ -177,6 +178,7 @@ export default function RiskRadar({ state }: Props) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <DebugLabel name="RiskRadar" />
       {/* Tab header chip */}
       <View style={styles.tabChipRow}>
         <View style={styles.tabChip}>

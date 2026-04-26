@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { P } from "../utils/v2Theme";
 import gptRuleDrafts from "../assets/gpt_rule_drafts.json";
+import DebugLabel from "./DebugLabel";
 
 type TrendLabel = "UP" | "DOWN" | "SIDEWAY";
 type TrendRow = {
@@ -87,6 +88,7 @@ export default function GptRuleScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <DebugLabel name="GptRuleScreen" />
       <View style={styles.headerCard}>
         <Text style={styles.eyebrow}>GPT RULE</Text>
         <Text style={styles.title}>Trend Matrix</Text>

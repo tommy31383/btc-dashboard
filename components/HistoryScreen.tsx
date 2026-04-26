@@ -10,6 +10,7 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { P } from "../utils/v2Theme";
+import DebugLabel from "./DebugLabel";
 import {
   AutoAccount,
   AutoPosition,
@@ -46,6 +47,7 @@ export default function HistoryScreen({ account, summary }: Props) {
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+      <DebugLabel name="HistoryScreen" />
       {/* KPI bar */}
       <View style={styles.kpiBar}>
         <Kpi

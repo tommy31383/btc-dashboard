@@ -5,6 +5,7 @@ import { P } from "../utils/v2Theme";
 import { TFAnalysis } from "../hooks/useBinanceKlines";
 import RSIBar from "./RSIBar";
 import TimeframeDetail from "./TimeframeDetail";
+import DebugLabel from "./DebugLabel";
 
 interface Props {
   tfData: TFAnalysis[];
@@ -43,6 +44,7 @@ function TimeframeTableInner({ tfData, overboughtLevel, oversoldLevel }: Props) 
 
   return (
     <View style={styles.container}>
+      <DebugLabel name="TimeframeTable" />
       <Text style={styles.title}>PHÂN TÍCH ĐA KHUNG THỜI GIAN</Text>
 
       <View style={styles.headerRow}>

@@ -9,6 +9,7 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { P } from "../utils/v2Theme";
 import { Alert } from "../hooks/useAlerts";
+import DebugLabel from "./DebugLabel";
 
 interface Props { alerts: Alert[]; }
 
@@ -16,6 +17,7 @@ function AlertLogInner({ alerts }: Props) {
   if (alerts.length === 0) return null;
   return (
     <View style={styles.card}>
+      <DebugLabel name="AlertLog" />
       <View style={styles.header}>
         <Text style={styles.caption}>ALERT LOG</Text>
         <View style={styles.countBadge}>

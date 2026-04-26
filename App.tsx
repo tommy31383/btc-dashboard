@@ -21,6 +21,7 @@ import { useTrackedRules } from "./hooks/useTrackedRules";
 import { useRuleAlerts } from "./hooks/useRuleAlerts";
 import { useCalibration } from "./hooks/useCalibration";
 import { initNotifications } from "./utils/notifications";
+import { hydrateDebugLabels } from "./components/DebugLabel";
 
 import PriceHeader from "./components/PriceHeader";
 import BinanceChart from "./components/BinanceChart";
@@ -62,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.84";
+const APP_VERSION = "4.3.85";
 const BUILD_DATE = "2026-04-26";
 
 /**
@@ -141,6 +142,7 @@ export default function App() {
       }
     });
     initNotifications().catch(() => {});
+    hydrateDebugLabels();
   }, []);
 
   const updateSettings = useCallback((newSettings: Settings) => {

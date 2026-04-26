@@ -11,6 +11,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import Svg, { Polyline, Line } from "react-native-svg";
 import { P } from "../utils/v2Theme";
+import DebugLabel from "./DebugLabel";
 import {
   All15mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE, NOTIONAL,
@@ -113,6 +114,7 @@ export default function All15mPanel({ account, summary, currentPrice, stoch5mK, 
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
+      <DebugLabel name="All15mPanel" />
       <View style={styles.headerRow}>
         <Text style={styles.h1}>📊 15m ALL · LONG MỌI NẾN · $1,000 PAPER</Text>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>

@@ -14,6 +14,7 @@ import { P } from "../utils/v2Theme";
 import { AccentBar } from "./v2/Primitives";
 import { MaterialIcon } from "./v2/MaterialIcon";
 import { PriceData } from "../hooks/useBinancePrice";
+import DebugLabel from "./DebugLabel";
 
 interface Props {
   priceData: PriceData | null;
@@ -96,6 +97,7 @@ export default function PriceHeader({ priceData, priceHistory, connectionStatus 
 
   return (
     <View style={styles.card}>
+      <DebugLabel name="PriceHeader" />
       <AccentBar color={P.bitcoinOrange} />
 
       {/* Top row: symbol + status */}

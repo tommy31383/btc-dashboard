@@ -7,6 +7,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-nati
 import { P, alpha } from "../utils/v2Theme";
 import { PaperTrade, PaperTradeSummary } from "../utils/paperTrader";
 import { CalibStats, classifyRuleHealth, MIN_RESOLVED_FOR_WARN } from "../utils/calibration";
+import DebugLabel from "./DebugLabel";
 
 interface Props {
   trades: PaperTrade[];
@@ -49,6 +50,7 @@ export default function PaperTradeJournal({ trades, summary, stats, pendingCount
 
   return (
     <View style={styles.card}>
+      <DebugLabel name="PaperTradeJournal" />
       <TouchableOpacity onPress={() => setCollapsed((v) => !v)} style={styles.header}>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>📓 PAPER JOURNAL · LEARNER</Text>

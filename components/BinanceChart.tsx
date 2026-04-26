@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef } from "react";
+import DebugLabel from "./DebugLabel";
 import {
   View,
   Text,
@@ -245,6 +246,7 @@ function BinanceChartInner({ rawKlines, selectedTF, onSelectTF }: Props) {
   if (klines.length === 0) {
     return (
       <View style={styles.container}>
+        <DebugLabel name="BinanceChart" />
         <Text style={styles.noData}>Đang tải biểu đồ...</Text>
       </View>
     );

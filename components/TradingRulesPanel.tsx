@@ -6,6 +6,7 @@ import { P } from "../utils/v2Theme";
 import { getHardRules, hasHardRules, HardRule, isRuleMonitorable } from "../utils/hardRules";
 import { useTrackedRules, makeRuleId } from "../hooks/useTrackedRules";
 import { RuleMatchDetail } from "../hooks/useRuleAlerts";
+import DebugLabel from "./DebugLabel";
 
 /**
  * Single source-of-truth panel for the simplified app:
@@ -602,6 +603,7 @@ export default function TradingRulesPanel({ tfFilter, ruleStatus = {}, ruleMatch
   if (!hasHardRules()) {
     return (
       <View style={styles.container}>
+        <DebugLabel name="TradingRulesPanel" />
         <Text style={styles.emptyText}>
           📦 Hard Rules chưa được tạo.{"\n\n"}
           Chạy lệnh sau từ máy tính:{"\n"}

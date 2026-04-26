@@ -6,6 +6,7 @@ import { AccentBar } from "./v2/Primitives";
 import { MaterialIcon } from "./v2/MaterialIcon";
 import { RuleAlert, LiveCondSnapshot, RuleMatchDetail } from "../hooks/useRuleAlerts";
 import { getHardRules } from "../utils/hardRules";
+import DebugLabel from "./DebugLabel";
 
 const INTERVAL_MIN: Record<string, number> = {
   "5m": 5, "15m": 15, "1h": 60, "4h": 240, "1d": 1440, "1w": 10080,
@@ -70,6 +71,7 @@ export default function RuleAlertBanner({ alerts, liveConditions = {}, ruleMatch
 
   return (
     <View style={styles.container}>
+      <DebugLabel name="RuleAlertBanner" />
       <AccentBar color={P.bitcoinOrange} glow />
       <View style={styles.crownHeader}>
         <View style={styles.firingDot} />

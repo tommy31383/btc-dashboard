@@ -8,6 +8,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import Svg, { Polyline, Line } from "react-native-svg";
 import { P } from "../utils/v2Theme";
+import DebugLabel from "./DebugLabel";
 import {
   All5mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE,
@@ -108,6 +109,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
+      <DebugLabel name="All5mPanel" />
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.h1}>⚡ 5m ALL — RULE: BINANCE HEDGE</Text>

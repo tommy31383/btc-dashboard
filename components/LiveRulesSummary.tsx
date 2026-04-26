@@ -13,6 +13,7 @@ import { P } from "../utils/v2Theme";
 import { RuleMatchDetail } from "../hooks/useRuleAlerts";
 import { TFAnalysis } from "../hooks/useBinanceKlines";
 import { parseRuleId } from "../hooks/useTrackedRules";
+import DebugLabel from "./DebugLabel";
 import {
   useIndicatorHistory, parseFilterLabel, estimateETA, formatETA,
 } from "../hooks/useIndicatorHistory";
@@ -101,6 +102,7 @@ function LiveRulesSummaryInner({ trackedIds, ruleStatus, ruleMatchDetails, tfDat
 
   return (
     <View style={styles.card}>
+      <DebugLabel name="LiveRulesSummary" />
       <Text style={styles.caption}>▼ LIVE RULES SUMMARY · {stats.total} TRACKED</Text>
       <View style={styles.row}>
         <StatCell label="FIRED" value={stats.fired} color={P.error} />

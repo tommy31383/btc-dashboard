@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { P } from "../utils/v2Theme";
+import DebugLabel from "./DebugLabel";
 import {
   getGistConfig, setGistConfig, clearGistConfig,
   pullFromGist, pushToGist, mergeTrades,
@@ -97,6 +98,7 @@ export default function GistSyncPanel({ onTradesReplaced }: Props) {
 
   return (
     <View style={styles.card}>
+      <DebugLabel name="GistSyncPanel" />
       <TouchableOpacity onPress={() => setCollapsed((v) => !v)} style={styles.header}>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>☁️ REPO SYNC · PAPER JOURNAL</Text>

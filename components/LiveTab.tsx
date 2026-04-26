@@ -10,6 +10,7 @@
  *   6. HISTORY — journal đầy đủ với filter dry/real, action kind
  */
 import React, { useMemo, useState } from "react";
+import DebugLabel from "./DebugLabel";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions,
 } from "react-native";
@@ -27,6 +28,7 @@ export default function LiveTab({ live }: Props) {
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
+      <DebugLabel name="LiveTab" />
       <StatusBar live={live} />
 
       <View style={[styles.grid, isWide && styles.gridWide]}>

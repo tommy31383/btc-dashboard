@@ -14,6 +14,7 @@ import { COLORS, TimeframeKey } from "../utils/constants";
 import { Verdict } from "../hooks/useAlerts";
 import { TFAnalysis, Kline, RawKlinesMap } from "../hooks/useBinanceKlines";
 import verdictAccuracyByTF from "../assets/verdict_accuracy_by_tf.json";
+import DebugLabel from "./DebugLabel";
 
 // ── Material You warm palette (v4.3.20) ──
 const P = {
@@ -258,6 +259,7 @@ function OverallVerdictInner({
 
   return (
     <View style={styles.outer}>
+      <DebugLabel name="OverallVerdict" />
       {/* Grid noise overlay — absolute, behind everything */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <Svg width="100%" height="100%">

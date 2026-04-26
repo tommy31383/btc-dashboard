@@ -13,6 +13,7 @@ import { TFAnalysis } from "../hooks/useBinanceKlines";
 import { RuleMatchDetail } from "../hooks/useRuleAlerts";
 import { parseRuleId, TrackedRuleId } from "../hooks/useTrackedRules";
 import { getHardRulesForTF } from "../utils/hardRules";
+import DebugLabel from "./DebugLabel";
 
 interface Props {
   tfData: TFAnalysis[];
@@ -149,6 +150,7 @@ function LiveFeatureSnapshotInner({ tfData, trackedIds, ruleStatus, ruleMatchDet
 
   return (
     <View style={styles.wrap}>
+      <DebugLabel name="LiveFeatureSnapshot" />
       <Text style={styles.caption}>▼ MARKET STATUS · 1H</Text>
 
       {/* REGIME + ACTION HINT */}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Switch, TextInput } from "react-native";
 import { COLORS, Settings } from "../utils/constants";
 import { P } from "../utils/v2Theme";
+import DebugLabel, { getDebugLabelsEnabled, setDebugLabelsEnabled } from "./DebugLabel";
 
 interface Props {
   visible: boolean;
@@ -37,6 +38,7 @@ export default function SettingsPanel({ visible, settings, onUpdate }: Props) {
   const [obText, setObText] = useState(String(settings.overboughtLevel));
   const [osText, setOsText] = useState(String(settings.oversoldLevel));
   const [minScoreText, setMinScoreText] = useState(String(settings.notifyMinScore));
+  const [debugLabels, setDebugLabels] = useState(getDebugLabelsEnabled());
 
   if (!visible) return null;
 
@@ -64,7 +66,18 @@ export default function SettingsPanel({ visible, settings, onUpdate }: Props) {
 
   return (
     <View style={styles.container}>
+      <DebugLabel name="SettingsPanel" />
       <Text style={styles.title}>CÀI ĐẶT</Text>
+
+      <View style={styles.grid}>
+        <ToggleRow
+          label="🏷️ Hiện label component"
+          value={debugLabels}
+          onToggle={(v) => { setDebugLabels(v); setDebugLabelsEnabled(v); }}
+          desc="Badge nhỏ góc trên-trái mỗi panel để biết tên file/component"
+        />
+      </View>
+      <View style={styles.divider} />
 
       <View style={styles.grid}>
         <ToggleRow

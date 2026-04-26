@@ -19,6 +19,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { P } from "../utils/v2Theme";
 import { TFAnalysis } from "../hooks/useBinanceKlines";
+import DebugLabel from "./DebugLabel";
 
 interface Props {
   tfData: TFAnalysis[];
@@ -87,6 +88,7 @@ export default function ConfluenceScore({ tfData }: Props) {
 
   return (
     <View style={styles.container}>
+      <DebugLabel name="ConfluenceScore" />
       <View style={styles.headerRow}>
         <Text style={styles.title}>📊 CONFLUENCE SCORE · ĐA KHUNG</Text>
         <Text style={[styles.scoreText, { color: v.color }]}>
