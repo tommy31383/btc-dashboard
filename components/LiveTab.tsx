@@ -253,14 +253,22 @@ function BigPill({ label, value, color }: { label: string; value: string; color:
 function ControlsCard({ live }: Props) {
   const isPaused = live.state.pausedUntilMs > Date.now();
   const credsSet = !!live.state.apiKey && !!live.state.apiSecret;
+  const isFollower = live.role === "FOLLOWER";
+  const canControl = !isFollower; // anh Tommy: follower chỉ XEM, không bật AUTO/REAL
   return (
-    <Card title="⚡ CONTROLS">
+    <Card title={`⚡ CONTROLS${isFollower ? " · 👁 READ-ONLY (FOLLOWER)" : ""}`}>
+      {isFollower && (
+        <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
+          🔒 Bạn đang ở FOLLOWER mode — KHÔNG được bật AUTO / đổi DRY/REAL / reset / clear / close.
+          Bấm CLAIM LEADER ở STATUS để takeover.
+        </Text>
+      )}
       <View style={styles.row}>
         <Toggle
           label={live.state.autoEnabled ? "AUTO ON" : "AUTO OFF"}
           on={live.state.autoEnabled}
           color={P.green}
-          disabled={!credsSet}
+          disabled={!credsSet || !canControl}
           onPress={() => live.setAutoEnabled(!live.state.autoEnabled)}
         />
         <Toggle
@@ -268,6 +276,7 @@ function ControlsCard({ live }: Props) {
           on={!live.state.dryRun}
           color={P.green}
           solidWhenOn
+          disabled={!canControl}
           onPress={() => live.setDryRun(!live.state.dryRun)}
         />
       </View>
@@ -276,14 +285,14 @@ function ControlsCard({ live }: Props) {
         {"\n"}💡 DRY RUN: chỉ giả lập, log vào HISTORY, KHÔNG gửi lên Binance.
         {"\n"}💡 REAL ORDERS (xanh): gửi MARKET + TP + SL thật, ăn tiền thật.
       </Text>
-      {!live.state.dryRun && (
+      {!live.state.dryRun && canControl && (
         <Text style={styles.warn}>🟢 REAL MODE — lệnh sẽ vào Binance bằng tiền thật.</Text>
       )}
-      {!credsSet && (
+      {!credsSet && canControl && (
         <Text style={styles.note}>Nhập API key trước khi bật AUTO.</Text>
       )}
       <View style={styles.row}>
-        {isPaused && (
+        {isPaused && canControl && (
           <TouchableOpacity onPress={live.resetCooldown} style={styles.btnGhost}>
             <Text style={styles.btnGhostText}>RESET COOLDOWN</Text>
           </TouchableOpacity>
@@ -291,9 +300,11 @@ function ControlsCard({ live }: Props) {
         <TouchableOpacity onPress={live.pullFromRemote} style={styles.btnGhost}>
           <Text style={styles.btnGhostText}>PULL FROM GIT</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={live.testNow} style={styles.btnGhost}>
-          <Text style={styles.btnGhostText}>TEST CONNECTION</Text>
-        </TouchableOpacity>
+        {canControl && (
+          <TouchableOpacity onPress={live.testNow} style={styles.btnGhost}>
+            <Text style={styles.btnGhostText}>TEST CONNECTION</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <Text style={styles.note}>
         💡 RESET COOLDOWN: bỏ qua pause sau daily-cap, resume ngay.
@@ -360,14 +371,20 @@ function CredentialsCard({ live }: Props) {
         autoCapitalize="none" autoCorrect={false}
         {...noCopyProps}
       />
-      <View style={styles.row}>
-        <TouchableOpacity onPress={handleSave} style={styles.btnPrimary}>
-          <Text style={styles.btnPrimaryText}>SAVE</Text>
-        </TouchableOpacity>
-        {credsSet && (
-          <Text style={[styles.note, { color: P.green, marginLeft: 6 }]}>✓ key đã lưu</Text>
-        )}
-      </View>
+      {live.role === "FOLLOWER" ? (
+        <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
+          🔒 FOLLOWER không cần nhập key (mirror state từ leader). CLAIM LEADER nếu muốn auto-trade ở máy này.
+        </Text>
+      ) : (
+        <View style={styles.row}>
+          <TouchableOpacity onPress={handleSave} style={styles.btnPrimary}>
+            <Text style={styles.btnPrimaryText}>SAVE</Text>
+          </TouchableOpacity>
+          {credsSet && (
+            <Text style={[styles.note, { color: P.green, marginLeft: 6 }]}>✓ key đã lưu</Text>
+          )}
+        </View>
+      )}
       {savedFlash && (
         <Text style={[styles.note, { color: P.green, fontWeight: "700" }]}>
           ✅ Đã lưu local. Bấm TEST CONNECTION để verify.
@@ -473,14 +490,20 @@ function SettingsCard({ live }: Props) {
         })}
       </View>
 
-      <View style={styles.row}>
-        <TouchableOpacity onPress={commit} style={styles.btnPrimary}>
-          <Text style={styles.btnPrimaryText}>SAVE + SYNC GIT</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={live.resetSettings} style={styles.btnGhost}>
-          <Text style={styles.btnGhostText}>RESET DEFAULT</Text>
-        </TouchableOpacity>
-      </View>
+      {live.role === "FOLLOWER" ? (
+        <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
+          🔒 FOLLOWER read-only — settings hiện đang mirror từ leader, không sửa được. Bấm CLAIM LEADER để đổi.
+        </Text>
+      ) : (
+        <View style={styles.row}>
+          <TouchableOpacity onPress={commit} style={styles.btnPrimary}>
+            <Text style={styles.btnPrimaryText}>SAVE + SYNC GIT</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={live.resetSettings} style={styles.btnGhost}>
+            <Text style={styles.btnGhostText}>RESET DEFAULT</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <Text style={styles.note}>
         Notional/lệnh = ${(draft.marginUsd * draft.leverage).toFixed(0)} ·
         max margin lock = ${(draft.marginUsd * draft.maxOpen).toFixed(0)}
@@ -521,6 +544,7 @@ function NumField({
 function TrackedPositionsCard({ live }: Props) {
   const tracked = live.state.trackedPositions;
   const cfg = live.state.settings;
+  const isFollower = live.role === "FOLLOWER";
   const longCount = tracked.filter((t) => t.side === "LONG").length;
   const shortCount = tracked.filter((t) => t.side === "SHORT").length;
   const markPrice = (() => {
@@ -588,9 +612,13 @@ function TrackedPositionsCard({ live }: Props) {
                     {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
                   </Text>
                   <View style={{ width: cols.action, alignItems: "center" }}>
-                    <TouchableOpacity onPress={() => handleClose(t.id, t.side, t.entryPrice)} style={styles.btnDanger}>
-                      <Text style={styles.btnDangerText}>✕ CLOSE</Text>
-                    </TouchableOpacity>
+                    {isFollower ? (
+                      <Text style={[styles.posCellSmall, { color: P.dim, textAlign: "center" }]}>read-only</Text>
+                    ) : (
+                      <TouchableOpacity onPress={() => handleClose(t.id, t.side, t.entryPrice)} style={styles.btnDanger}>
+                        <Text style={styles.btnDangerText}>✕ CLOSE</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               );
