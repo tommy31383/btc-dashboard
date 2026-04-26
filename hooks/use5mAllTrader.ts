@@ -11,8 +11,10 @@
 import { useEffect, useRef, useState } from "react";
 import {
   All5mAccount, AccountSummary, closePositionManual, emptyAccount,
-  loadAccount, processOpen, resetAccount, summarize, tryEntry5mBar,
+  loadAccount, processOpen, pullAccountFromGist, resetAccount, summarize, tryEntry5mBar,
 } from "../utils/all5mAccount";
+
+const FOLLOWER_PULL_MS = 30 * 1000;
 import { TFAnalysis, Kline, RawKlinesMap } from "./useBinanceKlines";
 
 const SR_LOOKBACK_15M = 50;
@@ -42,6 +44,7 @@ export function use5mAllTrader(
   tfData: TFAnalysis[],
   currentPrice: number | null,
   enabled: boolean,
+  isLeader: boolean = true,    // anh Tommy: chỉ leader run engine + push state lên gist; follower pull mirror
 ): Use5mAllTraderResult {
   const [account, setAccount] = useState<All5mAccount>(() => emptyAccount());
   const lastBarTimeRef = useRef<number>(0);
@@ -51,9 +54,9 @@ export function use5mAllTrader(
     loadAccount().then(setAccount);
   }, [enabled]);
 
-  // 5m bar đóng → try entry
+  // 5m bar đóng → try entry — CHỈ LEADER
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !isLeader) return;
     const klines5m: Kline[] | undefined = rawKlines["5m"];
     if (!klines5m || klines5m.length < 2) return;
     const closedBar = klines5m[klines5m.length - 2];
@@ -67,24 +70,40 @@ export function use5mAllTrader(
       const created = await tryEntry5mBar(closedBar.time, closedBar.close, stoch5m, support, resistance);
       if (created) setAccount(await loadAccount());
     })();
-  }, [enabled, rawKlines, tfData]);
+  }, [enabled, isLeader, rawKlines, tfData]);
 
-  // Tick → close OPEN khi hit TP/SL
+  // Tick → close OPEN khi hit TP/SL — CHỈ LEADER
   useEffect(() => {
-    if (!enabled || currentPrice === null || currentPrice <= 0) return;
+    if (!enabled || !isLeader || currentPrice === null || currentPrice <= 0) return;
     (async () => {
       const closed = await processOpen(currentPrice);
       if (closed > 0) setAccount(await loadAccount());
     })();
-  }, [enabled, currentPrice]);
+  }, [enabled, isLeader, currentPrice]);
+
+  // FOLLOWER: pull state mỗi 30s từ gist mirror
+  useEffect(() => {
+    if (!enabled || isLeader) return;
+    let alive = true;
+    const pull = async () => {
+      if (!alive) return;
+      const remote = await pullAccountFromGist();
+      if (alive && remote) setAccount(remote);
+    };
+    pull();
+    const id = setInterval(pull, FOLLOWER_PULL_MS);
+    return () => { alive = false; clearInterval(id); };
+  }, [enabled, isLeader]);
 
   const reset = async () => {
+    if (!isLeader) return; // follower không được reset
     const fresh = await resetAccount();
     lastBarTimeRef.current = 0;
     setAccount(fresh);
   };
   const reload = async () => setAccount(await loadAccount());
   const closeManual = async (positionId: string) => {
+    if (!isLeader) return; // follower không được close
     if (currentPrice === null || currentPrice <= 0) return;
     const ok = await closePositionManual(positionId, currentPrice);
     if (ok) setAccount(await loadAccount());

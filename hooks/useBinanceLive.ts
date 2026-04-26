@@ -309,8 +309,9 @@ export function useBinanceLive(
     })();
   }, [role, activeAlerts, dailyPnl, positions]);
 
-  // Poll Binance state every 30s when credentials present
+  // Poll Binance state every 30s — CHỈ LEADER (follower đọc snapshot từ gist)
   useEffect(() => {
+    if (role !== "LEADER") return;
     if (!state.apiKey || !state.apiSecret) return;
     let alive = true;
     const cred = { apiKey: state.apiKey, apiSecret: state.apiSecret };
@@ -332,14 +333,23 @@ export function useBinanceLive(
         setDailyPnl(pnl);
         setOpenOrders(ords);
         setRecentTrades(trades);
-        if (hedge !== stateRef.current.hedgeMode) {
-          const next = { ...stateRef.current, hedgeMode: hedge };
-          await engineSaveState(next, { sync: false });
-          setState(next);
-        }
+        // Push snapshot vào state để follower mirror
+        const snapshot = {
+          ts: Date.now(),
+          account: acc,
+          positions: pos,
+          openOrders: ords,
+          recentTrades: trades,
+          dailyPnl: pnl,
+        };
+        const updates: any = { binanceSnapshot: snapshot };
+        if (hedge !== stateRef.current.hedgeMode) updates.hedgeMode = hedge;
+        const next = { ...stateRef.current, ...updates };
+        await engineSaveState(next, { sync: true }); // sync: true → push gist debounce
+        setState(next);
         setLastError(null);
-        const next = await maybeTriggerCooldown(stateRef.current, pnl);
-        if (next !== stateRef.current) setState(next);
+        const next2 = await maybeTriggerCooldown(stateRef.current, pnl);
+        if (next2 !== stateRef.current) setState(next2);
       } catch (e: any) {
         if (!alive) return;
         setLastError(e?.message ?? String(e));
@@ -348,7 +358,19 @@ export function useBinanceLive(
     poll();
     const id = setInterval(poll, POLL_MS);
     return () => { alive = false; clearInterval(id); };
-  }, [state.apiKey, state.apiSecret]);
+  }, [role, state.apiKey, state.apiSecret]);
+
+  // FOLLOWER: render từ binanceSnapshot mirrored từ gist (không poll Binance trực tiếp)
+  useEffect(() => {
+    if (role !== "FOLLOWER") return;
+    const snap = state.binanceSnapshot;
+    if (!snap) return;
+    setAccount(snap.account);
+    setPositions(snap.positions || []);
+    setDailyPnl(snap.dailyPnl || 0);
+    setOpenOrders(snap.openOrders || []);
+    setRecentTrades(snap.recentTrades || []);
+  }, [role, state.binanceSnapshot]);
 
   // Plan B: monitor TP/SL mỗi tick price — CHỈ LEADER (follower mirror state, không tự close)
   useEffect(() => {

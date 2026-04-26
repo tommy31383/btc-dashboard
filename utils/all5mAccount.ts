@@ -11,8 +11,10 @@
  *   - Local PC only (AsyncStorage)
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { pullFile, scheduleFilePush } from "./gistSync";
 
 const STORAGE_KEY = "@all5m_data_v1";
+const REMOTE_FILE = "all5m_account.json";
 
 export const INITIAL_CAPITAL = 1000;
 export const MARGIN_PER_TRADE = 30;
@@ -96,14 +98,39 @@ export async function loadAccount(): Promise<All5mAccount> {
   } catch { return emptyAccount(); }
 }
 
-export async function saveAccount(acc: All5mAccount): Promise<void> {
+function isAll5mAccount(v: unknown): v is All5mAccount {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  return o.version === 1 && typeof o.capital === "number" && Array.isArray(o.positions);
+}
+
+export async function saveAccount(acc: All5mAccount, opts: { sync?: boolean } = {}): Promise<void> {
   acc.updatedAt = Date.now();
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(acc));
+  if (opts.sync !== false) {
+    // Leader push lên gist debounce 5s — follower pull mirror
+    scheduleFilePush(
+      REMOTE_FILE,
+      async () => acc,
+      () => `data: 5m ALL · ${acc.positions.filter(p => p.status === "OPEN").length} open · cap $${acc.capital.toFixed(0)}`,
+      5000,
+    );
+  }
+}
+
+/** Follower pull state từ gist + save local (KHÔNG push lại). Trả về account mới hoặc null. */
+export async function pullAccountFromGist(): Promise<All5mAccount | null> {
+  const remote = await pullFile<All5mAccount>(REMOTE_FILE, isAll5mAccount);
+  if (!remote) return null;
+  // Lưu local nhưng KHÔNG sync lại (tránh loop)
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+  return remote;
 }
 
 export async function resetAccount(): Promise<All5mAccount> {
   const fresh = emptyAccount();
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+  await saveAccount(fresh); // sync gist luôn
   return fresh;
 }
 

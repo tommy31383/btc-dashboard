@@ -94,6 +94,16 @@ export interface LiveJournalEntry {
   dryRun: boolean;
 }
 
+/** Snapshot từ Binance API — leader push để follower mirror (không cần API key trên follower). */
+export interface BinanceSnapshot {
+  ts: number;                       // lúc snapshot (ms)
+  account: any | null;              // AccountSnapshot — typed lỏng để khỏi cycle import
+  positions: any[];                 // PositionRisk[]
+  openOrders: any[];                // OpenOrder[]
+  recentTrades: any[];              // UserTrade[] (top 50)
+  dailyPnl: number;
+}
+
 /** State sync qua gist (KHÔNG có apiKey/secret) */
 export interface LiveSyncState {
   settings: LiveSettings;
@@ -108,6 +118,8 @@ export interface LiveSyncState {
   trackedPositions: TrackedPosition[];
   /** HTF rule fire → đợi LTF confirm (Phase 2) */
   pendingAlerts: PendingAlert[];
+  /** Snapshot Binance — leader poll xong push, follower đọc render */
+  binanceSnapshot?: BinanceSnapshot;
 }
 
 /** Full state in-memory (sync state + secrets) */
@@ -128,6 +140,7 @@ export function emptySyncState(): LiveSyncState {
     firedIds: {},
     trackedPositions: [],
     pendingAlerts: [],
+    binanceSnapshot: undefined,
   };
 }
 
@@ -207,6 +220,7 @@ export async function pullRemote(
       ...base,
       trackedPositions: remote.trackedPositions || [],
       pendingAlerts: remote.pendingAlerts || [],
+      binanceSnapshot: remote.binanceSnapshot,
     };
   }
   return base;
