@@ -68,7 +68,16 @@ function StatusBar({ live }: Props) {
   const isBoot = live.role === "BOOTING";
   const isDisconnected = live.role === "DISCONNECTED";
   const roleColor = isLeader ? P.green : isFollower ? P.bitcoinOrange : isDisconnected ? P.error : P.dim;
-  const roleLabel = isLeader ? "👑 LEADER" : isFollower ? "👁 FOLLOWER" : isDisconnected ? "⛔ DISCONNECTED" : "⏳ BOOTING";
+  const verifyLeftSec = Math.ceil(live.verifyLeftMs / 1000);
+  const roleLabel = isLeader
+    ? "👑 LEADER"
+    : isFollower
+    ? "👁 FOLLOWER"
+    : isDisconnected
+    ? "⛔ DISCONNECTED"
+    : isBoot && live.verifyLeftMs > 0
+    ? `⏳ VERIFYING ${verifyLeftSec}s`
+    : "⏳ BOOTING";
   // Leader info — phân biệt rõ 3 case: disconnected / có PAT đang push / LOCAL không PAT
   const leaderTxt = (() => {
     if (isDisconnected) return "⛔ Chưa nhập API key — KHÔNG tham gia leader election. Connect ở section CREDENTIALS bên dưới.";
@@ -85,6 +94,9 @@ function StatusBar({ live }: Props) {
     }
     if (isLeader && live.hasPat) {
       return `👉 BẠN (${live.deviceLabel || "?"}) — đang push lên GitHub gist lần đầu, chờ vài giây refresh...`;
+    }
+    if (isBoot && live.verifyLeftMs > 0) {
+      return `⏳ Đang verify leader claim trên gist · còn ${verifyLeftSec}s · sau đó hiển thị LEADER hoặc FOLLOWER chính xác`;
     }
     return "(chưa có leader)";
   })();

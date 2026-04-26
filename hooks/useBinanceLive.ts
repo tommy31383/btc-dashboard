@@ -47,6 +47,7 @@ export interface UseBinanceLiveResult {
   myIpLoc: IpLocation | null;        // IP + city/country của mình
   hasPat: boolean;                   // có GitHub Personal Access Token để sync multi-device không
   lastSyncMs: number;                // lần follower pull state cuối
+  verifyLeftMs: number;              // count down verify leader claim (3s sau push)
   claimLeadership: () => Promise<void>; // force takeover
   setMyDeviceLabel: (label: string) => Promise<void>;
   recheckPat: () => Promise<void>;       // re-run election để pick up PAT mới nhập (manual)
@@ -81,6 +82,8 @@ export function useBinanceLive(
   const [myIpLoc, setMyIpLoc] = useState<IpLocation | null>(null);
   const [hasPat, setHasPat] = useState<boolean>(false);
   const [lastSyncMs, setLastSyncMs] = useState<number>(0);
+  const [verifyLeftMs, setVerifyLeftMs] = useState<number>(0); // count-down verify leader claim
+  const verifyDeadlineRef = useRef<number>(0);
   const stateRef = useRef(state);
   stateRef.current = state;
   const roleRef = useRef(role);
@@ -112,16 +115,39 @@ export function useBinanceLive(
       setLastSyncMs(Date.now());
     } catch {}
     if (iAmLeader) {
-      setRole("LEADER");
-      pushLeader(myId, label, myIpLocRef.current).then(async (ok) => {
-        if (ok) {
-          const verify = await getLeaderInfo();
-          setLeader(verify);
-          if (verify && verify.deviceId !== myId && Date.now() - verify.lastBeatMs < 30_000) {
-            setRole("FOLLOWER");
-          }
-        }
-      }).catch(() => {});
+      // Set BOOTING (verifying) trước, KHÔNG vội set LEADER → tránh hiển thị nhầm khi race
+      setRole("BOOTING");
+      // Push lên gist
+      const ok = await pushLeader(myId, label, myIpLocRef.current);
+      if (!ok) {
+        // Push fail → giữ LEADER local nhưng warn
+        setRole("LEADER");
+        setLastError("⚠️ Push leader file fail — giữ LEADER local, sẽ retry mỗi heartbeat.");
+        return;
+      }
+      // Count down 3s cho gist propagate (UI hiện countdown qua verifyLeftMs)
+      const verifyDeadline = Date.now() + 3000;
+      verifyDeadlineRef.current = verifyDeadline;
+      setVerifyLeftMs(3000);
+      const tickId = setInterval(() => {
+        const left = Math.max(0, verifyDeadline - Date.now());
+        setVerifyLeftMs(left);
+        if (left <= 0) clearInterval(tickId);
+      }, 200);
+      await new Promise((r) => setTimeout(r, 3000));
+      clearInterval(tickId);
+      setVerifyLeftMs(0);
+      verifyDeadlineRef.current = 0;
+      // Verify ai là leader thực
+      const verify = await getLeaderInfo();
+      setLeader(verify);
+      if (verify && verify.deviceId === myId) {
+        setRole("LEADER");
+        setLastError(`👑 LEADER xác nhận — auto-trade chạy ở "${label}".`);
+      } else {
+        setRole("FOLLOWER");
+        setLastError(`👁 FOLLOWER — device khác "${verify?.deviceLabel ?? "?"}" thắng race claim leader.`);
+      }
     } else {
       setRole("FOLLOWER");
     }
@@ -370,7 +396,7 @@ export function useBinanceLive(
 
   return {
     state, account, positions, openOrders, recentTrades, dailyPnl, openCount, lastError,
-    role, leader, deviceId, deviceLabel, myIpLoc, hasPat, lastSyncMs,
+    role, leader, deviceId, deviceLabel, myIpLoc, hasPat, lastSyncMs, verifyLeftMs,
     async claimLeadership() {
       if (!deviceIdRef.current) return;
       const ok = await pushLeader(deviceIdRef.current, deviceLabelRef.current, myIpLocRef.current);
