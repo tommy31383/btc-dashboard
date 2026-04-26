@@ -466,7 +466,12 @@ export function useBinanceLive(
       await runElection(deviceIdRef.current, deviceLabelRef.current);
     },
     async setCredentials(apiKey, apiSecret) {
-      // Credentials lưu local only → cho phép cả follower set (không sync)
+      // Anh Tommy: follower chỉ được XEM, KHÔNG nhập credentials.
+      // Exception: device DISCONNECTED nhập key → trigger election (chuyển sang LEADER/FOLLOWER).
+      if (roleRef.current === "FOLLOWER") {
+        setLastError("🔒 FOLLOWER không được nhập credentials. Bấm CLAIM LEADER trước nếu muốn auto-trade ở máy này.");
+        return;
+      }
       const next = { ...stateRef.current, apiKey, apiSecret, leverageSetForSession: false };
       await saveState(next); setState(next);
     },

@@ -129,8 +129,12 @@ function StatusBar({ live }: Props) {
       return;
     }
     const ok = window.confirm(
-      `CLAIM LEADER?\n\nMáy này sẽ takeover auto-trade từ ${live.leader?.deviceLabel ?? "device hiện tại"}.\n` +
-      `Đảm bảo máy kia đã TẮT AUTO trước khi claim (tránh 2 máy cùng vào lệnh).`
+      `⚠️ CLAIM LEADER?\n\n` +
+      `Máy này sẽ ghi đè leader file trên gist.\n` +
+      `Máy "${live.leader?.deviceLabel ?? "?"}" sẽ TỰ ĐỘNG demote về FOLLOWER trong tối đa 20s ` +
+      `(khi tick check kế tiếp pull leader info từ gist).\n\n` +
+      `🚨 RISK: trong 20s overlap đó, NẾU máy kia vẫn AUTO ON + có rule fire → cả 2 máy cùng vào lệnh thật trên Binance.\n\n` +
+      `→ Khuyến cáo: SAU khi claim, ĐỢI 30s rồi mới bật AUTO ở máy này.`
     );
     if (!ok) return;
     live.claimLeadership();
