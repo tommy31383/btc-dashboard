@@ -36,6 +36,9 @@ export interface LiveSettings {
   stackMinEntryDistPct: number;     // entry mới xa entry gần nhất cùng side ≥ N% (default 0.3)
   /** Tổng notional (USD) cap CÙNG side — chống liquidation khi nhồi nhiều lệnh small qty (v4.4.8+) */
   stackMaxNotionalUsd: number;      // default 50000 = block nếu sum notional cùng side > 50k
+  /** Equity drawdown protection (anh Tommy v4.6.9): drop X% từ peak equity → pause auto Y giờ */
+  equityDdPausePct: number;         // default 30 — drop 30% từ peak → trigger pause
+  equityDdPauseHours: number;       // default 4 — pause N giờ sau trigger
 }
 
 /** Hard timeouts to prevent state from growing unbounded if data feeds stall. */
@@ -61,6 +64,8 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   stackPerSideSpacingMin: 0,     // 10 → 0 (giảm đáng kể bottleneck)
   stackMinEntryDistPct: 0,       // 0.3 → 0 (giảm bottleneck chính)
   stackMaxNotionalUsd: 200000,   // 50k → 200k (cho phép stack 50 lệnh)
+  equityDdPausePct: 30,          // drop 30% từ peak equity → pause
+  equityDdPauseHours: 4,         // pause 4h
 };
 
 export type LiveAction =
@@ -126,6 +131,10 @@ export interface LiveSyncState {
   pendingAlerts: PendingAlert[];
   /** Snapshot Binance — leader poll xong push, follower đọc render */
   binanceSnapshot?: BinanceSnapshot;
+  /** Peak equity USD (highest seen) — track cho equity DD protection (anh Tommy v4.6.9) */
+  peakEquityUsd?: number;
+  /** Pause reason để UI distinguish: "daily-cap" | "equity-dd" */
+  pauseReason?: "daily-cap" | "equity-dd" | null;
 }
 
 /** Full state in-memory (sync state + secrets) */
@@ -721,7 +730,50 @@ export async function monitorTrackedPositions(s: LiveTraderState, markPrice: num
 
 export async function maybeTriggerCooldown(s: LiveTraderState, dailyPnl: number): Promise<LiveTraderState> {
   if (dailyPnl <= s.settings.dailyLossCapUsd && s.pausedUntilMs < Date.now()) {
-    const next = { ...s, pausedUntilMs: Date.now() + s.settings.cooldownMinutes * 60_000 };
+    const next: LiveTraderState = {
+      ...s,
+      pausedUntilMs: Date.now() + s.settings.cooldownMinutes * 60_000,
+      pauseReason: "daily-cap",
+    };
+    await saveState(next);
+    return next;
+  }
+  return s;
+}
+
+/**
+ * Equity drawdown protection (anh Tommy v4.6.9 fix DD-44k% trong 2.5 tháng đầu backtest).
+ * Track peak equity (wallet + unrealized PnL). Nếu drop > equityDdPausePct% từ peak → pause auto.
+ *
+ * Gọi từ poll loop sau khi có snapshot account (LEADER only).
+ */
+export async function maybeTriggerEquityDdProtection(
+  s: LiveTraderState,
+  currentEquityUsd: number,
+): Promise<LiveTraderState> {
+  if (currentEquityUsd <= 0) return s;
+  const cfg = s.settings;
+  const prevPeak = s.peakEquityUsd ?? currentEquityUsd;
+  const newPeak = Math.max(prevPeak, currentEquityUsd);
+
+  // Nếu peak chưa thay đổi và current ≥ peak → không có DD, chỉ update peak nếu có
+  if (newPeak !== prevPeak) {
+    const next = { ...s, peakEquityUsd: newPeak };
+    await saveState(next, { sync: false });
+    return next;
+  }
+
+  // Compute drawdown từ peak
+  const ddPct = ((newPeak - currentEquityUsd) / newPeak) * 100;
+  if (ddPct >= cfg.equityDdPausePct && s.pausedUntilMs < Date.now()) {
+    // Trigger DD protection pause
+    const pauseMs = cfg.equityDdPauseHours * 3600_000;
+    const next: LiveTraderState = {
+      ...s,
+      peakEquityUsd: newPeak,
+      pausedUntilMs: Date.now() + pauseMs,
+      pauseReason: "equity-dd",
+    };
     await saveState(next);
     return next;
   }

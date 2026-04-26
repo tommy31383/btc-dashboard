@@ -232,8 +232,20 @@ function StatusBar({ live }: Props) {
         {upnl !== null && (
           <BigPill label="uPnL" value={`${upnl >= 0 ? "+" : ""}$${upnl.toFixed(2)}`} color={upnl >= 0 ? P.green : P.error} />
         )}
+        {/* Peak equity + current DD% (anh Tommy v4.6.9 Equity DD protection) */}
+        {live.state.peakEquityUsd && live.state.peakEquityUsd > 0 && wallet !== null && upnl !== null && (() => {
+          const cur = wallet + upnl;
+          const ddPct = ((live.state.peakEquityUsd - cur) / live.state.peakEquityUsd) * 100;
+          const ddColor = ddPct >= live.state.settings.equityDdPausePct ? P.error : ddPct >= live.state.settings.equityDdPausePct * 0.7 ? P.bitcoinOrange : P.dim;
+          return (
+            <>
+              <BigPill label="PEAK EQ" value={`$${live.state.peakEquityUsd.toFixed(2)}`} color={P.tertiary} />
+              <BigPill label="CUR DD%" value={`-${ddPct.toFixed(1)}%`} color={ddColor} />
+            </>
+          );
+        })()}
         {isPaused && (
-          <BigPill label="PAUSED" value={`${cooldownLeftM}m`} color={P.bitcoinOrange} />
+          <BigPill label={live.state.pauseReason === "equity-dd" ? "DD-PAUSED" : "PAUSED"} value={`${cooldownLeftM}m`} color={live.state.pauseReason === "equity-dd" ? P.error : P.bitcoinOrange} />
         )}
         <BigPill label="POS MODE" value={live.state.hedgeMode ? "HEDGE" : "ONE-WAY"} color={live.state.hedgeMode ? P.tertiary : P.text2} />
         {live.account?.multiAssetsMargin !== undefined && (
@@ -491,6 +503,17 @@ function SettingsCard({ live }: Props) {
         {"\n"}   App tự đóng đúng qty của lệnh khi mark price hit (Binance gộp position nhưng phần đóng đúng).
         {"\n"}💡 Spacing: tối thiểu N phút giữa 2 entry CÙNG side. 0 = tắt.
         {"\n"}💡 Min entry dist: entry mới phải xa entry gần nhất CÙNG side ≥ N% (tránh nhồi 1 vùng).
+      </Text>
+
+      <Text style={styles.subLabel}>🛡 EQUITY DD PROTECTION (anh Tommy v4.6.9)</Text>
+      <View style={styles.fieldRow}>
+        <NumField label="Drop từ peak (%)" value={draft.equityDdPausePct} onChangeNum={(v) => field("equityDdPausePct", Math.max(0, Math.min(100, v)))} step={5} />
+        <NumField label="Pause (giờ)" value={draft.equityDdPauseHours} onChangeNum={(v) => field("equityDdPauseHours", Math.max(0, Math.round(v)))} />
+      </View>
+      <Text style={styles.note}>
+        💡 App track peak equity (wallet + uPnL). Khi current equity drop X% từ peak → auto pause auto-trade Y giờ.
+        {"\n"}   Vd peak $100, drop 30% → equity $70 → pause 4h. Sau 4h auto resume.
+        {"\n"}   0% = tắt protection (KHÔNG khuyến cáo — backtest 3y có 1 đợt DD -76k% trong 2.5 tháng đầu).
       </Text>
 
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>

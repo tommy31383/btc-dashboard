@@ -13,6 +13,7 @@ import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
   monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual, reconcileTrackedPositions,
+  maybeTriggerEquityDdProtection,
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
@@ -381,6 +382,18 @@ export function useBinanceLive(
         if (recon.dropped === 0) setLastError(null);
         const next2 = await maybeTriggerCooldown(stateRef.current, pnl);
         if (next2 !== stateRef.current) setState(next2);
+        // Anh Tommy v4.6.9: Equity DD protection — pause auto khi equity drop X% từ peak
+        const wallet = parseFloat(acc.totalWalletBalance);
+        const upnl = parseFloat(acc.totalUnrealizedProfit);
+        const currentEquity = wallet + upnl;
+        const next3 = await maybeTriggerEquityDdProtection(stateRef.current, currentEquity);
+        if (next3 !== stateRef.current) {
+          setState(next3);
+          if (next3.pauseReason === "equity-dd") {
+            const ddPct = next3.peakEquityUsd ? ((next3.peakEquityUsd - currentEquity) / next3.peakEquityUsd * 100).toFixed(1) : "?";
+            setLastError(`🛑 EQUITY DD PROTECTION — drop ${ddPct}% từ peak $${next3.peakEquityUsd?.toFixed(2)} (current $${currentEquity.toFixed(2)}). Pause ${stateRef.current.settings.equityDdPauseHours}h.`);
+          }
+        }
       } catch (e: any) {
         if (!alive) return;
         setLastError(e?.message ?? String(e));
