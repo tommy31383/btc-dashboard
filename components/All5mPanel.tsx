@@ -110,8 +110,8 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.h1}>⚡ 5m ALL — STOCH + S/R</Text>
-          <Text style={styles.subtitle}>Paper test — chạy nền liên tục, không liên quan Binance</Text>
+          <Text style={styles.h1}>⚡ 5m ALL — RULE: BINANCE HEDGE</Text>
+          <Text style={styles.subtitle}>Paper test giả lập Cross + Hedge + Single · max 1 LONG + 1 SHORT</Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
           <Text style={styles.resetBtnText}>🗑 RESET</Text>
@@ -120,7 +120,10 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
 
       {/* RULE LOGIC */}
       <View style={styles.ruleBox}>
-        <Text style={styles.ruleTitle}>📋 RULE LOGIC — cách vào lệnh</Text>
+        <Text style={styles.ruleTitle}>📋 RULE: BINANCE HEDGE — giả lập Cross + Hedge + Single Asset</Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Mode:</Text> max <Text style={[styles.ruleNum, { color: P.green }]}>1 LONG</Text> + <Text style={[styles.ruleNum, { color: P.error }]}>1 SHORT</Text> cùng lúc (Hedge). Nếu đã có cùng side OPEN → skip entry.
+        </Text>
         <Text style={styles.ruleLine}>
           <Text style={styles.ruleStrong}>Trigger:</Text> mỗi cây 5m vừa đóng (close-bar evaluate)
         </Text>
@@ -141,7 +144,10 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           <Text style={styles.ruleStrong}>Risk:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Cooldown:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MS / 60000} phút</Text> giữa các entry · không vào trùng cây 5m · max parallel = capital / margin
+          <Text style={styles.ruleStrong}>Cooldown:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MS / 60000} phút</Text> giữa các entry · không vào trùng cây 5m
+        </Text>
+        <Text style={styles.ruleLine}>
+          <Text style={styles.ruleStrong}>Tên rule:</Text> <Text style={[styles.ruleNum, { color: P.tertiary }]}>BINANCE_HEDGE_5M_v1</Text> (paper test, mô phỏng exact setup live của Tommy)
         </Text>
       </View>
 

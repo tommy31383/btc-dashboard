@@ -143,6 +143,10 @@ export async function tryEntry5mBar(
   }
   if (!side || !source) return null;
 
+  // HEDGE rule: max 1 LONG + 1 SHORT cùng lúc. Nếu đã có OPEN cùng side → skip.
+  const hasSameSideOpen = acc.positions.some((p) => p.status === "OPEN" && p.side === side);
+  if (hasSameSideOpen) return null;
+
   const tpPrice = side === "LONG" ? fillPrice * (1 + TP_PCT / 100) : fillPrice * (1 - TP_PCT / 100);
   const slPrice = side === "LONG" ? fillPrice * (1 - SL_PCT / 100) : fillPrice * (1 + SL_PCT / 100);
 
