@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.3.73";
+const APP_VERSION = "4.3.74";
 const BUILD_DATE = "2026-04-25";
 
 /**
@@ -169,7 +169,7 @@ export default function App() {
   const autoTrader = useAutoTrader(activeAlerts, priceData?.price ?? null);
 
   // v4.3.52 — Binance Live (Phase 1 DRY RUN)
-  const live = useBinanceLive(activeAlerts);
+  const live = useBinanceLive(activeAlerts, priceData?.price ?? null);
 
   // v4.3.44 — 15m All trader: PC-only, local AsyncStorage, LONG every closed 15m bar
   // 15m All trader disabled — replaced by LIVE tab

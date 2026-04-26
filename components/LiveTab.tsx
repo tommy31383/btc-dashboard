@@ -61,6 +61,7 @@ function StatusBar({ live }: Props) {
         <BigPill label="MODE" value={live.state.dryRun ? "DRY" : "REAL"} color={live.state.dryRun ? P.dim : P.error} />
         <BigPill label="AUTO" value={live.state.autoEnabled ? "ON" : "OFF"} color={live.state.autoEnabled ? P.green : P.dim} />
         <BigPill label="OPEN" value={`${live.openCount}/${live.state.settings.maxOpen}`} color={P.text} />
+        <BigPill label="TRACKED" value={`${live.state.trackedPositions.length}`} color={P.tertiary} />
         <BigPill
           label="PnL TODAY"
           value={`${live.dailyPnl >= 0 ? "+" : ""}$${live.dailyPnl.toFixed(2)}`}
@@ -494,7 +495,7 @@ function RecentFillsCard({ live }: Props) {
 // ── HISTORY ─────────────────────────────────────────────────────────────────
 
 function HistoryCard({ live }: Props) {
-  const [filter, setFilter] = useState<"ALL" | "ENTRY" | "BLOCK" | "ERROR">("ALL");
+  const [filter, setFilter] = useState<"ALL" | "ENTRY" | "CLOSE" | "BLOCK" | "ERROR">("ALL");
   const [copyFlash, setCopyFlash] = useState(false);
   const items = useMemo(() => {
     const all = [...live.state.journal].slice(-200).reverse();
@@ -512,6 +513,7 @@ function HistoryCard({ live }: Props) {
       const a: any = j.action;
       let body = "";
       if (a.kind === "ENTRY") body = `ENTRY ${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
+      else if (a.kind === "CLOSE") body = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
       else if (a.kind === "BLOCK") body = `BLOCK · ${a.reason}`;
       else body = `ERROR · ${a.message}`;
       return `${dd}/${mo} ${hh}:${mi}  ${j.ruleId.padEnd(8)}  ${j.dryRun ? "[DRY] " : ""}${body}`;
@@ -529,7 +531,7 @@ function HistoryCard({ live }: Props) {
   return (
     <Card title={`📜 HISTORY · ${live.state.journal.length} total`}>
       <View style={styles.row}>
-        {(["ALL", "ENTRY", "BLOCK", "ERROR"] as const).map((f) => (
+        {(["ALL", "ENTRY", "CLOSE", "BLOCK", "ERROR"] as const).map((f) => (
           <TouchableOpacity key={f} onPress={() => setFilter(f)}
             style={[styles.filterChip, filter === f && styles.filterChipActive]}>
             <Text style={[styles.filterText, filter === f && { color: P.bitcoinOrange }]}>{f}</Text>
@@ -562,6 +564,9 @@ function JournalRow({ j }: { j: any }) {
   if (a.kind === "ENTRY") {
     color = a.side === "LONG" ? P.green : P.error;
     text = `${a.side} qty ${a.qty} @ $${a.entryPrice.toFixed(0)} → TP $${a.tpPrice.toFixed(0)} / SL $${a.slPrice.toFixed(0)}`;
+  } else if (a.kind === "CLOSE") {
+    color = a.trigger === "TP" ? P.green : P.error;
+    text = `CLOSE ${a.side} (${a.trigger}) qty ${a.qty} @ $${a.closePrice.toFixed(0)}`;
   } else if (a.kind === "BLOCK") {
     color = P.bitcoinOrange;
     text = `BLOCK · ${a.reason}`;

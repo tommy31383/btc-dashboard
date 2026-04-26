@@ -12,6 +12,7 @@ import { RuleAlert } from "./useRuleAlerts";
 import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
+  monitorTrackedPositions,
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
@@ -41,7 +42,7 @@ export interface UseBinanceLiveResult {
   pullFromRemote: () => Promise<void>;
 }
 
-export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult {
+export function useBinanceLive(activeAlerts: RuleAlert[], currentPrice: number | null = null): UseBinanceLiveResult {
   const [state, setState] = useState<LiveTraderState>(() => emptyState());
   const [account, setAccount] = useState<AccountSnapshot | null>(null);
   const [positions, setPositions] = useState<PositionRisk[]>([]);
@@ -135,6 +136,17 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
     const id = setInterval(poll, POLL_MS);
     return () => { alive = false; clearInterval(id); };
   }, [state.apiKey, state.apiSecret]);
+
+  // Plan B: monitor TP/SL mỗi tick price
+  useEffect(() => {
+    if (currentPrice === null || currentPrice <= 0) return;
+    if (!stateRef.current.trackedPositions.length) return;
+    if (stateRef.current.dryRun) return;
+    (async () => {
+      const next = await monitorTrackedPositions(stateRef.current, currentPrice);
+      if (next !== stateRef.current) setState(next);
+    })();
+  }, [currentPrice]);
 
   const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
 

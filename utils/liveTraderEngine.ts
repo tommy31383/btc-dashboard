@@ -40,8 +40,19 @@ export const DEFAULT_SETTINGS: LiveSettings = {
 
 export type LiveAction =
   | { kind: "ENTRY"; side: "LONG" | "SHORT"; entryPrice: number; tpPrice: number; slPrice: number; qty: number }
+  | { kind: "CLOSE"; side: "LONG" | "SHORT"; closePrice: number; qty: number; trigger: "TP" | "SL" }
   | { kind: "BLOCK"; reason: string }
   | { kind: "ERROR"; message: string };
+
+export interface TrackedPosition {
+  id: string;
+  side: "LONG" | "SHORT";
+  qty: number;
+  entryPrice: number;
+  tpPrice: number;
+  slPrice: number;
+  entryMs: number;
+}
 
 export interface LiveJournalEntry {
   ts: number;
@@ -61,6 +72,8 @@ export interface LiveSyncState {
   hedgeMode: boolean;       // detect từ /fapi/v1/positionSide/dual
   journal: LiveJournalEntry[];
   firedIds: Record<string, number>;
+  /** App tự monitor TP/SL (Plan B) — list các position đã mở chờ close khi giá hit */
+  trackedPositions: TrackedPosition[];
 }
 
 /** Full state in-memory (sync state + secrets) */
@@ -79,6 +92,7 @@ export function emptySyncState(): LiveSyncState {
     hedgeMode: false,
     journal: [],
     firedIds: {},
+    trackedPositions: [],
   };
 }
 
@@ -224,11 +238,22 @@ export async function executeAction(
   // Anh muốn đổi leverage → vào Binance app → BTCUSDT Futures → đóng position rồi đổi.
   try {
     const buySell: "BUY" | "SELL" = action.side === "LONG" ? "BUY" : "SELL";
-    const closeSide: "BUY" | "SELL" = action.side === "LONG" ? "SELL" : "BUY";
     const posSide: "LONG" | "SHORT" | undefined = s.hedgeMode ? action.side : undefined;
+    // Plan B: chỉ gửi MARKET entry. TP/SL app tự monitor mark price.
     await placeMarketOrder(cred, s.settings.symbol, buySell, action.qty, posSide);
-    await placeTakeProfitMarket(cred, s.settings.symbol, closeSide, action.tpPrice, action.qty, posSide);
-    await placeStopMarket(cred, s.settings.symbol, closeSide, action.slPrice, action.qty, posSide);
+    // Push vào trackedPositions để monitor
+    next = {
+      ...next,
+      trackedPositions: [...next.trackedPositions, {
+        id: alert.id,
+        side: action.side,
+        qty: action.qty,
+        entryPrice: action.entryPrice,
+        tpPrice: action.tpPrice,
+        slPrice: action.slPrice,
+        entryMs: Date.now(),
+      }],
+    };
   } catch (e: any) {
     const msg = e?.message ?? String(e);
     next = await logAction(next, alert.id, alert.tfKey, { kind: "ERROR", message: msg + explainBinanceError(msg) });
@@ -257,6 +282,51 @@ export function explainBinanceError(msg: string): string {
   if (msg.includes("-4120") || m.includes("algo order")) return "\n💡 Lỗi -4120: account đang ở Portfolio Margin hoặc Hedge Mode. Vào Binance: (1) Wallet → Portfolio Margin → DISABLE; (2) Trade → Position Mode → chọn 'One-way Mode'.";
   if (msg.includes("418") || m.includes("banned")) return "\n💡 IP bị Binance ban tạm thời (rate limit). Chờ vài phút.";
   return "";
+}
+
+/**
+ * Plan B monitor: scan trackedPositions, nếu mark price hit TP/SL → gửi MARKET close (reduceOnly).
+ * Gọi từ hook mỗi tick price update.
+ */
+export async function monitorTrackedPositions(s: LiveTraderState, markPrice: number): Promise<LiveTraderState> {
+  if (!s.trackedPositions.length || s.dryRun) return s;
+  if (!s.apiKey || !s.apiSecret) return s;
+  const cred: Credentials = { apiKey: s.apiKey, apiSecret: s.apiSecret };
+  let next = s;
+  const remaining: TrackedPosition[] = [];
+  for (const pos of s.trackedPositions) {
+    let trigger: "TP" | "SL" | null = null;
+    if (pos.side === "LONG") {
+      if (markPrice >= pos.tpPrice) trigger = "TP";
+      else if (markPrice <= pos.slPrice) trigger = "SL";
+    } else {
+      if (markPrice <= pos.tpPrice) trigger = "TP";
+      else if (markPrice >= pos.slPrice) trigger = "SL";
+    }
+    if (!trigger) {
+      remaining.push(pos);
+      continue;
+    }
+    // Hit → gửi MARKET close
+    const closeSide: "BUY" | "SELL" = pos.side === "LONG" ? "SELL" : "BUY";
+    const posSide: "LONG" | "SHORT" | undefined = s.hedgeMode ? pos.side : undefined;
+    try {
+      await placeMarketOrder(cred, s.settings.symbol, closeSide, pos.qty, posSide);
+      next = await logAction(next, pos.id, "live", {
+        kind: "CLOSE", side: pos.side, closePrice: markPrice, qty: pos.qty, trigger,
+      });
+    } catch (e: any) {
+      const msg = e?.message ?? String(e);
+      next = await logAction(next, pos.id, "live", { kind: "ERROR", message: `close ${trigger}: ${msg}` + explainBinanceError(msg) });
+      // Giữ lại trong remaining để retry tick sau
+      remaining.push(pos);
+    }
+  }
+  if (remaining.length !== s.trackedPositions.length) {
+    next = { ...next, trackedPositions: remaining };
+    await saveState(next);
+  }
+  return next;
 }
 
 export async function maybeTriggerCooldown(s: LiveTraderState, dailyPnl: number): Promise<LiveTraderState> {
