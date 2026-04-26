@@ -107,18 +107,18 @@ function StatusBar({ live }: Props) {
           </View>
         </View>
       )}
-      <View style={[styles.statusRow, { alignItems: "center" }]}>
+      <View style={styles.roleRow}>
         <BigPill label="ROLE" value={roleLabel} color={roleColor} />
-        <View style={{ flex: 1, marginHorizontal: 8 }}>
-          <Text style={[styles.note, { fontSize: 10 }]}>
+        <View style={styles.roleInfo}>
+          <Text style={[styles.note, { fontSize: 10 }]} numberOfLines={2}>
             <Text style={{ color: roleColor, fontWeight: "700" }}>{leaderTxt}</Text>
             {isFollower && ` · ${syncTxt}`}
-            {live.deviceId && ` · my id ${live.deviceId.slice(0, 6)}…`}
+            {live.deviceId && `\nmy id ${live.deviceId.slice(0, 6)}…`}
           </Text>
         </View>
         {!isLeader && !isBoot && (
-          <TouchableOpacity onPress={handleClaim} style={styles.btnDanger}>
-            <Text style={styles.btnDangerText}>CLAIM LEADER</Text>
+          <TouchableOpacity onPress={handleClaim} style={[styles.btnDanger, { marginLeft: 0 }]}>
+            <Text style={styles.btnDangerText}>🔒 CLAIM LEADER</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -445,7 +445,6 @@ function TrackedPositionsCard({ live }: Props) {
   const cfg = live.state.settings;
   const longCount = tracked.filter((t) => t.side === "LONG").length;
   const shortCount = tracked.filter((t) => t.side === "SHORT").length;
-  // Lấy mark price gần nhất từ Binance positions cho symbol chính
   const markPrice = (() => {
     const p = live.positions.find((x) => x.symbol === cfg.symbol);
     return p ? parseFloat(p.markPrice) : null;
@@ -461,47 +460,53 @@ function TrackedPositionsCard({ live }: Props) {
     <Card title={`🎯 SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
       <Text style={styles.note}>
         Mỗi virtual lệnh có entry/TP/SL/qty riêng. App tự đóng đúng qty của lệnh khi mark price hit (Plan B).
-        Binance gộp position cùng side, nhưng phần đóng = đúng qty của virtual lệnh.
       </Text>
       {tracked.length === 0 ? (
         <Text style={styles.note}>Chưa có virtual lệnh nào đang theo dõi.</Text>
       ) : (
-        tracked
-          .slice()
-          .sort((a, b) => b.entryMs - a.entryMs)
-          .map((t) => {
-            const sideColor = t.side === "LONG" ? P.green : P.error;
-            const upnlPct = markPrice !== null
-              ? (t.side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) / t.entryPrice * 100
-              : 0;
-            const distTp = markPrice !== null
-              ? Math.abs(t.tpPrice - markPrice) / markPrice * 100
-              : 0;
-            const distSl = markPrice !== null
-              ? Math.abs(t.slPrice - markPrice) / markPrice * 100
-              : 0;
-            const heldMin = Math.floor((Date.now() - t.entryMs) / 60000);
-            const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
-            return (
-              <View key={t.id} style={styles.posRow}>
-                <Text style={[styles.posCell, { width: 60, color: sideColor, fontWeight: "800" }]}>{t.side}</Text>
-                <Text style={[styles.posCell, { width: 130, color: P.tertiary, fontSize: 11, fontWeight: "700" }]}>{t.id}</Text>
-                <Text style={[styles.posCell, { width: 80 }]}>qty {t.qty}</Text>
-                <Text style={[styles.posCell, { width: 90 }]}>@ ${t.entryPrice.toFixed(1)}</Text>
-                <Text style={[styles.posCell, { width: 130, color: P.green, fontSize: 11 }]}>TP ${t.tpPrice.toFixed(1)} ({distTp.toFixed(2)}%)</Text>
-                <Text style={[styles.posCell, { width: 130, color: P.error, fontSize: 11 }]}>SL ${t.slPrice.toFixed(1)} ({distSl.toFixed(2)}%)</Text>
-                <Text style={[styles.posCell, { width: 60, color: P.dim, fontSize: 11 }]}>held {heldStr}</Text>
-                <Text style={[styles.posCell, { flex: 1, textAlign: "right", color: upnlPct >= 0 ? P.green : P.error, fontWeight: "700" }]}>
-                  {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
-                </Text>
+        tracked.slice().sort((a, b) => b.entryMs - a.entryMs).map((t) => {
+          const sideColor = t.side === "LONG" ? P.green : P.error;
+          const upnlPct = markPrice !== null
+            ? (t.side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) / t.entryPrice * 100
+            : 0;
+          const distTp = markPrice !== null ? Math.abs(t.tpPrice - markPrice) / markPrice * 100 : 0;
+          const distSl = markPrice !== null ? Math.abs(t.slPrice - markPrice) / markPrice * 100 : 0;
+          const heldMin = Math.floor((Date.now() - t.entryMs) / 60000);
+          const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
+          const upnlColor = upnlPct >= 0 ? P.green : P.error;
+          return (
+            <View key={t.id} style={styles.itemCard}>
+              <View style={styles.itemHeader}>
+                <Text style={[styles.itemSide, { color: sideColor }]}>{t.side}</Text>
+                <Text style={styles.itemRule}>{t.id}</Text>
+                <Text style={[styles.itemUpnl, { color: upnlColor }]}>{upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%</Text>
                 <TouchableOpacity onPress={() => handleClose(t.id, t.side, t.entryPrice)} style={styles.btnDanger}>
                   <Text style={styles.btnDangerText}>✕ CLOSE</Text>
                 </TouchableOpacity>
               </View>
-            );
-          })
+              <View style={styles.itemDetailGrid}>
+                <Detail label="ENTRY" value={`$${t.entryPrice.toFixed(1)}`} />
+                <Detail label="QTY" value={String(t.qty)} />
+                <Detail label="HELD" value={heldStr} />
+                <Detail label="TP" value={`$${t.tpPrice.toFixed(1)}`} sub={`${distTp.toFixed(2)}%`} subColor={P.green} />
+                <Detail label="SL" value={`$${t.slPrice.toFixed(1)}`} sub={`${distSl.toFixed(2)}%`} subColor={P.error} />
+              </View>
+            </View>
+          );
+        })
       )}
     </Card>
+  );
+}
+
+/** Compact label/value cell for mobile-friendly stacked detail grids. */
+function Detail({ label, value, sub, subColor }: { label: string; value: string; sub?: string; subColor?: string }) {
+  return (
+    <View style={styles.detailCell}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue}>{value}</Text>
+      {sub && <Text style={[styles.detailSub, { color: subColor || P.dim }]}>{sub}</Text>}
+    </View>
   );
 }
 
@@ -649,37 +654,40 @@ function OpenOrdersCard({ live }: Props) {
 // ── RECENT FILLS ────────────────────────────────────────────────────────────
 
 function RecentFillsCard({ live }: Props) {
-  // Sort newest first by time (Binance trả oldest first)
-  const trades = [...live.recentTrades].sort((a, b) => b.time - a.time).slice(0, 30);
+  // Sort newest first (Binance trả oldest first), limit 50
+  const trades = [...live.recentTrades].sort((a, b) => b.time - a.time).slice(0, 50);
+  const renderRow = (t: typeof trades[number]) => {
+    const pnl = parseFloat(t.realizedPnl);
+    const qty = parseFloat(t.qty);
+    const price = parseFloat(t.price);
+    const notional = qty * price;
+    const time = new Date(t.time);
+    const dd = String(time.getDate()).padStart(2, "0");
+    const mo = String(time.getMonth() + 1).padStart(2, "0");
+    const hh = String(time.getHours()).padStart(2, "0");
+    const mi = String(time.getMinutes()).padStart(2, "0");
+    return (
+      <View key={t.id} style={styles.posRow}>
+        <Text style={[styles.posCell, { width: 78, color: P.dim }]}>{dd}/{mo} {hh}:{mi}</Text>
+        <Text style={[styles.posCell, { width: 50, color: t.side === "BUY" ? P.green : P.error, fontWeight: "700" }]}>{t.side}</Text>
+        <Text style={[styles.posCell, { width: 80 }]}>${notional.toFixed(2)}</Text>
+        <Text style={[styles.posCell, { width: 90 }]}>@ ${price.toFixed(1)}</Text>
+        {pnl !== 0 && (
+          <Text style={[styles.posCell, { color: pnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "700" }]}>
+            {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
+          </Text>
+        )}
+      </View>
+    );
+  };
   return (
-    <Card title={`💱 RECENT FILLS · ${live.recentTrades.length}`}>
+    <Card title={`💱 RECENT FILLS · ${trades.length}/50 (scroll)`}>
       {trades.length === 0 ? (
         <Text style={styles.note}>Chưa có fill nào trong 50 lệnh gần nhất.</Text>
       ) : (
-        trades.map((t) => {
-          const pnl = parseFloat(t.realizedPnl);
-          const qty = parseFloat(t.qty);
-          const price = parseFloat(t.price);
-          const notional = qty * price;
-          const time = new Date(t.time);
-          const dd = String(time.getDate()).padStart(2, "0");
-          const mo = String(time.getMonth() + 1).padStart(2, "0");
-          const hh = String(time.getHours()).padStart(2, "0");
-          const mi = String(time.getMinutes()).padStart(2, "0");
-          return (
-            <View key={t.id} style={styles.posRow}>
-              <Text style={[styles.posCell, { width: 78, color: P.dim }]}>{dd}/{mo} {hh}:{mi}</Text>
-              <Text style={[styles.posCell, { width: 50, color: t.side === "BUY" ? P.green : P.error, fontWeight: "700" }]}>{t.side}</Text>
-              <Text style={[styles.posCell, { width: 80 }]}>${notional.toFixed(2)}</Text>
-              <Text style={[styles.posCell, { width: 90 }]}>@ ${price.toFixed(1)}</Text>
-              {pnl !== 0 && (
-                <Text style={[styles.posCell, { color: pnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "700" }]}>
-                  {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
-                </Text>
-              )}
-            </View>
-          );
-        })
+        <ScrollView style={styles.scrollList} nestedScrollEnabled showsVerticalScrollIndicator>
+          {trades.map(renderRow)}
+        </ScrollView>
       )}
     </Card>
   );
@@ -844,12 +852,14 @@ const styles = StyleSheet.create({
   profileLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, letterSpacing: 1 },
   profileAlias: { color: P.text, fontFamily: "monospace", fontSize: 14, fontWeight: "700", letterSpacing: 1, marginTop: 2 },
   statusRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  roleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 8 },
+  roleInfo: { flex: 1, minWidth: 140 },
   pill: {
     backgroundColor: P.elevated, borderWidth: 1, borderColor: P.border,
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 4, minWidth: 90, alignItems: "center",
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 4, minWidth: 76, alignItems: "center",
   },
   pillLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, letterSpacing: 1 },
-  pillValue: { fontFamily: "monospace", fontSize: 14, fontWeight: "900", marginTop: 2 },
+  pillValue: { fontFamily: "monospace", fontSize: 13, fontWeight: "900", marginTop: 2 },
   errorBar: { color: P.error, fontFamily: "monospace", fontSize: 11, marginTop: 8 },
 
   grid: { flexDirection: "column", gap: 12 },
@@ -895,11 +905,11 @@ const styles = StyleSheet.create({
   filterText: { color: P.dim, fontFamily: "monospace", fontWeight: "700", fontSize: 10, letterSpacing: 1 },
 
   posCard: { borderBottomWidth: 1, borderBottomColor: P.borderSoft, paddingVertical: 6 },
-  posRow: { flexDirection: "row", paddingVertical: 4, gap: 6, alignItems: "center" },
+  posRow: { flexDirection: "row", paddingVertical: 4, gap: 6, alignItems: "center", flexWrap: "wrap" },
   posCell: { color: P.text2, fontFamily: "monospace", fontSize: 11 },
   posCellSmall: { color: P.dim, fontFamily: "monospace", fontSize: 10 },
 
-  histRow: { flexDirection: "row", paddingVertical: 6, gap: 8, alignItems: "flex-start", borderBottomWidth: 1, borderBottomColor: P.borderSoft },
+  histRow: { flexDirection: "row", paddingVertical: 6, gap: 8, alignItems: "flex-start", borderBottomWidth: 1, borderBottomColor: P.borderSoft, flexWrap: "wrap" },
   histTime: { color: P.dim, fontFamily: "monospace", fontSize: 10, width: 78 },
   histRule: { fontFamily: "monospace", fontSize: 10, width: 90 },
   histRulePill: {
@@ -907,5 +917,23 @@ const styles = StyleSheet.create({
     borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, width: 100,
   },
   histRulePillText: { color: P.bitcoinOrange, fontFamily: "monospace", fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
-  histText: { fontFamily: "monospace", fontSize: 11, flex: 1, lineHeight: 16 },
+  histText: { fontFamily: "monospace", fontSize: 11, flex: 1, lineHeight: 16, minWidth: 200 },
+
+  // Scrollable list inside a Card (cap chiều cao để không chiếm hết màn hình)
+  scrollList: { maxHeight: 380 },
+
+  // SMART STACK card-style item layout (mobile-friendly stacked detail grid)
+  itemCard: {
+    borderBottomWidth: 1, borderBottomColor: P.borderSoft,
+    paddingVertical: 8, gap: 6,
+  },
+  itemHeader: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  itemSide: { fontFamily: "monospace", fontSize: 13, fontWeight: "900", letterSpacing: 1, minWidth: 56 },
+  itemRule: { color: P.tertiary, fontFamily: "monospace", fontSize: 11, fontWeight: "700", flexShrink: 1 },
+  itemUpnl: { fontFamily: "monospace", fontSize: 13, fontWeight: "800", marginLeft: "auto" },
+  itemDetailGrid: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+  detailCell: { minWidth: 80, paddingVertical: 2 },
+  detailLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, letterSpacing: 1 },
+  detailValue: { color: P.text, fontFamily: "monospace", fontSize: 12, fontWeight: "700", marginTop: 1 },
+  detailSub: { fontFamily: "monospace", fontSize: 10, marginTop: 1 },
 });

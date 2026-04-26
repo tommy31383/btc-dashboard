@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   section: { marginBottom: 18 },
   sectionTitle: { color: P.text, fontSize: 13, fontWeight: "700", marginBottom: 8, letterSpacing: 0.4 },
   empty: { color: P.dim, fontStyle: "italic", paddingVertical: 8, fontSize: 12 },
-  row: { flexDirection: "row", alignItems: "center", paddingVertical: 5, borderBottomColor: P.borderSoft, borderBottomWidth: 1, gap: 10 },
+  row: { flexDirection: "row", alignItems: "center", paddingVertical: 5, borderBottomColor: P.borderSoft, borderBottomWidth: 1, gap: 10, flexWrap: "wrap" },
   cellW: { flexBasis: 110, flexShrink: 0, fontFamily: "JetBrainsMono_500Medium", fontSize: 11 },
   cellNarrow: { flexBasis: 70, flexShrink: 0, fontFamily: "JetBrainsMono_500Medium", fontSize: 11 },
   filterRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
