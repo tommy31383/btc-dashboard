@@ -80,7 +80,9 @@ function StatusBar({ live }: Props) {
         )}
       </View>
       {live.lastError && (
-        <Text style={styles.errorBar}>❌ {live.lastError}</Text>
+        <Text style={[styles.errorBar, { color: live.lastError.startsWith("✅") ? P.green : P.error }]}>
+          {live.lastError}
+        </Text>
       )}
     </View>
   );

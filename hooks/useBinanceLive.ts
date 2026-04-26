@@ -162,11 +162,17 @@ export function useBinanceLive(activeAlerts: RuleAlert[]): UseBinanceLiveResult 
       await saveState(next); setState(next);
     },
     async testNow() {
+      const cur = stateRef.current;
+      if (!cur.apiKey || !cur.apiSecret) {
+        setLastError("Chưa nhập API key/secret. SAVE trước khi TEST.");
+        return;
+      }
       try {
-        const acc = await testConnection({ apiKey: state.apiKey, apiSecret: state.apiSecret });
-        setAccount(acc); setLastError(null);
+        const acc = await testConnection({ apiKey: cur.apiKey, apiSecret: cur.apiSecret });
+        setAccount(acc);
+        setLastError(`✅ Connected · wallet $${parseFloat(acc.totalWalletBalance).toFixed(2)} · avail $${parseFloat(acc.availableBalance).toFixed(2)}`);
       } catch (e: any) {
-        setLastError(e?.message ?? String(e));
+        setLastError("❌ " + (e?.message ?? String(e)));
       }
     },
     async pullFromRemote() {
