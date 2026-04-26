@@ -558,6 +558,26 @@
         "slPct": 2
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777234125738,
+      "ruleId": "1h:26",
+      "tfKey": "1h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777234125746,
+      "ruleId": "1h:25",
+      "tfKey": "1h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
@@ -641,26 +661,7 @@
       "entryMs": 1777188934835
     }
   ],
-  "pendingAlerts": [
-    {
-      "id": "1h:26",
-      "tfKey": "1h",
-      "side": "LONG",
-      "htfEntryPrice": 78250,
-      "tpPct": 3,
-      "slPct": 2,
-      "addedMs": 1777234005752
-    },
-    {
-      "id": "1h:25",
-      "tfKey": "1h",
-      "side": "LONG",
-      "htfEntryPrice": 78250,
-      "tpPct": 3,
-      "slPct": 2,
-      "addedMs": 1777234005762
-    }
-  ],
+  "pendingAlerts": [],
   "binanceSnapshot": {
     "ts": 1777234065982,
     "account": {
