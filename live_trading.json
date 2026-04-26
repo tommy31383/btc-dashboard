@@ -362,6 +362,16 @@
         "reason": "rule no longer firing"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777213305646,
+      "ruleId": "1h:24",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack price too close (0.19% < 0.3%) to last LONG @77968.82"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
