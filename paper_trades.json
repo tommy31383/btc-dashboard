@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1777208168141,
+  "updatedAt": 1777208651668,
   "trades": [
     {
       "id": "m7tjater5q",
@@ -3441,6 +3441,25 @@
       "exitPrice": 79366.2,
       "leveragedPnlPct": -200,
       "closedMs": 1777208148138
+    },
+    {
+      "id": "sq3xvzxq4b",
+      "ruleId": "5m:1",
+      "tfKey": "5m",
+      "side": "LONG",
+      "status": "LOSS",
+      "entryPrice": 77798.01,
+      "slPrice": 79353.9702,
+      "tpPrice": 74686.08959999999,
+      "leverage": 100,
+      "targetPct": 4,
+      "stopPct": 2,
+      "maxHoldBars": 50,
+      "openedMs": 1777208631399,
+      "deadlineMs": 1777223400000,
+      "exitPrice": 79353.9702,
+      "leveragedPnlPct": -200,
+      "closedMs": 1777208631665
     }
   ]
 }
