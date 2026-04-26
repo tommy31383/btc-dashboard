@@ -161,6 +161,10 @@ export async function getLeaderInfo(): Promise<LeaderInfo | null> {
   return await pullFile<LeaderInfo>(LEADER_FILE, isLeaderInfo);
 }
 
+/** Last error message từ pushLeader (cho UI debug). */
+let lastPushError: string | null = null;
+export function getLeaderPushError(): string | null { return lastPushError; }
+
 /**
  * Push lock file với info đầy đủ. Caller PHẢI verify lại bằng getLeaderInfo() sau ~1s
  * để chắc chắn không bị race (2 device cùng claim).
@@ -179,7 +183,18 @@ export async function pushLeader(
     country: loc?.country,
     city: loc?.city,
   };
-  return await pushFile(LEADER_FILE, info, `live: leader heartbeat (${deviceLabel})`);
+  try {
+    const ok = await pushFile(LEADER_FILE, info, `live: leader heartbeat (${deviceLabel})`);
+    if (!ok) {
+      lastPushError = "Worker/GitHub trả lỗi (xem console). Có thể PAT thiếu quyền Contents:Write.";
+    } else {
+      lastPushError = null;
+    }
+    return ok;
+  } catch (e: any) {
+    lastPushError = e?.message ?? String(e);
+    return false;
+  }
 }
 
 /** Cho phép claim không? true nếu file rỗng / leader cũ chết / mình đã là leader. */

@@ -120,9 +120,11 @@ export function useBinanceLive(
       // Push lên gist
       const ok = await pushLeader(myId, label, myIpLocRef.current);
       if (!ok) {
-        // Push fail → giữ LEADER local nhưng warn
+        // Push fail → giữ LEADER local + báo rõ lỗi (PAT thiếu quyền? Worker fail?)
         setRole("LEADER");
-        setLastError("⚠️ Push leader file fail — giữ LEADER local, sẽ retry mỗi heartbeat.");
+        const { getLeaderPushError } = await import("../utils/leaderElection");
+        const err = getLeaderPushError();
+        setLastError(`⚠️ PUSH LEADER FAIL: ${err || "không rõ"}\n→ Check Cloudflare Worker GH_PAT có quyền Contents:Write trên repo không. App đang chạy LOCAL mode.`);
         return;
       }
       // Count down 3s cho gist propagate (UI hiện countdown qua verifyLeftMs)
