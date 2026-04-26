@@ -14,7 +14,7 @@ import {
   loadAccount, processOpen, pullAccountFromGist, resetAccount, summarize, tryEntry5mBar,
 } from "../utils/all5mAccount";
 
-const FOLLOWER_PULL_MS = 60 * 1000; // anh Tommy v4.5.2: 30s → 60s
+const FOLLOWER_PULL_MS = 120 * 1000; // anh Tommy v4.5.3: 60s → 120s
 import { TFAnalysis, Kline, RawKlinesMap } from "./useBinanceKlines";
 
 const SR_LOOKBACK_15M = 50;

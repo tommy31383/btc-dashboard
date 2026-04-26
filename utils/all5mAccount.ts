@@ -108,12 +108,12 @@ export async function saveAccount(acc: All5mAccount, opts: { sync?: boolean } = 
   acc.updatedAt = Date.now();
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(acc));
   if (opts.sync !== false) {
-    // Leader push lên gist — debounce 10s (anh Tommy v4.5.2: 5s → 10s)
+    // Leader push lên gist — debounce 20s (anh Tommy v4.5.3: 10s → 20s)
     scheduleFilePush(
       REMOTE_FILE,
       async () => acc,
       () => `data: 5m ALL · ${acc.positions.filter(p => p.status === "OPEN").length} open · cap $${acc.capital.toFixed(0)}`,
-      10000,
+      20000,
     );
   }
 }

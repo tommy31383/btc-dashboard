@@ -19,11 +19,11 @@ const DEVICE_LABEL_KEY = "@device_label";
 const IP_LOC_CACHE_KEY = "@ip_loc_cache";
 const LEADER_FILE = "live_leader.json";
 
-// PA B timing — anh Tommy v4.5.2: tăng gấp đôi để tiết kiệm Cloudflare Worker req
-export const HEARTBEAT_INTERVAL_MS = 30_000;       // 15s → 30s
-export const HEARTBEAT_JITTER_MS = 4_000;          // 2s → 4s
-export const LEADER_CHECK_INTERVAL_MS = 40_000;    // 20s → 40s
-export const LEADER_TIMEOUT_MS = 90_000;           // 45s → 90s (3-strike: miss 3 heartbeat 30s)
+// PA B timing — anh Tommy v4.5.3: tăng x2 nữa (tổng x4 so với original)
+export const HEARTBEAT_INTERVAL_MS = 60_000;       // 30s → 60s (1 phút)
+export const HEARTBEAT_JITTER_MS = 8_000;          // 4s → 8s
+export const LEADER_CHECK_INTERVAL_MS = 80_000;    // 40s → 80s
+export const LEADER_TIMEOUT_MS = 180_000;          // 90s → 180s (3 phút - 3-strike miss 3 heartbeat 60s)
 
 const IP_CACHE_TTL_MS = 60 * 60 * 1000; // 1h
 
