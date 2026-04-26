@@ -155,6 +155,11 @@ function StatusBar({ live }: Props) {
               <Text style={styles.btnDangerText}>🔒 CLAIM LEADER</Text>
             </TouchableOpacity>
           )}
+          {isLeader && !live.hasPat && !isDisconnected && (
+            <TouchableOpacity onPress={() => live.recheckPat()} style={styles.btnGhost}>
+              <Text style={styles.btnGhostText}>🔄 RECHECK PAT</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       {isFollower && (

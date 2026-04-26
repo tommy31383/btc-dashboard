@@ -49,6 +49,7 @@ export interface UseBinanceLiveResult {
   lastSyncMs: number;                // lần follower pull state cuối
   claimLeadership: () => Promise<void>; // force takeover
   setMyDeviceLabel: (label: string) => Promise<void>;
+  recheckPat: () => Promise<void>;       // re-run election để pick up PAT mới nhập (manual)
   setCredentials: (apiKey: string, apiSecret: string) => Promise<void>;
   setAutoEnabled: (on: boolean) => Promise<void>;
   setDryRun: (on: boolean) => Promise<void>;
@@ -155,6 +156,22 @@ export function useBinanceLive(
     if (!state.apiKey || !state.apiSecret) return;
     runElection(deviceId, deviceLabelRef.current);
   }, [deviceId, state.apiKey, state.apiSecret]);
+
+  // Auto-poll PAT mỗi 30s nếu đang LOCAL mode (LEADER + chưa có PAT) → khi user nhập PAT
+  // ở DASHBOARD → tự động phát hiện và re-run election để chuyển sang gist sync mode.
+  useEffect(() => {
+    if (!deviceId) return;
+    if (roleRef.current !== "LEADER" || hasPat) return;
+    let alive = true;
+    const id = setInterval(async () => {
+      if (!alive) return;
+      const cfg = await getGistConfig();
+      if (cfg.pat && alive) {
+        await runElection(deviceIdRef.current, deviceLabelRef.current);
+      }
+    }, 30_000);
+    return () => { alive = false; clearInterval(id); };
+  }, [deviceId, hasPat, role]);
 
   // Leader: heartbeat 15s + jitter ±2s (PA B - tránh 2 device push collision)
   useEffect(() => {
@@ -384,6 +401,10 @@ export function useBinanceLive(
       if (roleRef.current === "LEADER") {
         await pushLeader(deviceIdRef.current, trimmed, myIpLocRef.current);
       }
+    },
+    async recheckPat() {
+      if (!deviceIdRef.current) return;
+      await runElection(deviceIdRef.current, deviceLabelRef.current);
     },
     async setCredentials(apiKey, apiSecret) {
       // Credentials lưu local only → cho phép cả follower set (không sync)
