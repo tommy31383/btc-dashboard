@@ -189,7 +189,6 @@ function ControlsCard({ live }: Props) {
 function CredentialsCard({ live }: Props) {
   const [keyDraft, setKeyDraft] = useState(live.state.apiKey);
   const [secretDraft, setSecretDraft] = useState(live.state.apiSecret);
-  const [show, setShow] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const credsSet = !!live.state.apiKey && !!live.state.apiSecret;
 
@@ -199,33 +198,41 @@ function CredentialsCard({ live }: Props) {
     setTimeout(() => setSavedFlash(false), 3000);
   }
 
+  // Web-only props ngăn copy/cut/right-click context menu trên RN-web → forward to <input>.
+  // Chỉ cho phép paste (default) + nhập tay. Không cho show, không cho copy ra.
+  const noCopyProps: any = {
+    onCopy: (e: any) => e.preventDefault?.(),
+    onCut: (e: any) => e.preventDefault?.(),
+    onContextMenu: (e: any) => e.preventDefault?.(),
+  };
+
   return (
     <Card title="🔐 CREDENTIALS (local only — KHÔNG sync)">
       <Text style={styles.warn}>
         ⚠️ DISABLE quyền "Withdrawal" trên API key. Chỉ enable Futures + Trading.
+        {"\n"}🔒 Nhập / paste vào được, KHÔNG show / copy ra để tránh lộ key.
       </Text>
       <TextInput
-        placeholder="API Key"
+        placeholder="API Key (paste vào)"
         placeholderTextColor={P.dim}
         value={keyDraft}
         onChangeText={setKeyDraft}
         style={styles.input}
-        secureTextEntry={!show}
+        secureTextEntry={true}
         autoCapitalize="none" autoCorrect={false}
+        {...noCopyProps}
       />
       <TextInput
-        placeholder="API Secret"
+        placeholder="API Secret (paste vào)"
         placeholderTextColor={P.dim}
         value={secretDraft}
         onChangeText={setSecretDraft}
         style={styles.input}
-        secureTextEntry={!show}
+        secureTextEntry={true}
         autoCapitalize="none" autoCorrect={false}
+        {...noCopyProps}
       />
       <View style={styles.row}>
-        <TouchableOpacity onPress={() => setShow((v) => !v)} style={styles.btnGhost}>
-          <Text style={styles.btnGhostText}>{show ? "👁 hide" : "👁 show"}</Text>
-        </TouchableOpacity>
         <TouchableOpacity onPress={handleSave} style={styles.btnPrimary}>
           <Text style={styles.btnPrimaryText}>SAVE</Text>
         </TouchableOpacity>
