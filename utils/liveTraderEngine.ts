@@ -12,6 +12,7 @@ import {
   Credentials, notionalToQty, placeMarketOrder, placeStopMarket, placeTakeProfitMarket, setLeverage,
 } from "./binanceLive";
 import { pullFile, scheduleFilePush } from "./gistSync";
+import { notify, playSlHit, playTpHit, playEntry } from "./liveAlerts";
 
 const STORAGE_KEY = "@live_trader_v2";
 const SECRET_KEY = "@live_trader_secret_v1";
@@ -33,6 +34,8 @@ export interface LiveSettings {
   stackMaxPerSide: number;          // tối đa N lệnh cùng side (default 15)
   stackPerSideSpacingMin: number;   // tối thiểu N phút giữa 2 entry CÙNG side (default 10)
   stackMinEntryDistPct: number;     // entry mới xa entry gần nhất cùng side ≥ N% (default 0.3)
+  /** Tổng notional (USD) cap CÙNG side — chống liquidation khi nhồi nhiều lệnh small qty (v4.4.8+) */
+  stackMaxNotionalUsd: number;      // default 50000 = block nếu sum notional cùng side > 50k
 }
 
 /** Hard timeouts to prevent state from growing unbounded if data feeds stall. */
@@ -55,6 +58,7 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   stackMaxPerSide: 15,
   stackPerSideSpacingMin: 10,
   stackMinEntryDistPct: 0.3,
+  stackMaxNotionalUsd: 50000,
 };
 
 export type LiveAction =
@@ -273,9 +277,18 @@ export function checkStackGate(
   const maxPerSide = cfg.stackMaxPerSide;
   const spacingMs = cfg.stackPerSideSpacingMin * 60_000;
   const minDistPct = cfg.stackMinEntryDistPct;
+  const maxNotionalUsd = cfg.stackMaxNotionalUsd;
   const sameSide = s.trackedPositions.filter((p) => p.side === side);
   if (sameSide.length >= maxPerSide) {
     return `stack full ${sameSide.length}/${maxPerSide} ${side}`;
+  }
+  // Notional cap CÙNG side — chống liquidation
+  if (maxNotionalUsd > 0) {
+    const currentNotional = sameSide.reduce((sum, p) => sum + p.qty * p.entryPrice, 0);
+    const newOrderNotional = cfg.marginUsd * cfg.leverage;
+    if (currentNotional + newOrderNotional > maxNotionalUsd) {
+      return `stack notional cap ${side}: current $${currentNotional.toFixed(0)} + new $${newOrderNotional.toFixed(0)} > $${maxNotionalUsd} (chống liquidation)`;
+    }
   }
   if (sameSide.length > 0) {
     const lastSame = sameSide.reduce((a, b) => (a.entryMs > b.entryMs ? a : b));
@@ -486,6 +499,15 @@ export async function executeAction(
         entryMs: Date.now(),
       }],
     };
+    // Notify + sound (anh Tommy v4.4.8+)
+    try {
+      playEntry();
+      notify({
+        title: `🔔 ENTRY ${action.side} ${alert.id}`,
+        body: `qty ${action.qty} @ $${action.entryPrice.toFixed(0)} → TP $${action.tpPrice.toFixed(0)} / SL $${action.slPrice.toFixed(0)}`,
+        tag: `entry-${alert.id}-${Date.now()}`,
+      });
+    } catch {}
   } catch (e: any) {
     const msg = e?.message ?? String(e);
     next = await logAction(next, alert.id, alert.tfKey, { kind: "ERROR", message: msg + explainBinanceError(msg) });
@@ -514,6 +536,59 @@ export function explainBinanceError(msg: string): string {
   if (msg.includes("-4120") || m.includes("algo order")) return "\n💡 Lỗi -4120: account đang ở Portfolio Margin hoặc Hedge Mode. Vào Binance: (1) Wallet → Portfolio Margin → DISABLE; (2) Trade → Position Mode → chọn 'One-way Mode'.";
   if (msg.includes("418") || m.includes("banned")) return "\n💡 IP bị Binance ban tạm thời (rate limit). Chờ vài phút.";
   return "";
+}
+
+/**
+ * Reconcile trackedPositions với Binance positions thực tế (anh Tommy v4.4.8+).
+ * Sau app crash hoặc restart, trackedPositions có thể KHÁC actual Binance position
+ * (qty đã close manually, hoặc position bị Binance cancel) → drop tracked entries
+ * không còn nằm trong Binance position thực + log warning.
+ *
+ * Strategy: tổng abs(positionAmt) cùng side phải >= sum(qty) của trackedPositions cùng side.
+ * Nếu Binance qty < tracked qty → có position đã close ngoài app → drop tracked dư.
+ */
+export async function reconcileTrackedPositions(
+  s: LiveTraderState,
+  binancePositions: { positionAmt: string; positionSide?: string }[],
+): Promise<{ next: LiveTraderState; dropped: number; warning: string | null }> {
+  if (!s.trackedPositions.length) return { next: s, dropped: 0, warning: null };
+  // Tính tổng qty Binance theo side
+  let binanceLong = 0, binanceShort = 0;
+  for (const p of binancePositions) {
+    const amt = parseFloat(p.positionAmt) || 0;
+    if (p.positionSide === "LONG") binanceLong += Math.abs(amt);
+    else if (p.positionSide === "SHORT") binanceShort += Math.abs(amt);
+    else if (amt > 0) binanceLong += amt;
+    else if (amt < 0) binanceShort += Math.abs(amt);
+  }
+  // Tổng qty tracked theo side
+  const trackedLong = s.trackedPositions.filter((t) => t.side === "LONG").reduce((sum, t) => sum + t.qty, 0);
+  const trackedShort = s.trackedPositions.filter((t) => t.side === "SHORT").reduce((sum, t) => sum + t.qty, 0);
+  const tolBtc = 0.0005; // 0.0005 BTC ~$30 tolerance
+  const longMismatch = trackedLong - binanceLong > tolBtc;
+  const shortMismatch = trackedShort - binanceShort > tolBtc;
+  if (!longMismatch && !shortMismatch) return { next: s, dropped: 0, warning: null };
+  // Có mismatch → drop tracked positions từ cũ nhất theo side đang dư
+  let trackedPositions = [...s.trackedPositions];
+  let dropped = 0;
+  const dropDebt = (side: "LONG" | "SHORT", debt: number) => {
+    const sorted = trackedPositions.filter((t) => t.side === side).sort((a, b) => a.entryMs - b.entryMs);
+    let remaining = debt;
+    const toDrop = new Set<string>();
+    for (const t of sorted) {
+      if (remaining <= 0) break;
+      toDrop.add(t.id);
+      remaining -= t.qty;
+    }
+    trackedPositions = trackedPositions.filter((t) => !toDrop.has(t.id));
+    dropped += toDrop.size;
+  };
+  if (longMismatch) dropDebt("LONG", trackedLong - binanceLong);
+  if (shortMismatch) dropDebt("SHORT", trackedShort - binanceShort);
+  const next: LiveTraderState = { ...s, trackedPositions };
+  await saveState(next);
+  const warning = `⚠️ Reconcile: Binance position khác app (${dropped} tracked dropped). LONG ${trackedLong}→${binanceLong}, SHORT ${trackedShort}→${binanceShort}.`;
+  return { next, dropped, warning };
 }
 
 /**
@@ -590,6 +665,25 @@ export async function monitorTrackedPositions(s: LiveTraderState, markPrice: num
       next = await logAction(next, pos.id, "live", {
         kind: "CLOSE", side: pos.side, closePrice: markPrice, qty: pos.qty, trigger,
       });
+      // Notify + sound (anh Tommy v4.4.8+) — SL urgent, TP nhẹ
+      try {
+        if (trigger === "SL") {
+          playSlHit();
+          notify({
+            title: `🚨 SL HIT — ${pos.side} ${pos.id}`,
+            body: `Closed ${pos.qty} @ $${markPrice.toFixed(0)} (entry $${pos.entryPrice.toFixed(0)})`,
+            tag: `sl-${pos.id}`,
+            urgent: true,
+          });
+        } else {
+          playTpHit();
+          notify({
+            title: `✅ TP HIT — ${pos.side} ${pos.id}`,
+            body: `Closed ${pos.qty} @ $${markPrice.toFixed(0)} (entry $${pos.entryPrice.toFixed(0)})`,
+            tag: `tp-${pos.id}`,
+          });
+        }
+      } catch {}
     } catch (e: any) {
       const msg = e?.message ?? String(e);
       next = await logAction(next, pos.id, "live", { kind: "ERROR", message: `close ${trigger}: ${msg}` + explainBinanceError(msg) });

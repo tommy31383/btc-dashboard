@@ -440,8 +440,13 @@ function SettingsCard({ live }: Props) {
       </View>
       <View style={styles.fieldRow}>
         <NumField label="Min entry dist (%)" value={draft.stackMinEntryDistPct} onChangeNum={(v) => field("stackMinEntryDistPct", Math.max(0, v))} step={0.05} />
-        <View style={{ flex: 1 }} />
+        <NumField label="Max notional CÙNG side ($)" value={draft.stackMaxNotionalUsd} onChangeNum={(v) => field("stackMaxNotionalUsd", Math.max(0, Math.round(v)))} step={1000} />
       </View>
+      <Text style={styles.note}>
+        💡 Max notional: tổng size ($) cùng side ≤ N → chống liquidation khi nhồi nhiều lệnh small qty.
+        {"\n"}   Vd: marginUsd $1 × lev 100 = notional $100/lệnh. 15 lệnh = $1500. Cap $50k thừa thoải mái.
+        {"\n"}   Lưu ý: cap quá thấp sẽ block lệnh hợp lệ. 0 = tắt cap.
+      </Text>
       <Text style={styles.note}>
         💡 Cho phép nhiều lệnh CÙNG side; mỗi lệnh TP/SL riêng (Plan B monitor).
         {"\n"}   App tự đóng đúng qty của lệnh khi mark price hit (Binance gộp position nhưng phần đóng đúng).

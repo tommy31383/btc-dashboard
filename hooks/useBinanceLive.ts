@@ -12,7 +12,7 @@ import { RuleAlert } from "./useRuleAlerts";
 import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
-  monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual,
+  monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual, reconcileTrackedPositions,
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
@@ -26,6 +26,7 @@ import {
   LEADER_CHECK_INTERVAL_MS,
 } from "../utils/leaderElection";
 import { getGistConfig } from "../utils/gistSync";
+import { ensureNotificationPermission } from "../utils/liveAlerts";
 
 const POLL_MS = 30 * 1000;
 const FOLLOWER_PULL_MS = 30 * 1000;     // follower pull live_trading.json mỗi 30s
@@ -117,6 +118,8 @@ export function useBinanceLive(
     if (iAmLeader) {
       // Set BOOTING (verifying) trước, KHÔNG vội set LEADER → tránh hiển thị nhầm khi race
       setRole("BOOTING");
+      // Request browser notification permission (chạy 1 lần trên LEADER) — không block boot
+      ensureNotificationPermission().catch(() => {});
       // Push lên gist
       const ok = await pushLeader(myId, label, myIpLocRef.current);
       if (!ok) {
@@ -346,10 +349,16 @@ export function useBinanceLive(
         };
         const updates: any = { binanceSnapshot: snapshot };
         if (hedge !== stateRef.current.hedgeMode) updates.hedgeMode = hedge;
-        const next = { ...stateRef.current, ...updates };
-        await engineSaveState(next, { sync: true }); // sync: true → push gist debounce
+        let next = { ...stateRef.current, ...updates };
+        // Reconcile trackedPositions với Binance position thực tế (anh Tommy: chống stale state sau crash)
+        const recon = await reconcileTrackedPositions(next, pos);
+        if (recon.dropped > 0 && recon.warning) {
+          setLastError(recon.warning);
+        }
+        next = recon.next;
+        await engineSaveState(next, { sync: true });
         setState(next);
-        setLastError(null);
+        if (recon.dropped === 0) setLastError(null);
         const next2 = await maybeTriggerCooldown(stateRef.current, pnl);
         if (next2 !== stateRef.current) setState(next2);
       } catch (e: any) {
