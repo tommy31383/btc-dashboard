@@ -7,11 +7,11 @@
       "ruleId": "5m:1",
       "tfKey": "5m",
       "side": "LONG",
-      "status": "PENDING",
+      "status": "OPEN",
       "ruleEntryPrice": 78031.72,
       "limitPrice": 77953.68828,
-      "slPrice": 79592.3544,
-      "tpPrice": 74910.4512,
+      "slPrice": 76394.6145144,
+      "tpPrice": 81071.8358112,
       "marginUsd": 30,
       "leverage": 100,
       "notionalUsd": 3000,
@@ -21,7 +21,10 @@
       "barMs": 300000,
       "createdMs": 1777239705757,
       "limitExpiresMs": 1777240005757,
-      "entryTfKey": "1m"
+      "entryTfKey": "1m",
+      "entryPrice": 77953.68828,
+      "openedMs": 1777239931112,
+      "entryMode": "limit_filled"
     },
     {
       "id": "auto_1777224249890_kj7vqc",
@@ -476,5 +479,5 @@
     "totalPnLUsd": 28.60857480320395,
     "lastResetMs": 1777052014772
   },
-  "updatedAt": 1777239705758
+  "updatedAt": 1777239931112
 }
