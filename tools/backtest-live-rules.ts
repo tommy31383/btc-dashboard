@@ -1249,11 +1249,28 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     blockedByRule[pr.ruleId] = 0;
   }
 
+  // Anh Tommy v4.6.9: Equity DD Protection — track peak equity, pause khi drop > X%
+  // Configurable via CLI: --ddPause=30 (default 30% drop) --ddHours=4 (default 4h pause)
+  const EQUITY_DD_PAUSE_PCT = parseFloat(args.find((a) => a.startsWith("--ddPause="))?.replace("--ddPause=", "") || "30");
+  const EQUITY_DD_PAUSE_HOURS = parseFloat(args.find((a) => a.startsWith("--ddHours="))?.replace("--ddHours=", "") || "4");
+  const startCapital = STACK_CFG.marginUsd * 100; // $100 starting capital
+  let cumPnlUsd = 0;
+  let peakEquity = startCapital;
+  let ddPausedUntilMs = 0;
+  let ddPauseTriggers = 0;
+  let ddBlockedCount = 0;
+
   let positions: VirtualPosition[] = [];
   const allComboTrades: TradeOutcome[] = [];
 
   for (const c of allCandidates) {
     const nowMs = c.entryTime;
+
+    // Equity DD Protection: skip nếu đang trong pause window
+    if (EQUITY_DD_PAUSE_PCT > 0 && nowMs < ddPausedUntilMs) {
+      ddBlockedCount++;
+      continue;
+    }
 
     // Cleanup positions đã exit trước nowMs
     positions = positions.filter((p) => p.exitMs > nowMs);
@@ -1298,7 +1315,21 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     };
     tradesByRule[c.ruleId].push(trade);
     allComboTrades.push(trade);
+
+    // Update equity tracking + check DD trigger sau khi trade close (exitMs)
+    const pnlUsd = sim.pnlPct * STACK_CFG.leverage * STACK_CFG.marginUsd - 2 * FEE_PER_SIDE * STACK_CFG.leverage * STACK_CFG.marginUsd / 100;
+    cumPnlUsd += pnlUsd;
+    const equity = startCapital + cumPnlUsd;
+    peakEquity = Math.max(peakEquity, equity);
+    if (EQUITY_DD_PAUSE_PCT > 0 && peakEquity > 0) {
+      const ddPct = ((peakEquity - equity) / peakEquity) * 100;
+      if (ddPct >= EQUITY_DD_PAUSE_PCT && ddPausedUntilMs < exitMs) {
+        ddPausedUntilMs = exitMs + EQUITY_DD_PAUSE_HOURS * 3600_000;
+        ddPauseTriggers++;
+      }
+    }
   }
+  console.log(`  Equity DD: ${ddPauseTriggers} pause triggers, ${ddBlockedCount} candidates blocked by DD pause`);
 
   const comboResults: RuleResult[] = perRuleData.map((pr) => summarizeTrades(
     pr.ruleId, pr.tfKey, pr.forceSide, pr.ruleName,
