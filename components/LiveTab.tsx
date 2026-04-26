@@ -654,6 +654,7 @@ function OpenOrdersCard({ live }: Props) {
 // ── RECENT FILLS ────────────────────────────────────────────────────────────
 
 function RecentFillsCard({ live }: Props) {
+  const [expanded, setExpanded] = useState(false);
   // Sort newest first (Binance trả oldest first), limit 50
   const trades = [...live.recentTrades].sort((a, b) => b.time - a.time).slice(0, 50);
   const renderRow = (t: typeof trades[number]) => {
@@ -681,15 +682,18 @@ function RecentFillsCard({ live }: Props) {
     );
   };
   return (
-    <Card title={`💱 RECENT FILLS · ${trades.length}/50 (scroll)`}>
-      {trades.length === 0 ? (
-        <Text style={styles.note}>Chưa có fill nào trong 50 lệnh gần nhất.</Text>
-      ) : (
-        <ScrollView style={styles.scrollList} nestedScrollEnabled showsVerticalScrollIndicator>
-          {trades.map(renderRow)}
-        </ScrollView>
+    <View style={styles.card}>
+      <TouchableOpacity onPress={() => setExpanded((v) => !v)} style={styles.collapsibleHeader}>
+        <Text style={styles.cardTitle}>{expanded ? "▼" : "▶"} 💱 RECENT FILLS · {trades.length}/50</Text>
+      </TouchableOpacity>
+      {expanded && (
+        <View style={styles.cardBody}>
+          {trades.length === 0
+            ? <Text style={styles.note}>Chưa có fill nào trong 50 lệnh gần nhất.</Text>
+            : trades.map(renderRow)}
+        </View>
       )}
-    </Card>
+    </View>
   );
 }
 
@@ -919,8 +923,8 @@ const styles = StyleSheet.create({
   histRulePillText: { color: P.bitcoinOrange, fontFamily: "monospace", fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
   histText: { fontFamily: "monospace", fontSize: 11, flex: 1, lineHeight: 16, minWidth: 200 },
 
-  // Scrollable list inside a Card (cap chiều cao để không chiếm hết màn hình)
-  scrollList: { maxHeight: 380 },
+  // Collapsible header — toàn bộ title chứa cả ▼/▶ icon
+  collapsibleHeader: { borderBottomWidth: 0 },
 
   // SMART STACK card-style item layout (mobile-friendly stacked detail grid)
   itemCard: {
