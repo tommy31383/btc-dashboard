@@ -590,21 +590,21 @@ function TrackedPositionsCard({ live }: Props) {
 
 function PositionsCard({ live }: Props) {
   const open = live.positions.filter((p) => parseFloat(p.positionAmt) !== 0);
-  // Pre-build TP/SL lookup from open orders (closePosition=true, side ngược position)
+  // Pre-build TP/SL lookup từ open orders Binance (fallback nếu không có trackedPositions)
   const tpslBySide: { LONG?: { tp?: number; sl?: number }; SHORT?: { tp?: number; sl?: number } } = {};
   for (const o of live.openOrders) {
     if (!o.closePosition) continue;
-    // SELL closePosition → close LONG; BUY closePosition → close SHORT
     const positionSide: "LONG" | "SHORT" = o.side === "SELL" ? "LONG" : "SHORT";
     if (!tpslBySide[positionSide]) tpslBySide[positionSide] = {};
     const price = parseFloat(o.stopPrice || o.price || "0");
     if (o.type.includes("TAKE_PROFIT")) tpslBySide[positionSide]!.tp = price;
     else if (o.type.includes("STOP")) tpslBySide[positionSide]!.sl = price;
   }
+  // Mobile-friendly card stacking layout
   return (
     <Card title={`📍 OPEN POSITIONS · ${open.length}`}>
       {open.length === 0 ? (
-        <Text style={styles.note}>Không có position nào mở.</Text>
+        <Text style={styles.note}>Không có position nào mở trên Binance.</Text>
       ) : (
         open.map((p, i) => {
           const amt = parseFloat(p.positionAmt);
@@ -613,13 +613,11 @@ function PositionsCard({ live }: Props) {
           const upnl = parseFloat(p.unRealizedProfit);
           const lev = parseInt(p.leverage, 10) || 1;
           const side: "LONG" | "SHORT" = amt > 0 ? "LONG" : "SHORT";
-          // ROE = uPnL / margin (margin = notional / lev)
           const notional = Math.abs(amt) * entry;
           const margin = notional / lev;
           const roe = margin > 0 ? (upnl / margin) * 100 : 0;
           const trackedForSide = live.state.trackedPositions.filter((t) => t.side === side);
           const ruleIds = trackedForSide.map((t) => t.id).join(", ");
-          // Plan B: TP/SL từ app trackedPositions (KHÔNG phải Binance order). Fallback Binance tpsl nếu có.
           const trackedTpSl = trackedForSide.length > 0
             ? { tp: trackedForSide[0].tpPrice, sl: trackedForSide[0].slPrice }
             : null;
@@ -627,73 +625,48 @@ function PositionsCard({ live }: Props) {
           const tpDist = tpsl.tp ? ((tpsl.tp - mark) / mark) * 100 : null;
           const slDist = tpsl.sl ? ((tpsl.sl - mark) / mark) * 100 : null;
           const ctrlBy = trackedForSide.length > 0 ? "APP" : (tpslBySide[side]?.tp || tpslBySide[side]?.sl) ? "BINANCE" : "NONE";
+          const ctrlColor = ctrlBy === "APP" ? P.tertiary : ctrlBy === "BINANCE" ? P.bitcoinOrange : P.error;
+          const sideColor = side === "LONG" ? P.green : P.error;
+          const upnlColor = upnl >= 0 ? P.green : P.error;
           return (
-            <View key={i} style={styles.posCard}>
-              <Text style={[styles.posCellSmall, { color: ruleIds ? P.tertiary : P.dim, marginBottom: 4 }]} numberOfLines={1}>
-                {ruleIds ? `📌 rule: ${ruleIds}` : "📌 manual / không track (đặt trước hoặc app restart)"}
-              </Text>
-              <View style={styles.posRow}>
-                <Text style={[styles.posCell, { color: side === "LONG" ? P.green : P.error, width: 56, fontWeight: "800" }]}>{side}</Text>
-                <Text style={[styles.posCell, { width: 70 }]}>{p.symbol}</Text>
-                <Text style={[styles.posCell, { width: 56, color: P.bitcoinOrange }]}>{lev}x</Text>
-                <Text style={[styles.posCell, { color: upnl >= 0 ? P.green : P.error, flex: 1, textAlign: "right", fontWeight: "800", fontSize: 13 }]}>
-                  {upnl >= 0 ? "+" : ""}${upnl.toFixed(2)}
-                </Text>
-                <Text style={[styles.posCell, { color: roe >= 0 ? P.green : P.error, width: 70, textAlign: "right", fontWeight: "700" }]}>
-                  ({roe >= 0 ? "+" : ""}{roe.toFixed(1)}%)
+            <View key={i} style={styles.itemCard}>
+              <View style={styles.itemHeader}>
+                <Text style={[styles.itemSide, { color: sideColor }]}>{side}</Text>
+                <Text style={styles.itemRule} numberOfLines={1}>{p.symbol} · {lev}x</Text>
+                <Text style={[styles.itemUpnl, { color: upnlColor }]}>
+                  {upnl >= 0 ? "+" : ""}${upnl.toFixed(2)} ({roe >= 0 ? "+" : ""}{roe.toFixed(1)}%)
                 </Text>
               </View>
-              <View style={styles.posRow}>
-                <Text style={[styles.posCellSmall, { width: 110 }]}>
-                  size ${notional.toFixed(2)}
-                </Text>
-                <Text style={[styles.posCellSmall, { width: 70 }]}>
-                  ({Math.abs(amt)} BTC)
-                </Text>
-                <Text style={[styles.posCellSmall, { marginLeft: 10 }]}>margin ${margin.toFixed(2)}</Text>
-              </View>
-              <View style={styles.posRow}>
-                <Text style={[styles.posCellSmall, { width: 110 }]}>entry ${entry.toFixed(1)}</Text>
-                <Text style={[styles.posCellSmall, { width: 110 }]}>mark ${mark.toFixed(1)}</Text>
-                <Text style={[styles.posCellSmall, { flex: 1, textAlign: "right", color: P.dim }]}>
-                  Δ {(((mark - entry) / entry) * 100).toFixed(3)}%
-                </Text>
-              </View>
-              <View style={styles.posRow}>
-                {tpsl.tp ? (
-                  <Text style={[styles.posCellSmall, { color: P.green, width: 140 }]}>
-                    TP ${tpsl.tp.toFixed(1)} ({tpDist! >= 0 ? "+" : ""}{tpDist!.toFixed(2)}%)
-                  </Text>
-                ) : <Text style={[styles.posCellSmall, { width: 140, color: P.dim }]}>TP —</Text>}
-                {tpsl.sl ? (
-                  <Text style={[styles.posCellSmall, { color: P.error, width: 140 }]}>
-                    SL ${tpsl.sl.toFixed(1)} ({slDist! >= 0 ? "+" : ""}{slDist!.toFixed(2)}%)
-                  </Text>
-                ) : <Text style={[styles.posCellSmall, { width: 140, color: P.dim }]}>SL —</Text>}
+              <View style={styles.itemDetailGrid}>
+                <Detail label="ENTRY" value={`$${entry.toFixed(1)}`} />
+                <Detail label="MARK" value={`$${mark.toFixed(1)}`} sub={`Δ ${(((mark - entry) / entry) * 100).toFixed(3)}%`} subColor={P.dim} />
+                <Detail label="SIZE" value={`$${notional.toFixed(0)}`} sub={`${Math.abs(amt)} BTC`} subColor={P.dim} />
+                <Detail label="MARGIN" value={`$${margin.toFixed(2)}`} />
+                <Detail label="TP" value={tpsl.tp ? `$${tpsl.tp.toFixed(1)}` : "—"} sub={tpDist !== null ? `${tpDist >= 0 ? "+" : ""}${tpDist.toFixed(2)}%` : ""} subColor={P.green} />
+                <Detail label="SL" value={tpsl.sl ? `$${tpsl.sl.toFixed(1)}` : "—"} sub={slDist !== null ? `${slDist >= 0 ? "+" : ""}${slDist.toFixed(2)}%` : ""} subColor={P.error} />
                 {parseFloat(p.liquidationPrice) > 0 && (
-                  <Text style={[styles.posCellSmall, { color: P.bitcoinOrange, flex: 1, textAlign: "right" }]}>
-                    LIQ ${parseFloat(p.liquidationPrice).toFixed(1)}
-                  </Text>
+                  <Detail label="LIQ" value={`$${parseFloat(p.liquidationPrice).toFixed(1)}`} subColor={P.bitcoinOrange} />
                 )}
               </View>
-              <View style={styles.posRow}>
-                <Text style={[styles.posCellSmall, {
-                  color: ctrlBy === "APP" ? P.tertiary : ctrlBy === "BINANCE" ? P.bitcoinOrange : P.error,
-                  fontWeight: "700",
-                }]}>
-                  ⚙️ TP/SL controlled by: {ctrlBy === "APP" ? "APP (self-monitor)" : ctrlBy === "BINANCE" ? "BINANCE (orders)" : "NONE — không có TP/SL!"}
-                </Text>
-                {trackedForSide.length > 1 && (
-                  <Text style={[styles.posCellSmall, { color: P.dim, marginLeft: 8 }]}>
-                    ({trackedForSide.length} tracked)
-                  </Text>
-                )}
-              </View>
+              <Text style={[styles.note, { fontSize: 10, marginTop: 4, color: ctrlColor, fontWeight: "700" }]} numberOfLines={2}>
+                ⚙️ TP/SL: {ctrlBy === "APP" ? `APP self-monitor (${trackedForSide.length} tracked${ruleIds ? ` · ${ruleIds}` : ""})` : ctrlBy === "BINANCE" ? "BINANCE orders" : "NONE — chưa có TP/SL!"}
+              </Text>
             </View>
           );
         })
       )}
     </Card>
+  );
+}
+
+/** Compact label/value cell — dùng cho mobile-friendly stacked detail grid. */
+function Detail({ label, value, sub, subColor }: { label: string; value: string; sub?: string; subColor?: string }) {
+  return (
+    <View style={styles.detailCell}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue}>{value}</Text>
+      {sub && <Text style={[styles.detailSub, { color: subColor || P.dim }]}>{sub}</Text>}
+    </View>
   );
 }
 
@@ -866,14 +839,15 @@ function JournalRow({ j }: { j: any }) {
     text = `ERROR · ${a.message}`;
   }
   return (
-    <View style={styles.histRow}>
-      <Text style={styles.histTime}>{dd}/{mm} {hh}:{mi}</Text>
-      <View style={styles.histRulePill}>
-        <Text style={styles.histRulePillText} numberOfLines={1}>📌 {j.ruleId}</Text>
+    <View style={styles.journalCard}>
+      <View style={styles.journalHeader}>
+        <Text style={styles.journalTime}>{dd}/{mm} {hh}:{mi}</Text>
+        <View style={styles.journalKindPill}>
+          <Text style={[styles.journalKindText, { color }]}>{a.kind}{j.dryRun && a.kind === "ENTRY" ? " [DRY]" : ""}</Text>
+        </View>
+        <Text style={styles.journalRule} numberOfLines={1}>📌 {j.ruleId}</Text>
       </View>
-      <Text style={[styles.histText, { color }]} numberOfLines={6}>
-        {j.dryRun && a.kind === "ENTRY" ? "[DRY] " : ""}{text}
-      </Text>
+      <Text style={[styles.journalBody, { color }]}>{text}</Text>
     </View>
   );
 }
@@ -1009,4 +983,25 @@ const styles = StyleSheet.create({
   tblHeader: { backgroundColor: P.elevated, borderBottomColor: P.border, borderBottomWidth: 2 },
   tblHeadCell: { color: P.dim, fontFamily: "monospace", fontSize: 9, fontWeight: "800", letterSpacing: 1 },
   tblCell: { color: P.text2, fontFamily: "monospace", fontSize: 11 },
+
+  // Mobile-friendly card layout (PositionsCard, etc)
+  itemCard: { borderBottomWidth: 1, borderBottomColor: P.borderSoft, paddingVertical: 8, gap: 6 },
+  itemHeader: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  itemSide: { fontFamily: "monospace", fontSize: 13, fontWeight: "900", letterSpacing: 1, minWidth: 56 },
+  itemRule: { color: P.tertiary, fontFamily: "monospace", fontSize: 11, fontWeight: "700", flexShrink: 1, minWidth: 80 },
+  itemUpnl: { fontFamily: "monospace", fontSize: 13, fontWeight: "800", marginLeft: "auto" },
+  itemDetailGrid: { flexDirection: "row", gap: 10, flexWrap: "wrap", marginTop: 2 },
+  detailCell: { minWidth: 78, paddingVertical: 2 },
+  detailLabel: { color: P.dim, fontFamily: "monospace", fontSize: 9, letterSpacing: 1 },
+  detailValue: { color: P.text, fontFamily: "monospace", fontSize: 12, fontWeight: "700", marginTop: 1 },
+  detailSub: { fontFamily: "monospace", fontSize: 10, marginTop: 1 },
+
+  // Mobile-friendly journal layout (HistoryCard)
+  journalCard: { borderBottomWidth: 1, borderBottomColor: P.borderSoft, paddingVertical: 8, gap: 4 },
+  journalHeader: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  journalTime: { color: P.dim, fontFamily: "monospace", fontSize: 10 },
+  journalKindPill: { backgroundColor: P.elevated, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: P.borderSoft },
+  journalKindText: { fontFamily: "monospace", fontSize: 10, fontWeight: "800", letterSpacing: 0.5 },
+  journalRule: { color: P.bitcoinOrange, fontFamily: "monospace", fontSize: 10, fontWeight: "700", flexShrink: 1 },
+  journalBody: { fontFamily: "monospace", fontSize: 11, lineHeight: 16 },
 });
