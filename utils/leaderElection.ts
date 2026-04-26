@@ -19,11 +19,11 @@ const DEVICE_LABEL_KEY = "@device_label";
 const IP_LOC_CACHE_KEY = "@ip_loc_cache";
 const LEADER_FILE = "live_leader.json";
 
-// PA B timing
-export const HEARTBEAT_INTERVAL_MS = 15_000;
-export const HEARTBEAT_JITTER_MS = 2_000;
-export const LEADER_CHECK_INTERVAL_MS = 20_000;
-export const LEADER_TIMEOUT_MS = 45_000; // 3-strike: leader phải miss 3 lần heartbeat 15s mới declare chết
+// PA B timing — anh Tommy v4.5.2: tăng gấp đôi để tiết kiệm Cloudflare Worker req
+export const HEARTBEAT_INTERVAL_MS = 30_000;       // 15s → 30s
+export const HEARTBEAT_JITTER_MS = 4_000;          // 2s → 4s
+export const LEADER_CHECK_INTERVAL_MS = 40_000;    // 20s → 40s
+export const LEADER_TIMEOUT_MS = 90_000;           // 45s → 90s (3-strike: miss 3 heartbeat 30s)
 
 const IP_CACHE_TTL_MS = 60 * 60 * 1000; // 1h
 

@@ -28,8 +28,9 @@ import {
 import { getGistConfig } from "../utils/gistSync";
 import { ensureNotificationPermission } from "../utils/liveAlerts";
 
-const POLL_MS = 30 * 1000;
-const FOLLOWER_PULL_MS = 30 * 1000;     // follower pull live_trading.json mỗi 30s
+// Anh Tommy v4.5.2: gấp đôi tất cả thời gian sync để tiết kiệm Cloudflare Worker req
+const POLL_MS = 60 * 1000;              // Binance poll 30s → 60s
+const FOLLOWER_PULL_MS = 60 * 1000;     // follower pull live_trading.json 30s → 60s
 
 export interface UseBinanceLiveResult {
   state: LiveTraderState;
@@ -131,15 +132,16 @@ export function useBinanceLive(
         return;
       }
       // Count down 3s cho gist propagate (UI hiện countdown qua verifyLeftMs)
-      const verifyDeadline = Date.now() + 3000;
+      // anh Tommy v4.5.2: 3s → 6s cho gist propagate chắc chắn
+      const verifyDeadline = Date.now() + 6000;
       verifyDeadlineRef.current = verifyDeadline;
-      setVerifyLeftMs(3000);
+      setVerifyLeftMs(6000);
       const tickId = setInterval(() => {
         const left = Math.max(0, verifyDeadline - Date.now());
         setVerifyLeftMs(left);
         if (left <= 0) clearInterval(tickId);
       }, 200);
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((r) => setTimeout(r, 6000));
       clearInterval(tickId);
       setVerifyLeftMs(0);
       verifyDeadlineRef.current = 0;
@@ -437,7 +439,7 @@ export function useBinanceLive(
         setLastError("❌ CLAIM LEADER fail (network / git lỗi).");
         return;
       }
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 2000)); // anh Tommy v4.5.2: 1s → 2s read-after-write
       const verify = await getLeaderInfo();
       setLeader(verify);
       if (verify?.deviceId === deviceIdRef.current) {

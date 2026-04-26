@@ -185,7 +185,7 @@ export async function saveState(s: LiveTraderState, opts: { sync?: boolean } = {
       REMOTE_FILE,
       async () => sync,
       () => `live: update settings/journal (${new Date().toISOString().slice(0, 16)})`,
-      3000,
+      6000, // anh Tommy v4.5.2: 3s → 6s
     );
   }
 }
