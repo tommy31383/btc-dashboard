@@ -65,9 +65,8 @@ const LTF_CFG: LtfConfirmConfig = {
   maxWaitBars: CONFIRM_WINDOW,
 };
 
-// ENTRY TFs — focus vào HTF (theo LIVE engine, 5m bị excluded mặc định).
-// Vẫn backtest hết để Tommy biết rule 5m đứng đâu nếu chưa enable.
-const ENTRY_TFS = ["5m", "15m", "1h", "4h"];
+// ENTRY TFs — TẤT CẢ TF có rule trong hard_rules.json (anh Tommy v4.6.3: thêm 1d+1w cho đủ 57 rules)
+const ENTRY_TFS = ["5m", "15m", "1h", "4h", "1d", "1w"];
 
 // HTF map (match useRuleAlerts.ts)
 const HTF_MAP: Record<string, [string, string]> = {
@@ -510,6 +509,9 @@ function detectRuleSignals(
   const sidesToCheck: ("LONG" | "SHORT")[] = forceSide ? [forceSide] : ["LONG", "SHORT"];
   const closes = entryCandles.map((c) => c.close);
   const signals: RawSignal[] = [];
+  // Anh Tommy v4.6.3 fix: chỉ fire khi RISING EDGE (prev=false, curr=true).
+  // Trước đây fire mỗi candle match → 1 rule có thể fire 6900 lần/3y, sai logic LIVE.
+  const prevMatched: Record<"LONG" | "SHORT", boolean> = { LONG: false, SHORT: false };
 
   for (let i = MIN_LOOKBACK; i < entryCandles.length - 1; i++) {
     const rsiV = entrySeries.rsi[i];
@@ -521,6 +523,8 @@ function detectRuleSignals(
     const price = closes[i];
     if (rsiV === null || stochKV === null || bbU === null || bbL === null || macdH === null || prevMacdH === null) continue;
     const div = detectDivAt(closes, entrySeries.rsi, i);
+
+    const matchedThisCandle: Record<"LONG" | "SHORT", boolean> = { LONG: false, SHORT: false };
 
     for (const side of sidesToCheck) {
       const conds: EntryConditions = side === "LONG" ? {
@@ -608,9 +612,18 @@ function detectRuleSignals(
         if (cnt < (cfg.minScore || 1)) continue;
       }
 
-      signals.push({ htfIdx: i, htfTime: entryCandles[i].time, side });
-      break; // 1 candle → 1 side max
+      // Side này pass tất cả checks → marked match candle này
+      matchedThisCandle[side] = true;
+      // RISING EDGE: chỉ fire nếu candle TRƯỚC chưa match side này
+      if (!prevMatched[side]) {
+        signals.push({ htfIdx: i, htfTime: entryCandles[i].time, side });
+      }
+      break; // 1 candle → 1 side max (giống LIVE)
     }
+    // Cuối iteration: update prevMatched theo matchedThisCandle
+    // Side không match candle này → reset prev = false để rising edge fire sau khi match lại
+    prevMatched.LONG = matchedThisCandle.LONG;
+    prevMatched.SHORT = matchedThisCandle.SHORT;
   }
   return signals;
 }
@@ -1078,7 +1091,13 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
     entryPrice: number;
     tpPct: number;
     slPct: number;
+    /** Anh Tommy v4.6.5 fix BUG #1: rule.maxHoldBars (HTF unit) → 5m bars để match LIVE Plan B monitor */
+    maxHold5m: number;
   }
+  // Convert HTF maxHoldBars → 5m bars (LIVE Plan B monitor scan từng tick mark price)
+  const TF_TO_5M_MULT: Record<string, number> = {
+    "5m": 1, "15m": 3, "1h": 12, "4h": 48, "1d": 288, "1w": 2016,
+  };
 
   interface PerRule {
     ruleId: string;
@@ -1116,6 +1135,8 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
         support, resistance, LTF_CFG,
       );
       if (ltfIdx === null) continue;
+      const ruleMaxHoldHtf = (rule.config as any).maxHoldBars || 100; // default 100 HTF bars
+      const maxHold5m = ruleMaxHoldHtf * (TF_TO_5M_MULT[tf] || 12);
       candidates.push({
         ruleId,
         tfKey: tf,
@@ -1127,6 +1148,7 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
         entryPrice: candles5m[ltfIdx].close,
         tpPct: rule.config.targetPct,
         slPct: rule.config.stopPct,
+        maxHold5m,
       });
     }
     perRuleData.push({
@@ -1139,15 +1161,31 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
   }
   console.log("");
 
-  // ─── Step 2: SOLO MODE ──────────────────────────────────────────────────
-  console.log(`\n[SOLO] simulating trades per rule (no shared state)...`);
+  // ─── Step 2: SOLO MODE (anh Tommy v4.6.5 fix BUG #2: block-while-position-open) ────
+  // Logic LIVE: trong khi 1 lệnh đang OPEN, rule fire lại → không vào lệnh thêm cùng rule.
+  // (10m cooldown vẫn giữ nhưng redundant vs block-while-open vì hold trung bình > 10m)
+  console.log(`\n[SOLO] simulating trades per rule (block-while-open + 10m cooldown)...`);
+  const PER_RULE_COOLDOWN_MS = 10 * 60_000;
   const soloResults: RuleResult[] = [];
   for (const pr of perRuleData) {
     const trades: TradeOutcome[] = [];
+    let lastEntryMs = 0;
+    let blockedUntilMs = 0; // block-while-open
+    let cooldownBlocked = 0;
     for (const c of pr.candidates) {
+      // Block while position open (giống LIVE: trackedPositions chứa lệnh same rule chưa exit)
+      if (c.entryTime < blockedUntilMs) {
+        cooldownBlocked++;
+        continue;
+      }
+      // Per-rule cooldown 10m (LIVE engine decideEntry gate ⑥)
+      if (c.entryTime - lastEntryMs < PER_RULE_COOLDOWN_MS) {
+        cooldownBlocked++;
+        continue;
+      }
       const sim = simulateTradeOnLtf(
         candles5m, c.entryIdx5m, c.side, c.entryPrice,
-        c.tpPct, c.slPct, MAX_HOLD_OVERRIDE,
+        c.tpPct, c.slPct, c.maxHold5m, // BUG #1 fix: dùng rule.maxHoldBars thật
       );
       trades.push({
         ruleId: c.ruleId, tfKey: c.tfKey, side: c.side,
@@ -1157,10 +1195,14 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
         outcome: sim.outcome, exitPrice: sim.exitPrice,
         pnlPct: sim.pnlPct, holdBars: sim.holdBars,
       });
+      lastEntryMs = c.entryTime;
+      // Tính exit time để block các candidate kế tiếp
+      const exitIdx5m = Math.min(c.entryIdx5m + sim.holdBars, candles5m.length - 1);
+      blockedUntilMs = candles5m[exitIdx5m].time;
     }
     soloResults.push(summarizeTrades(
       pr.ruleId, pr.tfKey, pr.forceSide, pr.ruleName,
-      pr.totalSignals, pr.candidates.length, 0, trades,
+      pr.totalSignals, pr.candidates.length, cooldownBlocked, trades,
     ));
   }
 
@@ -1201,10 +1243,10 @@ Plan B TP/SL: monitor mỗi 5m candle, fill 100% khi hit TP/SL (no slippage). Ti
       continue;
     }
 
-    // Pass → vào lệnh
+    // Pass → vào lệnh (BUG #1 fix: dùng rule.maxHold5m)
     const sim = simulateTradeOnLtf(
       candles5m, c.entryIdx5m, c.side, c.entryPrice,
-      c.tpPct, c.slPct, MAX_HOLD_OVERRIDE,
+      c.tpPct, c.slPct, c.maxHold5m,
     );
     const exitMs = candles5m[Math.min(c.entryIdx5m + sim.holdBars, candles5m.length - 1)].time;
     const qty = (STACK_CFG.marginUsd * STACK_CFG.leverage) / c.entryPrice;
