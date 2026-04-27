@@ -306,8 +306,13 @@ export function useBinanceLive(
     return () => { alive = false; clearInterval(id); };
   }, [role]);
 
+  // SERVER OWNS trading mode (anh Tommy v4.8.8): hard kill switch — frontend
+  // KHÔNG được fire bất kỳ entry nào. Chỉ server cloud được trade.
+  const SERVER_OWNS_TRADING = true;
+
   // Subscribe activeAlerts → fire decideEntry on new ones — CHỈ LEADER
   useEffect(() => {
+    if (SERVER_OWNS_TRADING) return; // 🔒 HARD KILL — không fire entry từ browser
     if (role !== "LEADER") return;
     if (!activeAlerts.length) return;
     const seen = lastAlertSeenRef.current;
@@ -445,6 +450,7 @@ export function useBinanceLive(
 
   // Plan B: monitor TP/SL mỗi tick price — CHỈ LEADER (follower mirror state, không tự close)
   useEffect(() => {
+    if (SERVER_OWNS_TRADING) return; // 🔒 HARD KILL — server Plan B đảm nhiệm
     if (role !== "LEADER") return;
     if (currentPrice === null || currentPrice <= 0) return;
     if (!stateRef.current.trackedPositions.length) return;
@@ -484,6 +490,7 @@ export function useBinanceLive(
   // Dedup theo bar5mTime (firedIds["5mall:<time>"]).
   useEffect(() => {
     if (role !== "LEADER") return;
+    if (SERVER_OWNS_TRADING) return; // 🔒 HARD KILL — server only
     if (!stateRef.current.settings.use5mAllEngineMode) return;
     const bar = ltfCtx.closedBar5m;
     if (!bar || !bar.time || !bar.close) return;
