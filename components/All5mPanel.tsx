@@ -12,8 +12,9 @@ import DebugLabel from "./DebugLabel";
 import {
   All5mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE,
-  TP_PCT, SL_PCT, STOCH_LONG_LEVEL, STOCH_SHORT_LEVEL, COOLDOWN_MS, FEE_PER_SIDE, SR_PROXIMITY_PCT,
-  STACK_MAX_PER_SIDE, STACK_PER_SIDE_SPACING_MS, STACK_MIN_ENTRY_DIST_PCT,
+  STOCH_LONG_LEVEL, STOCH_SHORT_LEVEL, COOLDOWN_MS, FEE_PER_SIDE, SR_PROXIMITY_PCT,
+  STACK_PER_SIDE_SPACING_MS,
+  PRESETS, PresetKey,
 } from "../utils/all5mAccount";
 
 interface Props {
@@ -23,6 +24,9 @@ interface Props {
   stoch5mK: number | null;
   onReset: () => Promise<void> | void;
   onCloseManual?: (positionId: string) => Promise<void> | void;
+  /** Active preset (anh Tommy v4.7.0) */
+  presetKey: PresetKey;
+  onSetPreset: (key: PresetKey) => Promise<void> | void;
   /** Optional content rendered at bottom of the scroll (vd PaperTradeJournal) */
   footer?: React.ReactNode;
 }
@@ -75,8 +79,30 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
   );
 }
 
-export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, footer }: Props) {
+export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
+  const preset = PRESETS[presetKey];
+  // Tunable values từ active preset
+  const TP_PCT = preset.tpPct;
+  const SL_PCT = preset.slPct;
+  const STACK_MAX_PER_SIDE = preset.stackMaxPerSide;
+  const STACK_MIN_ENTRY_DIST_PCT = preset.stackMinEntryDistPct;
+
+  const handleSwitchPreset = (key: PresetKey) => {
+    if (key === presetKey) return;
+    const target = PRESETS[key];
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(
+        `🔄 SWITCH PRESET → ${target.emoji} ${target.label}?\n\n` +
+        `TP +${target.tpPct}% / SL -${target.slPct}%\n` +
+        `Stack max ${target.stackMaxPerSide}/side · dist ≥ ${target.stackMinEntryDistPct}%\n\n` +
+        `📊 3y backtest: NET +$${target.expectedNet3y.toLocaleString()} · MaxDD $${target.expectedMaxDd3y.toLocaleString()}\n\n` +
+        `⚠️ Lệnh OPEN giữ TP/SL CŨ. Lệnh MỚI sẽ dùng preset mới.`
+      );
+      if (!ok) return;
+    }
+    Promise.resolve(onSetPreset(key));
+  };
 
   const handleReset = () => {
     if (typeof window !== "undefined") {
@@ -115,11 +141,43 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.h1}>⚡ 5m ALL — RULE: SMART STACK</Text>
-          <Text style={styles.subtitle}>Paper test · max {STACK_MAX_PER_SIDE} per side · spacing {STACK_PER_SIDE_SPACING_MS / 60000}m · min dist {STACK_MIN_ENTRY_DIST_PCT}%</Text>
+          <Text style={styles.subtitle}>
+            Preset: <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>{preset.emoji} {preset.label}</Text> · TP+{TP_PCT}%/SL-{SL_PCT}% · stack {STACK_MAX_PER_SIDE}/side · dist {STACK_MIN_ENTRY_DIST_PCT}%
+          </Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
           <Text style={styles.resetBtnText}>🗑 RESET</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* PRESET SWITCHER (anh Tommy v4.7.0): 3 chế độ — click để swap */}
+      <View style={styles.presetRow}>
+        {(["AGGRESSIVE", "BALANCED", "SAFE"] as PresetKey[]).map((k) => {
+          const p = PRESETS[k];
+          const active = k === presetKey;
+          const accentColor = k === "AGGRESSIVE" ? P.error : k === "BALANCED" ? P.bitcoinOrange : P.green;
+          return (
+            <TouchableOpacity
+              key={k}
+              onPress={() => handleSwitchPreset(k)}
+              style={[
+                styles.presetBtn,
+                { borderColor: active ? accentColor : P.borderSoft, backgroundColor: active ? accentColor + "22" : P.surface },
+              ]}
+            >
+              <Text style={[styles.presetTitle, { color: active ? accentColor : P.text }]}>
+                {p.emoji} {p.label} {active ? "✓" : ""}
+              </Text>
+              <Text style={styles.presetSub}>
+                TP+{p.tpPct}%/SL-{p.slPct}% · stack {p.stackMaxPerSide} · dist {p.stackMinEntryDistPct}%
+              </Text>
+              <Text style={[styles.presetMetric, { color: accentColor }]}>
+                3y: +${(p.expectedNet3y / 1000).toFixed(0)}k · DD ${(p.expectedMaxDd3y / 1000).toFixed(1)}k
+              </Text>
+              <Text style={styles.presetDesc}>{p.description}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       {/* RULE LOGIC */}
@@ -305,6 +363,12 @@ const styles = StyleSheet.create({
   subtitle: { color: P.dim, fontSize: 11, marginBottom: 14, fontFamily: "Inter_400Regular" },
   resetBtn: { backgroundColor: P.errorContainer, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 2 },
   resetBtnText: { color: P.onErrorContainer, fontSize: 11, fontWeight: "700", letterSpacing: 1 },
+  presetRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  presetBtn: { flex: 1, padding: 10, borderRadius: 4, borderWidth: 2, gap: 2 },
+  presetTitle: { fontSize: 12, fontWeight: "700", letterSpacing: 0.5 },
+  presetSub: { color: P.dim, fontSize: 10 },
+  presetMetric: { fontSize: 11, fontWeight: "700", marginTop: 2 },
+  presetDesc: { color: P.tertiary, fontSize: 9, fontStyle: "italic" },
   closeBtn: { backgroundColor: P.errorContainer, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 3, marginLeft: 6 },
   closeBtnText: { color: P.onErrorContainer, fontSize: 11, fontWeight: "700" },
   kpiGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16 },

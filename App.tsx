@@ -337,6 +337,8 @@ export default function App() {
             stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
             onReset={all5m.reset}
             onCloseManual={all5m.closeManual}
+            presetKey={all5m.presetKey}
+            onSetPreset={all5m.setPreset}
           />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar

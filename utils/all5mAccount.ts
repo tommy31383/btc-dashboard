@@ -15,24 +15,104 @@ import { pullFile, scheduleFilePush } from "./gistSync";
 
 const STORAGE_KEY = "@all5m_data_v1";
 const REMOTE_FILE = "all5m_account.json";
+const PRESET_STORAGE_KEY = "@all5m_preset_v1";
 
 export const INITIAL_CAPITAL = 1000;
 export const MARGIN_PER_TRADE = 30;
 export const LEVERAGE = 100;
 export const NOTIONAL = MARGIN_PER_TRADE * LEVERAGE;
-export const TP_PCT = 4;
-export const SL_PCT = 2;
 export const STOCH_LONG_LEVEL = 10;
 export const STOCH_SHORT_LEVEL = 90;
 export const COOLDOWN_MS = 10 * 60 * 1000;  // 10 phút giữa các entry (tổng, mọi side)
 export const SR_PROXIMITY_PCT = 0.3;
-// SMART STACK: cho phép nhiều lệnh cùng side, mỗi lệnh TP/SL riêng (anh Tommy v4.3.87+)
-export const STACK_MAX_PER_SIDE = 15;            // tối đa 15 LONG + 15 SHORT cùng lúc
 export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000; // tối thiểu 10m giữa 2 entry CÙNG side
-export const STACK_MIN_ENTRY_DIST_PCT = 0.3;     // entry mới phải xa entry gần nhất cùng side ≥ 0.3%
 export const FEE_PER_SIDE_PCT = 0.05;
 export const FEE_PER_SIDE = NOTIONAL * (FEE_PER_SIDE_PCT / 100);
 export const FEE_PER_TRADE = FEE_PER_SIDE * 2;
+
+// ════════════════════════════════════════════════════════════════════
+// 🎯 PRESETS (anh Tommy v4.7.0): 3 chế độ switch trong UI
+//   - AGGRESSIVE 🔴 WHALE  → Highest PnL (3y backtest +725k, MaxDD $5.2k)
+//   - BALANCED   🟡 EAGLE  → Balanced (3y backtest +392k, MaxDD $3k)
+//   - SAFE       🟢 TURTLE → Lowest MaxDD (3y backtest +299k, MaxDD $993)
+// ════════════════════════════════════════════════════════════════════
+
+export type PresetKey = "AGGRESSIVE" | "BALANCED" | "SAFE";
+
+export interface Preset {
+  key: PresetKey;
+  label: string;
+  emoji: string;
+  description: string;
+  tpPct: number;
+  slPct: number;
+  stackMaxPerSide: number;
+  stackMinEntryDistPct: number;
+  expectedNet3y: number;
+  expectedMaxDd3y: number;
+}
+
+export const PRESETS: Record<PresetKey, Preset> = {
+  AGGRESSIVE: {
+    key: "AGGRESSIVE",
+    label: "WHALE",
+    emoji: "🔴",
+    description: "Highest PnL · vốn lớn",
+    tpPct: 4, slPct: 2, stackMaxPerSide: 50, stackMinEntryDistPct: 0,
+    expectedNet3y: 725319, expectedMaxDd3y: 5217,
+  },
+  BALANCED: {
+    key: "BALANCED",
+    label: "EAGLE",
+    emoji: "🟡",
+    description: "Balanced · vốn vừa",
+    tpPct: 4, slPct: 2, stackMaxPerSide: 30, stackMinEntryDistPct: 0.2,
+    expectedNet3y: 392019, expectedMaxDd3y: 3069,
+  },
+  SAFE: {
+    key: "SAFE",
+    label: "TURTLE",
+    emoji: "🟢",
+    description: "Lowest MaxDD · vốn ít",
+    tpPct: 5, slPct: 2.5, stackMaxPerSide: 15, stackMinEntryDistPct: 0.3,
+    expectedNet3y: 299133, expectedMaxDd3y: 993,
+  },
+};
+
+export const DEFAULT_PRESET_KEY: PresetKey = "BALANCED";
+
+// Cache trong RAM để tryEntry5mBar không phải đọc AsyncStorage mỗi lần
+let _activePresetCache: PresetKey | null = null;
+
+export async function getActivePresetKey(): Promise<PresetKey> {
+  if (_activePresetCache) return _activePresetCache;
+  try {
+    const raw = await AsyncStorage.getItem(PRESET_STORAGE_KEY);
+    if (raw && (raw === "AGGRESSIVE" || raw === "BALANCED" || raw === "SAFE")) {
+      _activePresetCache = raw;
+      return raw;
+    }
+  } catch {}
+  _activePresetCache = DEFAULT_PRESET_KEY;
+  return DEFAULT_PRESET_KEY;
+}
+
+export async function setActivePresetKey(key: PresetKey): Promise<void> {
+  _activePresetCache = key;
+  await AsyncStorage.setItem(PRESET_STORAGE_KEY, key);
+}
+
+export async function getActivePreset(): Promise<Preset> {
+  const k = await getActivePresetKey();
+  return PRESETS[k];
+}
+
+// Backward-compat: TP_PCT / SL_PCT / STACK_MAX_PER_SIDE / STACK_MIN_ENTRY_DIST_PCT
+// vẫn export để code cũ (All5mPanel chart axis...) không vỡ. Giá trị = BALANCED preset.
+export const TP_PCT = PRESETS.BALANCED.tpPct;
+export const SL_PCT = PRESETS.BALANCED.slPct;
+export const STACK_MAX_PER_SIDE = PRESETS.BALANCED.stackMaxPerSide;
+export const STACK_MIN_ENTRY_DIST_PCT = PRESETS.BALANCED.stackMinEntryDistPct;
 
 export type EntrySource = "stoch_long" | "stoch_short" | "sr_long" | "sr_short";
 export type Side = "LONG" | "SHORT";
@@ -161,6 +241,9 @@ export async function tryEntry5mBar(
   if (now - acc.stats.lastEntryMs < COOLDOWN_MS) return null;
   if (freeMargin(acc) < MARGIN_PER_TRADE) return null;
 
+  // Đọc active preset (cache RAM, gần như miễn phí sau lần đầu)
+  const preset = await getActivePreset();
+
   let side: Side | null = null;
   let source: EntrySource | null = null;
 
@@ -174,21 +257,23 @@ export async function tryEntry5mBar(
   }
   if (!side || !source) return null;
 
-  // SMART STACK gates (anh Tommy v4.3.87+):
-  //   1. Max N OPEN cùng side
+  // SMART STACK gates — dùng PRESET đang active (anh Tommy v4.7.0):
+  //   1. Max N OPEN cùng side (preset.stackMaxPerSide)
   //   2. Min spacing 10m giữa 2 entry CÙNG side
-  //   3. Min distance 0.3% giữa entry mới và entry gần nhất cùng side (tránh nhồi 1 vùng)
+  //   3. Min distance % giữa entry mới và entry gần nhất cùng side (preset.stackMinEntryDistPct)
   const sameSideOpen = acc.positions.filter((p) => p.status === "OPEN" && p.side === side);
-  if (sameSideOpen.length >= STACK_MAX_PER_SIDE) return null;
+  if (sameSideOpen.length >= preset.stackMaxPerSide) return null;
   if (sameSideOpen.length > 0) {
     const lastSame = sameSideOpen.reduce((a, b) => (a.entryMs > b.entryMs ? a : b));
     if (now - lastSame.entryMs < STACK_PER_SIDE_SPACING_MS) return null;
-    const distPct = Math.abs(fillPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
-    if (distPct < STACK_MIN_ENTRY_DIST_PCT) return null;
+    if (preset.stackMinEntryDistPct > 0) {
+      const distPct = Math.abs(fillPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
+      if (distPct < preset.stackMinEntryDistPct) return null;
+    }
   }
 
-  const tpPrice = side === "LONG" ? fillPrice * (1 + TP_PCT / 100) : fillPrice * (1 - TP_PCT / 100);
-  const slPrice = side === "LONG" ? fillPrice * (1 - SL_PCT / 100) : fillPrice * (1 + SL_PCT / 100);
+  const tpPrice = side === "LONG" ? fillPrice * (1 + preset.tpPct / 100) : fillPrice * (1 - preset.tpPct / 100);
+  const slPrice = side === "LONG" ? fillPrice * (1 - preset.slPct / 100) : fillPrice * (1 + preset.slPct / 100);
 
   const pos: Position = {
     id: `bar5m-${bar5mTime}`,

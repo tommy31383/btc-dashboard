@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   All5mAccount, AccountSummary, closePositionManual, emptyAccount,
   loadAccount, processOpen, pullAccountFromGist, resetAccount, summarize, tryEntry5mBar,
+  PresetKey, getActivePresetKey, setActivePresetKey, DEFAULT_PRESET_KEY,
 } from "../utils/all5mAccount";
 
 const FOLLOWER_PULL_MS = 120 * 1000; // anh Tommy v4.5.3: 60s → 120s
@@ -25,6 +26,8 @@ export interface Use5mAllTraderResult {
   reset: () => Promise<void>;
   reload: () => Promise<void>;
   closeManual: (positionId: string) => Promise<void>;
+  presetKey: PresetKey;
+  setPreset: (key: PresetKey) => Promise<void>;
 }
 
 function pivotSR(klines15m: Kline[] | undefined): { support: number | null; resistance: number | null } {
@@ -47,11 +50,13 @@ export function use5mAllTrader(
   isLeader: boolean = true,    // anh Tommy: chỉ leader run engine + push state lên gist; follower pull mirror
 ): Use5mAllTraderResult {
   const [account, setAccount] = useState<All5mAccount>(() => emptyAccount());
+  const [presetKey, setPresetKey] = useState<PresetKey>(DEFAULT_PRESET_KEY);
   const lastBarTimeRef = useRef<number>(0);
 
   useEffect(() => {
     if (!enabled) return;
     loadAccount().then(setAccount);
+    getActivePresetKey().then(setPresetKey);
   }, [enabled]);
 
   // 5m bar đóng → try entry — CHỈ LEADER
@@ -109,5 +114,10 @@ export function use5mAllTrader(
     if (ok) setAccount(await loadAccount());
   };
 
-  return { account, summary: summarize(account), reset, reload, closeManual };
+  const setPreset = async (key: PresetKey) => {
+    await setActivePresetKey(key);
+    setPresetKey(key);
+  };
+
+  return { account, summary: summarize(account), reset, reload, closeManual, presetKey, setPreset };
 }
