@@ -489,7 +489,29 @@ function SettingsCard({ live }: Props) {
     setDirty(true);
     setDraft((d) => {
       const exists = d.excludedTfs.includes(tf);
-      return { ...d, excludedTfs: exists ? d.excludedTfs.filter((x) => x !== tf) : [...d.excludedTfs, tf] };
+      const nextExcluded = exists ? d.excludedTfs.filter((x) => x !== tf) : [...d.excludedTfs, tf];
+      // MUTEX 1-chiều (anh Tommy v4.7.11): khi user enable 5m rule (remove "5m" khỏi excludedTfs),
+      // và 5m ALL Engine đang ON → auto OFF engine để tránh 2 nguồn signal cùng cây 5m.
+      const next = { ...d, excludedTfs: nextExcluded };
+      if (tf === "5m" && exists && d.use5mAllEngineMode) {
+        // Removed "5m" from excluded → 5m rule sẽ ON → tắt engine
+        next.use5mAllEngineMode = false;
+      }
+      return next;
+    });
+  }
+
+  /** Toggle 5m ALL Engine — MUTEX 1-chiều với 5m rule (excludedTfs). */
+  function toggle5mAllEngine() {
+    setDirty(true);
+    setDraft((d) => {
+      const turningOn = !d.use5mAllEngineMode;
+      const next: LiveSettings = { ...d, use5mAllEngineMode: turningOn };
+      // Khi bật engine → auto add "5m" vào excludedTfs (tắt 5m rule path)
+      if (turningOn && !d.excludedTfs.includes("5m")) {
+        next.excludedTfs = [...d.excludedTfs, "5m"];
+      }
+      return next;
     });
   }
 
@@ -594,7 +616,7 @@ function SettingsCard({ live }: Props) {
       <Text style={styles.subLabel}>⚡ 5m ALL ENGINE MODE (v4.7.8+)</Text>
       <View style={{ flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <TouchableOpacity
-          onPress={() => setDraft({ ...draft, use5mAllEngineMode: !draft.use5mAllEngineMode })}
+          onPress={toggle5mAllEngine}
           style={[
             styles.tfChip,
             {
@@ -629,7 +651,9 @@ function SettingsCard({ live }: Props) {
         {"\n"}   ⇨ Đổi preset (WHALE/EAGLE/TURTLE) ở tab 5m ALL → cả paper + LIVE đều áp ngay.
         {"\n"}   Margin/leverage dùng từ LIVE settings ({draft.marginUsd} × {draft.leverage}x = ${draft.marginUsd * draft.leverage} notional/lệnh).
         {"\n"}   HTF rules (1h/4h/1d/1w) vẫn chạy SONG SONG.
-        {"\n"}   ⚠️ Nhớ: stack gates LIVE settings vẫn áp (max {draft.stackMaxPerSide}/side, dist {draft.stackMinEntryDistPct}%).
+        {"\n"}   ⚠️ Stack gates LIVE settings vẫn áp (max {draft.stackMaxPerSide}/side, dist {draft.stackMinEntryDistPct}%).
+        {"\n"}   🔒 MUTEX 1-chiều với 5m rule (excludedTfs): bật cái này → tự động ADD "5m" vào excluded.
+        {"\n"}   Tắt cả 2 OK; bật 1 trong 2 OK; KHÔNG cho phép cùng ON (tránh 2 nguồn signal trùng cây 5m).
       </Text>
 
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>
