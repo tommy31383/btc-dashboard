@@ -16,6 +16,7 @@ export interface BackendLiveState {
   state: any | null;             // server state (publicState — strip secrets)
   scheduler: any | null;         // scheduler status
   alerts: any[];                 // current rule alerts
+  journal: any[];                // recent journal entries (CLOSE for chart markers)
   lastUpdateMs: number;
 }
 
@@ -38,6 +39,7 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
   const [state, setStateLocal] = useState<any | null>(null);
   const [scheduler, setScheduler] = useState<any | null>(null);
   const [alerts, setAlerts] = useState<any[]>([]);
+  const [journal, setJournal] = useState<any[]>([]);
   const [lastUpdateMs, setLastUpdateMs] = useState(0);
   const refreshTimerRef = useRef<any>(null);
 
@@ -51,6 +53,10 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
       try {
         const a = await api.alerts();
         setAlerts(a.alerts || []);
+      } catch {}
+      try {
+        const j = await api.journal(100);
+        setJournal(j.entries || []);
       } catch {}
     } catch (e: any) {
       setLastError(e?.message ?? String(e));
@@ -150,7 +156,7 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
   }, [refresh]);
 
   return {
-    authed, loading, lastError, state, scheduler, alerts, lastUpdateMs,
+    authed, loading, lastError, state, scheduler, alerts, journal, lastUpdateMs,
     login, logout, refresh, setAuto, setDryRun, setSettings,
     closePosition, editTpSl, bulkClose,
   };

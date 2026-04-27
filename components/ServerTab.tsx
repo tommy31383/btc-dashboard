@@ -6,6 +6,7 @@
  */
 import React, { useState, useMemo, useEffect } from "react";
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import Svg, { Polyline, Polygon, Circle, Line as SvgLine } from "react-native-svg";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
@@ -13,9 +14,15 @@ import { SERVER_URL } from "../utils/backendApi";
 
 const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
 
-export default function ServerTab() {
+interface ServerTabProps {
+  klinesByTf?: Record<string, { time: number; close: number }[]>;
+}
+
+export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
   const live = useBackendLive();
   const [pwInput, setPwInput] = useState("");
+  const [chartTf, setChartTf] = useState<"5m" | "15m" | "1h" | "4h">("15m");
+  const [containerW, setContainerW] = useState<number>(0);
 
   // ALL hooks MUST be at top — Rules of Hooks (anh Tommy v4.8.7 fix crash)
   const s = live.state;
@@ -193,6 +200,34 @@ export default function ServerTab() {
         )}
       </View>
 
+      {/* Chart entry/exit markers */}
+      <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={styles.h2}>📊 PRICE {chartTf} + ENTRIES</Text>
+          <View style={{ flexDirection: "row", gap: 4 }}>
+            {(["5m", "15m", "1h", "4h"] as const).map((tf) => (
+              <TouchableOpacity key={tf} onPress={() => setChartTf(tf)}
+                style={{
+                  paddingHorizontal: 8, paddingVertical: 3, borderRadius: 3, borderWidth: 1,
+                  borderColor: chartTf === tf ? P.bitcoinOrange : P.borderSoft,
+                  backgroundColor: chartTf === tf ? P.bitcoinOrange + "22" : P.surface,
+                }}>
+                <Text style={{ color: chartTf === tf ? P.bitcoinOrange : P.dim, fontSize: 10, fontFamily: "monospace", fontWeight: "700" }}>{tf}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+        {containerW > 0 && (
+          <ServerPriceChart
+            bars={klinesByTf?.[chartTf] ?? []}
+            tracked={tracked}
+            journal={live.journal}
+            width={containerW}
+            tf={chartTf}
+          />
+        )}
+      </View>
+
       {/* Tracked positions */}
       <View style={styles.card}>
         <Text style={styles.h2}>📈 TRACKED ({tracked.length})</Text>
@@ -228,7 +263,10 @@ export default function ServerTab() {
                     <Text style={{ color: sideUpnlUsd >= 0 ? P.green : P.error }}> uPnL {sideUpnlUsd >= 0 ? "+" : ""}${sideUpnlUsd.toFixed(2)}</Text>
                   </Text>
                   {list.map((t: any, i: number) => {
-                    const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
+                    const heldMin = (Date.now() - t.entryMs) / 60000;
+                    const heldStr = heldMin < 60 ? `${heldMin.toFixed(0)}m` : `${(heldMin / 60).toFixed(1)}h`;
+                    const dt = new Date(t.entryMs);
+                    const dtStr = `${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")} ${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}`;
                     const diff = markPrice !== null ? (side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) : 0;
                     const upnlUsd = diff * t.qty;
                     const upnlPct = markPrice !== null ? (diff / t.entryPrice) * 100 : 0;
@@ -236,18 +274,19 @@ export default function ServerTab() {
                     const sizeUsd = t.qty * t.entryPrice;
                     return (
                       <View key={t.id} style={styles.posRow}>
-                        <Text style={[styles.dim, { width: 24 }]}>{i + 1}</Text>
-                        <Text style={[styles.dim, { width: 70 }]}>${t.entryPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.bitcoinOrange, width: 70, fontWeight: "700" }]}>${sizeUsd.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.green, width: 70 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.error, width: 70 }]}>SL ${t.slPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: upnlColor, width: 75, fontWeight: "700" }]}>
+                        <Text style={[styles.dim, { width: 22 }]}>{i + 1}</Text>
+                        <Text style={[styles.dim, { width: 90, color: P.tertiary, fontSize: 10 }]}>{dtStr}</Text>
+                        <Text style={[styles.dim, { width: 65 }]}>${t.entryPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.bitcoinOrange, width: 60, fontWeight: "700" }]}>${sizeUsd.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.green, width: 65 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.error, width: 65 }]}>SL ${t.slPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: upnlColor, width: 70, fontWeight: "700" }]}>
                           {upnlUsd >= 0 ? "+" : ""}${upnlUsd.toFixed(2)}
                         </Text>
-                        <Text style={[styles.dim, { color: upnlColor, width: 60, fontWeight: "700" }]}>
+                        <Text style={[styles.dim, { color: upnlColor, width: 55, fontWeight: "700" }]}>
                           {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
                         </Text>
-                        <Text style={[styles.dim, { width: 40 }]}>{heldH}h</Text>
+                        <Text style={[styles.dim, { width: 40 }]}>{heldStr}</Text>
                         <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
                           <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕</Text>
                         </TouchableOpacity>
@@ -284,6 +323,86 @@ function LiveAgo({ timestampMs, prefix = "", suffix = "" }: { timestampMs: numbe
   const sec = Math.max(0, Math.round((now - timestampMs) / 1000));
   const txt = sec < 60 ? `${sec}s` : sec < 3600 ? `${Math.round(sec / 60)}m` : `${(sec / 3600).toFixed(1)}h`;
   return <Text style={styles.dim}>{prefix}{txt}{suffix}</Text>;
+}
+
+function ServerPriceChart({ bars, tracked, journal, width, tf }: {
+  bars: { time: number; close: number }[];
+  tracked: any[]; journal: any[]; width: number; tf: string;
+}) {
+  const height = 240;
+  if (bars.length < 2) {
+    return <Text style={{ color: P.dim, fontSize: 11, fontFamily: "monospace", padding: 12 }}>chưa có data {tf}</Text>;
+  }
+  const maxBars = 120;
+  let slice = bars.slice(-maxBars);
+  if (tracked.length > 0) {
+    const oldestOpen = Math.min(...tracked.map((t) => t.entryMs));
+    if (oldestOpen < slice[0].time) {
+      const startIdx = Math.max(0, bars.findIndex((b) => b.time >= oldestOpen) - 1);
+      if (startIdx >= 0 && startIdx < bars.length) slice = bars.slice(startIdx);
+    }
+  }
+  const tMin = slice[0].time;
+  const tMax = Math.max(slice[slice.length - 1].time, ...tracked.map((t) => t.entryMs), Date.now());
+  const range = tMax - tMin || 1;
+  const closes = slice.map((b) => b.close);
+  const pricePoints: number[] = [...closes];
+  for (const t of tracked) pricePoints.push(t.entryPrice, t.tpPrice, t.slPrice);
+  const pMin = Math.min(...pricePoints);
+  const pMax = Math.max(...pricePoints);
+  const pRange = pMax - pMin || 1;
+  const pad = 8;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const xOf = (t: number) => {
+    if (t < tMin) return pad;
+    if (t > tMax) return width - pad;
+    return pad + ((t - tMin) / range) * w;
+  };
+  const yOf = (p: number) => pad + h - ((p - pMin) / pRange) * h;
+  const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
+
+  // CLOSE markers từ journal (last 30 closes)
+  const closesJ = journal.filter((j) => j.actionKind === "CLOSE").slice(0, 30);
+  return (
+    <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft, marginTop: 8 }}>
+      <Svg width={width} height={height}>
+        <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.4} opacity={0.85} />
+        {tracked.map((p) => {
+          const eX = xOf(p.entryMs);
+          const eY = yOf(p.entryPrice);
+          const longSide = p.side === "LONG";
+          const color = longSide ? P.green : P.error;
+          const tri = longSide
+            ? `${eX},${eY - 7} ${eX - 6},${eY + 4} ${eX + 6},${eY + 4}`
+            : `${eX},${eY + 7} ${eX - 6},${eY - 4} ${eX + 6},${eY - 4}`;
+          return (
+            <React.Fragment key={`open-${p.id}`}>
+              <SvgLine x1={eX} y1={eY} x2={eX} y2={height - pad} stroke={color} strokeWidth={0.4} strokeDasharray="2,3" opacity={0.3} />
+              <Polygon points={tri} fill={color} opacity={1} stroke={P.surface} strokeWidth={0.7} />
+            </React.Fragment>
+          );
+        })}
+        {closesJ.map((j: any, i: number) => {
+          const a = j.action;
+          if (!a?.closePrice || !a?.side) return null;
+          const cX = xOf(j.ts);
+          const cY = yOf(a.closePrice);
+          const win = a.trigger === "TP";
+          const dotColor = win ? P.green : P.error;
+          return <Circle key={`close-${i}`} cx={cX} cy={cY} r={4} fill={dotColor} opacity={1} stroke={P.surface} strokeWidth={0.5} />;
+        })}
+      </Svg>
+      <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12 }}>
+        <Text style={{ color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMax.toFixed(0)}</Text>
+        <Text style={{ color: P.green, fontSize: 9, fontFamily: "monospace" }}>▲ LONG ● TP</Text>
+        <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT ● SL</Text>
+      </View>
+      <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>
+        ${pMin.toFixed(0)} · {tracked.length} open · {closesJ.length} closed · {((tMax - tMin) / 3600000).toFixed(1)}h
+      </Text>
+    </View>
+  );
 }
 
 function Kpi({ label, value, color }: { label: string; value: string; color?: string }) {

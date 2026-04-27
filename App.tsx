@@ -63,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.8.10";
+const APP_VERSION = "4.8.11";
 const BUILD_DATE = "2026-04-28";
 
 /**
@@ -309,7 +309,12 @@ export default function App() {
             onNotifications={() => {}}
             onSettings={() => setShowSettings(true)}
           />
-          <ServerTab />
+          <ServerTab klinesByTf={{
+            "5m": (rawKlines["5m"] ?? []).map((k) => ({ time: k.time, close: k.close })),
+            "15m": (rawKlines["15m"] ?? []).map((k) => ({ time: k.time, close: k.close })),
+            "1h": (rawKlines["1h"] ?? []).map((k) => ({ time: k.time, close: k.close })),
+            "4h": (rawKlines["4h"] ?? []).map((k) => ({ time: k.time, close: k.close })),
+          }} />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}
