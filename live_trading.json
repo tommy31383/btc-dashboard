@@ -1189,6 +1189,16 @@
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777280433746,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77796 ≥ avg LONG $77700 — chỉ vào nếu THẤP hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
