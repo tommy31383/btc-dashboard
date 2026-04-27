@@ -15,6 +15,10 @@
  *               as Mode A otherwise. Tests whether removing the 5m baseline lifts
  *               NET (per Mode A perSource breakdown the 5m bucket dragged
  *               -332,756% on 34,580 trades, PF 1.01).
+ *   • Mode F — Mode E (full TF rules NO 5m:1) + 5m ALL Engine BALANCED preset
+ *               merged in. Tests whether adding the 5m engine on top of the freed
+ *               5m slot adds value (vs adding noise) when HTF rules and the
+ *               surviving 15m rules are kept.
  *
  * 5m ALL Engine signal source (each closed 5m bar, evaluated per preset):
  *   - Stoch K < preset.stochLongLevel  → LONG
@@ -1067,6 +1071,7 @@ function bigEquityOverlaySvg(modes: ModeResult[], width = 900, height = 280): st
     "Mode C": "#ef4444",
     "Mode D": "#3b82f6",
     "Mode E": "#a855f7",
+    "Mode F": "#fcd34d",
   };
   const allVals: number[] = [];
   for (const m of modes) {

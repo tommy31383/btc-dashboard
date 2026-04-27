@@ -27,7 +27,10 @@
             "srProximityPct": 0.3,
             "strategy": "stoch_extreme_or_sr_fallback",
             "tfBase": "5m",
-            "label": "Stoch 5m + S/R 15m fallback"
+            "label": "Stoch 5m + S/R 15m fallback",
+            "disabled": true,
+            "disabledAt": 1777278197804,
+            "disabledReason": "Mode E backtest 3y: NET -332k%, drag down full TF — disabled v4.7.26"
           },
           "stats": {
             "winRate": 36.68,
