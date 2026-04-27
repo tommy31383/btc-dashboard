@@ -858,11 +858,41 @@
         "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.005→0.003 (binance 0.004), SHORT 0.006→0.006 (binance 0.006)."
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777270313309,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 77752,
+        "tpPrice": 76196.95999999999,
+        "slPrice": 79307.04000000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777270313610,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 77752,
+        "tpPrice": 76196.95999999999,
+        "slPrice": 79307.04000000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
-    "15m:22": 1777269373990,
-    "15m:23": 1777269374318,
+    "15m:22": 1777270313312,
+    "15m:23": 1777270313616,
     "1h:24": 1777188934551,
     "1h:26": 1777180445851,
     "1h:25": 1777180446145,
@@ -931,6 +961,24 @@
       "entryMs": 1777269494319,
       "tpPrice": 81802.875,
       "slPrice": 75959.8125
+    },
+    {
+      "id": "15m:22",
+      "side": "SHORT",
+      "qty": 0.001,
+      "entryPrice": 77752,
+      "tpPrice": 76196.95999999999,
+      "slPrice": 79307.04000000001,
+      "entryMs": 1777270313605
+    },
+    {
+      "id": "15m:23",
+      "side": "SHORT",
+      "qty": 0.001,
+      "entryPrice": 77752,
+      "tpPrice": 76196.95999999999,
+      "slPrice": 79307.04000000001,
+      "entryMs": 1777270313914
     }
   ],
   "pendingAlerts": [],
@@ -30464,5 +30512,5 @@
     ],
     "dailyPnl": -0.5280147499999999
   },
-  "lastTrackedMutationMs": 1777270266259
+  "lastTrackedMutationMs": 1777270313914
 }
