@@ -187,7 +187,8 @@ export default function ServerTab() {
               </TouchableOpacity>
             </View>
             {(["LONG", "SHORT"] as const).map((side) => {
-              const list = tracked.filter((t: any) => t.side === side);
+              const list = tracked.filter((t: any) => t.side === side)
+                .sort((a: any, b: any) => b.entryMs - a.entryMs); // newest first
               if (list.length === 0) return null;
               const sideColor = side === "LONG" ? P.green : P.error;
               return (
@@ -195,11 +196,11 @@ export default function ServerTab() {
                   <Text style={[styles.h2, { color: sideColor, marginTop: 4 }]}>
                     {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length})
                   </Text>
-                  {list.slice(0, 15).map((t: any) => {
+                  {list.map((t: any, i: number) => {
                     const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
                     return (
                       <View key={t.id} style={styles.posRow}>
-                        <Text style={[styles.dim, { color: sideColor, fontWeight: "800", width: 60 }]}>{t.side}</Text>
+                        <Text style={[styles.dim, { width: 24, color: P.dim }]}>{i + 1}</Text>
                         <Text style={[styles.dim, { width: 80 }]}>${t.entryPrice.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: P.green, width: 80 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: P.error, width: 80 }]}>SL ${t.slPrice.toFixed(0)}</Text>
@@ -210,11 +211,6 @@ export default function ServerTab() {
                       </View>
                     );
                   })}
-                  {list.length > 15 && (
-                    <Text style={[styles.dim, { fontStyle: "italic", marginTop: 4 }]}>
-                      ... còn {list.length - 15} {side} nữa (close bulk để clear)
-                    </Text>
-                  )}
                 </View>
               );
             })}
