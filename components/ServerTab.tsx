@@ -4,7 +4,7 @@
  * If not authed → login form.
  * If authed → state + scheduler + alerts + control buttons.
  */
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
@@ -54,11 +54,27 @@ export default function ServerTab() {
   const s = live.state;
   const sched = live.scheduler;
   const tracked = s?.trackedPositions ?? [];
-  const longCount = tracked.filter((t: any) => t.side === "LONG").length;
-  const shortCount = tracked.filter((t: any) => t.side === "SHORT").length;
-  // Mark price từ Binance snapshot (cho compute uPnL real-time per position)
+  // Mark price từ Binance snapshot
   const symPos = s?.binanceSnapshot?.positions?.find((p: any) => p.symbol === (s?.settings?.symbol ?? "BTCUSDT"));
   const markPrice = symPos ? parseFloat(symPos.markPrice) : null;
+
+  // Memoize sort + filter to avoid recompute mỗi render (anh Tommy v0.3 perf)
+  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl } = useMemo(() => {
+    const long: any[] = [];
+    const short: any[] = [];
+    let lUpnl = 0, sUpnl = 0;
+    for (const t of tracked) {
+      if (t.side === "LONG") long.push(t);
+      else if (t.side === "SHORT") short.push(t);
+    }
+    long.sort((a, b) => b.entryMs - a.entryMs);
+    short.sort((a, b) => b.entryMs - a.entryMs);
+    if (markPrice !== null) {
+      for (const t of long) lUpnl += (markPrice - t.entryPrice) * t.qty;
+      for (const t of short) sUpnl += (t.entryPrice - markPrice) * t.qty;
+    }
+    return { longList: long, shortList: short, longCount: long.length, shortCount: short.length, longUpnl: lUpnl, shortUpnl: sUpnl };
+  }, [tracked, markPrice]);
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
@@ -190,18 +206,10 @@ export default function ServerTab() {
               </TouchableOpacity>
             </View>
             {(["LONG", "SHORT"] as const).map((side) => {
-              const list = tracked.filter((t: any) => t.side === side)
-                .sort((a: any, b: any) => b.entryMs - a.entryMs);
+              const list = side === "LONG" ? longList : shortList;
               if (list.length === 0) return null;
               const sideColor = side === "LONG" ? P.green : P.error;
-              // Compute side-total uPnL
-              let sideUpnlUsd = 0;
-              if (markPrice !== null) {
-                for (const t of list) {
-                  const diff = side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice);
-                  sideUpnlUsd += diff * t.qty;
-                }
-              }
+              const sideUpnlUsd = side === "LONG" ? longUpnl : shortUpnl;
               return (
                 <View key={side} style={{ marginTop: 8 }}>
                   <Text style={[styles.h2, { color: sideColor, marginTop: 4 }]}>
