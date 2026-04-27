@@ -1,6 +1,216 @@
 # LIVE TRADING ENGINE — Rule vào lệnh & Flow đầy đủ
 
-**Version:** v4.7.8 (last updated 2026-04-27)
+**Version:** v4.7.24 (last updated 2026-04-27)
+
+---
+
+## 🗺 SƠ ĐỒ FLOW (v4.7.24 — full)
+
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║       LIVE ENGINE — HTF RULE FLOW                                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+  ┌────────────────────────────┐         ┌──────────────────────────┐
+  │ useRuleAlerts (1h/4h/1d/1w)│         │  5m ALL ENGINE MODE      │
+  │   eval mỗi tick rawKlines  │         │  (mỗi cây 5m close)      │
+  │   → activeAlerts[]         │         │   eval Stoch + S/R 15m   │
+  └─────────────┬──────────────┘         │   per active preset      │
+                │                        └─────────────┬────────────┘
+                │ (HTF rule fire)                      │ (5m signal)
+                ▼                                      ▼
+        ┌───────────────────────────────────────────────────┐
+        │           decideEntry(alert, ctx)                 │
+        │  ┌─────────────────────────────────────────────┐  │
+        │  │ 8 GATES (BLOCK nếu không pass)              │  │
+        │  │  1. autoEnabled                              │  │
+        │  │  2. excludedTfs.includes(tfKey)              │  │
+        │  │  3. pausedUntilMs > now (cooldown/DD pause) │  │
+        │  │  4. dailyPnl <= dailyLossCapUsd              │  │
+        │  │  5. openCount >= maxOpen                     │  │
+        │  │  6. firedIds[id] < 10m (per-rule cooldown)   │  │
+        │  │  7. pendingAlerts has same id+side           │  │
+        │  │  8. checkStackGate (per-side: max/spacing/   │  │
+        │  │     dist/notional cap)                       │  │
+        │  └─────────────────────────────────────────────┘  │
+        │                       │                           │
+        │                       ▼                           │
+        │       ┌───────────────────────────────┐           │
+        │       │  isHtfRuleForLtfConfirm(tfKey)│           │
+        │       │   true: 1h/4h/1d/1w           │           │
+        │       │   false: 5m/15m/5mall         │           │
+        │       └───┬───────────────────────┬───┘           │
+        │           │                       │               │
+        │           │ HTF (1h+)             │ LTF (5m/15m/  │
+        │           ▼                       ▼  5mall)       │
+        │   ┌───────────────┐       ┌──────────────────┐    │
+        │   │ return PENDING│       │ return ENTRY ngay │    │
+        │   │ (chờ LTF      │       │ (PA A2 skip)     │    │
+        │   │  confirm)     │       │                  │    │
+        │   └───────┬───────┘       └────────┬─────────┘    │
+        └───────────┼────────────────────────┼──────────────┘
+                    │                        │
+                    ▼                        │
+        ┌──────────────────────┐             │
+        │ addToPending()       │             │
+        │ pendingAlerts.push   │             │
+        │  { tpPct, slPct,     │             │
+        │    htfEntryPrice }   │             │
+        └──────────┬───────────┘             │
+                   │                         │
+                   ▼ (mỗi tick price + LTF)  │
+        ┌──────────────────────────────┐     │
+        │ confirmPending(stoch5m, S/R) │     │
+        │  ─ rule còn fire?            │     │
+        │  ─ LONG: K<20 OR ≤support15m │     │
+        │           ×(1+0.4%)          │     │
+        │  ─ SHORT: K>80 OR ≥resist    │     │
+        │           ×(1-0.4%)          │     │
+        │  ─ recheck 4 gates (cooldown,│     │
+        │     maxOpen, dailyPnl, stack)│     │
+        └──────────┬───────────────────┘     │
+                   │ confirmed               │
+                   ▼                         │
+        ┌──────────────────────┐             │
+        │ recalc TP/SL theo    │             │
+        │ current price        │             │
+        └──────────┬───────────┘             │
+                   │                         │
+                   └────────┬────────────────┘
+                            │
+                            ▼
+            ┌───────────────────────────────┐
+            │ executeAction(ENTRY)          │
+            │  ─ placeMarketOrder MARKET    │
+            │     positionSide=LONG/SHORT   │
+            │  ─ trackedPositions.push({    │
+            │     id, side, qty, entry,     │
+            │     tpPrice, slPrice, ms })   │
+            │  ─ firedIds[id] = now         │
+            │  ─ lastTrackedMutationMs=now  │
+            │  ─ playEntry() + notify()     │
+            └──────────┬────────────────────┘
+                       │
+                       ▼
+            ┌──────────────────────────────────┐
+            │ Plan B monitor (mỗi tick mark)   │
+            │  loop trackedPositions:          │
+            │    LONG: mark>=tp →TP, mark<=sl  │
+            │      →SL                         │
+            │    SHORT: mark<=tp →TP, mark>=sl │
+            │      →SL                         │
+            │  hit → MARKET reduceOnly         │
+            │       qty=entry.qty              │
+            │       → partial close net pos    │
+            │  log CLOSE (trigger=TP/SL)       │
+            │  beep + notify                   │
+            └──────────────────────────────────┘
+```
+
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║       SYNC LOOP — 30s POLL (v4.7.17 optimized)                              ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ Poll Binance mỗi 30s (LEADER only)                                  │
+  │   getAccount + getPositions + getDailyPnl + getOpenOrders +         │
+  │   getRecentTrades + getDualSidePosition (parallel)                  │
+  └────────────────┬────────────────────────────────────────────────────┘
+                   ▼
+  ┌────────────────────────────────────────────────┐
+  │ trimFiredIds (loại entries > 24h)              │
+  └────────────────┬───────────────────────────────┘
+                   ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ reconcileTrackedPositions(state, binancePositions)     │
+  │ ┌────────────────────────────────────────────────────┐ │
+  │ │ Tính qty + avgEntry per side (Binance vs App)      │ │
+  │ │ tolerance 0.0005 BTC                               │ │
+  │ └────────────┬───────────────────────────────────────┘ │
+  │              │                                         │
+  │   ┌──────────┴──────────┐                              │
+  │   ▼                     ▼                              │
+  │ App > Binance       Binance > App                      │
+  │ (user closed         (user mở lệnh manual              │
+  │  manual)             trên Binance)                     │
+  │   ▼                     ▼                              │
+  │ ┌──────────┐         ┌─────────────────────────────┐   │
+  │ │SMART DROP│         │ AUTO-IMPORT                 │   │
+  │ │1.Single: │         │ - Race guard < 15s? skip    │   │
+  │ │  qty≈diff│         │ - Reverse-derive entry:     │   │
+  │ │2.Multi:  │         │   (binanceQty×binAvg −       │   │
+  │ │  greedy  │         │    appQty×appAvg)/debt      │   │
+  │ │  oldest  │         │ - Preset fallback BALANCED  │   │
+  │ └──────────┘         │ - Split nếu debt > 1.5×     │   │
+  │                      │   typical qty               │   │
+  │                      │ - Tạo tracked entry với     │   │
+  │                      │   id="manual:<ts>-<side>-   │   │
+  │                      │       <idx>-<nonce5>"       │   │
+  │                      │ - TP/SL từ active preset    │   │
+  │                      │   (@all5m_preset_v1)        │   │
+  │                      └─────────────────────────────┘   │
+  │              ▼                                         │
+  │ ┌────────────────────────────────────────┐             │
+  │ │ Drift detect: avg entry post-drop vs   │             │
+  │ │ Binance avg lệch >$50 → warn           │             │
+  │ │ "có thể edited TP/SL trên Binance"     │             │
+  │ └────────────────────────────────────────┘             │
+  │              ▼                                         │
+  │ ┌────────────────────────────────────────┐             │
+  │ │ Set lastTrackedMutationMs (BEFORE save)│             │
+  │ │ saveState + log to journal             │             │
+  │ └────────────────────────────────────────┘             │
+  └────────────────────────────────────────────────────────┘
+                   │
+                   ▼
+  ┌────────────────────────────────────────────────┐
+  │ maybeTriggerCooldown (daily PnL cap hit?)      │
+  │  → pause autoTrade cooldownMinutes (240m)      │
+  └────────────────┬───────────────────────────────┘
+                   ▼
+  ┌────────────────────────────────────────────────┐
+  │ maybeTriggerEquityDdProtection                 │
+  │  - track peak equity (wallet+upnl)             │
+  │  - drop >= equityDdPausePct (30%) → pause      │
+  │    equityDdPauseHours (4h)                     │
+  └────────────────────────────────────────────────┘
+                   │
+                   ▼
+              save + push gist (debounce 12s)
+                   │
+                   ▼
+              FOLLOWER pull mỗi 45s từ gist mirror
+```
+
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║       MUTEX & SAFEGUARDS                                                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+  use5mAllEngineMode toggle ←─── MUTEX 1-chiều ───→ excludedTfs ⊃ "5m"
+  (LIVE evaluates 5m bars)        (bật 1 → tắt cái kia)  (block 5m HTF rules)
+
+  AUTO ON  → all gates active           AUTO OFF → block all entries
+  DRY RUN  → chỉ log (no Binance)       REAL    → POST /fapi/v1/order MARKET
+
+  PASSWORD 30318384 cho:
+    ✕ CLOSE 1 lệnh
+    ✏ EDIT TP/SL
+    🚀 BULK CLOSE (PROFIT/LOSS/OLD/ALL)
+```
+
+**3 PATH CHÍNH:**
+
+| Path | Trigger | Phase 2 LTF? | Source ID |
+|---|---|---|---|
+| **HTF rule** (1h/4h/1d/1w) | Rule fire qua useRuleAlerts | ✅ qua confirmPending | `1h:24`, `4h:42`, etc. |
+| **LTF rule** (5m/15m từ hard_rules.json) | Rule fire | ❌ skip (PA A2) | `5m:1`, `15m:22`, etc. |
+| **5m ALL Engine** | Mỗi cây 5m close, eval Stoch+S/R per preset | ❌ skip (PA A2) | `5mall:<bar5mTime>` |
+
+Mọi path share: `trackedPositions[]` ledger + Plan B monitor + SMART reconcile + circuit breakers.
+
+---
 **Files:** `utils/liveTraderEngine.ts`, `hooks/useBinanceLive.ts`, `utils/leaderElection.ts`, `utils/binanceLive.ts`, `utils/gistSync.ts`
 
 ---
