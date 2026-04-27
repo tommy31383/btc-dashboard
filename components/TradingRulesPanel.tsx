@@ -305,10 +305,12 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
           // Backtest age
           let ageBadge: { label: string; color: string } | null = null;
           if (stats.lastBacktestAt) {
-            const ageMs = Date.now() - new Date(stats.lastBacktestAt).getTime();
-            const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
-            const c = ageDays > 30 ? COLORS.warning : COLORS.textMuted;
-            ageBadge = { label: ageDays === 0 ? "Hôm nay" : `${ageDays}d trước`, color: c };
+            const t = new Date(stats.lastBacktestAt).getTime();
+            if (Number.isFinite(t)) {
+              const ageDays = Math.floor((Date.now() - t) / (1000 * 60 * 60 * 24));
+              const c = ageDays > 30 ? COLORS.warning : COLORS.textMuted;
+              ageBadge = { label: ageDays === 0 ? "Hôm nay" : `${ageDays}d trước`, color: c };
+            }
           }
           return (
             <View style={styles.rcEquityRow}>

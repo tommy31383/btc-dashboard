@@ -98,37 +98,59 @@ cp android/app/build/outputs/apk/release/app-release.apk ../btc-dashboard-v<VERS
 
 App có **3 engine song song**, mỗi cái có nguồn trigger + account riêng. KHÔNG nhầm lẫn:
 
-### 1. `use5mAllTrader` — Tab 5m ALL (paper test, local)
+### 1. `use5mAllTrader` — Tab 5m ALL (paper test, local) — v4.7.1+
 - File: `hooks/use5mAllTrader.ts` + `utils/all5mAccount.ts`
-- Storage: AsyncStorage `@all5m_data_v1` (KHÔNG sync git)
-- Trigger: **mỗi cây 5m close** → Stoch K<10 → LONG, K>90 → SHORT, fallback S/R 15m
+- Storage: AsyncStorage `@all5m_data_v1` (sync gist) + `@all5m_preset_v1` (preset key, local only)
+- Trigger: **mỗi cây 5m close** → Stoch K<level → LONG, K>level → SHORT, fallback S/R 15m
 - Account: paper $1000, margin $30, lev 100x
 - Chạy nền **liên tục** (App.tsx pass `enabled=true`, không gate theo activeTab) — fix v4.3.66
 - KHÔNG liên quan rule trong `hard_rules.json`. KHÔNG liên quan Binance.
+- **3 PRESET switch trong UI** (default BALANCED 🟡 EAGLE):
+  - 🔴 **WHALE** (highest PnL): TP5/SL2.5, stack 75, dist 0%, cooldown 5m, stoch 10/90, srProx 0.4%, srLB 30 — expected 3y +$1.52M / DD $5.9k
+  - 🟡 **EAGLE** (balanced): TP5/SL2.5, stack 30, dist 0.1%, cooldown 5m, stoch 15/85, srProx 0.4%, srLB 50 — expected 3y +$634k / DD $1.98k
+  - 🟢 **TURTLE** (lowest DD): TP3.5/SL2, stack 15, dist 0.3%, cooldown 15m, stoch 10/90, srProx 0.4%, srLB 80 — expected 3y +$241k / DD $792
+- Switch preset → lệnh OPEN giữ TP/SL CŨ, lệnh MỚI dùng preset mới
+- Doc đầy đủ: `5MALL_TRADING_RULES.md` (Phase 2 sweep insights)
 
-### 2. `useAutoTrader` — Tab CLAUDE (paper, legacy)
+### 2. `useAutoTrader` — paper engine (LEGACY, v4.7+)
 - File: `hooks/useAutoTrader.ts` + `utils/autoAccount.ts`
 - Storage: AsyncStorage `paper_trades.json` + sync gist
-- Trigger: subscribe `activeAlerts` từ `useRuleAlerts` (rule trong `hard_rules.json` fire)
+- Trigger: subscribe `activeAlerts` từ `useRuleAlerts`
 - Account: paper $1000 cap, $30 margin, 100x, limit ±0.1% chờ tối đa 5p
-- Render trong `AutoTraderPanel` (Dashboard tab)
+- Render trong `AutoTraderPanel` (Dashboard tab cuối panel)
+- **STATUS:** Legacy — đã được LIVE engine thay thế cho production.
+  Giữ lại để compare paper vs live nếu cần. Tab HISTORY (xem paper closed trades) **đã xoá v4.7.2**.
 
-### 3. `useBinanceLive` — Tab LIVE (Binance real)
+### 3. `useBinanceLive` — Tab LIVE (Binance real) — production
 - File: `hooks/useBinanceLive.ts` + `utils/liveTraderEngine.ts` + `utils/binanceLive.ts`
 - Storage: AsyncStorage `@live_trader_v2` (settings + journal — sync git via `live_trading.json`) + `@live_trader_secret_v1` (API key/secret — LOCAL ONLY, KHÔNG sync)
 - Trigger: subscribe `activeAlerts` từ `useRuleAlerts` (cùng nguồn AutoTrader)
 - Filter: `state.settings.excludedTfs` (default `["5m"]`)
-- 2 mode: **DRY RUN** (chỉ log) hoặc **REAL ORDERS** (POST /fapi/v1/order MARKET + STOP_MARKET + TAKE_PROFIT_MARKET)
-- Circuit breakers: maxOpen, dailyLossCapUsd → cooldownMinutes pause
+- 2 mode: **DRY RUN** (chỉ log) hoặc **REAL ORDERS** (POST /fapi/v1/order MARKET — Plan B self-monitor TP/SL, KHÔNG dùng STOP_MARKET)
+- Hedge mode + ledger 2 lớp (Binance gộp 1 net LONG + 1 net SHORT, app maintain N tracked entries với TP/SL riêng, partial close reduceOnly khi hit)
+- Circuit breakers: `maxOpen`, `dailyLossCapUsd` → `cooldownMinutes` pause; **Equity DD Protection** (`equityDdPausePct` / `equityDdPauseHours`)
+- PRESET B mặc định: stack max 50/side, dist 0%, spacing 0m, notional cap $200k
+- "Apply Best" button trong SETTINGS card → 1-click optimal config
 - Render trong `LiveTab` (BottomNav → LIVE)
+- Doc đầy đủ: `LIVE_TRADING_RULES.md`
 
 ### Bảng trigger summary
 
-| Source event | 5m ALL | AutoTrader (CLAUDE) | LIVE (Binance) |
+| Source event | 5m ALL | AutoTrader (paper, legacy) | LIVE (Binance) |
 |---|---|---|---|
-| Cây 5m close + Stoch <10 | ✅ paper | ❌ | ❌ |
-| Rule `1h:rank3` FIRE | ❌ | ✅ paper | ✅ real (nếu AUTO ON) |
+| Cây 5m close + Stoch theo preset | ✅ paper | ❌ | ❌ |
+| Rule `1h:rank3` FIRE | ❌ | ✅ paper | ✅ real (nếu AUTO ON, qua Phase 2 LTF confirm) |
 | Rule `5m:1` baseline FIRE | ❌ | ✅ paper | ❌ (TF 5m excluded mặc định) |
+
+### BottomNav tabs hiện tại (v4.7.2)
+
+| Tab | Component | Mô tả |
+|---|---|---|
+| **RULE** (default) | `App.tsx` dashboard | Rule list + chart + AutoTraderPanel |
+| **LIVE** | `LiveTab` | Binance Futures real |
+| **5m ALL** (PC only) | `All5mPanel` | Paper engine với 3 preset switch |
+
+Tab HISTORY đã xoá v4.7.2 (HistoryScreen render AutoTrader closed — paper legacy redundant với Rule backtest stats + LIVE journal).
 
 ### Quy tắc khi sửa engine
 - **KHÔNG cross-trigger**: 5m ALL không được fire vào LIVE (và ngược lại) trừ khi Tommy yêu cầu rõ.

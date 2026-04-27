@@ -479,7 +479,9 @@ export default function App() {
 
         {/* LIVE TRADING moved to dedicated tab (BottomNav → LIVE) */}
 
-        {/* v4.3.41 — AUTO TRADER: tự động vào lệnh khi rule fire (1000U cap, 30U margin, 100x lev) */}
+        {/* AUTO TRADER (paper, legacy) — subscribe rule fire vào paper account $1000.
+            LIVE engine (tab LIVE) đã thay thế cho production. Panel này giữ lại
+            để Tommy compare paper vs live nếu cần. */}
         <PanelBoundary name="AutoTraderPanel">
           <AutoTraderPanel
             account={autoTrader.account}
