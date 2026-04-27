@@ -2505,12 +2505,27 @@
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777325843455,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76981.53,
+        "tpPrice": 78136.25295,
+        "slPrice": 69283.37700000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
     "15m:22": 1777325676032,
     "15m:23": 1777325676398,
-    "15m:16": 1777322711186,
+    "15m:16": 1777325843461,
     "1h:10": 1777310262046,
     "1h:4": 1777310262301,
     "1h:5": 1777310262528,
@@ -3088,6 +3103,15 @@
       "tpPrice": 75401.6116,
       "slPrice": 78479.22839999999,
       "entryMs": 1777325676613
+    },
+    {
+      "id": "15m:16",
+      "side": "LONG",
+      "qty": 0.001,
+      "entryPrice": 76981.53,
+      "tpPrice": 78136.25295,
+      "slPrice": 69283.37700000001,
+      "entryMs": 1777325843689
     }
   ],
   "pendingAlerts": [],
@@ -32781,5 +32805,5 @@
     ],
     "dailyPnl": -2.613086169999999
   },
-  "lastTrackedMutationMs": 1777325676613
+  "lastTrackedMutationMs": 1777325843689
 }
