@@ -34,7 +34,7 @@ import AlertLog from "./components/AlertLog";
 import OverallVerdict from "./components/OverallVerdict";
 import TradingRulesPanel from "./components/TradingRulesPanel";
 import RuleAlertBanner from "./components/RuleAlertBanner";
-import LiveFeatureSnapshot from "./components/LiveFeatureSnapshot";
+import LiveActionItems from "./components/LiveActionItems";
 import LiveRulesSummary from "./components/LiveRulesSummary";
 import RiskRadar from "./components/RiskRadar";
 import GptRuleScreen from "./components/GptRuleScreen";
@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.29";
+const APP_VERSION = "4.7.30";
 const BUILD_DATE = "2026-04-27";
 
 /**
@@ -469,13 +469,16 @@ export default function App() {
           <AlertBanner alerts={criticalAlerts} />
         </PanelBoundary>
 
-        {/* v4.3.16 — Live feature snapshot (B): show current RSI/MACD/ATR/EMA Dist/HTF */}
-        <PanelBoundary name="LiveFeatureSnapshot">
-          <LiveFeatureSnapshot
-            tfData={tfData}
-            trackedIds={tracked.trackedIds}
-            ruleStatus={ruleStatus}
-            ruleMatchDetails={ruleMatchDetails}
+        {/* v4.7.30 — LiveActionItems: STACK bars + EQ DD + active firing rules + S/R zones */}
+        <PanelBoundary name="LiveActionItems">
+          <LiveActionItems
+            liveState={live.state}
+            walletEquity={live.account ? parseFloat(live.account.totalWalletBalance) + parseFloat(live.account.totalUnrealizedProfit) : null}
+            activeAlerts={activeAlerts}
+            currentPrice={priceData?.price ?? null}
+            support15m={ltfCtx.support15m}
+            resistance15m={ltfCtx.resistance15m}
+            onGoToLive={() => { setNavTab("live"); setActiveTab("live"); }}
           />
         </PanelBoundary>
 
