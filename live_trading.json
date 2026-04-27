@@ -1219,11 +1219,41 @@
         "reason": "entry $77761 ≥ avg LONG $77700 — chỉ vào nếu THẤP hơn (better entry only vs-avg)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777284405812,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 77806.15,
+        "tpPrice": 76250.02699999999,
+        "slPrice": 79362.273,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777284406109,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 77806.15,
+        "tpPrice": 76250.02699999999,
+        "slPrice": 79362.273,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
-    "15m:22": 1777270313312,
-    "15m:23": 1777270313616,
+    "15m:22": 1777284405814,
+    "15m:23": 1777284406114,
     "15m:16": 1777279533670
   },
   "trackedPositions": [
@@ -1424,6 +1454,24 @@
       "tpPrice": 78836.35934999998,
       "slPrice": 69904.161,
       "entryMs": 1777279533988
+    },
+    {
+      "id": "15m:22",
+      "side": "SHORT",
+      "qty": 0.001,
+      "entryPrice": 77806.15,
+      "tpPrice": 76250.02699999999,
+      "slPrice": 79362.273,
+      "entryMs": 1777284406104
+    },
+    {
+      "id": "15m:23",
+      "side": "SHORT",
+      "qty": 0.001,
+      "entryPrice": 77806.15,
+      "tpPrice": 76250.02699999999,
+      "slPrice": 79362.273,
+      "entryMs": 1777284406398
     }
   ],
   "pendingAlerts": [],
@@ -31117,5 +31165,5 @@
     ],
     "dailyPnl": -1.04454919
   },
-  "lastTrackedMutationMs": 1777279533988
+  "lastTrackedMutationMs": 1777284406398
 }
