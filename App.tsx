@@ -41,11 +41,10 @@ import GptRuleScreen from "./components/GptRuleScreen";
 import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 // PaperTradeJournal removed (trùng với LIVE journal + 5m ALL panel)
-import AutoTraderPanel from "./components/AutoTraderPanel";
+import UnifiedTradesPanel from "./components/UnifiedTradesPanel";
 // LiveTradingPanel moved to dedicated LiveTab
 import LiveTab from "./components/LiveTab";
 import All5mPanel from "./components/All5mPanel";
-import { useAutoTrader } from "./hooks/useAutoTrader";
 import { useBinanceLive } from "./hooks/useBinanceLive";
 // import { use15mAllTrader } from "./hooks/use15mAllTrader"; // disabled — replaced by LIVE tab
 import { use5mAllTrader } from "./hooks/use5mAllTrader";
@@ -63,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.5";
+const APP_VERSION = "4.7.6";
 const BUILD_DATE = "2026-04-27";
 
 /**
@@ -166,9 +165,8 @@ export default function App() {
   // Learner + Paper Trader: log mỗi rule fire, resolve khi giá hit SL/TP/timeout
   const calib = useCalibration(activeAlerts, priceData?.price ?? null);
 
-  // v4.3.41 — Auto Trader: tự động vào lệnh khi rule fire (paper account
-  // 1000 USD, margin 30/lệnh, lev 100x, limit ±0.1% chờ tối đa 5p).
-  const autoTrader = useAutoTrader(activeAlerts, priceData?.price ?? null);
+  // v4.7.6 — AutoTrader (paper legacy) đã xoá. Tab Rule giờ show
+  // UnifiedTradesPanel gộp LIVE (real) + 5m ALL (paper) — đúng nguồn production.
 
   // v4.3.52 — Binance Live; v4.3.82 — pass LTF context (stoch5m + S/R 15m) cho confirm
   const ltfCtx = (() => {
@@ -479,15 +477,15 @@ export default function App() {
 
         {/* LIVE TRADING moved to dedicated tab (BottomNav → LIVE) */}
 
-        {/* AUTO TRADER (paper, legacy) — subscribe rule fire vào paper account $1000.
-            LIVE engine (tab LIVE) đã thay thế cho production. Panel này giữ lại
-            để Tommy compare paper vs live nếu cần. */}
-        <PanelBoundary name="AutoTraderPanel">
-          <AutoTraderPanel
-            account={autoTrader.account}
-            summary={autoTrader.summary}
+        {/* UNIFIED TRADES — gộp lệnh OPEN từ LIVE (Binance real) + 5m ALL (paper).
+            v4.7.6: thay AutoTraderPanel paper legacy bằng panel read-only đúng nguồn. */}
+        <PanelBoundary name="UnifiedTradesPanel">
+          <UnifiedTradesPanel
+            liveState={live.state}
+            all5mAccount={all5m.account}
             currentPrice={priceData?.price ?? null}
-            onReset={autoTrader.reset}
+            onGoToLive={() => { setNavTab("live"); setActiveTab("live"); }}
+            onGoToAll5m={() => { setNavTab("all5m"); setActiveTab("all5m"); }}
           />
         </PanelBoundary>
 
