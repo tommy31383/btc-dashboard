@@ -2960,6 +2960,16 @@
         "reason": "per-rule cooldown 8m (rule 15m:16)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777329937300,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 5m (rule 15m:16)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
