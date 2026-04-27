@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"/>
+<title>5m ALL Backtest 3-Year · BTC Dashboard</title>
+<style>
+  body { background:#131313; color:#e5e2e1; font-family:'JetBrains Mono','Menlo',monospace; font-size:12px; padding:18px; margin:0; }
+  h1 { color:#F7931A; font-size:20px; letter-spacing:1px; margin:0 0 6px 0; }
+  h2 { color:#ffdcc0; font-size:14px; letter-spacing:1px; margin:24px 0 10px 0; border-bottom:1px solid #2a2a2a; padding-bottom:4px; }
+  .info { color:#9f8e80; font-size:11px; margin-bottom:16px; line-height:1.7; }
+  .card { background:#1a1a1a; border:1px solid #2a2a2a; padding:14px 18px; border-radius:6px; margin-bottom:14px; }
+  .agg { display:flex; flex-wrap:wrap; gap:24px; align-items:center; }
+  .stat { color:#cfc6bc; }
+  .stat b { color:#ffdcc0; font-size:14px; }
+  .pos { color:#10b981; }
+  .neg { color:#ffb4ab; }
+  .roiBadge { display:inline-block; padding:6px 14px; border-radius:14px; font-size:16px; font-weight:700; }
+  .srcGrid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+  .srcCard { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:6px; padding:12px; }
+  .srcTitle { color:#F7931A; font-size:13px; font-weight:700; margin-bottom:8px; letter-spacing:1px; }
+  .srcRow { color:#cfc6bc; font-size:11px; line-height:1.7; }
+  .srcRow b { color:#ffdcc0; }
+  table { border-collapse:collapse; width:100%; }
+  th, td { border:1px solid #2a2a2a; padding:6px 9px; text-align:left; }
+  th { background:#1c1b1b; color:#F7931A; font-size:10px; letter-spacing:1px; text-transform:uppercase; }
+  tr:nth-child(2n) td { background:#181818; }
+  .blocks { color:#9f8e80; font-size:11px; line-height:1.8; }
+  .blocks b { color:#ffb874; }
+</style></head>
+<body>
+<h1>📊 5m ALL · LIVE-LOGIC BACKTEST · 3 YEAR · BTC/USDT</h1>
+<div class="info">
+  Generated: 2026-04-27T00:02:02.777Z ·
+  Total 5m candles: <b>315,360</b> ·
+  Years: 3 · Fee/side: 0.05% · Stack max: 15/side · Spacing: 10m · MinDist: 0.3%<br>
+  Engine: Stoch5m K&lt;10 LONG / K&gt;90 SHORT, fallback S/R 15m (lookback 50, ≤0.3% proximity) · TP +4% / SL -2% · Margin $30 × 100x = $3000 notional · Cooldown 10m all-side
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">⚡ AGGREGATE</h2>
+  <div class="agg">
+    <div class="stat">Trades: <b>13963</b></div>
+    <div class="stat">W/L: <b>4673/9290</b></div>
+    <div class="stat">Win rate: <b style="color:#ffb4ab">33.5%</b></div>
+    <div class="stat">PF: <b>1.78</b></div>
+    <div class="stat">Avg hold: <b>487.1 × 5m</b></div>
+    <div class="stat">NET: <b class="pos">+$240171.00</b></div>
+    <div class="stat">MaxDD: <b class="neg">-$972.00</b></div>
+    <div class="stat">Final capital: <b>$241171.00</b></div>
+    <div class="stat">ROI: <span class="roiBadge" style="background:#10b98122;color:#10b981">+24017.1%</span></div>
+  </div>
+  <div class="blocks" style="margin-top:14px">
+    Blocked entries — cooldown 10m all-side: <b>11039</b> ·
+    stack full: <b>60785</b> ·
+    spacing same-side: <b>0</b> ·
+    distance &lt;0.3%: <b>63164</b>
+  </div>
+</div>
+
+<h2>📈 EQUITY CURVE (USD · 200 pts · baseline $1000)</h2>
+<div class="card"><svg width="720" height="220" style="display:block">
+    <line x1="0" y1="219.9" x2="720" y2="219.9" stroke="#666" stroke-dasharray="4,3" stroke-width="0.8"/>
+    <polyline points="0.0,219.9 3.6,220.0 7.2,218.8 10.9,218.2 14.5,216.9 18.1,215.8 21.7,214.5 25.3,212.4 28.9,211.5 32.6,211.4 36.2,211.6 39.8,210.6 43.4,209.4 47.0,208.4 50.7,207.6 54.3,206.7 57.9,205.8 61.5,205.0 65.1,203.0 68.7,202.1 72.4,200.1 76.0,199.6 79.6,198.0 83.2,197.3 86.8,195.5 90.5,194.0 94.1,193.1 97.7,191.9 101.3,189.5 104.9,189.2 108.5,187.9 112.2,187.2 115.8,185.9 119.4,185.0 123.0,184.6 126.6,183.6 130.3,182.5 133.9,182.2 137.5,181.4 141.1,179.8 144.7,178.9 148.3,178.6 152.0,177.4 155.6,176.2 159.2,175.3 162.8,175.1 166.4,174.3 170.1,172.6 173.7,171.7 177.3,170.5 180.9,169.8 184.5,168.6 188.1,168.0 191.8,167.1 195.4,165.7 199.0,164.6 202.6,162.4 206.2,162.4 209.8,160.6 213.5,160.4 217.1,159.0 220.7,157.9 224.3,156.2 227.9,155.3 231.6,153.6 235.2,152.7 238.8,151.9 242.4,150.9 246.0,149.7 249.6,148.9 253.3,147.2 256.9,146.8 260.5,145.0 264.1,144.0 267.7,143.9 271.4,142.3 275.0,140.8 278.6,139.2 282.2,138.7 285.8,137.6 289.4,135.7 293.1,134.4 296.7,133.5 300.3,131.9 303.9,131.4 307.5,130.7 311.2,129.6 314.8,129.3 318.4,127.9 322.0,126.4 325.6,125.7 329.2,124.6 332.9,123.7 336.5,122.2 340.1,121.3 343.7,120.5 347.3,118.7 351.0,117.7 354.6,116.6 358.2,115.6 361.8,114.4 365.4,113.1 369.0,111.7 372.7,110.6 376.3,109.5 379.9,108.1 383.5,107.3 387.1,106.0 390.8,105.2 394.4,104.1 398.0,102.6 401.6,100.9 405.2,99.7 408.8,98.5 412.5,97.6 416.1,95.9 419.7,94.2 423.3,93.0 426.9,91.3 430.6,90.9 434.2,89.5 437.8,87.9 441.4,86.9 445.0,86.5 448.6,84.8 452.3,83.2 455.9,82.0 459.5,80.3 463.1,79.9 466.7,78.3 470.4,78.1 474.0,77.5 477.6,77.1 481.2,75.6 484.8,74.1 488.4,73.2 492.1,72.3 495.7,71.3 499.3,70.1 502.9,69.1 506.5,67.7 510.2,67.7 513.8,66.1 517.4,65.3 521.0,63.4 524.6,62.0 528.2,60.7 531.9,59.6 535.5,58.2 539.1,57.0 542.7,56.1 546.3,54.1 549.9,52.5 553.6,52.6 557.2,51.1 560.8,49.4 564.4,47.9 568.0,46.9 571.7,45.1 575.3,43.7 578.9,42.3 582.5,41.1 586.1,39.9 589.7,38.1 593.4,37.2 597.0,36.1 600.6,35.2 604.2,34.5 607.8,33.0 611.5,31.9 615.1,31.2 618.7,30.3 622.3,29.4 625.9,27.8 629.5,27.5 633.2,26.6 636.8,25.7 640.4,24.5 644.0,24.3 647.6,22.8 651.3,21.1 654.9,19.7 658.5,18.6 662.1,17.0 665.7,16.4 669.3,16.0 673.0,15.1 676.6,13.8 680.2,12.1 683.8,10.9 687.4,9.5 691.1,8.2 694.7,7.0 698.3,5.3 701.9,4.2 705.5,4.0 709.1,2.4 712.8,2.7 716.4,0.7 720.0,0.0" fill="none" stroke="#F7931A" stroke-width="1.6"/>
+    <text x="6" y="14" fill="#9f8e80" font-size="11">max $241171</text>
+    <text x="6" y="215.9" fill="#9f8e80" font-size="10">baseline $1000</text>
+    <text x="6" y="214" fill="#9f8e80" font-size="11">min $940</text>
+  </svg></div>
+
+<h2>🎯 PER-SOURCE BREAKDOWN</h2>
+<div class="srcGrid"><div class="srcCard">
+      <div class="srcTitle">stoch_long</div>
+      <div class="srcRow">Raw signals: <b>40292</b></div>
+      <div class="srcRow">Trades: <b>6130</b> (W 2135 / L 3995)</div>
+      <div class="srcRow">WR: <b style="color:#ffb4ab">34.8%</b></div>
+      <div class="srcRow">Avg W/L raw: +4.00% / -2.00%</div>
+      <div class="srcRow">NET: <b style="color:#10b981">+$117960.00</b></div>
+      <div class="srcRow">PF: <b>1.89</b></div>
+    </div><div class="srcCard">
+      <div class="srcTitle">stoch_short</div>
+      <div class="srcRow">Raw signals: <b>41141</b></div>
+      <div class="srcRow">Trades: <b>6139</b> (W 1980 / L 4159)</div>
+      <div class="srcRow">WR: <b style="color:#ffb4ab">32.3%</b></div>
+      <div class="srcRow">Avg W/L raw: +4.00% / -2.00%</div>
+      <div class="srcRow">NET: <b style="color:#10b981">+$94413.00</b></div>
+      <div class="srcRow">PF: <b>1.69</b></div>
+    </div><div class="srcCard">
+      <div class="srcTitle">sr_long</div>
+      <div class="srcRow">Raw signals: <b>26438</b></div>
+      <div class="srcRow">Trades: <b>796</b> (W 255 / L 541)</div>
+      <div class="srcRow">WR: <b style="color:#ffb4ab">32.0%</b></div>
+      <div class="srcRow">Avg W/L raw: +4.00% / -2.00%</div>
+      <div class="srcRow">NET: <b style="color:#10b981">+$11982.00</b></div>
+      <div class="srcRow">PF: <b>1.67</b></div>
+    </div><div class="srcCard">
+      <div class="srcTitle">sr_short</div>
+      <div class="srcRow">Raw signals: <b>30071</b></div>
+      <div class="srcRow">Trades: <b>898</b> (W 303 / L 595)</div>
+      <div class="srcRow">WR: <b style="color:#ffb4ab">33.7%</b></div>
+      <div class="srcRow">Avg W/L raw: +4.00% / -2.00%</div>
+      <div class="srcRow">NET: <b style="color:#10b981">+$15816.00</b></div>
+      <div class="srcRow">PF: <b>1.81</b></div>
+    </div></div>
+
+<h2>📊 PnL DISTRIBUTION (raw price %)</h2>
+<div class="card"><svg width="720" height="180"><rect x="2.0" y="10.0" width="51.4" height="150.0" fill="#ffb4ab" opacity="0.85"/>
+            <text x="27.7" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">-2.0</text>
+            <text x="27.7" y="8.0" fill="#cfc6bc" font-size="9" text-anchor="middle">9290</text>
+<rect x="57.4" y="160.0" width="51.4" height="0.0" fill="#ffb4ab" opacity="0.85"/>
+            <text x="83.1" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">-1.5</text>
+            
+<rect x="112.8" y="160.0" width="51.4" height="0.0" fill="#ffb4ab" opacity="0.85"/>
+            <text x="138.5" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">-1.0</text>
+            
+<rect x="168.2" y="160.0" width="51.4" height="0.0" fill="#ffb4ab" opacity="0.85"/>
+            <text x="193.8" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">-0.5</text>
+            
+<rect x="223.5" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="249.2" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">0</text>
+            
+<rect x="278.9" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="304.6" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+0.5</text>
+            
+<rect x="334.3" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="360.0" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+1.0</text>
+            
+<rect x="389.7" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="415.4" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+1.5</text>
+            
+<rect x="445.1" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="470.8" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+2.0</text>
+            
+<rect x="500.5" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="526.2" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+2.5</text>
+            
+<rect x="555.8" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="581.5" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+3.0</text>
+            
+<rect x="611.2" y="160.0" width="51.4" height="0.0" fill="#10b981" opacity="0.85"/>
+            <text x="636.9" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+3.5</text>
+            
+<rect x="666.6" y="84.5" width="51.4" height="75.5" fill="#10b981" opacity="0.85"/>
+            <text x="692.3" y="174" fill="#9f8e80" font-size="9" text-anchor="middle">+4.0</text>
+            <text x="692.3" y="82.5" fill="#cfc6bc" font-size="9" text-anchor="middle">4673</text></svg></div>
+
+<h2>📅 TRADES PER MONTH</h2>
+<div class="card"><svg width="720" height="140">
+    <rect x="1.0" y="118.3" width="17.5" height="5.7" fill="#F7931A" opacity="0.8"/><rect x="20.5" y="69.4" width="17.5" height="54.6" fill="#F7931A" opacity="0.8"/><rect x="39.9" y="68.7" width="17.5" height="55.3" fill="#F7931A" opacity="0.8"/><rect x="59.4" y="95.0" width="17.5" height="29.0" fill="#F7931A" opacity="0.8"/><rect x="78.8" y="89.7" width="17.5" height="34.3" fill="#F7931A" opacity="0.8"/><rect x="98.3" y="87.0" width="17.5" height="37.0" fill="#F7931A" opacity="0.8"/><rect x="117.8" y="73.3" width="17.5" height="50.7" fill="#F7931A" opacity="0.8"/><rect x="137.2" y="63.9" width="17.5" height="60.1" fill="#F7931A" opacity="0.8"/><rect x="156.7" y="52.8" width="17.5" height="71.2" fill="#F7931A" opacity="0.8"/><rect x="176.1" y="36.3" width="17.5" height="87.7" fill="#F7931A" opacity="0.8"/><rect x="195.6" y="70.6" width="17.5" height="53.4" fill="#F7931A" opacity="0.8"/><rect x="215.1" y="8.0" width="17.5" height="116.0" fill="#F7931A" opacity="0.8"/><rect x="234.5" y="21.0" width="17.5" height="103.0" fill="#F7931A" opacity="0.8"/><rect x="254.0" y="47.3" width="17.5" height="76.7" fill="#F7931A" opacity="0.8"/><rect x="273.4" y="74.2" width="17.5" height="49.8" fill="#F7931A" opacity="0.8"/><rect x="292.9" y="29.3" width="17.5" height="94.7" fill="#F7931A" opacity="0.8"/><rect x="312.4" y="14.0" width="17.5" height="110.0" fill="#F7931A" opacity="0.8"/><rect x="331.8" y="53.7" width="17.5" height="70.3" fill="#F7931A" opacity="0.8"/><rect x="351.3" y="53.2" width="17.5" height="70.8" fill="#F7931A" opacity="0.8"/><rect x="370.7" y="26.1" width="17.5" height="97.9" fill="#F7931A" opacity="0.8"/><rect x="390.2" y="32.9" width="17.5" height="91.1" fill="#F7931A" opacity="0.8"/><rect x="409.6" y="38.6" width="17.5" height="85.4" fill="#F7931A" opacity="0.8"/><rect x="429.1" y="54.8" width="17.5" height="69.2" fill="#F7931A" opacity="0.8"/><rect x="448.6" y="29.7" width="17.5" height="94.3" fill="#F7931A" opacity="0.8"/><rect x="468.0" y="58.7" width="17.5" height="65.3" fill="#F7931A" opacity="0.8"/><rect x="487.5" y="70.6" width="17.5" height="53.4" fill="#F7931A" opacity="0.8"/><rect x="506.9" y="73.1" width="17.5" height="50.9" fill="#F7931A" opacity="0.8"/><rect x="526.4" y="92.5" width="17.5" height="31.5" fill="#F7931A" opacity="0.8"/><rect x="545.9" y="73.5" width="17.5" height="50.5" fill="#F7931A" opacity="0.8"/><rect x="565.3" y="97.1" width="17.5" height="26.9" fill="#F7931A" opacity="0.8"/><rect x="584.8" y="43.0" width="17.5" height="81.0" fill="#F7931A" opacity="0.8"/><rect x="604.2" y="35.9" width="17.5" height="88.1" fill="#F7931A" opacity="0.8"/><rect x="623.7" y="59.1" width="17.5" height="64.9" fill="#F7931A" opacity="0.8"/><rect x="643.2" y="68.7" width="17.5" height="55.3" fill="#F7931A" opacity="0.8"/><rect x="662.6" y="19.2" width="17.5" height="104.8" fill="#F7931A" opacity="0.8"/><rect x="682.1" y="26.5" width="17.5" height="97.5" fill="#F7931A" opacity="0.8"/><rect x="701.5" y="77.9" width="17.5" height="46.1" fill="#F7931A" opacity="0.8"/>
+    <text x="2" y="138" fill="#9f8e80" font-size="10">2023-04</text>
+    <text x="670" y="138" fill="#9f8e80" font-size="10">2026-04</text>
+    <text x="620" y="12" fill="#9f8e80" font-size="10">max 652/mo</text>
+  </svg></div>
+
+<h2>📋 RECENT 50 TRADES</h2>
+<table>
+<thead><tr>
+  <th>Time (UTC)</th><th>Side</th><th>Source</th><th>Entry</th><th>Exit</th><th>Net $</th><th>Outcome</th>
+</tr></thead>
+<tbody>
+<tr>
+      <td>2026-04-22 14:40</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$78699.5</td>
+      <td>$77125.5</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-22 20:20</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$78556.0</td>
+      <td>$76984.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-22 16:40</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$78813.9</td>
+      <td>$77237.6</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-22 16:15</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$79127.4</td>
+      <td>$77544.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-21 09:25</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$76246.8</td>
+      <td>$79296.6</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 19:20</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$76193.4</td>
+      <td>$79241.2</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-22 03:00</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">sr_short</td>
+      <td>$77604.4</td>
+      <td>$79156.5</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 21:15</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75917.3</td>
+      <td>$78954.0</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-21 01:55</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75927.6</td>
+      <td>$78964.7</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 23:25</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75658.0</td>
+      <td>$78684.3</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-21 02:35</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75650.0</td>
+      <td>$78676.0</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-22 02:20</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$77015.1</td>
+      <td>$78555.4</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-18 09:35</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76607.7</td>
+      <td>$78139.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 07:15</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75122.6</td>
+      <td>$78127.5</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-19 17:00</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75160.0</td>
+      <td>$78166.4</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 10:40</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75174.4</td>
+      <td>$78181.4</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 16:30</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$75396.0</td>
+      <td>$78411.8</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-21 08:45</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76659.0</td>
+      <td>$78192.2</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-18 12:00</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76225.9</td>
+      <td>$77750.4</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 07:45</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$74856.6</td>
+      <td>$77850.9</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 15:00</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$74799.5</td>
+      <td>$77791.5</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 18:05</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76292.5</td>
+      <td>$77818.4</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-21 08:20</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">sr_short</td>
+      <td>$76332.1</td>
+      <td>$77858.7</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 18:00</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$74703.0</td>
+      <td>$77691.2</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-19 13:25</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76045.9</td>
+      <td>$77566.8</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-21 00:55</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76092.4</td>
+      <td>$77614.3</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-21 14:25</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76117.4</td>
+      <td>$77639.7</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 02:20</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$74446.1</td>
+      <td>$77423.9</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 17:15</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75855.9</td>
+      <td>$77373.0</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 23:55</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75841.0</td>
+      <td>$77357.8</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-21 05:05</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75931.8</td>
+      <td>$77450.4</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-18 19:05</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75742.0</td>
+      <td>$77256.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 13:05</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">sr_short</td>
+      <td>$75770.0</td>
+      <td>$77285.4</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 05:15</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$74221.1</td>
+      <td>$77190.0</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-21 03:30</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75669.4</td>
+      <td>$77182.7</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 11:45</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75542.4</td>
+      <td>$77053.3</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 07:50</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75232.3</td>
+      <td>$76736.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 22:00</td>
+      <td style="color:#10b981;font-weight:700">LONG</td>
+      <td style="font-size:10px">stoch_long</td>
+      <td>$73886.3</td>
+      <td>$76841.8</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-20 07:20</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75380.2</td>
+      <td>$76887.8</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 19:15</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$75021.0</td>
+      <td>$76521.4</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 18:55</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74770.1</td>
+      <td>$76265.5</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 06:40</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74781.3</td>
+      <td>$76276.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-19 21:30</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74740.7</td>
+      <td>$76235.5</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 01:40</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74681.2</td>
+      <td>$76174.8</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 06:15</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74400.9</td>
+      <td>$75888.9</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 00:50</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74306.0</td>
+      <td>$75792.1</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-20 00:10</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$74044.3</td>
+      <td>$75525.2</td>
+      <td style="color:#ffb4ab;font-weight:700">$-33.00</td>
+      <td style="color:#ffb4ab;font-weight:700">LOSS</td>
+    </tr><tr>
+      <td>2026-04-17 13:20</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$76881.3</td>
+      <td>$73806.0</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-17 14:00</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">sr_short</td>
+      <td>$77302.8</td>
+      <td>$74210.7</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr><tr>
+      <td>2026-04-17 19:20</td>
+      <td style="color:#ffb4ab;font-weight:700">SHORT</td>
+      <td style="font-size:10px">stoch_short</td>
+      <td>$77345.3</td>
+      <td>$74251.5</td>
+      <td style="color:#10b981;font-weight:700">+$117.00</td>
+      <td style="color:#10b981;font-weight:700">WIN</td>
+    </tr>
+</tbody></table>
+</body></html>
