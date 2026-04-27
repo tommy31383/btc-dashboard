@@ -1,13 +1,37 @@
 {
   "version": 1,
-  "capitalUsd": 1081.8372564978542,
+  "capitalUsd": 1096.6542736325425,
   "positions": [
+    {
+      "id": "auto_1777254945650_mvra1e",
+      "ruleId": "5m:1",
+      "tfKey": "5m",
+      "side": "LONG",
+      "status": "OPEN",
+      "ruleEntryPrice": 79181.6,
+      "limitPrice": 79102.41840000001,
+      "slPrice": 77520.370032,
+      "tpPrice": 82266.51513600002,
+      "marginUsd": 30,
+      "leverage": 100,
+      "notionalUsd": 3000,
+      "targetPct": 4,
+      "stopPct": 2,
+      "maxHoldBars": 50,
+      "barMs": 300000,
+      "createdMs": 1777254945650,
+      "limitExpiresMs": 1777255245650,
+      "entryTfKey": "1m",
+      "entryPrice": 79102.41840000001,
+      "openedMs": 1777255054001,
+      "entryMode": "limit_filled"
+    },
     {
       "id": "auto_1777246271980_9og0b1",
       "ruleId": "5m:1",
       "tfKey": "5m",
       "side": "LONG",
-      "status": "OPEN",
+      "status": "TIMEOUT",
       "ruleEntryPrice": 78164.08,
       "limitPrice": 78085.91592,
       "slPrice": 77163.7496,
@@ -24,7 +48,10 @@
       "entryTfKey": "1m",
       "entryPrice": 78738.52,
       "openedMs": 1777247498318,
-      "entryMode": "auto_at_expiry"
+      "entryMode": "auto_at_expiry",
+      "exitPrice": 79127.41,
+      "pnlUsd": 14.817017134688312,
+      "closedMs": 1777262501039
     },
     {
       "id": "auto_1777239705757_c1xr76",
@@ -874,12 +901,12 @@
     }
   ],
   "stats": {
-    "totalTrades": 14,
+    "totalTrades": 15,
     "wins": 0,
     "losses": 0,
-    "timeouts": 14,
-    "totalPnLUsd": 81.8372564978543,
+    "timeouts": 15,
+    "totalPnLUsd": 96.65427363254261,
     "lastResetMs": 1777052014772
   },
-  "updatedAt": 1777258339179
+  "updatedAt": 1777262501039
 }
