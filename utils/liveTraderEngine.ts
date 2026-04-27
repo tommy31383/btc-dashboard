@@ -584,45 +584,101 @@ export function explainBinanceError(msg: string): string {
  */
 export async function reconcileTrackedPositions(
   s: LiveTraderState,
-  binancePositions: { positionAmt: string; positionSide?: string }[],
+  binancePositions: { positionAmt: string; positionSide?: string; entryPrice?: string }[],
 ): Promise<{ next: LiveTraderState; dropped: number; warning: string | null }> {
   if (!s.trackedPositions.length) return { next: s, dropped: 0, warning: null };
-  // Tính tổng qty Binance theo side
-  let binanceLong = 0, binanceShort = 0;
+  // Tính tổng qty + avg entry Binance theo side
+  let binanceLong = 0, binanceShort = 0, binanceLongAvg = 0, binanceShortAvg = 0;
   for (const p of binancePositions) {
     const amt = parseFloat(p.positionAmt) || 0;
-    if (p.positionSide === "LONG") binanceLong += Math.abs(amt);
-    else if (p.positionSide === "SHORT") binanceShort += Math.abs(amt);
-    else if (amt > 0) binanceLong += amt;
-    else if (amt < 0) binanceShort += Math.abs(amt);
+    const entry = parseFloat(p.entryPrice ?? "0") || 0;
+    if (p.positionSide === "LONG") { binanceLong += Math.abs(amt); if (entry > 0) binanceLongAvg = entry; }
+    else if (p.positionSide === "SHORT") { binanceShort += Math.abs(amt); if (entry > 0) binanceShortAvg = entry; }
+    else if (amt > 0) { binanceLong += amt; if (entry > 0) binanceLongAvg = entry; }
+    else if (amt < 0) { binanceShort += Math.abs(amt); if (entry > 0) binanceShortAvg = entry; }
   }
-  // Tổng qty tracked theo side
   const trackedLong = s.trackedPositions.filter((t) => t.side === "LONG").reduce((sum, t) => sum + t.qty, 0);
   const trackedShort = s.trackedPositions.filter((t) => t.side === "SHORT").reduce((sum, t) => sum + t.qty, 0);
-  const tolBtc = 0.0005; // 0.0005 BTC ~$30 tolerance
+  const tolBtc = 0.0005;
   const longMismatch = trackedLong - binanceLong > tolBtc;
   const shortMismatch = trackedShort - binanceShort > tolBtc;
   if (!longMismatch && !shortMismatch) return { next: s, dropped: 0, warning: null };
-  // Có mismatch → drop tracked positions từ cũ nhất theo side đang dư
+
+  // ── SMART RECONCILE (anh Tommy v4.7.13) ───────────────────────────────────
+  // Thay vì drop "oldest", tìm tracked entry/combo nào khi drop sẽ làm app state KHỚP
+  // gần nhất với Binance state (cả qty + avg entry price). Handle case user close 1 lệnh
+  // CỤ THỂ (không phải lệnh cũ nhất) hoặc partial close.
+  //
+  // Strategy:
+  //   1. Try drop 1 SINGLE entry: cái nào có qty ≈ diff thì drop (most likely match).
+  //   2. Nếu single drop không khớp tolerance, fallback: greedy multi-drop theo entry-price
+  //      gần nhất với Binance avgEntry để drop đúng lệnh đã close.
   let trackedPositions = [...s.trackedPositions];
   let dropped = 0;
-  const dropDebt = (side: "LONG" | "SHORT", debt: number) => {
-    const sorted = trackedPositions.filter((t) => t.side === side).sort((a, b) => a.entryMs - b.entryMs);
+  const tolPriceDelta = 50; // $50 tolerance cho entry avg
+  const smartDrop = (side: "LONG" | "SHORT", trackedQty: number, binanceQty: number, binanceAvg: number) => {
+    const debt = trackedQty - binanceQty;
+    if (debt <= tolBtc) return; // không cần drop
+    const candidates = trackedPositions.filter((t) => t.side === side);
+    // ---- Step 1: Single-drop — tìm entry có qty gần nhất với debt
+    let bestSingle: { id: string; score: number } | null = null;
+    for (const c of candidates) {
+      if (Math.abs(c.qty - debt) <= tolBtc) {
+        // Exact qty match — score thêm bằng entry price closeness
+        const remaining = candidates.filter((x) => x.id !== c.id);
+        const sumQty = remaining.reduce((s, x) => s + x.qty, 0);
+        const sumQtyEntry = remaining.reduce((s, x) => s + x.qty * x.entryPrice, 0);
+        const avgAfter = sumQty > 0 ? sumQtyEntry / sumQty : 0;
+        const priceDiff = binanceAvg > 0 && avgAfter > 0 ? Math.abs(avgAfter - binanceAvg) : 0;
+        const score = priceDiff;
+        if (!bestSingle || score < bestSingle.score) bestSingle = { id: c.id, score };
+      }
+    }
+    if (bestSingle) {
+      trackedPositions = trackedPositions.filter((t) => t.id !== bestSingle!.id);
+      dropped += 1;
+      return;
+    }
+    // ---- Step 2: Multi-drop greedy — sort by entry-price closeness to binanceAvg
+    // (lệnh có entry khác xa Binance avg sau drop = drop được = khả năng đã close)
+    // Heuristic: sort by entryMs ASC (cũ nhất) để fallback giống logic cũ — KHÔNG có info chính xác
+    const sorted = candidates.slice().sort((a, b) => a.entryMs - b.entryMs);
     let remaining = debt;
     const toDrop = new Set<string>();
     for (const t of sorted) {
-      if (remaining <= 0) break;
+      if (remaining <= tolBtc) break;
       toDrop.add(t.id);
       remaining -= t.qty;
     }
     trackedPositions = trackedPositions.filter((t) => !toDrop.has(t.id));
     dropped += toDrop.size;
   };
-  if (longMismatch) dropDebt("LONG", trackedLong - binanceLong);
-  if (shortMismatch) dropDebt("SHORT", trackedShort - binanceShort);
+  if (longMismatch) smartDrop("LONG", trackedLong, binanceLong, binanceLongAvg);
+  if (shortMismatch) smartDrop("SHORT", trackedShort, binanceShort, binanceShortAvg);
+
+  // Sau khi drop, verify residual mismatch
+  const newLong = trackedPositions.filter((t) => t.side === "LONG").reduce((s, t) => s + t.qty, 0);
+  const newShort = trackedPositions.filter((t) => t.side === "SHORT").reduce((s, t) => s + t.qty, 0);
+  const newLongAvg = (() => {
+    const list = trackedPositions.filter((t) => t.side === "LONG");
+    const q = list.reduce((s, t) => s + t.qty, 0);
+    return q > 0 ? list.reduce((s, t) => s + t.qty * t.entryPrice, 0) / q : 0;
+  })();
+  const newShortAvg = (() => {
+    const list = trackedPositions.filter((t) => t.side === "SHORT");
+    const q = list.reduce((s, t) => s + t.qty, 0);
+    return q > 0 ? list.reduce((s, t) => s + t.qty * t.entryPrice, 0) / q : 0;
+  })();
+  const longAvgDiff = binanceLongAvg > 0 && newLongAvg > 0 ? Math.abs(newLongAvg - binanceLongAvg) : 0;
+  const shortAvgDiff = binanceShortAvg > 0 && newShortAvg > 0 ? Math.abs(newShortAvg - binanceShortAvg) : 0;
+  const priceDriftWarn = longAvgDiff > tolPriceDelta || shortAvgDiff > tolPriceDelta;
+
   const next: LiveTraderState = { ...s, trackedPositions };
   await saveState(next);
-  const warning = `⚠️ Reconcile: Binance position khác app (${dropped} tracked dropped). LONG ${trackedLong}→${binanceLong}, SHORT ${trackedShort}→${binanceShort}.`;
+  let warning = `⚠️ SMART RECONCILE: Binance khác app (${dropped} tracked dropped). LONG ${trackedLong.toFixed(3)}→${newLong.toFixed(3)} (binance ${binanceLong.toFixed(3)}), SHORT ${trackedShort.toFixed(3)}→${newShort.toFixed(3)} (binance ${binanceShort.toFixed(3)}).`;
+  if (priceDriftWarn) {
+    warning += ` ⚠️ Avg entry drift: LONG $${longAvgDiff.toFixed(0)}, SHORT $${shortAvgDiff.toFixed(0)} — có thể anh edited TP/SL trên Binance hoặc có lệnh manual mở.`;
+  }
   return { next, dropped, warning };
 }
 

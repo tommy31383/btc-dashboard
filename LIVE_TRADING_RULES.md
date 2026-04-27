@@ -52,11 +52,14 @@ App vượt giới hạn này bằng kiến trúc 2 lớp:
 | `stackMinEntryDistPct` | **0%** | bỏ gate khoảng cách price (0.3% trong PRESET A) |
 | `stackPerSideSpacingMin` | **0 phút** | bỏ gate spacing time |
 
-### Reconcile sau restart (`reconcileTrackedPositions`):
+### SMART Reconcile (v4.7.13 — anh Tommy):
 
 - So tổng `trackedPositions.qty` cùng side vs Binance `positionAmt` (cùng `positionSide`)
 - Tolerance: 0.0005 BTC (~$30)
-- Nếu Binance < app (user close manual) → **drop tracked entry cũ nhất** cho khớp + log warning
+- Nếu Binance < app (user close manual):
+  - **Step 1 (single-drop):** tìm tracked entry có `qty ≈ debt` (≤ 0.0005 BTC) → drop chính xác lệnh đó. Nếu nhiều candidate → chọn cái khi drop làm `avg entry post-drop` gần nhất với Binance `entryPrice`
+  - **Step 2 (multi-drop greedy):** fallback nếu single-drop không khớp → drop từ cũ nhất tới khi sum qty đủ debt
+- **Avg entry drift detection:** sau drop, so `app post-drop avgEntry` vs Binance `entryPrice`. Nếu lệch > $50 → log warning "có thể anh edited TP/SL trên Binance hoặc có lệnh manual mở"
 
 ### Hard timeout:
 
