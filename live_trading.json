@@ -1331,361 +1331,108 @@
       "dryRun": false
     },
     {
-      "ts": 1777306666084,
+      "ts": 1777299421667,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77702 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777299421681,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77702 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777302586876,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77531 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777302586889,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77531 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306767487,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77126 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306767499,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77126 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306767508,
+      "ruleId": "4h:40",
+      "tfKey": "4h",
+      "action": {
+        "kind": "PENDING",
+        "side": "LONG",
+        "htfEntryPrice": 77125.96,
+        "tpPct": 5.000000000000012,
+        "slPct": 2.500000000000006
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777308649210,
       "ruleId": "15m:16",
       "tfKey": "15m",
       "action": {
         "kind": "ENTRY",
         "side": "LONG",
-        "entryPrice": 76833.35,
-        "tpPrice": 77985.85025,
-        "slPrice": 69150.01500000001,
+        "entryPrice": 76868.01,
+        "tpPrice": 78021.03014999999,
+        "slPrice": 69181.209,
         "qty": 0.001,
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
     },
     {
-      "ts": 1777306666698,
+      "ts": 1777308649962,
       "ruleId": "15m:16",
       "tfKey": "15m",
       "action": {
         "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306666709,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "PENDING",
-        "side": "SHORT",
-        "htfEntryPrice": 76833.35,
-        "tpPct": 3.0000000000000115,
-        "slPct": 1.4999999999999964
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306666722,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "PENDING",
-        "side": "SHORT",
-        "htfEntryPrice": 76833.35,
-        "tpPct": 3.0000000000000115,
-        "slPct": 1.0000000000000102
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306666733,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "PENDING",
-        "side": "SHORT",
-        "htfEntryPrice": 76833.35,
-        "tpPct": 3.0000000000000115,
-        "slPct": 1.0000000000000102
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306802238,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76831.43,
-        "tpPrice": 74526.48709999998,
-        "slPrice": 77983.90144999999,
-        "qty": 0.001,
-        "confirmedBy": "Stoch5m K=84.4 > 80"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306802582,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306802594,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76831.43,
-        "tpPrice": 74526.48709999998,
-        "slPrice": 77599.74429999999,
-        "qty": 0.001,
-        "confirmedBy": "Stoch5m K=84.4 > 80"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306802940,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306802951,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76831.43,
-        "tpPrice": 74526.48709999998,
-        "slPrice": 77599.74429999999,
-        "qty": 0.001,
-        "confirmedBy": "Stoch5m K=84.4 > 80"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306803340,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306922262,
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 74458.1797,
-        "slPrice": 77912.42514999998,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306922604,
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306922635,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 75225.7898,
-        "slPrice": 78296.23019999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306922991,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306923022,
-      "ruleId": "15m:11",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 75225.7898,
-        "slPrice": 78296.23019999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306923354,
-      "ruleId": "15m:11",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306923386,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 75225.7898,
-        "slPrice": 78296.23019999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306923733,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306923767,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 75225.7898,
-        "slPrice": 78296.23019999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306924120,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306924158,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 74458.1797,
-        "slPrice": 77912.42514999998,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306924513,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306924549,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 75225.7898,
-        "slPrice": 78296.23019999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306924894,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306924930,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76761.01,
-        "tpPrice": 75225.7898,
-        "slPrice": 78296.23019999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306925282,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     }
   ],
   "firedIds": {
-    "15m:22": 1777306924561,
-    "15m:23": 1777306924942,
-    "1h:24": 1777188934551,
-    "1h:26": 1777180445851,
-    "1h:25": 1777180446145,
-    "15m:16": 1777306666108,
-    "1h:10": 1777306802244,
-    "1h:4": 1777306802600,
-    "1h:5": 1777306802957,
-    "15m:2": 1777306922270,
-    "15m:8": 1777306922649,
-    "15m:11": 1777306923034,
-    "15m:12": 1777306923398,
-    "15m:9": 1777306923778,
-    "15m:3": 1777306924170
+    "15m:22": 1777286013803,
+    "15m:23": 1777286014085,
+    "15m:16": 1777308649231
   },
   "trackedPositions": [
     {
@@ -1941,7 +1688,17 @@
       "entryMs": 1777286014411
     }
   ],
-  "pendingAlerts": [],
+  "pendingAlerts": [
+    {
+      "id": "4h:40",
+      "tfKey": "4h",
+      "side": "LONG",
+      "htfEntryPrice": 77125.96,
+      "tpPct": 5.000000000000012,
+      "slPct": 2.500000000000006,
+      "addedMs": 1777306767515
+    }
+  ],
   "binanceSnapshot": {
     "ts": 1777288467717,
     "account": {
@@ -31631,5 +31388,6 @@
       }
     ],
     "dailyPnl": -1.27787214
-  }
+  },
+  "lastTrackedMutationMs": 1777286014411
 }
