@@ -78,7 +78,7 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   equityDdPausePct: 30,          // drop 30% từ peak equity → pause
   equityDdPauseHours: 4,         // pause 4h
   use5mAllEngineMode: false,     // default OFF — phải bật rõ ràng trong SETTINGS
-  stackBetterEntryMode: "vs-avg", // default ON vs-avg (anh Tommy v4.7.27 — middle strict)
+  stackBetterEntryMode: "off", // v4.7.29: backtest 3y confirm better-entry HURTS LIVE — flip về OFF
 };
 
 export type LiveAction =

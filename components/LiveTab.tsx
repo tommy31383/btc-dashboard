@@ -614,7 +614,7 @@ function SettingsCard({ live }: Props) {
       equityDdPausePct: 30,
       equityDdPauseHours: 4,
       use5mAllEngineMode: false,  // user phải bật rõ ràng (v4.7.8)
-      stackBetterEntryMode: "vs-avg", // anh Tommy v4.7.27
+      stackBetterEntryMode: "off", // v4.7.29: backtest confirm OFF tốt nhất
     };
     setDirty(true);
     setDraft(best);
@@ -672,10 +672,10 @@ function SettingsCard({ live }: Props) {
         {(["off", "vs-last", "vs-best", "vs-avg"] as const).map((mode) => {
           const active = draft.stackBetterEntryMode === mode;
           const labels: Record<string, string> = {
-            off: "OFF",
+            off: "OFF ⭐",
             "vs-last": "vs LAST",
             "vs-best": "vs BEST",
-            "vs-avg": "vs AVG ⭐",
+            "vs-avg": "vs AVG",
           };
           return (
             <TouchableOpacity
@@ -698,11 +698,11 @@ function SettingsCard({ live }: Props) {
       </View>
       <Text style={styles.note}>
         💡 Entry mới phải TỐT HƠN entry trước cùng side (LONG cần thấp hơn, SHORT cần cao hơn):
-        {"\n"}   • <Text style={{ fontWeight: "700" }}>OFF</Text>: tắt — vào lệnh ở giá nào cũng OK
-        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs LAST</Text>: tốt hơn entry GẦN NHẤT cùng side
-        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs BEST</Text>: tốt hơn entry TỐT NHẤT (avg luôn cải thiện, strict nhất)
-        {"\n"}   • <Text style={{ fontWeight: "700", color: P.bitcoinOrange }}>vs AVG ⭐ (default)</Text>: tốt hơn weighted avg entry cùng side
-        {"\n"}   → Tránh stack gần nhau; ép DCA đúng hướng.
+        {"\n"}   • <Text style={{ fontWeight: "700", color: P.bitcoinOrange }}>OFF ⭐ (default)</Text>: tắt — backtest 3y confirm tốt nhất
+        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs LAST</Text>: tốt hơn entry GẦN NHẤT (cắt 92% trades, NET -91%)
+        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs BEST</Text>: tốt hơn entry TỐT NHẤT (= vs LAST trong LIVE PRESET B)
+        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs AVG</Text>: tốt hơn weighted avg (cắt 68% trades, NET -67%)
+        {"\n"}   ⚠️ Backtest 3y: better-entry HURT NET + Sharpe ở mọi mode. WR không đổi → filter cắt cả good lẫn bad trade.
       </Text>
 
       <Text style={styles.subLabel}>🛡 EQUITY DD PROTECTION (anh Tommy v4.6.9)</Text>
