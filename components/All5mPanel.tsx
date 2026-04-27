@@ -154,13 +154,65 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(" ");
   const yInitial = pad + h - ((INITIAL_CAPITAL - min) / range) * h;
-  const color = vals[vals.length - 1] >= INITIAL_CAPITAL ? P.green : P.error;
+  const current = vals[vals.length - 1];
+  const color = current >= INITIAL_CAPITAL ? P.green : P.error;
+  // Find max + min point indices for marker labels
+  let maxIdx = 0, minIdx = 0;
+  for (let i = 1; i < vals.length; i++) {
+    if (vals[i] > vals[maxIdx]) maxIdx = i;
+    if (vals[i] < vals[minIdx]) minIdx = i;
+  }
+  const xOf = (i: number) => pad + (i / (data.length - 1)) * w;
+  const yOf = (v: number) => pad + h - ((v - min) / range) * h;
+  // Y-axis tick values: min, mid1, INITIAL_CAPITAL, mid2, max
+  const ticks = Array.from(new Set([min, (min + INITIAL_CAPITAL) / 2, INITIAL_CAPITAL, (INITIAL_CAPITAL + max) / 2, max])).sort((a, b) => a - b);
+  const fmtV = (v: number) => v >= 10000 ? `$${(v / 1000).toFixed(1)}k` : `$${v.toFixed(0)}`;
   return (
     <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
       <Svg width={width} height={height}>
+        {/* Baseline line */}
         <Line x1={0} y1={yInitial} x2={width} y2={yInitial} stroke={P.dim} strokeWidth={0.6} strokeDasharray="3,3" />
+        {/* Equity polyline */}
         <Polyline points={pts} fill="none" stroke={color} strokeWidth={2} />
+        {/* MAX point marker */}
+        <Circle cx={xOf(maxIdx)} cy={yOf(vals[maxIdx])} r={3} fill={P.green} />
+        {/* MIN point marker (only if different from max and below baseline) */}
+        {minIdx !== maxIdx && vals[minIdx] < INITIAL_CAPITAL && (
+          <Circle cx={xOf(minIdx)} cy={yOf(vals[minIdx])} r={3} fill={P.error} />
+        )}
+        {/* CURRENT point marker (last) */}
+        <Circle cx={xOf(vals.length - 1)} cy={yOf(current)} r={4} fill={color} stroke={P.surface} strokeWidth={1} />
       </Svg>
+      {/* Y-axis tick labels (right edge) */}
+      {ticks.map((t, i) => {
+        const y = yOf(t);
+        if (y < 12 || y > height - 4) return null;
+        return (
+          <Text key={i} style={{
+            position: "absolute", right: 4, top: y - 7,
+            color: t === INITIAL_CAPITAL ? P.dim : P.tertiary,
+            fontSize: 9, fontFamily: "monospace",
+          }}>{fmtV(t)}{t === INITIAL_CAPITAL ? " ─" : ""}</Text>
+        );
+      })}
+      {/* Top-left: MAX value + delta from baseline */}
+      <View style={{ position: "absolute", top: 4, left: 6 }}>
+        <Text style={{ color: P.green, fontSize: 10, fontFamily: "monospace", fontWeight: "700" }}>
+          ▲ MAX {fmtV(max)} ({((max - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100).toFixed(1)}%)
+        </Text>
+      </View>
+      {/* Bottom-left: MIN value + delta */}
+      <View style={{ position: "absolute", bottom: 4, left: 6 }}>
+        <Text style={{ color: vals[minIdx] >= INITIAL_CAPITAL ? P.dim : P.error, fontSize: 10, fontFamily: "monospace", fontWeight: "700" }}>
+          ▼ MIN {fmtV(vals[minIdx])} ({((vals[minIdx] - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100).toFixed(1)}%)
+        </Text>
+      </View>
+      {/* Top-right (next to ticks): CURRENT */}
+      <View style={{ position: "absolute", top: 4, left: width / 2 - 50 }}>
+        <Text style={{ color, fontSize: 11, fontFamily: "monospace", fontWeight: "800" }}>
+          NOW {fmtV(current)} ({((current - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100).toFixed(2)}%)
+        </Text>
+      </View>
     </View>
   );
 }
