@@ -17,7 +17,11 @@ const STORAGE_KEY = "@all5m_data_v1";
 const REMOTE_FILE = "all5m_account.json";
 const PRESET_STORAGE_KEY = "@all5m_preset_v1";
 
-export const INITIAL_CAPITAL = 1000;
+// v4.7.20 (anh Tommy): bump $1000 → $5000 cho stack 75 (WHALE) khả thi
+// — 75 LONG × $30 + 75 SHORT × $30 = $4500 max margin, $5000 đủ buffer.
+// Migration: account cũ có flag `capitalVersion: 1` (or undefined) → top up +$4000 ONCE.
+export const INITIAL_CAPITAL = 5000;
+export const PREV_INITIAL_CAPITAL = 1000;
 export const MARGIN_PER_TRADE = 30;
 export const LEVERAGE = 100;
 export const NOTIONAL = MARGIN_PER_TRADE * LEVERAGE;
@@ -178,6 +182,8 @@ export interface All5mAccount {
   equityHistory: { t: number; equity: number }[];
   stats: AccountStats;
   updatedAt: number;
+  /** v4.7.20 (anh Tommy): track migration cap $1k → $5k. undefined hoặc 1 = chưa migrate. */
+  capitalVersion?: number;
 }
 
 export function emptyAccount(): All5mAccount {
@@ -189,6 +195,7 @@ export function emptyAccount(): All5mAccount {
     equityHistory: [{ t: now, equity: INITIAL_CAPITAL }],
     stats: { totalClosed: 0, wins: 0, losses: 0, totalPnlUsd: 0, totalFeeUsd: 0, lastEntryMs: 0, lastResetMs: now },
     updatedAt: now,
+    capitalVersion: 2, // mới = v2 (5000)
   };
 }
 
@@ -199,6 +206,16 @@ export async function loadAccount(): Promise<All5mAccount> {
     const p = JSON.parse(raw) as All5mAccount;
     if (p.version !== 1) return emptyAccount();
     if (!p.equityHistory) p.equityHistory = [{ t: p.updatedAt, equity: p.capital }];
+    // ── Migration v1→v2 (anh Tommy v4.7.20): bump capital baseline $1k → $5k
+    // Top up diff $4000 ONCE để mày không mất lệnh hiện tại.
+    if (!p.capitalVersion || p.capitalVersion < 2) {
+      const diff = INITIAL_CAPITAL - PREV_INITIAL_CAPITAL;
+      p.capital += diff;
+      p.capitalVersion = 2;
+      p.equityHistory.push({ t: Date.now(), equity: p.capital });
+      // Save migrated state
+      try { await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
+    }
     return p;
   } catch { return emptyAccount(); }
 }
