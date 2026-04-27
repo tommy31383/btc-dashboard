@@ -21,6 +21,17 @@ import {
   NOTIONAL_USD,
   summarize,
 } from "../utils/autoAccount";
+import { getHardRulesForTF, HardRule } from "../utils/hardRules";
+
+/** Lookup HardRule by ruleId "tfKey:rank" — return null if not found */
+function findRuleInfo(ruleId: string, tfKey: string): HardRule | null {
+  const parts = ruleId.split(":");
+  const rankStr = parts[parts.length - 1];
+  const rank = Number(rankStr);
+  if (!Number.isFinite(rank)) return null;
+  const rules = getHardRulesForTF(tfKey);
+  return rules.find((r) => r.rank === rank) ?? null;
+}
 
 interface Props {
   account: AutoAccount;
@@ -32,6 +43,7 @@ interface Props {
 function AutoTraderPanelInner({ account, summary, currentPrice, onReset }: Props) {
   const [collapsed, setCollapsed] = useState(false);
   const [showSpec, setShowSpec] = useState(false);
+  const [showRuleInfo, setShowRuleInfo] = useState(false);
 
   const handleReset = () => {
     if (typeof window !== "undefined") {
@@ -114,12 +126,21 @@ function AutoTraderPanelInner({ account, summary, currentPrice, onReset }: Props
             />
           </View>
 
+          {/* Toggle: show rule info per row */}
+          {(summary.pending.length > 0 || summary.open.length > 0) && (
+            <TouchableOpacity onPress={() => setShowRuleInfo((v) => !v)} style={styles.ruleInfoToggle}>
+              <Text style={styles.ruleInfoToggleText}>
+                {showRuleInfo ? "▴ HIDE RULE INFO" : "▾ SHOW RULE INFO (WR/PF/NET/trend)"}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           {/* Pending positions */}
           {summary.pending.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>⏳ PENDING ({summary.pending.length})</Text>
               {summary.pending.map((p) => (
-                <PendingRow key={p.id} p={p} currentPrice={currentPrice} />
+                <PendingRow key={p.id} p={p} currentPrice={currentPrice} showRuleInfo={showRuleInfo} />
               ))}
             </View>
           )}
@@ -129,7 +150,7 @@ function AutoTraderPanelInner({ account, summary, currentPrice, onReset }: Props
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>📈 OPEN ({summary.open.length})</Text>
               {summary.open.map((p) => (
-                <OpenRow key={p.id} p={p} currentPrice={currentPrice} />
+                <OpenRow key={p.id} p={p} currentPrice={currentPrice} showRuleInfo={showRuleInfo} />
               ))}
             </View>
           )}
@@ -173,7 +194,7 @@ function Kpi({ label, value, sub, color }: { label: string; value: string; sub?:
   );
 }
 
-function PendingRow({ p, currentPrice }: { p: AutoPosition; currentPrice: number | null }) {
+function PendingRow({ p, currentPrice, showRuleInfo }: { p: AutoPosition; currentPrice: number | null; showRuleInfo: boolean }) {
   const remainingMs = Math.max(0, p.limitExpiresMs - Date.now());
   const remainingS = Math.ceil(remainingMs / 1000);
   const mm = Math.floor(remainingS / 60);
@@ -195,6 +216,7 @@ function PendingRow({ p, currentPrice }: { p: AutoPosition; currentPrice: number
           limit ${p.limitPrice.toFixed(1)} (rule ${p.ruleEntryPrice.toFixed(1)})
           {distPct !== null ? `  · cách ${distPct.toFixed(2)}%` : ""}
         </Text>
+        {showRuleInfo && <RuleInfoLine ruleId={p.ruleId} tfKey={p.tfKey} />}
       </View>
       <Text style={[styles.rowRight, { color: remainingMs > 0 ? P.tertiary : P.error }]}>
         ⏱ {expiresIn}
@@ -203,7 +225,7 @@ function PendingRow({ p, currentPrice }: { p: AutoPosition; currentPrice: number
   );
 }
 
-function OpenRow({ p, currentPrice }: { p: AutoPosition; currentPrice: number | null }) {
+function OpenRow({ p, currentPrice, showRuleInfo }: { p: AutoPosition; currentPrice: number | null; showRuleInfo: boolean }) {
   if (!p.entryPrice) return null;
   const pricePct = currentPrice
     ? p.side === "LONG"
@@ -225,6 +247,7 @@ function OpenRow({ p, currentPrice }: { p: AutoPosition; currentPrice: number | 
           SL ${p.slPrice.toFixed(1)}{"  "}
           TP ${p.tpPrice.toFixed(1)}
         </Text>
+        {showRuleInfo && <RuleInfoLine ruleId={p.ruleId} tfKey={p.tfKey} />}
       </View>
       <View style={{ alignItems: "flex-end" }}>
         <Text style={[styles.rowRight, { color: upnlColor }]}>
@@ -234,6 +257,45 @@ function OpenRow({ p, currentPrice }: { p: AutoPosition; currentPrice: number | 
           {pricePct >= 0 ? "+" : ""}{pricePct.toFixed(2)}%
         </Text>
       </View>
+    </View>
+  );
+}
+
+/** Backtest stats block — show khi user toggle "SHOW RULE INFO". */
+function RuleInfoLine({ ruleId, tfKey }: { ruleId: string; tfKey: string }) {
+  const rule = findRuleInfo(ruleId, tfKey);
+  if (!rule) {
+    return <Text style={styles.ruleInfoLine}>📋 rule {ruleId} không tìm thấy trong hard_rules.json</Text>;
+  }
+  const s: any = rule.stats || {};
+  const wr = s.winRate ?? 0;
+  const pf = s.profitFactor ?? 0;
+  const trades = s.trades ?? 0;
+  const net = s.netPnL ?? 0;
+  const trend = (s.equityTrend as "UP" | "FLAT" | "DOWN" | undefined) ?? "FLAT";
+  const dd = s.maxDrawdownPct ?? 0;
+  const trendIcon = trend === "UP" ? "📈" : trend === "DOWN" ? "📉" : "➖";
+  const trendColor = trend === "UP" ? P.green : trend === "DOWN" ? P.error : P.dim;
+  const cfg: any = rule.config || {};
+  const targetPct = cfg.targetPct ?? 0;
+  const stopPct = cfg.stopPct ?? 0;
+  return (
+    <View style={styles.ruleInfoBox}>
+      <Text style={styles.ruleInfoLine}>
+        📋 #{rule.rank} · WR <Text style={{ color: wr >= 55 ? P.green : wr >= 40 ? P.bitcoinOrange : P.error }}>{wr.toFixed(0)}%</Text>
+        {"  "}· PF <Text style={{ color: pf >= 1.5 ? P.green : pf >= 1 ? P.bitcoinOrange : P.error }}>{pf.toFixed(2)}</Text>
+        {"  "}· {trades} trades
+      </Text>
+      <Text style={styles.ruleInfoLine}>
+        NET <Text style={{ color: net >= 0 ? P.green : P.error }}>{net >= 0 ? "+" : ""}{net.toFixed(1)}%</Text>
+        {"  "}· DD <Text style={{ color: P.error }}>{dd.toFixed(1)}%</Text>
+        {"  "}· trend <Text style={{ color: trendColor }}>{trendIcon} {trend}</Text>
+      </Text>
+      <Text style={styles.ruleInfoLine}>
+        TP raw <Text style={{ color: P.green }}>+{targetPct.toFixed(2)}%</Text>
+        {"  "}· SL raw <Text style={{ color: P.error }}>-{stopPct.toFixed(2)}%</Text>
+        {"  "}· source {rule.source}
+      </Text>
     </View>
   );
 }
@@ -273,6 +335,10 @@ const styles = StyleSheet.create({
     backgroundColor: P.error + "10",
   },
   resetText: { color: P.error, fontSize: 11, fontWeight: "700", letterSpacing: 0.8, fontFamily: "SpaceGrotesk_700Bold" },
+  ruleInfoToggle: { alignSelf: "flex-start", paddingVertical: 6, paddingHorizontal: 10, marginTop: 12, borderWidth: 1, borderColor: P.bitcoinOrange + "55", borderRadius: 2, backgroundColor: P.bitcoinOrange + "12" },
+  ruleInfoToggleText: { color: P.bitcoinOrange, fontSize: 10, fontWeight: "700", letterSpacing: 0.8, fontFamily: "JetBrainsMono_700Bold" },
+  ruleInfoBox: { marginTop: 4, paddingTop: 4, borderTopWidth: 1, borderTopColor: P.highest, gap: 1 },
+  ruleInfoLine: { color: P.dim, fontSize: 9, fontFamily: "JetBrainsMono_500Medium", lineHeight: 12 },
 });
 
 

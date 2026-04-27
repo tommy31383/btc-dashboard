@@ -63,8 +63,8 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.0";
-const BUILD_DATE = "2026-04-26";
+const APP_VERSION = "4.7.4";
+const BUILD_DATE = "2026-04-27";
 
 /**
  * Catches React render crashes and shows a friendly error screen with the
