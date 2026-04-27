@@ -554,9 +554,22 @@ function SettingsCard({ live }: Props) {
 
   /** Toggle 5m ALL Engine — MUTEX 1-chiều với 5m rule (excludedTfs). */
   function toggle5mAllEngine() {
+    const turningOn = !draft.use5mAllEngineMode;
+    // Confirm dialog khi BẬT (do backtest 3y cho thấy giảm NET) — anh Tommy v4.7.25
+    if (turningOn && typeof window !== "undefined") {
+      const ok = window.confirm(
+        "⚠️ BẬT 5m ALL Engine cho LIVE?\n\n" +
+        "Backtest 3y v4.7.x cho thấy MỌI preset đều giảm hoặc âm NET vs rules-only:\n" +
+        "  • BALANCED: NET -28k% (vs baseline +295k%)\n" +
+        "  • WHALE: NET -13k%\n" +
+        "  • TURTLE: NET +39k% (chỉ 13% baseline)\n\n" +
+        "Khuyến nghị: dùng cho paper test (tab 5m ALL), KHÔNG ON ở LIVE production.\n\n" +
+        "Vẫn muốn bật?"
+      );
+      if (!ok) return;
+    }
     setDirty(true);
     setDraft((d) => {
-      const turningOn = !d.use5mAllEngineMode;
       const next: LiveSettings = { ...d, use5mAllEngineMode: turningOn };
       // Khi bật engine → auto add "5m" vào excludedTfs (tắt 5m rule path)
       if (turningOn && !d.excludedTfs.includes("5m")) {
@@ -665,6 +678,23 @@ function SettingsCard({ live }: Props) {
       </Text>
 
       <Text style={styles.subLabel}>⚡ 5m ALL ENGINE MODE (v4.7.8+)</Text>
+      <View style={{
+        backgroundColor: P.error + "12", borderWidth: 1, borderColor: P.error + "55",
+        padding: 8, borderRadius: 4, marginBottom: 8,
+      }}>
+        <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 11, marginBottom: 3 }}>
+          ⚠️ KHÔNG khuyến nghị ON cho LIVE production
+        </Text>
+        <Text style={{ color: P.text, fontFamily: "monospace", fontSize: 10, lineHeight: 14 }}>
+          Backtest 3y (v4.7.x): 5m ALL Engine ON cho LIVE → mọi preset đều
+          <Text style={{ color: P.error, fontWeight: "700" }}> giảm/lỗ NET vs rules-only</Text>:
+          {"\n"}  • BALANCED: NET -28k% (vs Mode A +295k%)
+          {"\n"}  • WHALE: NET -13k% (DD thấp nhất nhưng NET vẫn âm)
+          {"\n"}  • TURTLE: NET +39k% (chỉ 13% NET của Mode A)
+          {"\n"}Lý do: 149k-205k 5m candidates 3y → noisy, đẩy HTF rules ra khỏi stack/DD budget.
+          {"\n"}💡 Dùng cho <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>paper test (tab 5m ALL)</Text> thôi — KHÔNG ON ở LIVE production.
+        </Text>
+      </View>
       <View style={{ flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <TouchableOpacity
           onPress={toggle5mAllEngine}

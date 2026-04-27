@@ -1,7 +1,7 @@
 /**
  * backtest-live-fulltf-5mall-3y.ts
  *
- * 4-mode 3-year LIVE engine backtest combining HTF rules from hard_rules.json
+ * 5-mode 3-year LIVE engine backtest combining HTF rules from hard_rules.json
  * with the 5m ALL Engine (per-preset). Goal: compare current production
  * (rules-only) vs proposed (rules + 5m ALL Engine per preset).
  *
@@ -11,6 +11,10 @@
  *   • Mode B — HTF rules only (1h/4h/1d/1w) + 5m ALL Engine BALANCED preset.
  *   • Mode C — HTF rules only + 5m ALL Engine WHALE.
  *   • Mode D — HTF rules only + 5m ALL Engine TURTLE.
+ *   • Mode E — Full TF rules EXCLUDING the 5m baseline rule (5m:1). Same config
+ *               as Mode A otherwise. Tests whether removing the 5m baseline lifts
+ *               NET (per Mode A perSource breakdown the 5m bucket dragged
+ *               -332,756% on 34,580 trades, PF 1.01).
  *
  * 5m ALL Engine signal source (each closed 5m bar, evaluated per preset):
  *   - Stoch K < preset.stochLongLevel  → LONG
@@ -114,6 +118,8 @@ const LTF_CFG: LtfConfirmConfig = {
 
 const ENTRY_TFS_FULL = ["5m", "15m", "1h", "4h", "1d", "1w"];
 const ENTRY_TFS_HTF = ["1h", "4h", "1d", "1w"];
+// 5m baseline rule(s) to exclude in Mode E. Matches `${tf}:${rank}`.
+const EXCLUDE_5M_BASELINE_IDS = new Set<string>(["5m:1"]);
 
 const HTF_MAP: Record<string, [string, string]> = {
   "5m": ["15m", "1h"],
@@ -1201,6 +1207,7 @@ ${cardHtml}
 let modeBResult: ModeResult | undefined;
 let modeCResult: ModeResult | undefined;
 let modeDResult: ModeResult | undefined;
+let modeEResult: ModeResult | undefined;
 
 (async () => {
   console.log(`\n=== LIVE FullTF + 5m ALL Engine BACKTEST 3Y · BTC/USDT ===`);
@@ -1287,9 +1294,17 @@ let modeDResult: ModeResult | undefined;
 
   const fullTfRules = collectActiveRules(ENTRY_TFS_FULL);
   const htfOnlyRules = collectActiveRules(ENTRY_TFS_HTF);
+  // Mode E pool: full TF rules MINUS 5m baseline rule(s) (id 5m:1)
+  const fullTfNoBaselineRules = fullTfRules.filter(
+    ({ tf, rule }) => !EXCLUDE_5M_BASELINE_IDS.has(`${tf}:${rule.rank}`),
+  );
+  const excludedRuleIds = fullTfRules
+    .filter(({ tf, rule }) => EXCLUDE_5M_BASELINE_IDS.has(`${tf}:${rule.rank}`))
+    .map(({ tf, rule }) => `${tf}:${rule.rank}`);
 
   console.log(`\nRules loaded: full TF ${fullTfRules.length} (${ENTRY_TFS_FULL.map((tf) => `${tf}:${fullTfRules.filter((r) => r.tf === tf).length}`).join(", ")})`);
   console.log(`              HTF only ${htfOnlyRules.length} (${ENTRY_TFS_HTF.map((tf) => `${tf}:${htfOnlyRules.filter((r) => r.tf === tf).length}`).join(", ")})`);
+  console.log(`              full TF NO 5m baseline ${fullTfNoBaselineRules.length} (excluded: ${excludedRuleIds.join(", ") || "none"})`);
 
   // Build candidates for each pool
   console.log(`\nBuilding rule candidates (full TF, with Phase 2 LTF confirm)...`);
@@ -1307,6 +1322,13 @@ let modeDResult: ModeResult | undefined;
     candles5m, stoch5mSeries, candles15m, srSupportBaseline, srResistanceBaseline,
   );
   console.log(`  HTF only candidates: ${htfOnlyCandidates.length.toLocaleString()} (${((Date.now() - t2) / 1000).toFixed(1)}s)`);
+
+  // Mode E candidate pool = full TF candidates with 5m baseline rule sources stripped.
+  // Filter from already-built fullTfCandidates (cheaper than rebuilding).
+  const fullTfNoBaselineCandidates = fullTfCandidates.filter(
+    (c) => !EXCLUDE_5M_BASELINE_IDS.has(c.source),
+  );
+  console.log(`  full TF NO 5m baseline candidates: ${fullTfNoBaselineCandidates.length.toLocaleString()} (after filtering ${(fullTfCandidates.length - fullTfNoBaselineCandidates.length).toLocaleString()} from ${[...EXCLUDE_5M_BASELINE_IDS].join(",")})`);
 
   // 5m ALL Engine candidates per preset
   const all5mCandidatesByPreset: Record<PresetKey, Candidate[]> = { WHALE: [], BALANCED: [], TURTLE: [] };
