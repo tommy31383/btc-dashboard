@@ -1910,12 +1910,37 @@
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777314672048,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76682.01,
+        "tpPrice": 77832.24014999998,
+        "slPrice": 69013.809,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777314672914,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.021→0.020 (binance 0.020), SHORT 0.014→0.014 (binance 0.014)."
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
     "15m:22": 1777286013803,
     "15m:23": 1777286014085,
-    "15m:16": 1777313772005,
+    "15m:16": 1777314672050,
     "1h:10": 1777310262046,
     "1h:4": 1777310262301,
     "1h:5": 1777310262528
@@ -2192,15 +2217,6 @@
       "entryMs": 1777312873391
     },
     {
-      "id": "manual:1777312932939-LONG-0-eirgq",
-      "side": "LONG",
-      "qty": 0.0009999999999999905,
-      "entryPrice": 77125.06999994098,
-      "entryMs": 1777312932939,
-      "tpPrice": 80981.32349993804,
-      "slPrice": 75196.94324994246
-    },
-    {
       "id": "15m:16",
       "side": "LONG",
       "qty": 0.001,
@@ -2208,11 +2224,20 @@
       "tpPrice": 77905.10699999999,
       "slPrice": 69078.42,
       "entryMs": 1777313774177
+    },
+    {
+      "id": "15m:16",
+      "side": "LONG",
+      "qty": 0.001,
+      "entryPrice": 76682.01,
+      "tpPrice": 77832.24014999998,
+      "slPrice": 69013.809,
+      "entryMs": 1777314672883
     }
   ],
   "pendingAlerts": [],
   "binanceSnapshot": {
-    "ts": 1777314613227,
+    "ts": 1777314684585,
     "account": {
       "feeTier": 0,
       "canTrade": true,
@@ -2222,17 +2247,17 @@
       "tradeGroupId": -1,
       "updateTime": 0,
       "multiAssetsMargin": false,
-      "totalInitialMargin": "20.84877280",
-      "totalMaintMargin": "10.42438640",
-      "totalWalletBalance": "77.80818507",
-      "totalUnrealizedProfit": "-1.46550000",
-      "totalMarginBalance": "76.34268507",
-      "totalPositionInitialMargin": "20.84877280",
+      "totalInitialMargin": "21.47090401",
+      "totalMaintMargin": "10.73545200",
+      "totalWalletBalance": "77.76985147",
+      "totalUnrealizedProfit": "-1.25950000",
+      "totalMarginBalance": "76.51035147",
+      "totalPositionInitialMargin": "21.47090401",
       "totalOpenOrderInitialMargin": "0.00000000",
-      "totalCrossWalletBalance": "77.80818507",
-      "totalCrossUnPnl": "-1.46550000",
-      "availableBalance": "55.49251227",
-      "maxWithdrawAmount": "55.49251227",
+      "totalCrossWalletBalance": "77.76985147",
+      "totalCrossUnPnl": "-1.25950000",
+      "availableBalance": "55.03944746",
+      "maxWithdrawAmount": "55.03944746",
       "assets": [
         {
           "asset": "FDUSD",
@@ -2364,19 +2389,19 @@
         },
         {
           "asset": "USDT",
-          "walletBalance": "77.80818507",
-          "unrealizedProfit": "-1.46550000",
-          "marginBalance": "76.34268507",
-          "maintMargin": "10.42438640",
-          "initialMargin": "20.84877280",
-          "positionInitialMargin": "20.84877280",
+          "walletBalance": "77.76985147",
+          "unrealizedProfit": "-1.25950000",
+          "marginBalance": "76.51035147",
+          "maintMargin": "10.73545200",
+          "initialMargin": "21.47090401",
+          "positionInitialMargin": "21.47090401",
           "openOrderInitialMargin": "0.00000000",
-          "maxWithdrawAmount": "55.49251227",
-          "crossWalletBalance": "77.80818507",
-          "crossUnPnl": "-1.46550000",
-          "availableBalance": "55.49251227",
+          "maxWithdrawAmount": "55.03944746",
+          "crossWalletBalance": "77.76985147",
+          "crossUnPnl": "-1.25950000",
+          "availableBalance": "55.03944746",
           "marginAvailable": true,
-          "updateTime": 1777313774042
+          "updateTime": 1777314672843
         },
         {
           "asset": "USD1",
@@ -29774,30 +29799,30 @@
         },
         {
           "symbol": "BTCUSDT",
-          "initialMargin": "12.26398400",
-          "maintMargin": "6.13199200",
-          "unrealizedProfit": "-16.98660000",
-          "positionInitialMargin": "12.26398400",
+          "initialMargin": "12.88254240",
+          "maintMargin": "6.44127120",
+          "unrealizedProfit": "-16.33400000",
+          "positionInitialMargin": "12.88254240",
           "openOrderInitialMargin": "0",
           "leverage": "125",
           "isolated": false,
-          "entryPrice": "77499.23",
-          "breakEvenPrice": "77562.371355",
+          "entryPrice": "77459.60952381",
+          "breakEvenPrice": "77521.56955714",
           "maxNotional": "300000",
           "positionSide": "LONG",
-          "positionAmt": "0.020",
-          "notional": "1532.99800000",
+          "positionAmt": "0.021",
+          "notional": "1610.31780000",
           "isolatedWallet": "0",
-          "updateTime": 1777313774042,
+          "updateTime": 1777314672843,
           "bidNotional": "0",
           "askNotional": "0"
         },
         {
           "symbol": "BTCUSDT",
-          "initialMargin": "8.58478880",
-          "maintMargin": "4.29239440",
-          "unrealizedProfit": "15.52110000",
-          "positionInitialMargin": "8.58478880",
+          "initialMargin": "8.58836161",
+          "maintMargin": "4.29418080",
+          "unrealizedProfit": "15.07450000",
+          "positionInitialMargin": "8.58836161",
           "openOrderInitialMargin": "0",
           "leverage": "125",
           "isolated": false,
@@ -29806,7 +29831,7 @@
           "maxNotional": "300000",
           "positionSide": "SHORT",
           "positionAmt": "-0.014",
-          "notional": "-1073.09860000",
+          "notional": "-1073.54520000",
           "isolatedWallet": "0",
           "updateTime": 1777286014373,
           "bidNotional": "0",
@@ -31057,21 +31082,21 @@
     "positions": [
       {
         "symbol": "BTCUSDT",
-        "positionAmt": "0.020",
-        "entryPrice": "77499.23",
-        "breakEvenPrice": "77562.371355",
-        "markPrice": "76649.90000000",
-        "unRealizedProfit": "-16.98660000",
-        "liquidationPrice": "65408.71673431",
+        "positionAmt": "0.021",
+        "entryPrice": "77459.60952381",
+        "breakEvenPrice": "77521.56955714",
+        "markPrice": "76681.80000000",
+        "unRealizedProfit": "-16.33400000",
+        "liquidationPrice": "67093.62223470",
         "leverage": "125",
         "maxNotionalValue": "300000",
         "marginType": "cross",
         "isolatedMargin": "0.00000000",
         "isAutoAddMargin": "false",
         "positionSide": "LONG",
-        "notional": "1532.99800000",
+        "notional": "1610.31780000",
         "isolatedWallet": "0",
-        "updateTime": 1777313774042,
+        "updateTime": 1777314672843,
         "isolated": false,
         "adlQuantile": 2
       },
@@ -31080,16 +31105,16 @@
         "positionAmt": "-0.014",
         "entryPrice": "77758.55",
         "breakEvenPrice": "77719.670725",
-        "markPrice": "76649.90000000",
-        "unRealizedProfit": "15.52110000",
-        "liquidationPrice": "65408.71673431",
+        "markPrice": "76681.80000000",
+        "unRealizedProfit": "15.07450000",
+        "liquidationPrice": "67093.62223470",
         "leverage": "125",
         "maxNotionalValue": "300000",
         "marginType": "cross",
         "isolatedMargin": "0.00000000",
         "isAutoAddMargin": "false",
         "positionSide": "SHORT",
-        "notional": "-1073.09860000",
+        "notional": "-1073.54520000",
         "isolatedWallet": "0",
         "updateTime": 1777286014373,
         "isolated": false,
@@ -31098,22 +31123,6 @@
     ],
     "openOrders": [],
     "recentTrades": [
-      {
-        "symbol": "BTCUSDT",
-        "id": 7599546542,
-        "orderId": 994437215834,
-        "side": "BUY",
-        "price": "77642.20",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "77.64220",
-        "commission": "0.03882109",
-        "commissionAsset": "USDT",
-        "time": 1777006029144,
-        "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
-      },
       {
         "symbol": "BTCUSDT",
         "id": 7599546543,
@@ -31897,9 +31906,25 @@
         "positionSide": "LONG",
         "buyer": true,
         "maker": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7608389987,
+        "orderId": 997335799706,
+        "side": "BUY",
+        "price": "76667.20",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "76.66720",
+        "commission": "0.03833360",
+        "commissionAsset": "USDT",
+        "time": 1777314672843,
+        "positionSide": "LONG",
+        "buyer": true,
+        "maker": false
       }
     ],
-    "dailyPnl": -1.4227352099999997
+    "dailyPnl": -1.4610688099999998
   },
-  "lastTrackedMutationMs": 1777313774177
+  "lastTrackedMutationMs": 1777314672912
 }
