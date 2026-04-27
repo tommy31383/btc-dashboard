@@ -140,13 +140,16 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
                       <Text style={[styles.tblHead, { width: 90 }]}>TP</Text>
                       <Text style={[styles.tblHead, { width: 90 }]}>SL</Text>
                       <Text style={[styles.tblHead, { width: 50 }]}>HELD</Text>
-                      <Text style={[styles.tblHead, { width: 70, textAlign: "right" }]}>uPnL</Text>
+                      <Text style={[styles.tblHead, { width: 75, textAlign: "right" }]}>uPnL $</Text>
+                      <Text style={[styles.tblHead, { width: 70, textAlign: "right" }]}>uPnL %</Text>
                     </View>
                     {liveTracked.slice().sort((a, b) => b.entryMs - a.entryMs).map((t) => {
                       const sideColor = t.side === "LONG" ? P.green : P.error;
-                      const upnlPct = currentPrice !== null
-                        ? (t.side === "LONG" ? (currentPrice - t.entryPrice) : (t.entryPrice - currentPrice)) / t.entryPrice * 100
+                      const priceDiff = currentPrice !== null
+                        ? (t.side === "LONG" ? (currentPrice - t.entryPrice) : (t.entryPrice - currentPrice))
                         : 0;
+                      const upnlPct = currentPrice !== null ? priceDiff / t.entryPrice * 100 : 0;
+                      const upnlUsd = priceDiff * t.qty;
                       const heldMin = Math.floor((Date.now() - t.entryMs) / 60000);
                       const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
                       const upnlColor = upnlPct >= 0 ? P.green : P.error;
@@ -159,6 +162,9 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
                           <Text style={[styles.tblCell, { width: 90, color: P.green }]}>${t.tpPrice.toFixed(0)}</Text>
                           <Text style={[styles.tblCell, { width: 90, color: P.error }]}>${t.slPrice.toFixed(0)}</Text>
                           <Text style={[styles.tblCell, { width: 50, color: P.dim }]}>{heldStr}</Text>
+                          <Text style={[styles.tblCell, { width: 75, color: upnlColor, textAlign: "right", fontWeight: "700" }]}>
+                            {upnlUsd >= 0 ? "+" : ""}${upnlUsd.toFixed(2)}
+                          </Text>
                           <Text style={[styles.tblCell, { width: 70, color: upnlColor, textAlign: "right", fontWeight: "700" }]}>
                             {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
                           </Text>
@@ -203,17 +209,23 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
                       <Text style={[styles.tblHead, { width: 90 }]}>TP</Text>
                       <Text style={[styles.tblHead, { width: 90 }]}>SL</Text>
                       <Text style={[styles.tblHead, { width: 50 }]}>HELD</Text>
-                      <Text style={[styles.tblHead, { width: 70, textAlign: "right" }]}>uPnL</Text>
+                      <Text style={[styles.tblHead, { width: 75, textAlign: "right" }]}>uPnL $</Text>
+                      <Text style={[styles.tblHead, { width: 70, textAlign: "right" }]}>uPnL %</Text>
                     </View>
                     {all5mOpen.slice().sort((a, b) => b.entryMs - a.entryMs).map((p) => {
                       const sideColor = p.side === "LONG" ? P.green : P.error;
                       const NOTIONAL = MARGIN_PER_TRADE * LEVERAGE;
-                      const upnlPct = currentPrice !== null
-                        ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE
+                      const pricePct = currentPrice !== null
+                        ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100
                         : 0;
+                      // upnl USD: margin × pricePct × lev / 100, capped at -margin (cùng formula với engine)
+                      let grossUsd = MARGIN_PER_TRADE * pricePct * LEVERAGE / 100;
+                      if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
+                      const upnlUsd = grossUsd - FEE_PER_SIDE;  // entry fee deducted; exit fee chưa charge
+                      const upnlPctLev = pricePct * LEVERAGE;   // % trên margin
                       const heldMin = Math.floor((Date.now() - p.entryMs) / 60000);
                       const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
-                      const upnlColor = upnlPct >= 0 ? P.green : P.error;
+                      const upnlColor = upnlUsd >= 0 ? P.green : P.error;
                       return (
                         <View key={p.id} style={styles.tblRow}>
                           <Text style={[styles.tblCell, { width: 40, color: sideColor, fontWeight: "800" }]}>{p.side}</Text>
@@ -223,8 +235,11 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
                           <Text style={[styles.tblCell, { width: 90, color: P.green }]}>${p.tpPrice.toFixed(0)}</Text>
                           <Text style={[styles.tblCell, { width: 90, color: P.error }]}>${p.slPrice.toFixed(0)}</Text>
                           <Text style={[styles.tblCell, { width: 50, color: P.dim }]}>{heldStr}</Text>
+                          <Text style={[styles.tblCell, { width: 75, color: upnlColor, textAlign: "right", fontWeight: "700" }]}>
+                            {upnlUsd >= 0 ? "+" : ""}${upnlUsd.toFixed(2)}
+                          </Text>
                           <Text style={[styles.tblCell, { width: 70, color: upnlColor, textAlign: "right", fontWeight: "700" }]}>
-                            {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
+                            {upnlPctLev >= 0 ? "+" : ""}{upnlPctLev.toFixed(2)}%
                           </Text>
                         </View>
                       );
