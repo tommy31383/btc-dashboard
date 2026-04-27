@@ -2250,12 +2250,27 @@
         "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.025→0.026 (binance 0.026), SHORT 0.022→0.022 (binance 0.022). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777320911143,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76910.63,
+        "tpPrice": 78064.28945,
+        "slPrice": 69219.56700000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
     "15m:22": 1777317912708,
     "15m:23": 1777317912981,
-    "15m:16": 1777320072108,
+    "15m:16": 1777320911146,
     "1h:10": 1777310262046,
     "1h:4": 1777310262301,
     "1h:5": 1777310262528,
@@ -2680,6 +2695,15 @@
       "entryMs": 1777320132339,
       "tpPrice": 80775.45000003294,
       "slPrice": 75005.77500003058
+    },
+    {
+      "id": "15m:16",
+      "side": "LONG",
+      "qty": 0.001,
+      "entryPrice": 76910.63,
+      "tpPrice": 78064.28945,
+      "slPrice": 69219.56700000001,
+      "entryMs": 1777320911477
     }
   ],
   "pendingAlerts": [],
@@ -32373,5 +32397,5 @@
     ],
     "dailyPnl": -1.959778249999999
   },
-  "lastTrackedMutationMs": 1777320132340
+  "lastTrackedMutationMs": 1777320911477
 }
