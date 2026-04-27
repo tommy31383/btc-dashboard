@@ -141,6 +141,9 @@ export interface LiveSyncState {
   peakEquityUsd?: number;
   /** Pause reason để UI distinguish: "daily-cap" | "equity-dd" */
   pauseReason?: "daily-cap" | "equity-dd" | null;
+  /** Timestamp khi trackedPositions thay đổi (entry/close/edit) — anh Tommy v4.7.15
+   *  Reconcile dùng để skip auto-import nếu mutation < 30s qua (tránh race với Plan B). */
+  lastTrackedMutationMs?: number;
 }
 
 /** Full state in-memory (sync state + secrets) */
@@ -525,6 +528,7 @@ export async function executeAction(
     // Push vào trackedPositions để monitor
     next = {
       ...next,
+      lastTrackedMutationMs: Date.now(),
       trackedPositions: [...next.trackedPositions, {
         id: alert.id,
         side: action.side,
@@ -666,29 +670,69 @@ export async function reconcileTrackedPositions(
   if (longMismatch) smartDrop("LONG", trackedLong, binanceLong, binanceLongAvg);
   if (shortMismatch) smartDrop("SHORT", trackedShort, binanceShort, binanceShortAvg);
 
-  // ── AUTO-IMPORT (anh Tommy v4.7.14): Binance > App → user mở manual → tạo tracked mới ──
-  // TP/SL lấy từ active 5m ALL preset (đồng bộ với engine 5m ALL).
+  // ── AUTO-IMPORT (v4.7.14, hardened v4.7.15) ──
+  // Binance > App → user mở manual → tạo tracked mới với TP/SL từ preset.
+  //
+  // 5 FIX (v4.7.15):
+  //   #1 REVERSE-DERIVE entry: subtract app weighted avg từ Binance để có TRUE manual entry
+  //   #2 PRESET FALLBACK: nếu load preset fail → dùng BALANCED hardcoded defaults
+  //   #3 RACE GUARD: skip auto-import nếu lastTrackedMutationMs < 30s qua (Plan B race)
+  //   #4 NONCE: id thêm Math.random để KHÔNG trùng khi 2 imports same ms
+  //   #5 SPLIT: nếu debt > 1.5× typical position → split thành N entries riêng (granular)
   let imported = 0;
-  if (longImportMismatch || shortImportMismatch) {
+  const now = Date.now();
+  const recentMutation = s.lastTrackedMutationMs && (now - s.lastTrackedMutationMs < 30_000);
+  if ((longImportMismatch || shortImportMismatch) && !recentMutation) {
+    // FIX #2: Preset fallback
+    let presetTp = 4, presetSl = 2; // BALANCED defaults
     try {
       const preset = await getActivePreset();
-      const now = Date.now();
-      const buildImport = (side: "LONG" | "SHORT", qty: number, entryPrice: number, idx: number): TrackedPosition => ({
-        id: `manual:${now}-${side}-${idx}`,
-        side, qty, entryPrice, entryMs: now,
-        tpPrice: side === "LONG" ? entryPrice * (1 + preset.tpPct / 100) : entryPrice * (1 - preset.tpPct / 100),
-        slPrice: side === "LONG" ? entryPrice * (1 - preset.slPct / 100) : entryPrice * (1 + preset.slPct / 100),
-      });
-      if (longImportMismatch && binanceLongAvg > 0) {
-        const debt = binanceLong - trackedLong;
-        trackedPositions.push(buildImport("LONG", debt, binanceLongAvg, imported++));
-      }
-      if (shortImportMismatch && binanceShortAvg > 0) {
-        const debt = binanceShort - trackedShort;
-        trackedPositions.push(buildImport("SHORT", debt, binanceShortAvg, imported++));
-      }
+      presetTp = preset.tpPct;
+      presetSl = preset.slPct;
     } catch {
-      // Nếu fail load preset → bỏ qua import, log warning sau
+      // Use defaults
+    }
+    // Helper: derive TRUE manual entry price (FIX #1)
+    const deriveManualEntry = (side: "LONG" | "SHORT", binanceQty: number, binanceAvg: number, appQty: number): number => {
+      if (binanceAvg <= 0) return 0;
+      if (appQty <= tolBtc) return binanceAvg; // app empty → binanceAvg = manualAvg
+      const list = trackedPositions.filter((t) => t.side === side);
+      const appNotional = list.reduce((s, t) => s + t.qty * t.entryPrice, 0);
+      const debt = binanceQty - appQty;
+      if (debt <= tolBtc) return binanceAvg;
+      const manualNotional = binanceQty * binanceAvg - appNotional;
+      const manualEntry = manualNotional / debt;
+      // Sanity: phải dương + reasonable (trong 50% của binanceAvg)
+      if (!Number.isFinite(manualEntry) || manualEntry <= 0) return binanceAvg;
+      if (manualEntry < binanceAvg * 0.5 || manualEntry > binanceAvg * 1.5) return binanceAvg; // outlier → fallback
+      return manualEntry;
+    };
+    // FIX #4: nonce
+    const nonce = () => Math.random().toString(36).slice(2, 7);
+    const buildImport = (side: "LONG" | "SHORT", qty: number, entryPrice: number, idx: number): TrackedPosition => ({
+      id: `manual:${now}-${side}-${idx}-${nonce()}`,
+      side, qty, entryPrice, entryMs: now,
+      tpPrice: side === "LONG" ? entryPrice * (1 + presetTp / 100) : entryPrice * (1 - presetTp / 100),
+      slPrice: side === "LONG" ? entryPrice * (1 - presetSl / 100) : entryPrice * (1 + presetSl / 100),
+    });
+    // FIX #5: split if debt > 1.5× typical (margin × lev / entry)
+    const importSide = (side: "LONG" | "SHORT", debt: number, manualEntry: number) => {
+      const typicalQty = (s.settings.marginUsd * s.settings.leverage) / manualEntry;
+      const splitCount = typicalQty > 0 ? Math.max(1, Math.round(debt / typicalQty)) : 1;
+      const qtyPerSplit = debt / splitCount;
+      for (let i = 0; i < splitCount; i++) {
+        trackedPositions.push(buildImport(side, qtyPerSplit, manualEntry, imported++));
+      }
+    };
+    if (longImportMismatch && binanceLongAvg > 0) {
+      const debt = binanceLong - trackedLong;
+      const manualEntry = deriveManualEntry("LONG", binanceLong, binanceLongAvg, trackedLong);
+      importSide("LONG", debt, manualEntry);
+    }
+    if (shortImportMismatch && binanceShortAvg > 0) {
+      const debt = binanceShort - trackedShort;
+      const manualEntry = deriveManualEntry("SHORT", binanceShort, binanceShortAvg, trackedShort);
+      importSide("SHORT", debt, manualEntry);
     }
   }
 
@@ -709,14 +753,28 @@ export async function reconcileTrackedPositions(
   const shortAvgDiff = binanceShortAvg > 0 && newShortAvg > 0 ? Math.abs(newShortAvg - binanceShortAvg) : 0;
   const priceDriftWarn = longAvgDiff > tolPriceDelta || shortAvgDiff > tolPriceDelta;
 
-  const next: LiveTraderState = { ...s, trackedPositions };
+  const stateChanged = dropped > 0 || imported > 0;
+  let next: LiveTraderState = { ...s, trackedPositions };
+  if (stateChanged) {
+    next.lastTrackedMutationMs = Date.now();
+  }
   await saveState(next);
   let warning = `⚠️ SMART RECONCILE: Binance khác app (${dropped} dropped, ${imported} auto-imported). LONG ${trackedLong.toFixed(3)}→${newLong.toFixed(3)} (binance ${binanceLong.toFixed(3)}), SHORT ${trackedShort.toFixed(3)}→${newShort.toFixed(3)} (binance ${binanceShort.toFixed(3)}).`;
   if (imported > 0) {
     warning += ` ✅ Auto-imported ${imported} lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor.`;
   }
+  if (recentMutation && (longImportMismatch || shortImportMismatch)) {
+    warning += ` ℹ️ SKIPPED auto-import: app vừa mutation < 30s qua (race với Plan B/entry — chờ Binance update).`;
+  }
   if (priceDriftWarn) {
     warning += ` ⚠️ Avg entry drift: LONG $${longAvgDiff.toFixed(0)}, SHORT $${shortAvgDiff.toFixed(0)} — có thể anh edited TP/SL trên Binance.`;
+  }
+  // Log to journal cho user trace (FIX: comprehensive logging)
+  if (stateChanged) {
+    next = await logAction(next, "reconcile", "live", {
+      kind: "ERROR",
+      message: warning,
+    });
   }
   return { next, dropped, warning };
 }
@@ -749,7 +807,7 @@ export async function closeTrackedManual(
   next = await logAction(next, pos.id, "live", {
     kind: "CLOSE", side: pos.side, closePrice: markPrice, qty: pos.qty, trigger: "TP",
   });
-  next = { ...next, trackedPositions: next.trackedPositions.filter((p) => p.id !== positionId) };
+  next = { ...next, trackedPositions: next.trackedPositions.filter((p) => p.id !== positionId), lastTrackedMutationMs: Date.now() };
   await saveState(next);
   return next;
 }
@@ -785,7 +843,7 @@ export async function updateTrackedTpSl(
   const updated = s.trackedPositions.map((p) =>
     p.id === positionId ? { ...p, tpPrice: tp, slPrice: sl } : p
   );
-  let next: LiveTraderState = { ...s, trackedPositions: updated };
+  let next: LiveTraderState = { ...s, trackedPositions: updated, lastTrackedMutationMs: Date.now() };
   next = await logAction(next, positionId, "live", {
     kind: "ERROR",
     message: `MANUAL EDIT TP/SL ${pos.side} ${positionId}: TP $${oldTp.toFixed(0)}→$${tp.toFixed(0)} · SL $${oldSl.toFixed(0)}→$${sl.toFixed(0)}`,
@@ -890,7 +948,7 @@ export async function monitorTrackedPositions(s: LiveTraderState, markPrice: num
     }
   }
   if (remaining.length !== s.trackedPositions.length) {
-    next = { ...next, trackedPositions: remaining };
+    next = { ...next, trackedPositions: remaining, lastTrackedMutationMs: Date.now() };
     await saveState(next);
   }
   return next;
