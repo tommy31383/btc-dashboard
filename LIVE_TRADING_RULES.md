@@ -1,7 +1,29 @@
 # LIVE TRADING ENGINE — Rule vào lệnh & Flow đầy đủ
 
-**Version:** v4.7.0 (last updated 2026-04-27)
+**Version:** v4.7.8 (last updated 2026-04-27)
 **Files:** `utils/liveTraderEngine.ts`, `hooks/useBinanceLive.ts`, `utils/leaderElection.ts`, `utils/binanceLive.ts`, `utils/gistSync.ts`
+
+---
+
+## ⚡ 5m ALL ENGINE MODE (v4.7.8 — anh Tommy Apr 2026)
+
+**Default OFF.** Khi bật trong LIVE SETTINGS card → toggle "✓ 5m ALL ENGINE: ON":
+
+- Mỗi cây 5m close → LIVE evaluate signal **giống engine 5m ALL paper**:
+  - Stoch5m K < `preset.stochLongLevel` → LONG
+  - Stoch5m K > `preset.stochShortLevel` → SHORT
+  - Else fallback S/R 15m: close ≤ support × (1 + `srProximityPct`) → LONG, etc.
+- Active preset đọc từ `@all5m_preset_v1` (đồng bộ tab 5m ALL — đổi preset 1 chỗ, cả paper + LIVE đều áp)
+- Entry MARKET thật → `decideEntry()` → `executeAction()` (vẫn check circuit breakers, equity DD, stack gates)
+- TF key alert = `"5mall"` để bypass `excludedTfs: ["5m"]` (cố ý — distinct entry path)
+- Skip Phase 2 LTF confirm (vì đã là 5m close-bar evaluate)
+- Margin/leverage từ LIVE settings (`marginUsd × leverage`)
+- Stack gates: LIVE settings (`stackMaxPerSide`, `stackMinEntryDistPct`, etc.) — KHÔNG dùng preset's stack
+- HTF rules (1h/4h/1d/1w) **vẫn chạy SONG SONG** — entry từ cả 2 nguồn share `trackedPositions[]`
+
+**Why "5mall" tfKey:** distinct từ "5m" để dedup riêng + bypass `excludedTfs` filter (vẫn block rule HTF 5m từ hard_rules.json nếu user muốn).
+
+**Dedup:** `firedIds["5mall:<bar5mTime>"]` — mỗi cây 5m chỉ eval 1 lần (kể cả không có signal).
 
 ---
 

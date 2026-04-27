@@ -15,6 +15,7 @@ import {
   monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual, reconcileTrackedPositions,
   maybeTriggerEquityDdProtection, updateTrackedTpSl, closeTrackedBulk,
 } from "../utils/liveTraderEngine";
+import { getActivePreset } from "../utils/all5mAccount";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
   getDailyPnl, getPositions, getOpenOrders, getRecentTrades, testConnection, getDualSidePosition,
@@ -73,7 +74,7 @@ export interface UseBinanceLiveResult {
 export function useBinanceLive(
   activeAlerts: RuleAlert[],
   currentPrice: number | null = null,
-  ltfCtx: { stoch5m: number | null; support15m: number | null; resistance15m: number | null } = { stoch5m: null, support15m: null, resistance15m: null },
+  ltfCtx: { stoch5m: number | null; support15m: number | null; resistance15m: number | null; closedBar5m?: { time: number; close: number } | null } = { stoch5m: null, support15m: null, resistance15m: null, closedBar5m: null },
 ): UseBinanceLiveResult {
   const [state, setState] = useState<LiveTraderState>(() => emptyState());
   const [account, setAccount] = useState<AccountSnapshot | null>(null);
@@ -452,6 +453,75 @@ export function useBinanceLive(
       if (next !== stateRef.current) setState(next);
     })();
   }, [role, currentPrice, ltfCtx.stoch5m, ltfCtx.support15m, ltfCtx.resistance15m, activeAlerts, positions, dailyPnl]);
+
+  // ─── 5m ALL ENGINE MODE (anh Tommy v4.7.8) ─────────────────────────────────
+  // Khi settings.use5mAllEngineMode = true: mỗi cây 5m close → eval signal giống
+  // engine 5m ALL (Stoch + S/R 15m fallback per active preset từ @all5m_preset_v1).
+  // Pipe entry qua decideEntry → executeAction → MARKET thật.
+  // Margin/leverage dùng từ LIVE settings. HTF rules vẫn chạy song song.
+  // Dedup theo bar5mTime (firedIds["5mall:<time>"]).
+  useEffect(() => {
+    if (role !== "LEADER") return;
+    if (!stateRef.current.settings.use5mAllEngineMode) return;
+    const bar = ltfCtx.closedBar5m;
+    if (!bar || !bar.time || !bar.close) return;
+    if (currentPrice === null || currentPrice <= 0) return;
+    const dedupId = `5mall:${bar.time}`;
+    if (stateRef.current.firedIds[dedupId]) return; // already processed bar
+    (async () => {
+      try {
+        const preset = await getActivePreset();
+        // Eval signal logic (giống all5mAccount.tryEntry5mBar)
+        let side: "LONG" | "SHORT" | null = null;
+        const k = ltfCtx.stoch5m;
+        const close = bar.close;
+        if (k !== null && k < preset.stochLongLevel) side = "LONG";
+        else if (k !== null && k > preset.stochShortLevel) side = "SHORT";
+        else if (ltfCtx.support15m !== null && ltfCtx.resistance15m !== null) {
+          const distSup = ((close - ltfCtx.support15m) / ltfCtx.support15m) * 100;
+          const distRes = ((ltfCtx.resistance15m - close) / close) * 100;
+          if (distSup >= 0 && distSup <= preset.srProximityPct) side = "LONG";
+          else if (distRes >= 0 && distRes <= preset.srProximityPct) side = "SHORT";
+        }
+        if (!side) {
+          // Mark bar processed even when no signal — tránh re-eval cùng bar
+          stateRef.current = { ...stateRef.current, firedIds: { ...stateRef.current.firedIds, [dedupId]: Date.now() } };
+          return;
+        }
+        // Build alert: tpPct/slPct từ preset, entryPrice = close
+        const tpPrice = side === "LONG" ? close * (1 + preset.tpPct / 100) : close * (1 - preset.tpPct / 100);
+        const slPrice = side === "LONG" ? close * (1 - preset.slPct / 100) : close * (1 + preset.slPct / 100);
+        const alert: AlertInput = {
+          id: dedupId,
+          tfKey: "5mall",  // KHÔNG dùng "5m" để bypass excludedTfs check
+          side,
+          entryPrice: close,
+          tpPrice, slPrice,
+          firedAt: bar.time,
+          tpPct: preset.tpPct,
+          slPct: preset.slPct,
+        };
+        const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
+        const action = decideEntry(stateRef.current, alert, {
+          nowMs: Date.now(),
+          openCount,
+          dailyPnl,
+        });
+        let next = stateRef.current;
+        if (action.kind === "ENTRY") {
+          next = await executeAction(next, alert, action);
+          // executeAction tự set firedIds[id]
+        } else {
+          // Mark dedup để khỏi re-eval cùng bar (mọi outcome)
+          next = { ...next, firedIds: { ...next.firedIds, [dedupId]: Date.now() } };
+          await saveState(next);
+        }
+        if (next !== stateRef.current) setState(next);
+      } catch (e: any) {
+        setLastError(`5m ALL engine error: ${e?.message ?? String(e)}`);
+      }
+    })();
+  }, [role, ltfCtx.closedBar5m?.time, currentPrice]);
 
   const openCount = positions.filter((p) => parseFloat(p.positionAmt) !== 0).length;
 

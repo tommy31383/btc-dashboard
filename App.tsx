@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.7";
+const APP_VERSION = "4.7.8";
 const BUILD_DATE = "2026-04-27";
 
 /**
@@ -169,6 +169,7 @@ export default function App() {
   // UnifiedTradesPanel gộp LIVE (real) + 5m ALL (paper) — đúng nguồn production.
 
   // v4.3.52 — Binance Live; v4.3.82 — pass LTF context (stoch5m + S/R 15m) cho confirm
+  // v4.7.8 — thêm closedBar5m cho 5m ALL Engine Mode trong LIVE
   const ltfCtx = (() => {
     const stoch5m = tfData.find((t) => t.key === "5m")?.stochK ?? null;
     const klines15m = rawKlines["15m"];
@@ -181,7 +182,12 @@ export default function App() {
       if (lo !== Infinity) support15m = lo;
       if (hi !== -Infinity) resistance15m = hi;
     }
-    return { stoch5m, support15m, resistance15m };
+    // closedBar5m = cây 5m vừa đóng (kline áp chót — kline cuối là in-progress)
+    const k5 = rawKlines["5m"];
+    const closedBar5m = (k5 && k5.length >= 2)
+      ? { time: k5[k5.length - 2].time, close: k5[k5.length - 2].close }
+      : null;
+    return { stoch5m, support15m, resistance15m, closedBar5m };
   })();
   const live = useBinanceLive(activeAlerts, priceData?.price ?? null, ltfCtx);
 

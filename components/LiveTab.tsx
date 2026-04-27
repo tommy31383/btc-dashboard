@@ -492,6 +492,7 @@ function SettingsCard({ live }: Props) {
       stackMaxNotionalUsd: 200000,
       equityDdPausePct: 30,
       equityDdPauseHours: 4,
+      use5mAllEngineMode: false,  // user phải bật rõ ràng (v4.7.8)
     };
     setDirty(true);
     setDraft(best);
@@ -553,6 +554,31 @@ function SettingsCard({ live }: Props) {
         💡 App track peak equity (wallet + uPnL). Khi current equity drop X% từ peak → auto pause auto-trade Y giờ.
         {"\n"}   Vd peak $100, drop 30% → equity $70 → pause 4h. Sau 4h auto resume.
         {"\n"}   0% = tắt protection (KHÔNG khuyến cáo — backtest 3y có 1 đợt DD -76k% trong 2.5 tháng đầu).
+      </Text>
+
+      <Text style={styles.subLabel}>⚡ 5m ALL ENGINE MODE (anh Tommy v4.7.8)</Text>
+      <TouchableOpacity
+        onPress={() => setDraft({ ...draft, use5mAllEngineMode: !draft.use5mAllEngineMode })}
+        style={[
+          styles.tfChip,
+          {
+            borderColor: draft.use5mAllEngineMode ? P.green : P.dim,
+            backgroundColor: draft.use5mAllEngineMode ? P.green + "22" : P.surface,
+            paddingHorizontal: 14, paddingVertical: 8, alignSelf: "flex-start",
+          },
+        ]}
+      >
+        <Text style={{ color: draft.use5mAllEngineMode ? P.green : P.dim, fontFamily: "monospace", fontWeight: "800", fontSize: 11 }}>
+          {draft.use5mAllEngineMode ? "✓ 5m ALL ENGINE: ON" : "○ 5m ALL ENGINE: OFF"}
+        </Text>
+      </TouchableOpacity>
+      <Text style={styles.note}>
+        💡 ON: mỗi cây 5m close, LIVE evaluate signal giống engine 5m ALL — Stoch K (per active preset)
+        + S/R 15m fallback. Entry MARKET thật, tpPct/slPct/cooldown từ active preset
+        (đồng bộ tab 5m ALL via @all5m_preset_v1).
+        {"\n"}   Margin/leverage dùng từ LIVE settings ({draft.marginUsd} × {draft.leverage}x = ${draft.marginUsd * draft.leverage} notional/lệnh).
+        {"\n"}   HTF rules (1h/4h/1d/1w) vẫn chạy SONG SONG.
+        {"\n"}   ⚠️ Nhớ: stack gates LIVE settings vẫn áp (max {draft.stackMaxPerSide}/side, dist {draft.stackMinEntryDistPct}%).
       </Text>
 
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>
