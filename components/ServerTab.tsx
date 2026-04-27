@@ -4,7 +4,7 @@
  * If not authed → login form.
  * If authed → state + scheduler + alerts + control buttons.
  */
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
@@ -80,8 +80,8 @@ export default function ServerTab() {
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
-  const lastPollSec = sched?.lastPollOkMs > 0 ? Math.round((Date.now() - sched.lastPollOkMs) / 1000) : "—";
-  const lastEvalSec = sched?.lastRuleEvalMs > 0 ? Math.round((Date.now() - sched.lastRuleEvalMs) / 1000) : "—";
+  const lastPollMs = sched?.lastPollOkMs ?? 0;
+  const lastEvalMs = sched?.lastRuleEvalMs ?? 0;
 
   const askPw = (): string | null => {
     if (typeof window === "undefined") return null;
@@ -99,7 +99,10 @@ export default function ServerTab() {
             <Text style={styles.btnGhostText}>LOGOUT</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.dim}>{SERVER_URL} · last update {Math.round((Date.now() - live.lastUpdateMs) / 1000)}s ago</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <Text style={styles.dim}>{SERVER_URL} · last update </Text>
+          <LiveAgo timestampMs={live.lastUpdateMs} suffix=" ago" />
+        </View>
       </View>
 
       {/* ENGINE START/STOP — clearer for new entries vs Plan B */}
@@ -161,9 +164,11 @@ export default function ServerTab() {
           <Kpi label="SHORT" value={`${shortCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.error} />
           <Kpi label="HEDGE" value={s?.hedgeMode ? "✅" : "❌"} />
         </View>
-        <Text style={styles.dim}>
-          poll {lastPollSec}s ago · ruleEval {lastEvalSec}s ago · alerts {sched?.lastRuleAlerts ?? 0}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+          <Text style={styles.dim}>poll </Text><LiveAgo timestampMs={lastPollMs} suffix=" ago" />
+          <Text style={styles.dim}> · ruleEval </Text><LiveAgo timestampMs={lastEvalMs} suffix=" ago" />
+          <Text style={styles.dim}> · alerts {sched?.lastRuleAlerts ?? 0}</Text>
+        </View>
         {s?.pauseReason && (
           <Text style={[styles.error, { marginTop: 6 }]}>
             🛑 PAUSED ({s.pauseReason}) — until {new Date(s.pausedUntilMs).toLocaleTimeString()}
@@ -257,6 +262,22 @@ export default function ServerTab() {
       )}
     </ScrollView>
   );
+}
+
+/**
+ * LiveAgo — tự tick mỗi 1s, chỉ re-render component nhỏ này (anh Tommy v4.8.9 perf).
+ * Parent ServerTab + 64 tracked rows KHÔNG re-render → tiết kiệm CPU/battery.
+ */
+function LiveAgo({ timestampMs, prefix = "", suffix = "" }: { timestampMs: number; prefix?: string; suffix?: string }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  if (!timestampMs) return <Text style={styles.dim}>—</Text>;
+  const sec = Math.max(0, Math.round((now - timestampMs) / 1000));
+  const txt = sec < 60 ? `${sec}s` : sec < 3600 ? `${Math.round(sec / 60)}m` : `${(sec / 3600).toFixed(1)}h`;
+  return <Text style={styles.dim}>{prefix}{txt}{suffix}</Text>;
 }
 
 function Kpi({ label, value, color }: { label: string; value: string; color?: string }) {
