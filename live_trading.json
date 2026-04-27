@@ -728,6 +728,26 @@
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777268749666,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 8m (rule 15m:22)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777268749670,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 8m (rule 15m:23)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
