@@ -56,6 +56,9 @@ export default function ServerTab() {
   const tracked = s?.trackedPositions ?? [];
   const longCount = tracked.filter((t: any) => t.side === "LONG").length;
   const shortCount = tracked.filter((t: any) => t.side === "SHORT").length;
+  // Mark price từ Binance snapshot (cho compute uPnL real-time per position)
+  const symPos = s?.binanceSnapshot?.positions?.find((p: any) => p.symbol === (s?.settings?.symbol ?? "BTCUSDT"));
+  const markPrice = symPos ? parseFloat(symPos.markPrice) : null;
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
@@ -188,25 +191,44 @@ export default function ServerTab() {
             </View>
             {(["LONG", "SHORT"] as const).map((side) => {
               const list = tracked.filter((t: any) => t.side === side)
-                .sort((a: any, b: any) => b.entryMs - a.entryMs); // newest first
+                .sort((a: any, b: any) => b.entryMs - a.entryMs);
               if (list.length === 0) return null;
               const sideColor = side === "LONG" ? P.green : P.error;
+              // Compute side-total uPnL
+              let sideUpnlUsd = 0;
+              if (markPrice !== null) {
+                for (const t of list) {
+                  const diff = side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice);
+                  sideUpnlUsd += diff * t.qty;
+                }
+              }
               return (
                 <View key={side} style={{ marginTop: 8 }}>
                   <Text style={[styles.h2, { color: sideColor, marginTop: 4 }]}>
-                    {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length})
+                    {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) ·
+                    <Text style={{ color: sideUpnlUsd >= 0 ? P.green : P.error }}> total uPnL {sideUpnlUsd >= 0 ? "+" : ""}${sideUpnlUsd.toFixed(2)}</Text>
                   </Text>
                   {list.map((t: any, i: number) => {
                     const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
+                    const diff = markPrice !== null ? (side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) : 0;
+                    const upnlUsd = diff * t.qty;
+                    const upnlPct = markPrice !== null ? (diff / t.entryPrice) * 100 : 0;
+                    const upnlColor = upnlUsd >= 0 ? P.green : P.error;
                     return (
                       <View key={t.id} style={styles.posRow}>
-                        <Text style={[styles.dim, { width: 24, color: P.dim }]}>{i + 1}</Text>
-                        <Text style={[styles.dim, { width: 80 }]}>${t.entryPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.green, width: 80 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.error, width: 80 }]}>SL ${t.slPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { width: 50 }]}>{heldH}h</Text>
+                        <Text style={[styles.dim, { width: 24 }]}>{i + 1}</Text>
+                        <Text style={[styles.dim, { width: 70 }]}>${t.entryPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.green, width: 70 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.error, width: 70 }]}>SL ${t.slPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: upnlColor, width: 75, fontWeight: "700" }]}>
+                          {upnlUsd >= 0 ? "+" : ""}${upnlUsd.toFixed(2)}
+                        </Text>
+                        <Text style={[styles.dim, { color: upnlColor, width: 60, fontWeight: "700" }]}>
+                          {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
+                        </Text>
+                        <Text style={[styles.dim, { width: 40 }]}>{heldH}h</Text>
                         <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
-                          <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕ CLOSE</Text>
+                          <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕</Text>
                         </TouchableOpacity>
                       </View>
                     );
