@@ -38,6 +38,8 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
 
   const liveTracked = liveState.trackedPositions;
   const all5mOpen = all5mAccount.positions.filter((p) => p.status === "OPEN");
+  // Detect LIVE disconnected — chưa nhập API key (anh Tommy v4.7.7)
+  const liveDisconnected = !liveState.apiKey || !liveState.apiSecret;
 
   // ── LIVE summary ──
   const liveLong = liveTracked.filter((t) => t.side === "LONG");
@@ -83,7 +85,7 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>📊 OPEN POSITIONS · LIVE + 5m ALL</Text>
           <Text style={styles.subtitle}>
-            {totalOpen} open · LIVE {liveTracked.length} ({liveLong.length}L · {liveShort.length}S){"  "}
+            {totalOpen} open · LIVE {liveDisconnected ? <Text style={{ color: P.error }}>⛔ DISCONNECTED</Text> : `${liveTracked.length} (${liveLong.length}L · ${liveShort.length}S)`}{"  "}
             · 5m ALL {all5mOpen.length} ({all5mLong.length}L · {all5mShort.length}S){"  "}
             · uPnL <Text style={{ color: totalUpnl >= 0 ? P.green : P.error }}>{fmtUsd(totalUpnl, true)}</Text>
           </Text>
@@ -94,17 +96,30 @@ function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoTo
       {!collapsed && (
         <View style={styles.body}>
           {/* ──────────── LIVE section ──────────── */}
-          <View style={[styles.section, { borderColor: P.error + "55" }]}>
+          <View style={[styles.section, { borderColor: liveDisconnected ? P.error : P.error + "55" }]}>
             <View style={styles.sectionHead}>
-              <Text style={[styles.sectionTitle, { color: P.error }]}>🔴 LIVE · Binance real ({liveTracked.length})</Text>
+              <Text style={[styles.sectionTitle, { color: P.error }]}>
+                🔴 LIVE · Binance real ({liveTracked.length})
+                {liveDisconnected && " · ⛔ DISCONNECTED"}
+              </Text>
               {onGoToLive && (
-                <TouchableOpacity onPress={onGoToLive} style={styles.gotoBtn}>
-                  <Text style={styles.gotoBtnText}>tab LIVE →</Text>
+                <TouchableOpacity onPress={onGoToLive} style={[styles.gotoBtn, liveDisconnected && { borderColor: P.error, backgroundColor: P.error + "18" }]}>
+                  <Text style={[styles.gotoBtnText, liveDisconnected && { color: P.error, fontWeight: "700" }]}>
+                    {liveDisconnected ? "🔧 SETUP →" : "tab LIVE →"}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
-            {liveTracked.length === 0 ? (
-              <Text style={styles.empty}>Chưa có lệnh LIVE đang theo dõi.</Text>
+            {liveDisconnected ? (
+              <View style={styles.disconnectBox}>
+                <Text style={styles.disconnectTitle}>⛔ LIVE chưa connect Binance</Text>
+                <Text style={styles.disconnectText}>
+                  Device này chưa có API key — không vào lệnh thật, không tham gia leader election.
+                  {"\n"}→ Bấm <Text style={{ color: P.error, fontWeight: "700" }}>🔧 SETUP</Text> để sang tab LIVE → CREDENTIALS card → nhập API key/secret.
+                </Text>
+              </View>
+            ) : liveTracked.length === 0 ? (
+              <Text style={styles.empty}>Đã connect — chưa có lệnh LIVE đang theo dõi (chờ rule fire).</Text>
             ) : (
               <>
                 {liveSummary && (
@@ -249,6 +264,9 @@ const styles = StyleSheet.create({
   tblHead: { color: P.dim, fontSize: 9, fontFamily: "JetBrainsMono_700Bold", letterSpacing: 0.5, paddingHorizontal: 4 },
   tblCell: { color: P.text, fontSize: 10, fontFamily: "JetBrainsMono_500Medium", paddingHorizontal: 4 },
   footnote: { color: P.dim, fontSize: 9, fontStyle: "italic", marginTop: 4, fontFamily: "JetBrainsMono_500Medium" },
+  disconnectBox: { padding: 10, borderRadius: 4, borderWidth: 1, borderColor: P.error + "60", backgroundColor: P.error + "10" },
+  disconnectTitle: { color: P.error, fontSize: 11, fontWeight: "800", letterSpacing: 0.5, fontFamily: "JetBrainsMono_700Bold", marginBottom: 4 },
+  disconnectText: { color: P.text, fontSize: 10, lineHeight: 14, fontFamily: "JetBrainsMono_500Medium" },
 });
 
 const UnifiedTradesPanel = React.memo(UnifiedTradesPanelInner);
