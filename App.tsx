@@ -63,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.4";
+const APP_VERSION = "4.7.5";
 const BUILD_DATE = "2026-04-27";
 
 /**

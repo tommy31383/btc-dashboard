@@ -13,7 +13,7 @@ import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
   monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual, reconcileTrackedPositions,
-  maybeTriggerEquityDdProtection,
+  maybeTriggerEquityDdProtection, updateTrackedTpSl, closeTrackedBulk,
 } from "../utils/liveTraderEngine";
 import {
   AccountSnapshot, PositionRisk, OpenOrder, UserTrade,
@@ -64,6 +64,10 @@ export interface UseBinanceLiveResult {
   testNow: () => Promise<void>;
   pullFromRemote: () => Promise<void>;
   closeTracked: (positionId: string) => Promise<void>;
+  /** Update TP/SL của 1 tracked position (KHÔNG đụng Binance — Plan B tự dùng giá mới). v4.7.5+ */
+  updateTrackedTpSl: (positionId: string, newTp?: number, newSl?: number) => Promise<void>;
+  /** Bulk close — filter callback chọn lệnh nào close. v4.7.5+ */
+  closeTrackedBulk: (filter: "ALL" | "PROFIT" | "LOSS" | "OLD_HOURS", oldHoursThreshold?: number) => Promise<{ closed: number; errors: number }>;
 }
 
 export function useBinanceLive(
@@ -563,6 +567,30 @@ export function useBinanceLive(
       }
       const next = await closeTrackedManual(stateRef.current, positionId, currentPrice);
       setState(next);
+    },
+    async updateTrackedTpSl(positionId, newTp, newSl) {
+      if (!requireLeader("Edit TP/SL")) return;
+      const next = await updateTrackedTpSl(stateRef.current, positionId, newTp, newSl);
+      setState(next);
+    },
+    async closeTrackedBulk(filter, oldHoursThreshold = 24) {
+      if (!requireLeader("Bulk close")) return { closed: 0, errors: 0 };
+      if (currentPrice === null || currentPrice <= 0) {
+        setLastError("Không có mark price để bulk close.");
+        return { closed: 0, errors: 0 };
+      }
+      const px = currentPrice;
+      const fn = (p: any, mp: number) => {
+        if (filter === "ALL") return true;
+        const upnlPct = (p.side === "LONG" ? (mp - p.entryPrice) : (p.entryPrice - mp)) / p.entryPrice * 100;
+        if (filter === "PROFIT") return upnlPct > 0;
+        if (filter === "LOSS") return upnlPct < 0;
+        if (filter === "OLD_HOURS") return (Date.now() - p.entryMs) > oldHoursThreshold * 60 * 60 * 1000;
+        return false;
+      };
+      const r = await closeTrackedBulk(stateRef.current, px, fn);
+      setState(r.next);
+      return { closed: r.closedCount, errors: r.errors };
     },
   };
 }

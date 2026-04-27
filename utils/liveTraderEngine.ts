@@ -655,6 +655,74 @@ export async function closeTrackedManual(
 }
 
 /**
+ * Update TP/SL của 1 tracked position (anh Tommy v4.7.5+).
+ * KHÔNG gửi gì lên Binance — Plan B monitor sẽ tự dùng giá mới ở tick kế tiếp.
+ * Cho phép Tommy nới TP / kéo SL theo trend mà không phải close + reopen (tốn fee).
+ *
+ * @param newTpPrice  giá TP mới (undefined = giữ nguyên)
+ * @param newSlPrice  giá SL mới (undefined = giữ nguyên)
+ */
+export async function updateTrackedTpSl(
+  s: LiveTraderState,
+  positionId: string,
+  newTpPrice?: number,
+  newSlPrice?: number,
+): Promise<LiveTraderState> {
+  const pos = s.trackedPositions.find((p) => p.id === positionId);
+  if (!pos) return s;
+  const oldTp = pos.tpPrice;
+  const oldSl = pos.slPrice;
+  const tp = newTpPrice ?? oldTp;
+  const sl = newSlPrice ?? oldSl;
+  // Validation: LONG → tp > entry > sl. SHORT → tp < entry < sl.
+  if (pos.side === "LONG") {
+    if (tp <= pos.entryPrice) return s; // TP phải > entry với LONG
+    if (sl >= pos.entryPrice) return s; // SL phải < entry với LONG
+  } else {
+    if (tp >= pos.entryPrice) return s;
+    if (sl <= pos.entryPrice) return s;
+  }
+  const updated = s.trackedPositions.map((p) =>
+    p.id === positionId ? { ...p, tpPrice: tp, slPrice: sl } : p
+  );
+  let next: LiveTraderState = { ...s, trackedPositions: updated };
+  next = await logAction(next, positionId, "live", {
+    kind: "ERROR",
+    message: `MANUAL EDIT TP/SL ${pos.side} ${positionId}: TP $${oldTp.toFixed(0)}→$${tp.toFixed(0)} · SL $${oldSl.toFixed(0)}→$${sl.toFixed(0)}`,
+  });
+  await saveState(next);
+  return next;
+}
+
+/**
+ * Bulk close N tracked positions (anh Tommy v4.7.5+).
+ * Chạy tuần tự để KHÔNG vượt rate limit Binance + KHÔNG đụng nhau khi update state.
+ *
+ * @param filter  callback chọn position nào close (vd: chỉ profit, chỉ loss, chỉ old)
+ * @returns       { next, closedCount, errors }
+ */
+export async function closeTrackedBulk(
+  s: LiveTraderState,
+  markPrice: number,
+  filter: (p: TrackedPosition, markPrice: number) => boolean,
+): Promise<{ next: LiveTraderState; closedCount: number; errors: number }> {
+  const targets = s.trackedPositions.filter((p) => filter(p, markPrice));
+  let cur = s;
+  let closed = 0, errors = 0;
+  for (const p of targets) {
+    const before = cur.trackedPositions.length;
+    try {
+      cur = await closeTrackedManual(cur, p.id, markPrice);
+      if (cur.trackedPositions.length < before) closed++;
+      else errors++;
+    } catch (e) {
+      errors++;
+    }
+  }
+  return { next: cur, closedCount: closed, errors };
+}
+
+/**
  * Plan B monitor: scan trackedPositions, nếu mark price hit TP/SL → gửi MARKET close (reduceOnly).
  * Gọi từ hook mỗi tick price update.
  */

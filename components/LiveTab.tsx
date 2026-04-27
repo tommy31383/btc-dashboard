@@ -629,6 +629,44 @@ function NumField({
 
 // ── TRACKED (Plan B virtual lệnh, mỗi lệnh TP/SL riêng) ──────────────────────
 
+// Password chung cho mọi destructive action (close, edit TP/SL, bulk close) — anh Tommy v4.7.5
+const DESTRUCTIVE_PASSWORD = "30318384";
+
+/** Hỏi password trước khi cho phép destructive action. Trả về true nếu OK. */
+function requireDestructivePassword(actionLabel: string): boolean {
+  if (typeof window === "undefined") return true;
+  const input = window.prompt(`🔒 Mã xác nhận để ${actionLabel}:`);
+  if (input === null) return false; // user cancel
+  if (input.trim() !== DESTRUCTIVE_PASSWORD) {
+    window.alert("❌ Sai mã xác nhận. Hành động đã hủy.");
+    return false;
+  }
+  return true;
+}
+
+/** Compute weighted summary cho stack 1 side */
+function computeSideSummary(tracked: { side: string; qty: number; entryPrice: number; tpPrice: number; slPrice: number }[], side: "LONG" | "SHORT", markPrice: number | null) {
+  const list = tracked.filter((t) => t.side === side);
+  if (list.length === 0) return null;
+  let sumQty = 0, sumNotional = 0, sumQtyTp = 0, sumQtySl = 0;
+  for (const p of list) {
+    sumQty += p.qty;
+    sumNotional += p.qty * p.entryPrice;
+    sumQtyTp += p.qty * p.tpPrice;
+    sumQtySl += p.qty * p.slPrice;
+  }
+  const avgEntry = sumNotional / sumQty;
+  const avgTp = sumQtyTp / sumQty;
+  const avgSl = sumQtySl / sumQty;
+  const upnlPct = markPrice !== null
+    ? ((side === "LONG" ? (markPrice - avgEntry) : (avgEntry - markPrice)) / avgEntry) * 100
+    : 0;
+  const upnlUsd = markPrice !== null
+    ? (side === "LONG" ? (markPrice - avgEntry) : (avgEntry - markPrice)) * sumQty
+    : 0;
+  return { count: list.length, sumQty, sumNotional, avgEntry, avgTp, avgSl, upnlPct, upnlUsd };
+}
+
 function TrackedPositionsCard({ live }: Props) {
   const tracked = live.state.trackedPositions;
   const cfg = live.state.settings;
@@ -639,25 +677,123 @@ function TrackedPositionsCard({ live }: Props) {
     const p = live.positions.find((x) => x.symbol === cfg.symbol);
     return p ? parseFloat(p.markPrice) : null;
   })();
+  const longSummary = computeSideSummary(tracked, "LONG", markPrice);
+  const shortSummary = computeSideSummary(tracked, "SHORT", markPrice);
   const handleClose = (id: string, side: string, entry: number) => {
+    if (!requireDestructivePassword(`CLOSE ${side} @$${entry.toFixed(0)}`)) return;
     if (typeof window !== "undefined") {
       const ok = window.confirm(`Close ${side} @${entry.toFixed(0)} ngay tại $${markPrice?.toFixed(0) ?? "?"}? (sẽ gửi MARKET reduceOnly lên Binance)`);
       if (!ok) return;
     }
     live.closeTracked(id);
   };
+  const handleEditTpSl = (id: string, side: "LONG" | "SHORT", entry: number, tp: number, sl: number) => {
+    if (typeof window === "undefined") return;
+    const newTpStr = window.prompt(`✏️ Edit TP cho ${side} entry $${entry.toFixed(1)}\nTP hiện tại: $${tp.toFixed(1)}\nNhập giá TP mới (Enter trống = giữ nguyên):`, tp.toFixed(1));
+    if (newTpStr === null) return;
+    const newSlStr = window.prompt(`✏️ Edit SL cho ${side} entry $${entry.toFixed(1)}\nSL hiện tại: $${sl.toFixed(1)}\nNhập giá SL mới (Enter trống = giữ nguyên):`, sl.toFixed(1));
+    if (newSlStr === null) return;
+    const newTp = newTpStr.trim() === "" ? undefined : parseFloat(newTpStr);
+    const newSl = newSlStr.trim() === "" ? undefined : parseFloat(newSlStr);
+    if (newTp !== undefined && (!Number.isFinite(newTp) || newTp <= 0)) { window.alert("❌ TP không hợp lệ."); return; }
+    if (newSl !== undefined && (!Number.isFinite(newSl) || newSl <= 0)) { window.alert("❌ SL không hợp lệ."); return; }
+    // Validation side-aware
+    if (side === "LONG") {
+      if (newTp !== undefined && newTp <= entry) { window.alert("❌ LONG: TP phải > entry"); return; }
+      if (newSl !== undefined && newSl >= entry) { window.alert("❌ LONG: SL phải < entry"); return; }
+    } else {
+      if (newTp !== undefined && newTp >= entry) { window.alert("❌ SHORT: TP phải < entry"); return; }
+      if (newSl !== undefined && newSl <= entry) { window.alert("❌ SHORT: SL phải > entry"); return; }
+    }
+    if (newTp === undefined && newSl === undefined) return;
+    if (!requireDestructivePassword(`EDIT TP/SL ${side}`)) return;
+    live.updateTrackedTpSl(id, newTp, newSl);
+  };
+  const handleBulkClose = async (filter: "ALL" | "PROFIT" | "LOSS" | "OLD_HOURS") => {
+    const labels = { ALL: "TẤT CẢ lệnh", PROFIT: "lệnh đang LỜI", LOSS: "lệnh đang LỖ", OLD_HOURS: "lệnh giữ > 24h" };
+    const label = labels[filter];
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(`⚠️ BULK CLOSE ${label}?\n\nSẽ gửi MARKET reduceOnly cho từng lệnh khớp filter. Không thể undo.`);
+      if (!ok) return;
+    }
+    if (!requireDestructivePassword(`BULK CLOSE ${label}`)) return;
+    const r = await live.closeTrackedBulk(filter, 24);
+    if (typeof window !== "undefined") window.alert(`✅ Bulk close done: ${r.closed} closed, ${r.errors} errors.`);
+  };
   // Sort: newest first
   const sorted = tracked.slice().sort((a, b) => b.entryMs - a.entryMs);
-  // Column widths (px) — total ~880, scroll ngang trên mobile
+  // Column widths (px) — total ~920, scroll ngang trên mobile
   const cols = {
-    stt: 32, side: 56, rule: 110, entry: 80, qty: 60, tp: 130, sl: 130, held: 56, upnl: 70, action: 80,
+    stt: 32, side: 56, rule: 110, entry: 80, qty: 80, tp: 140, sl: 140, held: 56, upnl: 70, action: 130,
   };
   return (
     <Card icon="track_changes" title={`SMART STACK · ${longCount}/${cfg.stackMaxPerSide} LONG · ${shortCount}/${cfg.stackMaxPerSide} SHORT`}>
       <Text style={styles.note}>
         Mỗi virtual lệnh có entry/TP/SL/qty riêng. App tự đóng đúng qty của lệnh khi mark price hit (Plan B).
         {"\n"}⚠️ CHỈ count lệnh APP MỞ qua rule. Lệnh anh tự đặt trên Binance (manual) KHÔNG hiện ở đây.
+        {"\n"}🔒 CLOSE / EDIT TP-SL / BULK CLOSE đều cần mã xác nhận trước khi gửi Binance.
       </Text>
+
+      {/* STACK SUMMARY (per side) — anh Tommy v4.7.5 */}
+      {(longSummary || shortSummary) && (
+        <View style={styles.stackSummaryWrap}>
+          {longSummary && (
+            <View style={[styles.stackSummary, { borderColor: P.green + "55" }]}>
+              <Text style={[styles.stackSummaryTitle, { color: P.green }]}>📊 LONG · {longSummary.count} lệnh</Text>
+              <Text style={styles.stackSummaryLine}>
+                avg entry <Text style={styles.stackSummaryNum}>${longSummary.avgEntry.toFixed(1)}</Text>
+                {"  "}· total <Text style={styles.stackSummaryNum}>${longSummary.sumNotional.toFixed(0)}</Text>
+              </Text>
+              <Text style={styles.stackSummaryLine}>
+                avg TP <Text style={[styles.stackSummaryNum, { color: P.green }]}>${longSummary.avgTp.toFixed(1)}</Text>
+                {"  "}· avg SL <Text style={[styles.stackSummaryNum, { color: P.error }]}>${longSummary.avgSl.toFixed(1)}</Text>
+              </Text>
+              <Text style={styles.stackSummaryLine}>
+                uPnL <Text style={[styles.stackSummaryNum, { color: longSummary.upnlPct >= 0 ? P.green : P.error }]}>
+                  {longSummary.upnlPct >= 0 ? "+" : ""}{longSummary.upnlPct.toFixed(2)}% (${longSummary.upnlUsd.toFixed(2)})
+                </Text>
+              </Text>
+            </View>
+          )}
+          {shortSummary && (
+            <View style={[styles.stackSummary, { borderColor: P.error + "55" }]}>
+              <Text style={[styles.stackSummaryTitle, { color: P.error }]}>📊 SHORT · {shortSummary.count} lệnh</Text>
+              <Text style={styles.stackSummaryLine}>
+                avg entry <Text style={styles.stackSummaryNum}>${shortSummary.avgEntry.toFixed(1)}</Text>
+                {"  "}· total <Text style={styles.stackSummaryNum}>${shortSummary.sumNotional.toFixed(0)}</Text>
+              </Text>
+              <Text style={styles.stackSummaryLine}>
+                avg TP <Text style={[styles.stackSummaryNum, { color: P.green }]}>${shortSummary.avgTp.toFixed(1)}</Text>
+                {"  "}· avg SL <Text style={[styles.stackSummaryNum, { color: P.error }]}>${shortSummary.avgSl.toFixed(1)}</Text>
+              </Text>
+              <Text style={styles.stackSummaryLine}>
+                uPnL <Text style={[styles.stackSummaryNum, { color: shortSummary.upnlPct >= 0 ? P.green : P.error }]}>
+                  {shortSummary.upnlPct >= 0 ? "+" : ""}{shortSummary.upnlPct.toFixed(2)}% (${shortSummary.upnlUsd.toFixed(2)})
+                </Text>
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* BULK ACTIONS (LEADER only) — anh Tommy v4.7.5 */}
+      {!isFollower && tracked.length > 0 && (
+        <View style={styles.bulkRow}>
+          <Text style={styles.bulkLabel}>🚀 BULK:</Text>
+          <TouchableOpacity onPress={() => handleBulkClose("PROFIT")} style={[styles.bulkBtn, { borderColor: P.green }]}>
+            <Text style={[styles.bulkBtnText, { color: P.green }]}>✓ CLOSE PROFIT</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleBulkClose("LOSS")} style={[styles.bulkBtn, { borderColor: P.error }]}>
+            <Text style={[styles.bulkBtnText, { color: P.error }]}>✗ CLOSE LOSS</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleBulkClose("OLD_HOURS")} style={[styles.bulkBtn, { borderColor: P.bitcoinOrange }]}>
+            <Text style={[styles.bulkBtnText, { color: P.bitcoinOrange }]}>⏱ CLOSE &gt;24h</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleBulkClose("ALL")} style={[styles.bulkBtn, { borderColor: P.error, backgroundColor: P.error + "18" }]}>
+            <Text style={[styles.bulkBtnText, { color: P.error, fontWeight: "800" }]}>🔥 CLOSE ALL</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       {sorted.length === 0 ? (
         <Text style={styles.note}>Chưa có virtual lệnh nào đang theo dõi.</Text>
       ) : (
@@ -669,9 +805,9 @@ function TrackedPositionsCard({ live }: Props) {
               <Text style={[styles.tblHeadCell, { width: cols.side }]}>SIDE</Text>
               <Text style={[styles.tblHeadCell, { width: cols.rule }]}>RULE</Text>
               <Text style={[styles.tblHeadCell, { width: cols.entry }]}>ENTRY</Text>
-              <Text style={[styles.tblHeadCell, { width: cols.qty }]}>QTY</Text>
-              <Text style={[styles.tblHeadCell, { width: cols.tp }]}>TP (dist%)</Text>
-              <Text style={[styles.tblHeadCell, { width: cols.sl }]}>SL (dist%)</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.qty }]}>SIZE (USDT)</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.tp }]}>TP (dist%) ✏️</Text>
+              <Text style={[styles.tblHeadCell, { width: cols.sl }]}>SL (dist%) ✏️</Text>
               <Text style={[styles.tblHeadCell, { width: cols.held }]}>HELD</Text>
               <Text style={[styles.tblHeadCell, { width: cols.upnl, textAlign: "right" }]}>uPnL</Text>
               <Text style={[styles.tblHeadCell, { width: cols.action, textAlign: "center" }]}>ACTION</Text>
@@ -692,9 +828,13 @@ function TrackedPositionsCard({ live }: Props) {
                   <Text style={[styles.tblCell, { width: cols.side, color: sideColor, fontWeight: "800" }]}>{t.side}</Text>
                   <Text style={[styles.tblCell, { width: cols.rule, color: P.tertiary, fontWeight: "700" }]}>{t.id}</Text>
                   <Text style={[styles.tblCell, { width: cols.entry }]}>${t.entryPrice.toFixed(1)}</Text>
-                  <Text style={[styles.tblCell, { width: cols.qty }]}>{t.qty}</Text>
-                  <Text style={[styles.tblCell, { width: cols.tp, color: P.green }]}>${t.tpPrice.toFixed(1)} ({distTp.toFixed(2)}%)</Text>
-                  <Text style={[styles.tblCell, { width: cols.sl, color: P.error }]}>${t.slPrice.toFixed(1)} ({distSl.toFixed(2)}%)</Text>
+                  <Text style={[styles.tblCell, { width: cols.qty }]}>${(t.qty * t.entryPrice).toFixed(2)}</Text>
+                  <TouchableOpacity disabled={isFollower} onPress={() => handleEditTpSl(t.id, t.side, t.entryPrice, t.tpPrice, t.slPrice)} style={{ width: cols.tp }}>
+                    <Text style={[styles.tblCell, { color: P.green, textDecorationLine: isFollower ? "none" : "underline" }]}>${t.tpPrice.toFixed(1)} ({distTp.toFixed(2)}%)</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity disabled={isFollower} onPress={() => handleEditTpSl(t.id, t.side, t.entryPrice, t.tpPrice, t.slPrice)} style={{ width: cols.sl }}>
+                    <Text style={[styles.tblCell, { color: P.error, textDecorationLine: isFollower ? "none" : "underline" }]}>${t.slPrice.toFixed(1)} ({distSl.toFixed(2)}%)</Text>
+                  </TouchableOpacity>
                   <Text style={[styles.tblCell, { width: cols.held, color: P.dim }]}>{heldStr}</Text>
                   <Text style={[styles.tblCell, { width: cols.upnl, textAlign: "right", color: upnlColor, fontWeight: "700" }]}>
                     {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
@@ -1174,6 +1314,16 @@ const styles = StyleSheet.create({
   btnGhostText: { color: P.text2, fontFamily: "monospace", fontWeight: "700", fontSize: 11, letterSpacing: 1 },
   btnDanger: { backgroundColor: P.errorContainer, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 3, marginLeft: 6 },
   btnDangerText: { color: P.onErrorContainer, fontFamily: "monospace", fontWeight: "800", fontSize: 10, letterSpacing: 0.5 },
+  // Stack summary + bulk actions (v4.7.5)
+  stackSummaryWrap: { flexDirection: "row", gap: 8, marginTop: 8, marginBottom: 8, flexWrap: "wrap" },
+  stackSummary: { flex: 1, minWidth: 280, padding: 8, borderRadius: 4, borderWidth: 1, backgroundColor: P.surface },
+  stackSummaryTitle: { fontFamily: "monospace", fontWeight: "800", fontSize: 11, letterSpacing: 0.5, marginBottom: 4 },
+  stackSummaryLine: { color: P.dim, fontFamily: "monospace", fontSize: 10, lineHeight: 14 },
+  stackSummaryNum: { color: P.text, fontWeight: "700" },
+  bulkRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8, marginBottom: 8, flexWrap: "wrap" },
+  bulkLabel: { color: P.dim, fontFamily: "monospace", fontSize: 10, fontWeight: "800", letterSpacing: 1 },
+  bulkBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 3, borderWidth: 1 },
+  bulkBtnText: { fontFamily: "monospace", fontSize: 10, fontWeight: "700", letterSpacing: 0.5 },
 
   toggle: { borderWidth: 2, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 4 },
   toggleText: { fontFamily: "monospace", fontWeight: "900", fontSize: 11, letterSpacing: 1 },
