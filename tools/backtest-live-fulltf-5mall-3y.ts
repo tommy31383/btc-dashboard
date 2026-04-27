@@ -1066,6 +1066,7 @@ function bigEquityOverlaySvg(modes: ModeResult[], width = 900, height = 280): st
     "Mode B": "#10b981",
     "Mode C": "#ef4444",
     "Mode D": "#3b82f6",
+    "Mode E": "#a855f7",
   };
   const allVals: number[] = [];
   for (const m of modes) {
@@ -1091,7 +1092,7 @@ function bigEquityOverlaySvg(modes: ModeResult[], width = 900, height = 280): st
   const zeroY = height - ((0 - min) / range) * height;
   const legend = modes.map((m, idx) => {
     const color = palette[m.modeName] || "#999";
-    const x = 12 + idx * 200;
+    const x = 12 + idx * 170;
     return `<rect x="${x}" y="6" width="14" height="3" fill="${color}"/>
             <text x="${x + 20}" y="13" fill="#cfc6bc" font-size="11">${m.modeName}: ${m.metrics.netPctLev >= 0 ? "+" : ""}${m.metrics.netPctLev.toFixed(0)}% lev</text>`;
   }).join("\n");
@@ -1186,7 +1187,7 @@ HTF rules use Phase 2 LTF confirm (5m Stoch 20/80 OR 15m S/R 0.4%, max wait ${CO
 </div>
 
 <div class="card">
-  <h2>📈 EQUITY OVERLAY · 4 modes</h2>
+  <h2>📈 EQUITY OVERLAY · 5 modes (Mode E = full TF rules NO 5m baseline)</h2>
   ${overlay}
 </div>
 
@@ -1371,6 +1372,16 @@ let modeEResult: ModeResult | undefined;
     else modeDResult = m;
   }
 
+  console.log(`\n[Mode E] Full TF rules NO 5m baseline (${excludedRuleIds.join(",") || "none excluded"})...`);
+  modeEResult = runModeSimulation(
+    "Mode E",
+    `Full TF rules EXCLUDING 5m baseline (${excludedRuleIds.join(",") || "none"}) + Phase 2 LTF + LIVE PRESET B`,
+    fullTfNoBaselineCandidates,
+    candles5m,
+    LIVE_STACK_CFG.perRuleCooldownMin,
+  );
+  console.log(`  ${modeEResult.metrics.trades} trades · NET ${modeEResult.metrics.netPctLev}% · MaxDD -${modeEResult.metrics.maxDD}% · PF ${modeEResult.metrics.profitFactor === 999 ? "∞" : modeEResult.metrics.profitFactor}`);
+
   function strip(m: ModeResult) {
     // Avoid dumping every trade in JSON (would balloon file). Keep summary + curve only.
     return {
@@ -1386,7 +1397,7 @@ let modeEResult: ModeResult | undefined;
     };
   }
 
-  const modes = [modeA, modeBResult!, modeCResult!, modeDResult!];
+  const modes = [modeA, modeBResult!, modeCResult!, modeDResult!, modeEResult!];
 
   const out = {
     generatedAt: Date.now(),
@@ -1399,13 +1410,23 @@ let modeEResult: ModeResult | undefined;
       all5mPresets: ALL5M_PRESETS,
       entryTfsFull: ENTRY_TFS_FULL,
       entryTfsHtf: ENTRY_TFS_HTF,
+      excludeFor5mBaseline: [...EXCLUDE_5M_BASELINE_IDS],
     },
     periods,
     activeRuleCounts: {
       fullTf: fullTfRules.length,
       htfOnly: htfOnlyRules.length,
+      fullTfNoBaseline: fullTfNoBaselineRules.length,
     },
     modes: modes.map(strip),
+    modeEvsA: {
+      excludedRules: excludedRuleIds,
+      deltaNetPctLev: Math.round((modeEResult!.metrics.netPctLev - modeA.metrics.netPctLev) * 100) / 100,
+      deltaMaxDD: Math.round((modeEResult!.metrics.maxDD - modeA.metrics.maxDD) * 100) / 100,
+      deltaTrades: modeEResult!.metrics.trades - modeA.metrics.trades,
+      deltaWinRate: Math.round((modeEResult!.metrics.winRate - modeA.metrics.winRate) * 100) / 100,
+      deltaProfitFactor: Math.round((modeEResult!.metrics.profitFactor - modeA.metrics.profitFactor) * 100) / 100,
+    },
   };
 
   const jsonPath = join(__dirname, "..", "assets", "backtest_live_fulltf_5mall_3y.json");
@@ -1419,7 +1440,7 @@ let modeEResult: ModeResult | undefined;
   // Final summary
   console.log(`\n=== Summary ===`);
   console.log(`Mode A (baseline full TF rules): NET ${modeA.metrics.netPctLev}%, MaxDD -${modeA.metrics.maxDD}%, ${modeA.metrics.trades} trades, WR ${modeA.metrics.winRate}%, PF ${modeA.metrics.profitFactor === 999 ? "∞" : modeA.metrics.profitFactor}, Sharpe ${modeA.metrics.sharpeLike}`);
-  for (const m of [modeBResult!, modeCResult!, modeDResult!]) {
+  for (const m of [modeBResult!, modeCResult!, modeDResult!, modeEResult!]) {
     console.log(`${m.modeName} (${m.description.slice(0, 60)}): NET ${m.metrics.netPctLev}%, MaxDD -${m.metrics.maxDD}%, ${m.metrics.trades} trades, WR ${m.metrics.winRate}%, PF ${m.metrics.profitFactor === 999 ? "∞" : m.metrics.profitFactor}, Sharpe ${m.metrics.sharpeLike}`);
   }
   const sortedByNet = [...modes].sort((a, b) => b.metrics.netPctLev - a.metrics.netPctLev);
@@ -1428,4 +1449,11 @@ let modeEResult: ModeResult | undefined;
   console.log(`\nBest by NET:    ${sortedByNet[0].modeName} (${sortedByNet[0].metrics.netPctLev}%)`);
   console.log(`Best by Sharpe: ${sortedBySharpe[0].modeName} (${sortedBySharpe[0].metrics.sharpeLike})`);
   console.log(`Best by MaxDD:  ${sortedByDd[0].modeName} (-${sortedByDd[0].metrics.maxDD}%)`);
+  console.log(`\n=== Mode E vs Mode A (5m baseline removal) ===`);
+  console.log(`Excluded rules: ${excludedRuleIds.join(",") || "none"}`);
+  console.log(`Δ NET   = ${(modeEResult!.metrics.netPctLev - modeA.metrics.netPctLev).toFixed(2)}% lev (E ${modeEResult!.metrics.netPctLev}% vs A ${modeA.metrics.netPctLev}%)`);
+  console.log(`Δ MaxDD = ${(modeEResult!.metrics.maxDD - modeA.metrics.maxDD).toFixed(2)}% lev (E -${modeEResult!.metrics.maxDD}% vs A -${modeA.metrics.maxDD}%)`);
+  console.log(`Δ Trades = ${modeEResult!.metrics.trades - modeA.metrics.trades} (E ${modeEResult!.metrics.trades} vs A ${modeA.metrics.trades})`);
+  console.log(`Δ WR    = ${(modeEResult!.metrics.winRate - modeA.metrics.winRate).toFixed(2)}pp (E ${modeEResult!.metrics.winRate}% vs A ${modeA.metrics.winRate}%)`);
+  console.log(`Δ PF    = ${(modeEResult!.metrics.profitFactor - modeA.metrics.profitFactor).toFixed(2)} (E ${modeEResult!.metrics.profitFactor} vs A ${modeA.metrics.profitFactor})`);
 })();
