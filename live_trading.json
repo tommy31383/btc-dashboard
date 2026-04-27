@@ -898,6 +898,16 @@
         "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 2 auto-imported). LONG 0.003→0.005 (binance 0.005), SHORT 0.008→0.008 (binance 0.008). ✅ Auto-imported 2 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777270553298,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:16)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
