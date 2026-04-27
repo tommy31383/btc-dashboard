@@ -43,7 +43,6 @@ import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 // PaperTradeJournal removed (trùng với LIVE journal + 5m ALL panel)
 import AutoTraderPanel from "./components/AutoTraderPanel";
 // LiveTradingPanel moved to dedicated LiveTab
-import HistoryScreen from "./components/HistoryScreen";
 import LiveTab from "./components/LiveTab";
 import All5mPanel from "./components/All5mPanel";
 import { useAutoTrader } from "./hooks/useAutoTrader";
@@ -129,7 +128,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "history" | "live" | "all5m">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "live" | "all5m">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -237,7 +236,6 @@ export default function App() {
     setNavTab(t);
     if (t === "trades") setActiveTab("risk");
     else if (t === "gptRule") setActiveTab("gptRule");
-    else if (t === "history") setActiveTab("history");
     else if (t === "live") setActiveTab("live");
     else if (t === "all5m") setActiveTab("all5m");
     else setActiveTab("dashboard");
@@ -282,31 +280,6 @@ export default function App() {
             settings={settings}
             onUpdate={updateSettings}
           />
-          <BottomNavBar
-            active={navTab}
-            tradesBadge={firingGoldensCount}
-            onSelect={handleNavSelect}
-          />
-        </SafeAreaView>
-      </ErrorBoundary>
-    );
-  }
-
-  if (activeTab === "history") {
-    return (
-      <ErrorBoundary>
-        <SafeAreaView style={styles.safe}>
-          <StatusBar style="light" />
-          <TopAppBar
-            title="BTC DASHBOARD"
-            version={APP_VERSION}
-            buildDate={BUILD_DATE}
-            lastUpdate={lastUpdate}
-            onNotifications={() => {}}
-            onSettings={() => setShowSettings(true)}
-          />
-          <HistoryScreen account={autoTrader.account} summary={autoTrader.summary} />
-          <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}
             tradesBadge={firingGoldensCount}

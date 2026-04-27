@@ -16,11 +16,10 @@ import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "r
 import { P } from "../../utils/v2Theme";
 import { MaterialIcon } from "./MaterialIcon";
 
-export type NavTab = "radar" | "trades" | "gptRule" | "history" | "live" | "all5m";
+export type NavTab = "radar" | "trades" | "gptRule" | "live" | "all5m";
 
 const ALL_TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"]; pcOnly?: boolean }[] = [
   { key: "radar",   label: "RULE",    icon: "radar" },
-  { key: "history", label: "HISTORY", icon: "history" },
   { key: "live",    label: "LIVE",    icon: "bolt" },
   { key: "all5m",   label: "5m ALL",  icon: "auto_graph", pcOnly: true },
 ];
