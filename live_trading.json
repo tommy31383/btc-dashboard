@@ -1427,12 +1427,117 @@
         "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777309355412,
+      "ruleId": "4h:40",
+      "tfKey": "4h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309355443,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76640.71,
+        "tpPrice": 77790.32065,
+        "slPrice": 68976.63900000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356120,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356126,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356129,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356133,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361662,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 10m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361666,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361671,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361674,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
     "15m:22": 1777286013803,
     "15m:23": 1777286014085,
-    "15m:16": 1777308649231
+    "15m:16": 1777309355447
   },
   "trackedPositions": [
     {
@@ -1688,17 +1793,7 @@
       "entryMs": 1777286014411
     }
   ],
-  "pendingAlerts": [
-    {
-      "id": "4h:40",
-      "tfKey": "4h",
-      "side": "LONG",
-      "htfEntryPrice": 77125.96,
-      "tpPct": 5.000000000000012,
-      "slPct": 2.500000000000006,
-      "addedMs": 1777306767515
-    }
-  ],
+  "pendingAlerts": [],
   "binanceSnapshot": {
     "ts": 1777288467717,
     "account": {
