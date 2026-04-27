@@ -6,7 +6,7 @@
  */
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import Svg, { Polyline, Line } from "react-native-svg";
+import Svg, { Polyline, Line, Polygon, Circle } from "react-native-svg";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import {
@@ -25,6 +25,8 @@ interface Props {
   /** Active preset (anh Tommy v4.7.0) */
   presetKey: PresetKey;
   onSetPreset: (key: PresetKey) => Promise<void> | void;
+  /** Price 5m bars cho chart entry/exit markers (anh Tommy v4.7.12) */
+  price5mBars?: { time: number; close: number }[];
   /** Optional content rendered at bottom of the scroll (vd PaperTradeJournal) */
   footer?: React.ReactNode;
 }
@@ -45,6 +47,92 @@ function fmtCountdown(ms: number) {
   if (ms <= 0) return "00:00";
   const s = Math.floor(ms / 1000);
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/**
+ * Price chart 5m + entry/exit markers (anh Tommy v4.7.12).
+ * Marker compact để không rối khi nhiều lệnh:
+ *   ▲ green (4px) = LONG entry · ▼ red = SHORT entry
+ *   ● green (3px) = WIN exit  · ● red = LOSS exit
+ * Auto-zoom theo time range của bars + markers (last 100 bars ~8h).
+ */
+function PriceChartWithMarkersSvg({
+  bars, positions, width = 760, height = 220, maxBars = 120,
+}: {
+  bars: { time: number; close: number }[];
+  positions: Position[];
+  width?: number; height?: number; maxBars?: number;
+}) {
+  if (!bars || bars.length < 2) {
+    return <View style={[styles.chartBox, { width, height, justifyContent: "center", alignItems: "center" }]}>
+      <Text style={styles.chartEmpty}>chưa có price data 5m</Text>
+    </View>;
+  }
+  // Slice last N bars
+  const slice = bars.slice(-maxBars);
+  const tMin = slice[0].time;
+  const tMax = slice[slice.length - 1].time;
+  const range = tMax - tMin || 1;
+  const closes = slice.map((b) => b.close);
+  const pMin = Math.min(...closes);
+  const pMax = Math.max(...closes);
+  const pRange = pMax - pMin || 1;
+  const pad = 8;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const xOf = (t: number) => pad + ((t - tMin) / range) * w;
+  const yOf = (p: number) => pad + h - ((p - pMin) / pRange) * h;
+  const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
+  // Filter positions có time trong range
+  const visible = positions.filter((p) => p.entryMs >= tMin - 60_000); // include slight extension
+  return (
+    <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
+      <Svg width={width} height={height}>
+        {/* Price line */}
+        <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.2} opacity={0.85} />
+        {/* Markers */}
+        {visible.map((p) => {
+          const eX = xOf(p.entryMs);
+          const eY = yOf(p.entryPrice);
+          const longSide = p.side === "LONG";
+          const entryColor = longSide ? P.green : P.error;
+          // Triangle 5px (entry)
+          const tri = longSide
+            ? `${eX},${eY - 4} ${eX - 3.5},${eY + 2} ${eX + 3.5},${eY + 2}`
+            : `${eX},${eY + 4} ${eX - 3.5},${eY - 2} ${eX + 3.5},${eY - 2}`;
+          // Exit dot if closed and within range
+          let exitMark = null;
+          if (p.exitMs && p.exitPrice && p.exitMs <= tMax + 60_000 && p.exitMs >= tMin - 60_000) {
+            const xX = xOf(p.exitMs);
+            const xY = yOf(p.exitPrice);
+            const win = p.status === "WIN";
+            exitMark = (
+              <>
+                <Circle cx={xX} cy={xY} r={2.5} fill={win ? P.green : P.error} opacity={0.9} />
+                {/* Connect line entry → exit faint */}
+                <Line x1={eX} y1={eY} x2={xX} y2={xY} stroke={win ? P.green : P.error} strokeWidth={0.5} strokeDasharray="2,2" opacity={0.4} />
+              </>
+            );
+          }
+          return (
+            <React.Fragment key={p.id}>
+              <Polygon points={tri} fill={entryColor} opacity={0.95} />
+              {exitMark}
+            </React.Fragment>
+          );
+        })}
+        {/* Labels */}
+        <Text> </Text>
+      </Svg>
+      {/* Min/max price + legend */}
+      <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12 }}>
+        <Text style={{ color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMax.toFixed(0)}</Text>
+        <Text style={{ color: P.green, fontSize: 9, fontFamily: "monospace" }}>▲ LONG  ● win</Text>
+        <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT  ● loss</Text>
+      </View>
+      <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMin.toFixed(0)} · {slice.length} cây 5m</Text>
+    </View>
+  );
 }
 
 function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number; equity: number }[]; width?: number; height?: number; }) {
@@ -77,7 +165,7 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
   );
 }
 
-export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, footer }: Props) {
+export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
   const preset = PRESETS[presetKey];
   // ALL tunable values từ active preset (anh Tommy v4.7.1)
@@ -253,6 +341,14 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           </View>
         );
       })()}
+
+      {/* Price 5m + entry/exit markers (anh Tommy v4.7.12) */}
+      {price5mBars && price5mBars.length >= 2 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📊 PRICE 5m + ENTRIES (last 120 cây ≈ 10h)</Text>
+          <PriceChartWithMarkersSvg bars={price5mBars} positions={account.positions} />
+        </View>
+      )}
 
       {/* Equity curve */}
       <View style={styles.section}>
