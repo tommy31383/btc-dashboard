@@ -104,6 +104,7 @@ export function useBinanceLive(
   const myIpLocRef = useRef<IpLocation | null>(null);
   myIpLocRef.current = myIpLoc;
   const lastAlertSeenRef = useRef<Set<string>>(new Set());
+  const authFailCountRef = useRef<number>(0); // anh Tommy v4.7.31: auto-demote sau 3 fails liên tục
 
   /** Election logic dùng chung cho boot + sau khi setCredentials. */
   const runElection = useRef(async (myId: string, label: string) => {
@@ -389,6 +390,7 @@ export function useBinanceLive(
         await engineSaveState(next, { sync: true });
         setState(next);
         if (recon.dropped === 0) setLastError(null);
+        authFailCountRef.current = 0; // poll thành công → reset counter (v4.7.31)
         const next2 = await maybeTriggerCooldown(stateRef.current, pnl);
         if (next2 !== stateRef.current) setState(next2);
         // Anh Tommy v4.6.9: Equity DD protection — pause auto khi equity drop X% từ peak
@@ -405,7 +407,23 @@ export function useBinanceLive(
         }
       } catch (e: any) {
         if (!alive) return;
-        setLastError(e?.message ?? String(e));
+        const msg = e?.message ?? String(e);
+        setLastError(msg);
+        // AUTO-DEMOTE (anh Tommy v4.7.31): nếu Binance từ chối API/IP liên tục
+        // → leader này vô dụng (không poll/trade được) → release lock cho device khác claim
+        const isAuthErr = msg.includes("-2015") || msg.toLowerCase().includes("invalid api-key") || msg.toLowerCase().includes("invalid ip");
+        if (isAuthErr) {
+          authFailCountRef.current += 1;
+          if (authFailCountRef.current >= 3) {
+            setRole("DISCONNECTED");
+            setLastError(`⛔ AUTO-DEMOTE: Binance từ chối ${authFailCountRef.current} lần liên tục — released LEADER lock. Sửa IP whitelist Binance rồi CLAIM lại.`);
+            // Clear leader info trên gist để device khác claim được
+            try { await pushLeader("", "", null); } catch {}
+            authFailCountRef.current = 0;
+          }
+        } else {
+          authFailCountRef.current = 0; // reset khi gặp lỗi khác (network etc.)
+        }
       }
     }
     poll();
@@ -543,6 +561,24 @@ export function useBinanceLive(
     role, leader, deviceId, deviceLabel, myIpLoc, hasPat, lastSyncMs, verifyLeftMs,
     async claimLeadership() {
       if (!deviceIdRef.current) return;
+      // PREFLIGHT (anh Tommy v4.7.31): test Binance API trước khi claim
+      // Nếu IP không whitelist hoặc API key sai → BLOCK claim, không cho freeze hệ thống.
+      const cur = stateRef.current;
+      if (!cur.apiKey || !cur.apiSecret) {
+        setLastError("❌ CLAIM BLOCKED: chưa nhập API key/secret. Vào CREDENTIALS card nhập trước.");
+        return;
+      }
+      try {
+        await testConnection({ apiKey: cur.apiKey, apiSecret: cur.apiSecret });
+      } catch (e: any) {
+        const msg = e?.message ?? String(e);
+        if (msg.includes("-2015") || msg.toLowerCase().includes("invalid api-key") || msg.toLowerCase().includes("ip")) {
+          setLastError(`❌ CLAIM BLOCKED: Binance từ chối API/IP — "${msg}". Whitelist IP hiện tại trên Binance API Mgmt rồi mới claim được.`);
+          return;
+        }
+        setLastError(`❌ CLAIM BLOCKED: testConnection fail — "${msg}". Fix lỗi rồi thử lại.`);
+        return;
+      }
       const ok = await pushLeader(deviceIdRef.current, deviceLabelRef.current, myIpLocRef.current);
       if (!ok) {
         setLastError("❌ CLAIM LEADER fail (network / git lỗi).");
