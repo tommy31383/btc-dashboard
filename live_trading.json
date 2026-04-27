@@ -1309,6 +1309,26 @@
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777287914888,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77792 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777287914891,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77792 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
