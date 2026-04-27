@@ -614,6 +614,7 @@ function SettingsCard({ live }: Props) {
       equityDdPausePct: 30,
       equityDdPauseHours: 4,
       use5mAllEngineMode: false,  // user phải bật rõ ràng (v4.7.8)
+      stackBetterEntryMode: "vs-avg", // anh Tommy v4.7.27
     };
     setDirty(true);
     setDraft(best);
@@ -664,6 +665,44 @@ function SettingsCard({ live }: Props) {
         {"\n"}   App tự đóng đúng qty của lệnh khi mark price hit (Binance gộp position nhưng phần đóng đúng).
         {"\n"}💡 Spacing: tối thiểu N phút giữa 2 entry CÙNG side. 0 = tắt.
         {"\n"}💡 Min entry dist: entry mới phải xa entry gần nhất CÙNG side ≥ N% (tránh nhồi 1 vùng).
+      </Text>
+
+      <Text style={styles.subLabel}>🎯 BETTER ENTRY ONLY (anh Tommy v4.7.27)</Text>
+      <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+        {(["off", "vs-last", "vs-best", "vs-avg"] as const).map((mode) => {
+          const active = draft.stackBetterEntryMode === mode;
+          const labels: Record<string, string> = {
+            off: "OFF",
+            "vs-last": "vs LAST",
+            "vs-best": "vs BEST",
+            "vs-avg": "vs AVG ⭐",
+          };
+          return (
+            <TouchableOpacity
+              key={mode}
+              onPress={() => field("stackBetterEntryMode", mode)}
+              style={{
+                paddingHorizontal: 10, paddingVertical: 6, borderRadius: 3,
+                borderWidth: 1,
+                borderColor: active ? P.bitcoinOrange : P.borderSoft,
+                backgroundColor: active ? P.bitcoinOrange + "22" : P.surface,
+              }}
+            >
+              <Text style={{
+                color: active ? P.bitcoinOrange : P.dim,
+                fontSize: 10, fontFamily: "monospace", fontWeight: "700",
+              }}>{labels[mode]}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <Text style={styles.note}>
+        💡 Entry mới phải TỐT HƠN entry trước cùng side (LONG cần thấp hơn, SHORT cần cao hơn):
+        {"\n"}   • <Text style={{ fontWeight: "700" }}>OFF</Text>: tắt — vào lệnh ở giá nào cũng OK
+        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs LAST</Text>: tốt hơn entry GẦN NHẤT cùng side
+        {"\n"}   • <Text style={{ fontWeight: "700" }}>vs BEST</Text>: tốt hơn entry TỐT NHẤT (avg luôn cải thiện, strict nhất)
+        {"\n"}   • <Text style={{ fontWeight: "700", color: P.bitcoinOrange }}>vs AVG ⭐ (default)</Text>: tốt hơn weighted avg entry cùng side
+        {"\n"}   → Tránh stack gần nhau; ép DCA đúng hướng.
       </Text>
 
       <Text style={styles.subLabel}>🛡 EQUITY DD PROTECTION (anh Tommy v4.6.9)</Text>

@@ -59,6 +59,8 @@ export interface Preset {
   stackMaxPerSide: number;
   stackMinEntryDistPct: number;
   stackPerSideSpacingMin: number;
+  /** Better entry only mode (anh Tommy v4.7.27): "off" | "vs-last" | "vs-best" | "vs-avg" */
+  stackBetterEntryMode?: "off" | "vs-last" | "vs-best" | "vs-avg";
   // Entry gates
   cooldownMin: number;
   stochLongLevel: number;
@@ -76,6 +78,7 @@ export const PRESETS: Record<PresetKey, Preset> = {
     description: "Highest PnL · vốn lớn",
     tpPct: 5, slPct: 2.5,
     stackMaxPerSide: 75, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    stackBetterEntryMode: "vs-avg",
     cooldownMin: 5,
     stochLongLevel: 10, stochShortLevel: 90,
     srProximityPct: 0.4, srLookback15m: 30,
@@ -86,6 +89,7 @@ export const PRESETS: Record<PresetKey, Preset> = {
     description: "Balanced · vốn vừa",
     tpPct: 5, slPct: 2.5,
     stackMaxPerSide: 30, stackMinEntryDistPct: 0.1, stackPerSideSpacingMin: 10,
+    stackBetterEntryMode: "vs-avg",
     cooldownMin: 5,
     stochLongLevel: 15, stochShortLevel: 85,
     srProximityPct: 0.4, srLookback15m: 50,
@@ -96,6 +100,7 @@ export const PRESETS: Record<PresetKey, Preset> = {
     description: "Lowest MaxDD · vốn ít",
     tpPct: 3.5, slPct: 2,
     stackMaxPerSide: 15, stackMinEntryDistPct: 0.3, stackPerSideSpacingMin: 10,
+    stackBetterEntryMode: "vs-avg",
     cooldownMin: 15,
     stochLongLevel: 10, stochShortLevel: 90,
     srProximityPct: 0.4, srLookback15m: 80,
@@ -310,6 +315,22 @@ export async function tryEntry5mBar(
     if (preset.stackMinEntryDistPct > 0) {
       const distPct = Math.abs(fillPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
       if (distPct < preset.stackMinEntryDistPct) return null;
+    }
+    // BETTER ENTRY ONLY (anh Tommy v4.7.27): entry mới tốt hơn benchmark cùng side
+    if (preset.stackBetterEntryMode && preset.stackBetterEntryMode !== "off") {
+      let benchmark: number;
+      if (preset.stackBetterEntryMode === "vs-last") benchmark = lastSame.entryPrice;
+      else if (preset.stackBetterEntryMode === "vs-best") {
+        benchmark = side === "LONG"
+          ? Math.min(...sameSideOpen.map((p) => p.entryPrice))
+          : Math.max(...sameSideOpen.map((p) => p.entryPrice));
+      } else { // vs-avg
+        const sumQ = sameSideOpen.reduce((a, b) => a + 1, 0);  // 5m ALL qty không track sẵn — dùng count
+        const sumE = sameSideOpen.reduce((a, b) => a + b.entryPrice, 0);
+        benchmark = sumE / sumQ;
+      }
+      if (side === "LONG" && fillPrice >= benchmark) return null;
+      if (side === "SHORT" && fillPrice <= benchmark) return null;
     }
   }
 

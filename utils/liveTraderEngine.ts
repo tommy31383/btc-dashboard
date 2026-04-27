@@ -44,6 +44,12 @@ export interface LiveSettings {
    *  giống engine 5m ALL (Stoch + S/R 15m fallback per active preset từ @all5m_preset_v1).
    *  HTF rules vẫn chạy song song. Margin/lev dùng từ LIVE settings. */
   use5mAllEngineMode: boolean;      // default false
+  /** Better entry only mode (anh Tommy v4.7.27): entry mới phải TỐT HƠN entry trước cùng side.
+   *  - "off": tắt (default cũ)
+   *  - "vs-last": tốt hơn entry GẦN NHẤT cùng side (LONG cần thấp hơn, SHORT cần cao hơn)
+   *  - "vs-best": tốt hơn entry TỐT NHẤT cùng side (most strict, avg entry luôn cải thiện)
+   *  - "vs-avg": tốt hơn AVG entry cùng side (giữa) */
+  stackBetterEntryMode: "off" | "vs-last" | "vs-best" | "vs-avg";
 }
 
 /** Hard timeouts to prevent state from growing unbounded if data feeds stall. */
@@ -72,6 +78,7 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   equityDdPausePct: 30,          // drop 30% từ peak equity → pause
   equityDdPauseHours: 4,         // pause 4h
   use5mAllEngineMode: false,     // default OFF — phải bật rõ ràng trong SETTINGS
+  stackBetterEntryMode: "vs-avg", // default ON vs-avg (anh Tommy v4.7.27 — middle strict)
 };
 
 export type LiveAction =
@@ -333,6 +340,34 @@ export function checkStackGate(
     const distPct = Math.abs(entryPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
     if (distPct < minDistPct) {
       return `stack price too close (${distPct.toFixed(2)}% < ${minDistPct}%) to last ${side} @${lastSame.entryPrice.toFixed(2)}`;
+    }
+  }
+  // BETTER ENTRY ONLY (anh Tommy v4.7.27): entry mới phải tốt hơn entry trước cùng side
+  // LONG cần entryPrice thấp hơn (mua rẻ hơn), SHORT cần cao hơn (bán cao hơn)
+  if (cfg.stackBetterEntryMode !== "off" && sameSide.length > 0) {
+    let benchmark: number;
+    let label: string;
+    if (cfg.stackBetterEntryMode === "vs-last") {
+      const lastSame = sameSide.reduce((a, b) => (a.entryMs > b.entryMs ? a : b));
+      benchmark = lastSame.entryPrice;
+      label = "last";
+    } else if (cfg.stackBetterEntryMode === "vs-best") {
+      // Best = lowest entry cho LONG, highest cho SHORT
+      benchmark = side === "LONG"
+        ? Math.min(...sameSide.map((p) => p.entryPrice))
+        : Math.max(...sameSide.map((p) => p.entryPrice));
+      label = "best";
+    } else { // vs-avg
+      const sumQty = sameSide.reduce((a, b) => a + b.qty, 0);
+      const sumQtyEntry = sameSide.reduce((a, b) => a + b.qty * b.entryPrice, 0);
+      benchmark = sumQty > 0 ? sumQtyEntry / sumQty : sameSide[0].entryPrice;
+      label = "avg";
+    }
+    if (side === "LONG" && entryPrice >= benchmark) {
+      return `entry $${entryPrice.toFixed(0)} ≥ ${label} LONG $${benchmark.toFixed(0)} — chỉ vào nếu THẤP hơn (better entry only ${cfg.stackBetterEntryMode})`;
+    }
+    if (side === "SHORT" && entryPrice <= benchmark) {
+      return `entry $${entryPrice.toFixed(0)} ≤ ${label} SHORT $${benchmark.toFixed(0)} — chỉ vào nếu CAO hơn (better entry only ${cfg.stackBetterEntryMode})`;
     }
   }
   return null;
