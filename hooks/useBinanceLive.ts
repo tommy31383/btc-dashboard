@@ -13,7 +13,7 @@ import {
   LiveTraderState, LiveSettings, loadState, saveState, decideEntry, executeAction,
   maybeTriggerCooldown, AlertInput, emptyState, pullRemote, DEFAULT_SETTINGS,
   monitorTrackedPositions, addToPending, confirmPending, closeTrackedManual, reconcileTrackedPositions,
-  maybeTriggerEquityDdProtection, updateTrackedTpSl, closeTrackedBulk,
+  maybeTriggerEquityDdProtection, updateTrackedTpSl, closeTrackedBulk, trimFiredIds,
 } from "../utils/liveTraderEngine";
 import { getActivePreset } from "../utils/all5mAccount";
 import {
@@ -31,8 +31,10 @@ import { getGistConfig } from "../utils/gistSync";
 import { ensureNotificationPermission } from "../utils/liveAlerts";
 
 // Anh Tommy v4.5.3: tăng x2 nữa (tổng x4)
-const POLL_MS = 120 * 1000;              // Binance poll 60s → 120s (2 phút)
-const FOLLOWER_PULL_MS = 120 * 1000;     // follower pull 60s → 120s
+// v4.7.17 — anh Tommy: optimize sync nhanh chính xác
+const POLL_MS = 30 * 1000;               // 120s → 30s (sync 4× nhanh, latency max 30s)
+const FOLLOWER_PULL_MS = 45 * 1000;      // 120s → 45s (follower mirror nhanh)
+const FIRED_IDS_TTL_MS = 24 * 60 * 60 * 1000; // trim firedIds > 24h khỏi memory leak
 
 export interface UseBinanceLiveResult {
   state: LiveTraderState;
@@ -376,6 +378,8 @@ export function useBinanceLive(
         const updates: any = { binanceSnapshot: snapshot };
         if (hedge !== stateRef.current.hedgeMode) updates.hedgeMode = hedge;
         let next = { ...stateRef.current, ...updates };
+        // Trim firedIds > 24h (chống memory leak — anh Tommy v4.7.17)
+        next = trimFiredIds(next);
         // Reconcile trackedPositions với Binance position thực tế (anh Tommy: chống stale state sau crash)
         const recon = await reconcileTrackedPositions(next, pos);
         if (recon.dropped > 0 && recon.warning) {

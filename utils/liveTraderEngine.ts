@@ -195,6 +195,20 @@ function trimJournal(s: LiveSyncState): LiveSyncState {
   return s;
 }
 
+/** Trim firedIds older than TTL (anh Tommy v4.7.17 — chống memory leak). */
+const FIRED_IDS_TTL_MS = 24 * 60 * 60 * 1000;
+export function trimFiredIds(s: LiveTraderState): LiveTraderState {
+  const now = Date.now();
+  const trimmed: Record<string, number> = {};
+  let removed = 0;
+  for (const [id, ts] of Object.entries(s.firedIds)) {
+    if (now - ts < FIRED_IDS_TTL_MS) trimmed[id] = ts;
+    else removed++;
+  }
+  if (removed === 0) return s;
+  return { ...s, firedIds: trimmed };
+}
+
 export async function saveState(s: LiveTraderState, opts: { sync?: boolean } = {}): Promise<void> {
   const { apiKey, apiSecret, ...sync } = s;
   trimJournal(sync);
@@ -681,7 +695,8 @@ export async function reconcileTrackedPositions(
   //   #5 SPLIT: nếu debt > 1.5× typical position → split thành N entries riêng (granular)
   let imported = 0;
   const now = Date.now();
-  const recentMutation = s.lastTrackedMutationMs && (now - s.lastTrackedMutationMs < 30_000);
+  // v4.7.17: race guard 30s → 15s (Binance phản ánh order ~5-10s, 15s đủ buffer)
+  const recentMutation = s.lastTrackedMutationMs && (now - s.lastTrackedMutationMs < 15_000);
   if ((longImportMismatch || shortImportMismatch) && !recentMutation) {
     // FIX #2: Preset fallback
     let presetTp = 4, presetSl = 2; // BALANCED defaults
