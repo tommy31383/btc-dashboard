@@ -6,7 +6,7 @@
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const SERVER_URL = "http://159.223.90.60";
+export const SERVER_URL = "https://tommybtc.duckdns.org";
 const TOKEN_KEY = "@backend_token_v1";
 
 let _cachedToken: string | null = null;
