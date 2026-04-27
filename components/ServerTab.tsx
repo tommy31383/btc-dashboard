@@ -186,19 +186,35 @@ export default function ServerTab() {
                 <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 10 }}>🔥 CLOSE ALL</Text>
               </TouchableOpacity>
             </View>
-            {tracked.slice(0, 20).map((t: any) => {
-              const sideColor = t.side === "LONG" ? P.green : P.error;
-              const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
+            {(["LONG", "SHORT"] as const).map((side) => {
+              const list = tracked.filter((t: any) => t.side === side);
+              if (list.length === 0) return null;
+              const sideColor = side === "LONG" ? P.green : P.error;
               return (
-                <View key={t.id} style={styles.posRow}>
-                  <Text style={[styles.dim, { color: sideColor, fontWeight: "800", width: 60 }]}>{t.side}</Text>
-                  <Text style={[styles.dim, { width: 80 }]}>${t.entryPrice.toFixed(0)}</Text>
-                  <Text style={[styles.dim, { color: P.green, width: 80 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
-                  <Text style={[styles.dim, { color: P.error, width: 80 }]}>SL ${t.slPrice.toFixed(0)}</Text>
-                  <Text style={[styles.dim, { width: 50 }]}>{heldH}h</Text>
-                  <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
-                    <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕ CLOSE</Text>
-                  </TouchableOpacity>
+                <View key={side} style={{ marginTop: 8 }}>
+                  <Text style={[styles.h2, { color: sideColor, marginTop: 4 }]}>
+                    {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length})
+                  </Text>
+                  {list.slice(0, 15).map((t: any) => {
+                    const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
+                    return (
+                      <View key={t.id} style={styles.posRow}>
+                        <Text style={[styles.dim, { color: sideColor, fontWeight: "800", width: 60 }]}>{t.side}</Text>
+                        <Text style={[styles.dim, { width: 80 }]}>${t.entryPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.green, width: 80 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.error, width: 80 }]}>SL ${t.slPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { width: 50 }]}>{heldH}h</Text>
+                        <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
+                          <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕ CLOSE</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
+                  {list.length > 15 && (
+                    <Text style={[styles.dim, { fontStyle: "italic", marginTop: 4 }]}>
+                      ... còn {list.length - 15} {side} nữa (close bulk để clear)
+                    </Text>
+                  )}
                 </View>
               );
             })}
