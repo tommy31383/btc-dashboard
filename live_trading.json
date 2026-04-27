@@ -817,7 +817,7 @@
   ],
   "pendingAlerts": [],
   "binanceSnapshot": {
-    "ts": 1777269055115,
+    "ts": 1777269175396,
     "account": {
       "feeTier": 0,
       "canTrade": true,
@@ -827,17 +827,17 @@
       "tradeGroupId": -1,
       "updateTime": 0,
       "multiAssetsMargin": false,
-      "totalInitialMargin": "4.35222912",
-      "totalMaintMargin": "2.17611455",
+      "totalInitialMargin": "4.35679302",
+      "totalMaintMargin": "2.17839650",
       "totalWalletBalance": "78.81952328",
-      "totalUnrealizedProfit": "-0.39507693",
-      "totalMarginBalance": "78.42444635",
-      "totalPositionInitialMargin": "4.35222912",
+      "totalUnrealizedProfit": "-0.47657520",
+      "totalMarginBalance": "78.34294808",
+      "totalPositionInitialMargin": "4.35679302",
       "totalOpenOrderInitialMargin": "0.00000000",
       "totalCrossWalletBalance": "78.81952328",
-      "totalCrossUnPnl": "-0.39507693",
-      "availableBalance": "74.06178642",
-      "maxWithdrawAmount": "74.06178642",
+      "totalCrossUnPnl": "-0.47657520",
+      "availableBalance": "73.96132940",
+      "maxWithdrawAmount": "73.96132940",
       "assets": [
         {
           "asset": "FDUSD",
@@ -970,16 +970,16 @@
         {
           "asset": "USDT",
           "walletBalance": "78.81952328",
-          "unrealizedProfit": "-0.39507693",
-          "marginBalance": "78.42444635",
-          "maintMargin": "2.17611455",
-          "initialMargin": "4.35222912",
-          "positionInitialMargin": "4.35222912",
+          "unrealizedProfit": "-0.47657520",
+          "marginBalance": "78.34294808",
+          "maintMargin": "2.17839650",
+          "initialMargin": "4.35679302",
+          "positionInitialMargin": "4.35679302",
           "openOrderInitialMargin": "0.00000000",
-          "maxWithdrawAmount": "74.06178642",
+          "maxWithdrawAmount": "73.96132940",
           "crossWalletBalance": "78.81952328",
-          "crossUnPnl": "-0.39507693",
-          "availableBalance": "74.06178642",
+          "crossUnPnl": "-0.47657520",
+          "availableBalance": "73.96132940",
           "marginAvailable": true,
           "updateTime": 1777268582495
         },
@@ -28379,10 +28379,10 @@
         },
         {
           "symbol": "BTCUSDT",
-          "initialMargin": "1.86524105",
-          "maintMargin": "0.93262052",
-          "unrealizedProfit": "-0.56736919",
-          "positionInitialMargin": "1.86524105",
+          "initialMargin": "1.86719701",
+          "maintMargin": "0.93359850",
+          "unrealizedProfit": "-0.32287434",
+          "positionInitialMargin": "1.86719701",
           "openOrderInitialMargin": "0",
           "leverage": "125",
           "isolated": false,
@@ -28391,7 +28391,7 @@
           "maxNotional": "300000",
           "positionSide": "LONG",
           "positionAmt": "0.003",
-          "notional": "233.15513080",
+          "notional": "233.39962565",
           "isolatedWallet": "0",
           "updateTime": 1777267209649,
           "bidNotional": "0",
@@ -28399,10 +28399,10 @@
         },
         {
           "symbol": "BTCUSDT",
-          "initialMargin": "2.48698807",
-          "maintMargin": "1.24349403",
-          "unrealizedProfit": "0.17229226",
-          "positionInitialMargin": "2.48698807",
+          "initialMargin": "2.48959601",
+          "maintMargin": "1.24479800",
+          "unrealizedProfit": "-0.15370086",
+          "positionInitialMargin": "2.48959601",
           "openOrderInitialMargin": "0",
           "leverage": "125",
           "isolated": false,
@@ -28411,7 +28411,7 @@
           "maxNotional": "300000",
           "positionSide": "SHORT",
           "positionAmt": "-0.004",
-          "notional": "-310.87350773",
+          "notional": "-311.19950086",
           "isolatedWallet": "0",
           "updateTime": 1777268582495,
           "bidNotional": "0",
@@ -29665,8 +29665,8 @@
         "positionAmt": "0.003",
         "entryPrice": "77907.5",
         "breakEvenPrice": "78109.06535",
-        "markPrice": "77718.37693478",
-        "unRealizedProfit": "-0.56736919",
+        "markPrice": "77799.87521739",
+        "unRealizedProfit": "-0.32287434",
         "liquidationPrice": "151889.90591440",
         "leverage": "125",
         "maxNotionalValue": "300000",
@@ -29674,7 +29674,7 @@
         "isolatedMargin": "0.00000000",
         "isAutoAddMargin": "false",
         "positionSide": "LONG",
-        "notional": "233.15513080",
+        "notional": "233.39962565",
         "isolatedWallet": "0",
         "updateTime": 1777267209649,
         "isolated": false,
@@ -29685,8 +29685,8 @@
         "positionAmt": "-0.004",
         "entryPrice": "77761.45",
         "breakEvenPrice": "77722.569275",
-        "markPrice": "77718.37693478",
-        "unRealizedProfit": "0.17229226",
+        "markPrice": "77799.87521739",
+        "unRealizedProfit": "-0.15370086",
         "liquidationPrice": "151889.90591440",
         "leverage": "125",
         "maxNotionalValue": "300000",
@@ -29694,7 +29694,7 @@
         "isolatedMargin": "0.00000000",
         "isAutoAddMargin": "false",
         "positionSide": "SHORT",
-        "notional": "-310.87350773",
+        "notional": "-311.19950086",
         "isolatedWallet": "0",
         "updateTime": 1777268582495,
         "isolated": false,
@@ -29716,8 +29716,8 @@
         "commissionAsset": "USDT",
         "time": 1776823066514,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29732,8 +29732,8 @@
         "commissionAsset": "USDT",
         "time": 1776903768219,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29748,8 +29748,8 @@
         "commissionAsset": "USDT",
         "time": 1776938711081,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -29764,8 +29764,8 @@
         "commissionAsset": "USDT",
         "time": 1776945965124,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29780,8 +29780,8 @@
         "commissionAsset": "USDT",
         "time": 1776993643515,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -29796,8 +29796,8 @@
         "commissionAsset": "USDT",
         "time": 1776996440989,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -29812,8 +29812,8 @@
         "commissionAsset": "USDT",
         "time": 1776996621829,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -29828,8 +29828,8 @@
         "commissionAsset": "USDT",
         "time": 1776997129291,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -29844,8 +29844,8 @@
         "commissionAsset": "USDT",
         "time": 1777001855577,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29860,8 +29860,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29876,8 +29876,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29892,8 +29892,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29908,8 +29908,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29924,8 +29924,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29940,8 +29940,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29956,8 +29956,8 @@
         "commissionAsset": "USDT",
         "time": 1777006029144,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -29972,8 +29972,8 @@
         "commissionAsset": "USDT",
         "time": 1777052051793,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -29988,8 +29988,8 @@
         "commissionAsset": "USDT",
         "time": 1777140633575,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30004,8 +30004,8 @@
         "commissionAsset": "USDT",
         "time": 1777175580387,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30020,8 +30020,8 @@
         "commissionAsset": "USDT",
         "time": 1777175581049,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30036,8 +30036,8 @@
         "commissionAsset": "USDT",
         "time": 1777176060516,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30052,8 +30052,8 @@
         "commissionAsset": "USDT",
         "time": 1777176061159,
         "positionSide": "BOTH",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30068,8 +30068,8 @@
         "commissionAsset": "USDT",
         "time": 1777176660440,
         "positionSide": "BOTH",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30084,8 +30084,8 @@
         "commissionAsset": "USDT",
         "time": 1777178974026,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30100,8 +30100,8 @@
         "commissionAsset": "USDT",
         "time": 1777179613818,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30116,8 +30116,8 @@
         "commissionAsset": "USDT",
         "time": 1777180145754,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30132,8 +30132,8 @@
         "commissionAsset": "USDT",
         "time": 1777180446122,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30148,8 +30148,8 @@
         "commissionAsset": "USDT",
         "time": 1777180446404,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30164,8 +30164,8 @@
         "commissionAsset": "USDT",
         "time": 1777182398510,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30180,8 +30180,8 @@
         "commissionAsset": "USDT",
         "time": 1777183254582,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30196,8 +30196,8 @@
         "commissionAsset": "USDT",
         "time": 1777188934814,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30212,8 +30212,8 @@
         "commissionAsset": "USDT",
         "time": 1777188934815,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
@@ -30228,8 +30228,8 @@
         "commissionAsset": "USDT",
         "time": 1777267209648,
         "positionSide": "LONG",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30244,8 +30244,8 @@
         "commissionAsset": "USDT",
         "time": 1777267562053,
         "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30260,8 +30260,8 @@
         "commissionAsset": "USDT",
         "time": 1777267562392,
         "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30276,8 +30276,8 @@
         "commissionAsset": "USDT",
         "time": 1777268582174,
         "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
@@ -30292,8 +30292,8 @@
         "commissionAsset": "USDT",
         "time": 1777268582494,
         "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
+        "maker": false,
+        "buyer": false
       }
     ],
     "dailyPnl": -0.4113969999999999
