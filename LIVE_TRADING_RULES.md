@@ -1,7 +1,45 @@
 # LIVE TRADING ENGINE — Rule vào lệnh & Flow đầy đủ
 
-**Version:** v4.6.9 (last updated 2026-04-27)
+**Version:** v4.7.0 (last updated 2026-04-27)
 **Files:** `utils/liveTraderEngine.ts`, `hooks/useBinanceLive.ts`, `utils/leaderElection.ts`, `utils/binanceLive.ts`, `utils/gistSync.ts`
+
+---
+
+## 🔑 HEDGE MODE & STACK ARCHITECTURE (CỐT LÕI)
+
+**Binance Futures Hedge Mode chỉ cho phép 1 net LONG + 1 net SHORT per symbol.**
+App vượt giới hạn này bằng kiến trúc 2 lớp:
+
+| Lớp | Vai trò |
+|---|---|
+| **Binance** | Gộp tất cả MARKET cùng `positionSide` → **1 net LONG position + 1 net SHORT position** (avg entry, sum qty) |
+| **App ledger** (`trackedPositions[]`) | Maintain **N "logical stack entries" độc lập** — mỗi entry: `id, side, qty, entryPrice, tpPrice, slPrice, entryMs` |
+
+### Plan B monitor (mỗi tick markPrice — `monitorTrackedPositions`):
+
+- Loop từng tracked entry → check `markPrice >= tpPrice` (LONG) hoặc `<= tpPrice` (SHORT)
+- Hit TP/SL → gửi `MARKET reduceOnly qty=entry.qty` → **partial close net position trên Binance đúng size lệnh đó**
+- **KHÔNG dùng STOP_MARKET / TAKE_PROFIT_MARKET** của Binance (Binance không support nhiều TP/SL trên cùng 1 net position)
+
+### Stack tunable (qua LIVE SETTINGS card):
+
+| Setting | Default (PRESET B) | Range |
+|---|---|---|
+| `stackMaxPerSide` | **50** | 15 / 30 / 50 (sweet spot từ backtest) |
+| `stackMaxNotionalUsd` | **$200,000** | cap chống liquidation |
+| `stackMinEntryDistPct` | **0%** | bỏ gate khoảng cách price (0.3% trong PRESET A) |
+| `stackPerSideSpacingMin` | **0 phút** | bỏ gate spacing time |
+
+### Reconcile sau restart (`reconcileTrackedPositions`):
+
+- So tổng `trackedPositions.qty` cùng side vs Binance `positionAmt` (cùng `positionSide`)
+- Tolerance: 0.0005 BTC (~$30)
+- Nếu Binance < app (user close manual) → **drop tracked entry cũ nhất** cho khớp + log warning
+
+### Hard timeout:
+
+- Tracked position quá **72h** → log ERROR + drop khỏi monitor (price feed có thể chết)
+- User cần check Binance manually để close nếu position còn
 
 ---
 
