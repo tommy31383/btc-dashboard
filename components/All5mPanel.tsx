@@ -11,9 +11,7 @@ import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import {
   All5mAccount, AccountSummary, Position,
-  INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE,
-  STOCH_LONG_LEVEL, STOCH_SHORT_LEVEL, COOLDOWN_MS, FEE_PER_SIDE, SR_PROXIMITY_PCT,
-  STACK_PER_SIDE_SPACING_MS,
+  INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE, FEE_PER_SIDE,
   PRESETS, PresetKey,
 } from "../utils/all5mAccount";
 
@@ -82,11 +80,17 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
 export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
   const preset = PRESETS[presetKey];
-  // Tunable values từ active preset
+  // ALL tunable values từ active preset (anh Tommy v4.7.1)
   const TP_PCT = preset.tpPct;
   const SL_PCT = preset.slPct;
   const STACK_MAX_PER_SIDE = preset.stackMaxPerSide;
   const STACK_MIN_ENTRY_DIST_PCT = preset.stackMinEntryDistPct;
+  const STACK_SPACING_MIN = preset.stackPerSideSpacingMin;
+  const COOLDOWN_MIN = preset.cooldownMin;
+  const STOCH_LONG = preset.stochLongLevel;
+  const STOCH_SHORT = preset.stochShortLevel;
+  const SR_PROX_PCT = preset.srProximityPct;
+  const SR_LOOKBACK = preset.srLookback15m;
 
   const handleSwitchPreset = (key: PresetKey) => {
     if (key === presetKey) return;
@@ -180,13 +184,13 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         })}
       </View>
 
-      {/* RULE LOGIC */}
+      {/* RULE LOGIC — dynamic theo active preset (anh Tommy v4.7.1) */}
       <View style={styles.ruleBox}>
-        <Text style={styles.ruleTitle}>📋 RULE: SMART STACK — nhiều lệnh cùng side, mỗi lệnh TP/SL riêng</Text>
+        <Text style={styles.ruleTitle}>📋 RULE: SMART STACK [{preset.emoji} {preset.label}] — nhiều lệnh cùng side, mỗi lệnh TP/SL riêng</Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Stack gates per side (anh Tommy v4.3.87+):</Text>
+          <Text style={styles.ruleStrong}>Stack gates per side (preset {preset.label}):</Text>
           {"\n"}  • Tối đa <Text style={[styles.ruleNum, { color: P.bitcoinOrange }]}>{STACK_MAX_PER_SIDE}</Text> lệnh OPEN cùng side (LONG / SHORT đếm riêng)
-          {"\n"}  • Tối thiểu <Text style={styles.ruleNum}>{STACK_PER_SIDE_SPACING_MS / 60000} phút</Text> giữa 2 entry CÙNG side
+          {"\n"}  • Tối thiểu <Text style={styles.ruleNum}>{STACK_SPACING_MIN} phút</Text> giữa 2 entry CÙNG side
           {"\n"}  • Entry mới phải xa entry gần nhất CÙNG side ≥ <Text style={styles.ruleNum}>{STACK_MIN_ENTRY_DIST_PCT}%</Text> (tránh nhồi 1 vùng)
         </Text>
         <Text style={styles.ruleLine}>
@@ -194,13 +198,13 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </Text>
         <Text style={styles.ruleLine}>
           <Text style={styles.ruleStrong}>Primary signal — StochRSI 5m K(14,14,3,3):</Text>
-          {"\n"}  • K &lt; <Text style={styles.ruleNum}>{STOCH_LONG_LEVEL}</Text> → vào <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
-          {"\n"}  • K &gt; <Text style={styles.ruleNum}>{STOCH_SHORT_LEVEL}</Text> → vào <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
+          {"\n"}  • K &lt; <Text style={styles.ruleNum}>{STOCH_LONG}</Text> → vào <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
+          {"\n"}  • K &gt; <Text style={styles.ruleNum}>{STOCH_SHORT}</Text> → vào <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Fallback — S/R 15m (pivot 50 cây gần nhất):</Text>
-          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROXIMITY_PCT}%</Text> trên Support → <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
-          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROXIMITY_PCT}%</Text> dưới Resistance → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
+          <Text style={styles.ruleStrong}>Fallback — S/R 15m (pivot {SR_LOOKBACK} cây gần nhất):</Text>
+          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROX_PCT}%</Text> trên Support → <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
+          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROX_PCT}%</Text> dưới Resistance → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
         </Text>
         <Text style={styles.ruleLine}>
           <Text style={styles.ruleStrong}>Exit (per-lệnh):</Text> TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> raw price.
@@ -210,10 +214,10 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           <Text style={styles.ruleStrong}>Risk per lệnh:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Cooldown chung:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MS / 60000} phút</Text> giữa các entry (mọi side) · không vào trùng cây 5m
+          <Text style={styles.ruleStrong}>Cooldown chung:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MIN} phút</Text> giữa các entry (mọi side) · không vào trùng cây 5m
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Tên rule:</Text> <Text style={[styles.ruleNum, { color: P.tertiary }]}>SMART_STACK_5M_v1</Text> · UI có nút ✕ CLOSE từng lệnh
+          <Text style={styles.ruleStrong}>Tên rule:</Text> <Text style={[styles.ruleNum, { color: P.tertiary }]}>SMART_STACK_5M_v2 · {preset.label}</Text> · expected 3y NET +${(preset.expectedNet3y / 1000).toFixed(0)}k · DD ${preset.expectedMaxDd3y}
         </Text>
       </View>
 
