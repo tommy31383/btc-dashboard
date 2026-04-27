@@ -13,6 +13,7 @@ import {
 } from "./binanceLive";
 import { pullFile, scheduleFilePush } from "./gistSync";
 import { notify, playSlHit, playTpHit, playEntry } from "./liveAlerts";
+import { getActivePreset } from "./all5mAccount";
 
 const STORAGE_KEY = "@live_trader_v2";
 const SECRET_KEY = "@live_trader_secret_v1";
@@ -600,9 +601,18 @@ export async function reconcileTrackedPositions(
   const trackedLong = s.trackedPositions.filter((t) => t.side === "LONG").reduce((sum, t) => sum + t.qty, 0);
   const trackedShort = s.trackedPositions.filter((t) => t.side === "SHORT").reduce((sum, t) => sum + t.qty, 0);
   const tolBtc = 0.0005;
-  const longMismatch = trackedLong - binanceLong > tolBtc;
-  const shortMismatch = trackedShort - binanceShort > tolBtc;
-  if (!longMismatch && !shortMismatch) return { next: s, dropped: 0, warning: null };
+  // App > Binance → user closed manual → drop tracked
+  const longDropMismatch = trackedLong - binanceLong > tolBtc;
+  const shortDropMismatch = trackedShort - binanceShort > tolBtc;
+  // Binance > App → user opened manual → import vào tracked
+  const longImportMismatch = binanceLong - trackedLong > tolBtc;
+  const shortImportMismatch = binanceShort - trackedShort > tolBtc;
+  if (!longDropMismatch && !shortDropMismatch && !longImportMismatch && !shortImportMismatch) {
+    return { next: s, dropped: 0, warning: null };
+  }
+  // Backward-compat alias (drop logic uses these)
+  const longMismatch = longDropMismatch;
+  const shortMismatch = shortDropMismatch;
 
   // ── SMART RECONCILE (anh Tommy v4.7.13) ───────────────────────────────────
   // Thay vì drop "oldest", tìm tracked entry/combo nào khi drop sẽ làm app state KHỚP
@@ -656,6 +666,32 @@ export async function reconcileTrackedPositions(
   if (longMismatch) smartDrop("LONG", trackedLong, binanceLong, binanceLongAvg);
   if (shortMismatch) smartDrop("SHORT", trackedShort, binanceShort, binanceShortAvg);
 
+  // ── AUTO-IMPORT (anh Tommy v4.7.14): Binance > App → user mở manual → tạo tracked mới ──
+  // TP/SL lấy từ active 5m ALL preset (đồng bộ với engine 5m ALL).
+  let imported = 0;
+  if (longImportMismatch || shortImportMismatch) {
+    try {
+      const preset = await getActivePreset();
+      const now = Date.now();
+      const buildImport = (side: "LONG" | "SHORT", qty: number, entryPrice: number, idx: number): TrackedPosition => ({
+        id: `manual:${now}-${side}-${idx}`,
+        side, qty, entryPrice, entryMs: now,
+        tpPrice: side === "LONG" ? entryPrice * (1 + preset.tpPct / 100) : entryPrice * (1 - preset.tpPct / 100),
+        slPrice: side === "LONG" ? entryPrice * (1 - preset.slPct / 100) : entryPrice * (1 + preset.slPct / 100),
+      });
+      if (longImportMismatch && binanceLongAvg > 0) {
+        const debt = binanceLong - trackedLong;
+        trackedPositions.push(buildImport("LONG", debt, binanceLongAvg, imported++));
+      }
+      if (shortImportMismatch && binanceShortAvg > 0) {
+        const debt = binanceShort - trackedShort;
+        trackedPositions.push(buildImport("SHORT", debt, binanceShortAvg, imported++));
+      }
+    } catch {
+      // Nếu fail load preset → bỏ qua import, log warning sau
+    }
+  }
+
   // Sau khi drop, verify residual mismatch
   const newLong = trackedPositions.filter((t) => t.side === "LONG").reduce((s, t) => s + t.qty, 0);
   const newShort = trackedPositions.filter((t) => t.side === "SHORT").reduce((s, t) => s + t.qty, 0);
@@ -675,9 +711,12 @@ export async function reconcileTrackedPositions(
 
   const next: LiveTraderState = { ...s, trackedPositions };
   await saveState(next);
-  let warning = `⚠️ SMART RECONCILE: Binance khác app (${dropped} tracked dropped). LONG ${trackedLong.toFixed(3)}→${newLong.toFixed(3)} (binance ${binanceLong.toFixed(3)}), SHORT ${trackedShort.toFixed(3)}→${newShort.toFixed(3)} (binance ${binanceShort.toFixed(3)}).`;
+  let warning = `⚠️ SMART RECONCILE: Binance khác app (${dropped} dropped, ${imported} auto-imported). LONG ${trackedLong.toFixed(3)}→${newLong.toFixed(3)} (binance ${binanceLong.toFixed(3)}), SHORT ${trackedShort.toFixed(3)}→${newShort.toFixed(3)} (binance ${binanceShort.toFixed(3)}).`;
+  if (imported > 0) {
+    warning += ` ✅ Auto-imported ${imported} lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor.`;
+  }
   if (priceDriftWarn) {
-    warning += ` ⚠️ Avg entry drift: LONG $${longAvgDiff.toFixed(0)}, SHORT $${shortAvgDiff.toFixed(0)} — có thể anh edited TP/SL trên Binance hoặc có lệnh manual mở.`;
+    warning += ` ⚠️ Avg entry drift: LONG $${longAvgDiff.toFixed(0)}, SHORT $${shortAvgDiff.toFixed(0)} — có thể anh edited TP/SL trên Binance.`;
   }
   return { next, dropped, warning };
 }

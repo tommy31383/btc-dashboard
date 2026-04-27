@@ -60,6 +60,11 @@ App vượt giới hạn này bằng kiến trúc 2 lớp:
   - **Step 1 (single-drop):** tìm tracked entry có `qty ≈ debt` (≤ 0.0005 BTC) → drop chính xác lệnh đó. Nếu nhiều candidate → chọn cái khi drop làm `avg entry post-drop` gần nhất với Binance `entryPrice`
   - **Step 2 (multi-drop greedy):** fallback nếu single-drop không khớp → drop từ cũ nhất tới khi sum qty đủ debt
 - **Avg entry drift detection:** sau drop, so `app post-drop avgEntry` vs Binance `entryPrice`. Nếu lệch > $50 → log warning "có thể anh edited TP/SL trên Binance hoặc có lệnh manual mở"
+- **AUTO-IMPORT (v4.7.14):** khi Binance > app (user mở lệnh manual qua Binance app):
+  - Tự động tạo tracked entry mới: `{ id: "manual:<ts>-<side>-<idx>", qty: debt, entryPrice: Binance avgEntry, entryMs: now }`
+  - TP/SL lấy từ **active 5m ALL preset** (`@all5m_preset_v1` — đồng bộ với engine 5m ALL)
+  - Plan B monitor lệnh imported giống lệnh app tự mở → tự close khi hit TP/SL
+  - Log warning "✅ Auto-imported N lệnh manual"
 
 ### Hard timeout:
 
