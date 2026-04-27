@@ -492,57 +492,78 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <EquityCurveSvg data={account.equityHistory} />
       </View>
 
-      {/* OPEN list */}
+      {/* OPEN list — split LONG/SHORT, show all, total per side (anh Tommy v4.8.12) */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🟢 OPEN ({open.length}) · uPnL: <Text style={{ color: unrealized >= 0 ? P.green : P.error }}>{fmtUsd(unrealized, true)}</Text></Text>
-        {open.length === 0
-          ? <Text style={styles.empty}>chưa có lệnh nào đang mở</Text>
-          : open.slice(0, 30).map((p) => {
-              const upnlPct = currentPrice !== null
-                ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE
-                : 0;
-              const grossUsd = currentPrice !== null
-                ? Math.max(-MARGIN_PER_TRADE, MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100)
-                : 0;
-              const upnlUsd = grossUsd - FEE_PER_SIDE;
-              const color = upnlUsd >= 0 ? P.green : P.error;
-              const sideColor = p.side === "LONG" ? P.green : P.error;
-              const notional = MARGIN_PER_TRADE * LEVERAGE;
-              // Distance from current to TP/SL (%) — anh Tommy: hiện rõ rule + cách quản lý
-              const distTpPct = currentPrice !== null
-                ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
-              const distSlPct = currentPrice !== null
-                ? Math.abs(p.slPrice - currentPrice) / currentPrice * 100 : 0;
-              const heldMin = Math.floor((Date.now() - p.entryMs) / 60000);
-              const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
-              const handleClose = () => {
-                if (!onCloseManual) return;
-                if (typeof window !== "undefined") {
-                  const ok = window.confirm(`Close ${p.side} @${p.entryPrice.toFixed(0)} ngay tại $${currentPrice?.toFixed(0)}?`);
-                  if (!ok) return;
-                }
-                Promise.resolve(onCloseManual(p.id));
-              };
-              return (
-                <View key={p.id} style={styles.row}>
-                  <Text style={[styles.cellW, { color: P.tertiary }]}>{fmtTime(p.entryMs)}</Text>
-                  <Text style={[styles.cellNarrow, { color: sideColor, fontWeight: "700" }]}>{p.side}</Text>
-                  <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
-                  <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
-                  <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
-                  <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
-                  <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
-                  <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
-                  <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
-                  <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
-                  {onCloseManual && (
-                    <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
-                      <Text style={styles.closeBtnText}>✕</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              );
-            })}
+        <Text style={styles.sectionTitle}>🟢 OPEN ({open.length}) · TỔNG uPnL: <Text style={{ color: unrealized >= 0 ? P.green : P.error }}>{fmtUsd(unrealized, true)}</Text></Text>
+        {open.length === 0 ? (
+          <Text style={styles.empty}>chưa có lệnh nào đang mở</Text>
+        ) : (
+          (["LONG", "SHORT"] as const).map((side) => {
+            const list = open.filter((p) => p.side === side).sort((a, b) => b.entryMs - a.entryMs);
+            if (list.length === 0) return null;
+            // Side-total uPnL
+            let sideUpnl = 0;
+            if (currentPrice !== null) {
+              for (const p of list) {
+                const upnlPct = (side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE;
+                let grossUsd = MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100;
+                if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
+                sideUpnl += grossUsd - FEE_PER_SIDE;
+              }
+            }
+            const sideColor = side === "LONG" ? P.green : P.error;
+            return (
+              <View key={side} style={{ marginTop: 6 }}>
+                <Text style={[styles.sectionTitle, { color: sideColor, marginTop: 4 }]}>
+                  {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) · uPnL <Text style={{ color: sideUpnl >= 0 ? P.green : P.error }}>{fmtUsd(sideUpnl, true)}</Text>
+                </Text>
+                {list.map((p, i) => {
+                  const upnlPct = currentPrice !== null
+                    ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE
+                    : 0;
+                  let grossUsd = currentPrice !== null
+                    ? MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100
+                    : 0;
+                  if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
+                  const upnlUsd = grossUsd - FEE_PER_SIDE;
+                  const color = upnlUsd >= 0 ? P.green : P.error;
+                  const notional = MARGIN_PER_TRADE * LEVERAGE;
+                  const distTpPct = currentPrice !== null ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
+                  const distSlPct = currentPrice !== null ? Math.abs(p.slPrice - currentPrice) / currentPrice * 100 : 0;
+                  const heldMin = Math.floor((Date.now() - p.entryMs) / 60000);
+                  const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
+                  const handleClose = () => {
+                    if (!onCloseManual) return;
+                    if (typeof window !== "undefined") {
+                      const ok = window.confirm(`Close ${p.side} @${p.entryPrice.toFixed(0)} ngay tại $${currentPrice?.toFixed(0)}?`);
+                      if (!ok) return;
+                    }
+                    Promise.resolve(onCloseManual(p.id));
+                  };
+                  return (
+                    <View key={p.id} style={styles.row}>
+                      <Text style={[styles.cellNarrow, { color: P.dim, width: 22 }]}>{i + 1}</Text>
+                      <Text style={[styles.cellW, { color: P.tertiary }]}>{fmtTime(p.entryMs)}</Text>
+                      <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
+                      <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
+                      <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
+                      <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
+                      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
+                      <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
+                      <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
+                      <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
+                      {onCloseManual && (
+                        <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
+                          <Text style={styles.closeBtnText}>✕</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })
+        )}
       </View>
 
       {/* CLOSED history */}
