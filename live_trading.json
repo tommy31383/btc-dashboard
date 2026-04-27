@@ -2110,6 +2110,86 @@
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777318211203,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 5m (rule 15m:2)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211205,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:8)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211208,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:11)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211210,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:12)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211212,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:9)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211214,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:3)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211217,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:22)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211219,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:23)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
