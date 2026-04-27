@@ -648,16 +648,65 @@
         "reason": "rule no longer firing"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777267561810,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 77831.12,
+        "tpPrice": 76274.49759999999,
+        "slPrice": 79387.7424,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777267562098,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 77831.12,
+        "tpPrice": 76274.49759999999,
+        "slPrice": 79387.7424,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
-    "15m:22": 1777176060253,
-    "15m:23": 1777176060825,
+    "15m:22": 1777267561813,
+    "15m:23": 1777267562100,
     "1h:24": 1777188934551,
     "1h:26": 1777180445851,
     "1h:25": 1777180446145
   },
-  "trackedPositions": [],
+  "trackedPositions": [
+    {
+      "id": "15m:22",
+      "side": "SHORT",
+      "qty": 0.001,
+      "entryPrice": 77831.12,
+      "tpPrice": 76274.49759999999,
+      "slPrice": 79387.7424,
+      "entryMs": 1777267562086
+    },
+    {
+      "id": "15m:23",
+      "side": "SHORT",
+      "qty": 0.001,
+      "entryPrice": 77831.12,
+      "tpPrice": 76274.49759999999,
+      "slPrice": 79387.7424,
+      "entryMs": 1777267562425
+    }
+  ],
   "pendingAlerts": [],
   "binanceSnapshot": {
     "ts": 1777267455186,
