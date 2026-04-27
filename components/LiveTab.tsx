@@ -27,8 +27,55 @@ const CLAIM_LEADER_PASSWORD = "30318384";
 
 interface Props {
   live: UseBinanceLiveResult;
-  /** Price 5m bars cho chart entry/exit markers (anh Tommy v4.7.19) */
-  price5mBars?: { time: number; close: number }[];
+  /** Klines theo TF — user chọn TF chart trong LivePriceChartCard (anh Tommy v4.7.21).
+   *  Lưu lựa chọn vào AsyncStorage @live_chart_tf_v1. */
+  klinesByTf?: Record<string, { time: number; close: number }[]>;
+}
+
+const CHART_TF_STORAGE_KEY = "@live_chart_tf_v1";
+const CHART_TF_OPTIONS = ["5m", "15m", "1h", "4h"] as const;
+type ChartTfKey = typeof CHART_TF_OPTIONS[number];
+
+function useChartTf(): [ChartTfKey, (k: ChartTfKey) => void] {
+  const [tf, setTf] = useState<ChartTfKey>("15m");
+  useEffect(() => {
+    AsyncStorage.getItem(CHART_TF_STORAGE_KEY).then((v) => {
+      if (v && CHART_TF_OPTIONS.includes(v as ChartTfKey)) setTf(v as ChartTfKey);
+    });
+  }, []);
+  const update = (k: ChartTfKey) => {
+    setTf(k);
+    AsyncStorage.setItem(CHART_TF_STORAGE_KEY, k).catch(() => {});
+  };
+  return [tf, update];
+}
+
+function ChartTfPicker({ tf, onChange }: { tf: ChartTfKey; onChange: (k: ChartTfKey) => void }) {
+  return (
+    <View style={{ flexDirection: "row", gap: 6, padding: 8, borderBottomWidth: 1, borderBottomColor: P.borderSoft }}>
+      <Text style={{ color: P.dim, fontSize: 10, fontFamily: "monospace", alignSelf: "center", marginRight: 4 }}>TF:</Text>
+      {CHART_TF_OPTIONS.map((k) => {
+        const active = k === tf;
+        return (
+          <TouchableOpacity
+            key={k}
+            onPress={() => onChange(k)}
+            style={{
+              paddingHorizontal: 10, paddingVertical: 4, borderRadius: 3,
+              borderWidth: 1,
+              borderColor: active ? P.bitcoinOrange : P.borderSoft,
+              backgroundColor: active ? P.bitcoinOrange + "22" : P.surface,
+            }}
+          >
+            <Text style={{
+              color: active ? P.bitcoinOrange : P.dim,
+              fontSize: 10, fontFamily: "monospace", fontWeight: "700", letterSpacing: 0.5,
+            }}>{k}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 }
 
 /** Shared hook — đọc active preset từ AsyncStorage (đồng bộ với tab 5m ALL).
@@ -45,7 +92,7 @@ function useActivePreset(): PresetKey {
   return key;
 }
 
-export default function LiveTab({ live, price5mBars }: Props) {
+export default function LiveTab({ live, klinesByTf }: Props) {
   const { width } = useWindowDimensions();
   const isWide = width >= 900;
   const presetKey = useActivePreset();
@@ -79,7 +126,7 @@ export default function LiveTab({ live, price5mBars }: Props) {
           <SettingsCard live={live} />
         </View>
         <View style={[isWide && styles.col]}>
-          <LivePriceChartCard live={live} price5mBars={price5mBars} />
+          <LivePriceChartCard live={live} klinesByTf={klinesByTf} />
           <TrackedPositionsCard live={live} />
           <PositionsCard live={live} />
           <OpenOrdersCard live={live} />
@@ -772,19 +819,31 @@ function computeSideSummary(tracked: { side: string; qty: number; entryPrice: nu
   return { count: list.length, sumQty, sumNotional, avgEntry, avgTp, avgSl, upnlPct, upnlUsd };
 }
 
-// ── PRICE CHART + ENTRY/EXIT MARKERS (anh Tommy v4.7.19) ──────────────────
-// Last 120 cây 5m (~10h). Marker compact:
+// ── PRICE CHART + ENTRY/EXIT MARKERS (anh Tommy v4.7.19, TF chooser v4.7.21) ──
+// User chọn TF (5m/15m/1h/4h) qua chip — lưu @live_chart_tf_v1.
+// Last 120 cây của TF chọn. Marker compact:
 //   ▲ green = LONG entry · ▼ red = SHORT entry
 //   ● green = WIN exit (TP hit) · ● red = LOSS exit (SL hit)
 //   Faint dash entry → exit
-function LivePriceChartCard({ live, price5mBars }: { live: UseBinanceLiveResult; price5mBars?: { time: number; close: number }[] }) {
-  if (!price5mBars || price5mBars.length < 2) return null;
+function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; klinesByTf?: Record<string, { time: number; close: number }[]> }) {
+  const [tf, setTf] = useChartTf();
+  const bars = klinesByTf?.[tf] ?? [];
+  if (bars.length < 2) {
+    return (
+      <Card icon="auto_graph" title={`PRICE ${tf} + ENTRIES`}>
+        <ChartTfPicker tf={tf} onChange={setTf} />
+        <Text style={{ color: P.dim, fontSize: 11, fontFamily: "monospace", padding: 12 }}>
+          chưa có data {tf} — chờ Binance load
+        </Text>
+      </Card>
+    );
+  }
   const tracked = live.state.trackedPositions;
   const journal = live.state.journal;
   const width = 760;
   const height = 220;
   const maxBars = 120;
-  const slice = price5mBars.slice(-maxBars);
+  const slice = bars.slice(-maxBars);
   const tMin = slice[0].time;
   const tMax = slice[slice.length - 1].time;
   const range = tMax - tMin || 1;
@@ -822,7 +881,8 @@ function LivePriceChartCard({ live, price5mBars }: { live: UseBinanceLiveResult;
   });
 
   return (
-    <Card icon="auto_graph" title={`PRICE 5m + ENTRIES (last ${slice.length} cây)`}>
+    <Card icon="auto_graph" title={`PRICE ${tf} + ENTRIES (last ${slice.length} cây)`}>
+      <ChartTfPicker tf={tf} onChange={setTf} />
       <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
         <Svg width={width} height={height}>
           <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.2} opacity={0.85} />
