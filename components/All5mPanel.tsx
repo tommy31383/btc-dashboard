@@ -27,6 +27,9 @@ interface Props {
   onSetPreset: (key: PresetKey) => Promise<void> | void;
   /** Price 5m bars cho chart entry/exit markers (anh Tommy v4.7.12) */
   price5mBars?: { time: number; close: number }[];
+  /** S/R 15m levels cho status fallback display (anh Tommy v4.7.18) */
+  support15m?: number | null;
+  resistance15m?: number | null;
   /** Optional content rendered at bottom of the scroll (vd PaperTradeJournal) */
   footer?: React.ReactNode;
 }
@@ -217,7 +220,7 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
   );
 }
 
-export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, footer }: Props) {
+export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, support15m, resistance15m, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
   const preset = PRESETS[presetKey];
   // ALL tunable values từ active preset (anh Tommy v4.7.1)
@@ -371,25 +374,106 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <Kpi label="OPEN" value={`${summary.openCount}`} color={P.primaryContainer} sub={`free $${summary.freeMargin.toFixed(0)}`} />
       </View>
 
-      {/* Status banner — engine đang chờ gì + SMART STACK count */}
+      {/* Status detail — anh Tommy v4.7.18: cho biết chờ gì + bị gì block */}
       {(() => {
         const longCount = open.filter((p) => p.side === "LONG").length;
         const shortCount = open.filter((p) => p.side === "SHORT").length;
-        const k = stoch5mK !== null ? stoch5mK.toFixed(1) : "—";
-        let msg = "";
-        let bg = P.surface; let fg = P.text;
-        if (summary.cooldownRemainMs > 0) {
-          msg = `⏸ COOLDOWN — entry kế sau ${fmtCountdown(summary.cooldownRemainMs)} · K=${k}`;
-        } else if (longCount >= STACK_MAX_PER_SIDE && shortCount >= STACK_MAX_PER_SIDE) {
-          msg = `🚫 STACK FULL — ${longCount}/${STACK_MAX_PER_SIDE} LONG · ${shortCount}/${STACK_MAX_PER_SIDE} SHORT · K=${k}`;
-          fg = P.error;
-        } else {
-          msg = `🎯 SMART STACK · ${longCount}/${STACK_MAX_PER_SIDE} LONG · ${shortCount}/${STACK_MAX_PER_SIDE} SHORT · K=${k}`;
-          fg = (longCount > 0 || shortCount > 0) ? P.green : P.dim;
-        }
+        const k = stoch5mK;
+        const cd = summary.cooldownRemainMs;
+        const freeM = summary.freeMargin;
+        const minMargin = 30; // MARGIN_PER_TRADE — 1 lệnh cần $30
+        const lastLong = open.filter((p) => p.side === "LONG").reduce((a, b) => (a && a.entryMs > b.entryMs ? a : b), null as Position | null);
+        const lastShort = open.filter((p) => p.side === "SHORT").reduce((a, b) => (a && a.entryMs > b.entryMs ? a : b), null as Position | null);
+        const now = Date.now();
+
+        // Eval per side
+        const evalSide = (side: "LONG" | "SHORT", count: number, lastEntry: Position | null) => {
+          const blocks: string[] = [];
+          // 1. Cooldown chung
+          if (cd > 0) blocks.push(`cooldown ${fmtCountdown(cd)}`);
+          // 2. Free margin
+          if (freeM < minMargin) blocks.push(`free margin $${freeM.toFixed(0)} < $${minMargin}`);
+          // 3. Stack max
+          if (count >= STACK_MAX_PER_SIDE) blocks.push(`STACK FULL ${count}/${STACK_MAX_PER_SIDE}`);
+          // 4. Spacing per side
+          if (lastEntry && STACK_SPACING_MIN > 0) {
+            const sinceLastMin = (now - lastEntry.entryMs) / 60000;
+            if (sinceLastMin < STACK_SPACING_MIN) {
+              blocks.push(`spacing còn ${(STACK_SPACING_MIN - sinceLastMin).toFixed(1)}m`);
+            }
+          }
+          // 5. Distance per side (only valid if currentPrice known)
+          if (lastEntry && currentPrice !== null && STACK_MIN_ENTRY_DIST_PCT > 0) {
+            const distPct = Math.abs(currentPrice - lastEntry.entryPrice) / lastEntry.entryPrice * 100;
+            if (distPct < STACK_MIN_ENTRY_DIST_PCT) {
+              blocks.push(`dist ${distPct.toFixed(2)}% < ${STACK_MIN_ENTRY_DIST_PCT}%`);
+            }
+          }
+          // 6. Trigger condition (signal)
+          let trigger: string;
+          let triggered = false;
+          const stochTriggered = side === "LONG" ? (k !== null && k < STOCH_LONG) : (k !== null && k > STOCH_SHORT);
+          let srTriggered = false;
+          let srInfo = "";
+          if (currentPrice !== null) {
+            if (side === "LONG" && support15m) {
+              const distSup = ((currentPrice - support15m) / support15m) * 100;
+              srTriggered = distSup >= 0 && distSup <= SR_PROX_PCT;
+              srInfo = `Support $${support15m.toFixed(0)} (cách ${distSup.toFixed(2)}%, trigger ≤${SR_PROX_PCT}%)`;
+            } else if (side === "SHORT" && resistance15m) {
+              const distRes = ((resistance15m - currentPrice) / currentPrice) * 100;
+              srTriggered = distRes >= 0 && distRes <= SR_PROX_PCT;
+              srInfo = `Resistance $${resistance15m.toFixed(0)} (cách ${distRes.toFixed(2)}%, trigger ≤${SR_PROX_PCT}%)`;
+            }
+          }
+          triggered = stochTriggered || srTriggered;
+          if (stochTriggered) {
+            trigger = `✅ Stoch K=${k?.toFixed(1)} ${side === "LONG" ? `<${STOCH_LONG}` : `>${STOCH_SHORT}`} (PRIMARY)`;
+          } else if (srTriggered) {
+            trigger = `✅ ${srInfo} (FALLBACK)`;
+          } else {
+            const stochInfo = k !== null ? `K=${k.toFixed(1)} (chờ ${side === "LONG" ? `<${STOCH_LONG}` : `>${STOCH_SHORT}`})` : "K=—";
+            trigger = `⏳ Chưa trigger · ${stochInfo}${srInfo ? " · " + srInfo : ""}`;
+          }
+
+          if (!triggered) blocks.push("no signal");
+          return { triggered, blocks, trigger };
+        };
+
+        const longEval = evalSide("LONG", longCount, lastLong);
+        const shortEval = evalSide("SHORT", shortCount, lastShort);
+        const longReady = longEval.blocks.length === 0;
+        const shortReady = shortEval.blocks.length === 0;
+
+        const Bullet = ({ side, count, max, ready, blocks, trigger }: {
+          side: "LONG" | "SHORT"; count: number; max: number; ready: boolean; blocks: string[]; trigger: string;
+        }) => {
+          const sideColor = side === "LONG" ? P.green : P.error;
+          const statusColor = ready ? P.green : P.bitcoinOrange;
+          return (
+            <View style={{ marginBottom: 4 }}>
+              <Text style={[styles.cdBannerText, { color: sideColor, textAlign: "left", fontWeight: "700" }]}>
+                {ready ? "✅" : "⏸"} {side} {count}/{max} — {ready ? "READY (cây 5m kế đóng → vào lệnh)" : "BLOCKED"}
+              </Text>
+              <Text style={[styles.cdBannerText, { color: P.dim, textAlign: "left", fontSize: 10 }]}>
+                · Trigger: <Text style={{ color: statusColor }}>{trigger}</Text>
+              </Text>
+              {blocks.length > 0 && (
+                <Text style={[styles.cdBannerText, { color: P.error, textAlign: "left", fontSize: 10 }]}>
+                  · Block: {blocks.join(" · ")}
+                </Text>
+              )}
+            </View>
+          );
+        };
+
         return (
-          <View style={[styles.cdBanner, { backgroundColor: bg }]}>
-            <Text style={[styles.cdBannerText, { color: fg }]}>{msg}</Text>
+          <View style={[styles.cdBanner, { backgroundColor: P.surface, borderWidth: 1, borderColor: P.borderSoft, padding: 10 }]}>
+            <Text style={[styles.cdBannerText, { color: P.text, fontWeight: "700", marginBottom: 6 }]}>
+              🎯 ENGINE STATUS — preset {preset.emoji} {preset.label} · K={k !== null ? k.toFixed(1) : "—"} · price ${currentPrice?.toFixed(0) ?? "—"}
+            </Text>
+            <Bullet side="LONG" count={longCount} max={STACK_MAX_PER_SIDE} ready={longReady} blocks={longEval.blocks} trigger={longEval.trigger} />
+            <Bullet side="SHORT" count={shortCount} max={STACK_MAX_PER_SIDE} ready={shortReady} blocks={shortEval.blocks} trigger={shortEval.trigger} />
           </View>
         );
       })()}

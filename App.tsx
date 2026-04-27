@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.17";
+const APP_VERSION = "4.7.18";
 const BUILD_DATE = "2026-04-27";
 
 /**
@@ -317,6 +317,8 @@ export default function App() {
             presetKey={all5m.presetKey}
             onSetPreset={all5m.setPreset}
             price5mBars={(rawKlines["5m"] ?? []).map((k) => ({ time: k.time, close: k.close }))}
+            support15m={ltfCtx.support15m}
+            resistance15m={ltfCtx.resistance15m}
           />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
