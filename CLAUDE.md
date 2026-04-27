@@ -26,6 +26,23 @@ Rule có NET tổng dương nhưng equityTrend=DOWN nghĩa là **đã hết edge
 
 ---
 
+## 🔖 BUMP VERSION MỖI LẦN BUILD (BẮT BUỘC)
+
+Trước MỌI lần build (web `npx expo export -p web` hoặc APK), **PHẢI** bump 3 chỗ đồng bộ:
+
+1. `App.tsx` → `APP_VERSION` (vd `4.7.4` → `4.7.5`)
+2. `App.tsx` → `BUILD_DATE` (vd `2026-04-27` — ngày hiện tại)
+3. `app.json` → `expo.version` (sync với APP_VERSION)
+
+**Quy tắc bump số:**
+- Patch (4.7.4 → 4.7.5): bug fix, doc update, config tweak
+- Minor (4.7.x → 4.8.0): feature mới (panel mới, preset mới, engine mới)
+- Major (4.x.x → 5.0.0): breaking change, refactor lớn
+
+**KHÔNG được build mà KHÔNG bump version** — Tommy cần track được "build này có gì mới" qua version hiển thị trên TopAppBar.
+
+---
+
 ## 🚫 CẤM TỰ Ý BUILD APK
 
 - **KHÔNG bao giờ** tự chạy `./gradlew assembleRelease` hoặc build APK
