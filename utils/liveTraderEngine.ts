@@ -769,10 +769,10 @@ export async function reconcileTrackedPositions(
   const priceDriftWarn = longAvgDiff > tolPriceDelta || shortAvgDiff > tolPriceDelta;
 
   const stateChanged = dropped > 0 || imported > 0;
-  let next: LiveTraderState = { ...s, trackedPositions };
-  if (stateChanged) {
-    next.lastTrackedMutationMs = Date.now();
-  }
+  // FIX (anh Tommy v4.7.24): set lastTrackedMutationMs BEFORE saveState
+  // (avoid race window where saved state has stale timestamp)
+  const mutationMs = stateChanged ? Date.now() : s.lastTrackedMutationMs;
+  let next: LiveTraderState = { ...s, trackedPositions, lastTrackedMutationMs: mutationMs };
   await saveState(next);
   let warning = `⚠️ SMART RECONCILE: Binance khác app (${dropped} dropped, ${imported} auto-imported). LONG ${trackedLong.toFixed(3)}→${newLong.toFixed(3)} (binance ${binanceLong.toFixed(3)}), SHORT ${trackedShort.toFixed(3)}→${newShort.toFixed(3)} (binance ${binanceShort.toFixed(3)}).`;
   if (imported > 0) {
