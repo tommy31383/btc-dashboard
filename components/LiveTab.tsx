@@ -827,58 +827,83 @@ function computeSideSummary(tracked: { side: string; qty: number; entryPrice: nu
 //   Faint dash entry → exit
 function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; klinesByTf?: Record<string, { time: number; close: number }[]> }) {
   const [tf, setTf] = useChartTf();
-  const { width: winW } = useWindowDimensions();
+  const [containerW, setContainerW] = useState<number>(0);
   const bars = klinesByTf?.[tf] ?? [];
-  if (bars.length < 2) {
-    return (
-      <Card icon="auto_graph" title={`PRICE ${tf} + ENTRIES`}>
-        <ChartTfPicker tf={tf} onChange={setTf} />
-        <Text style={{ color: P.dim, fontSize: 11, fontFamily: "monospace", padding: 12 }}>
-          chưa có data {tf} — chờ Binance load
-        </Text>
-      </Card>
-    );
-  }
   const tracked = live.state.trackedPositions;
   const journal = live.state.journal;
-  // Responsive width: card padding ~28, container max 880 (col layout)
-  const width = Math.max(320, Math.min(winW - 60, 880));
-  const height = 240;
+
+  // Always render Card với onLayout để measure container thực
+  return (
+    <Card icon="auto_graph" title={`PRICE ${tf} + ENTRIES (${bars.length} cây)`}>
+      <ChartTfPicker tf={tf} onChange={setTf} />
+      <View
+        style={{ width: "100%" }}
+        onLayout={(e) => setContainerW(e.nativeEvent.layout.width)}
+      >
+        {bars.length < 2 ? (
+          <Text style={{ color: P.dim, fontSize: 11, fontFamily: "monospace", padding: 12 }}>
+            chưa có data {tf} — chờ Binance load
+          </Text>
+        ) : containerW === 0 ? (
+          <View style={{ height: 240 }} />  /* wait for layout */
+        ) : (
+          <ChartInner
+            bars={bars} tracked={tracked} journal={journal}
+            width={containerW} height={240}
+          />
+        )}
+      </View>
+    </Card>
+  );
+}
+
+function ChartInner({ bars, tracked, journal, width, height }: {
+  bars: { time: number; close: number }[];
+  tracked: UseBinanceLiveResult["state"]["trackedPositions"];
+  journal: UseBinanceLiveResult["state"]["journal"];
+  width: number; height: number;
+}) {
   const maxBars = 120;
   let slice = bars.slice(-maxBars);
-  // AUTO-EXTEND tMin: nếu có OPEN position cũ hơn slice[0] → mở rộng window để show
-  // (anh Tommy v4.7.22: tránh markers bị cắt ngoài window)
+  // Extend window để include all OPEN positions (anh Tommy v4.7.23)
   if (tracked.length > 0) {
     const oldestOpen = Math.min(...tracked.map((t) => t.entryMs));
     if (oldestOpen < slice[0].time) {
-      // Find index in bars closest to oldestOpen
       const startIdx = Math.max(0, bars.findIndex((b) => b.time >= oldestOpen) - 1);
-      slice = bars.slice(startIdx);
+      if (startIdx >= 0 && startIdx < bars.length) slice = bars.slice(startIdx);
     }
   }
   const tMin = slice[0].time;
-  const tMax = slice[slice.length - 1].time;
+  const tMax = Math.max(slice[slice.length - 1].time, ...tracked.map((t) => t.entryMs), Date.now());
   const range = tMax - tMin || 1;
-  const closes = slice.map((b) => b.close);
-  const pMin = Math.min(...closes);
-  const pMax = Math.max(...closes);
+  // Price range: include all bar closes + ALL tracked entry/tp/sl (anh Tommy v4.7.23)
+  const pricePoints: number[] = slice.map((b) => b.close);
+  for (const t of tracked) {
+    pricePoints.push(t.entryPrice, t.tpPrice, t.slPrice);
+  }
+  const pMin = Math.min(...pricePoints);
+  const pMax = Math.max(...pricePoints);
   const pRange = pMax - pMin || 1;
   const pad = 8;
   const w = width - pad * 2;
   const h = height - pad * 2;
-  const xOf = (t: number) => pad + ((t - tMin) / range) * w;
+  // Clamp x position để markers ngoài window vẫn hiện ở edge
+  const xOf = (t: number) => {
+    if (t < tMin) return pad;
+    if (t > tMax) return width - pad;
+    return pad + ((t - tMin) / range) * w;
+  };
   const yOf = (p: number) => pad + h - ((p - pMin) / pRange) * h;
   const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
 
-  // Visible OPEN tracked positions
-  const visibleOpen = tracked.filter((t) => t.entryMs >= tMin - 60_000);
+  // SHOW ALL tracked positions (no filter — clamp to edge nếu ngoài window)
+  const allOpen = tracked;
+  const olderCount = tracked.filter((t) => t.entryMs < tMin).length;
 
-  // Recent CLOSE entries from journal (within visible window)
-  const closes_ = journal.filter((j) => j.action.kind === "CLOSE" && j.ts >= tMin - 60_000 && j.ts <= tMax + 60_000);
-
-  // Match each CLOSE with its entry — find entry by ruleId in journal (entry kind, same ruleId, ts < close ts)
+  // CLOSE entries from journal (no filter — clamp to edge)
+  const closes_ = journal.filter((j) => j.action.kind === "CLOSE");
   type CloseMark = { side: "LONG" | "SHORT"; closePrice: number; closeMs: number; entryPrice?: number; entryMs?: number; trigger: "TP" | "SL" };
-  const closeMarks: CloseMark[] = closes_.map((j) => {
+  const closeMarks: CloseMark[] = closes_.slice(-50).map((j) => {  // last 50 closes max
     const a: any = j.action;
     const matchEntry = journal.slice().reverse().find((e) => e.action.kind === "ENTRY" && e.ruleId === j.ruleId && e.ts < j.ts);
     const ea: any = matchEntry?.action;
@@ -893,36 +918,32 @@ function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; 
   });
 
   return (
-    <Card icon="auto_graph" title={`PRICE ${tf} + ENTRIES (last ${slice.length} cây)`}>
-      <ChartTfPicker tf={tf} onChange={setTf} />
       <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
         <Svg width={width} height={height}>
-          <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.2} opacity={0.85} />
-          {/* OPEN tracked entries — bigger triangle markers + vertical guide line */}
-          {visibleOpen.map((p) => {
+          <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.4} opacity={0.85} />
+          {/* OPEN tracked entries — triangle markers (clamped to edge if older than window) */}
+          {allOpen.map((p) => {
             const eX = xOf(p.entryMs);
             const eY = yOf(p.entryPrice);
             const longSide = p.side === "LONG";
             const color = longSide ? P.green : P.error;
-            // Triangle 8px (bigger so visible)
             const tri = longSide
-              ? `${eX},${eY - 6} ${eX - 5},${eY + 3} ${eX + 5},${eY + 3}`
-              : `${eX},${eY + 6} ${eX - 5},${eY - 3} ${eX + 5},${eY - 3}`;
+              ? `${eX},${eY - 7} ${eX - 6},${eY + 4} ${eX + 6},${eY + 4}`
+              : `${eX},${eY + 7} ${eX - 6},${eY - 4} ${eX + 6},${eY - 4}`;
             return (
               <React.Fragment key={`open-${p.id}`}>
-                {/* Vertical dotted guide line từ entry xuống đáy chart */}
                 <SvgLine x1={eX} y1={eY} x2={eX} y2={height - pad} stroke={color} strokeWidth={0.4} strokeDasharray="2,3" opacity={0.3} />
-                <Polygon points={tri} fill={color} opacity={1} stroke={P.surface} strokeWidth={0.5} />
+                <Polygon points={tri} fill={color} opacity={1} stroke={P.surface} strokeWidth={0.7} />
               </React.Fragment>
             );
           })}
-          {/* CLOSE markers — circle dots + line back to entry if known */}
+          {/* CLOSE markers — circles */}
           {closeMarks.map((c, i) => {
             const cX = xOf(c.closeMs);
             const cY = yOf(c.closePrice);
             const win = c.trigger === "TP";
             const dotColor = win ? P.green : P.error;
-            const lineEl = c.entryPrice && c.entryMs && c.entryMs >= tMin - 60_000 ? (
+            const lineEl = c.entryPrice && c.entryMs ? (
               <SvgLine
                 x1={xOf(c.entryMs)} y1={yOf(c.entryPrice)} x2={cX} y2={cY}
                 stroke={dotColor} strokeWidth={0.5} strokeDasharray="2,2" opacity={0.4}
@@ -936,16 +957,15 @@ function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; 
             );
           })}
         </Svg>
-        <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12 }}>
+        <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
           <Text style={{ color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMax.toFixed(0)}</Text>
           <Text style={{ color: P.green, fontSize: 9, fontFamily: "monospace" }}>▲ LONG  ● TP</Text>
           <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT  ● SL</Text>
         </View>
         <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>
-          ${pMin.toFixed(0)} · {visibleOpen.length}/{tracked.length} open shown · {closeMarks.length} closed · window {((tMax - tMin) / 3600000).toFixed(1)}h
+          ${pMin.toFixed(0)} · {tracked.length} open ({olderCount > 0 ? `${olderCount} clamped left ◀ ` : ""}) · {closeMarks.length} closed · window {((tMax - tMin) / 3600000).toFixed(1)}h
         </Text>
       </View>
-    </Card>
   );
 }
 
