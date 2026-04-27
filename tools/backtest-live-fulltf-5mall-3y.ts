@@ -1097,7 +1097,7 @@ function bigEquityOverlaySvg(modes: ModeResult[], width = 900, height = 280): st
   const zeroY = height - ((0 - min) / range) * height;
   const legend = modes.map((m, idx) => {
     const color = palette[m.modeName] || "#999";
-    const x = 12 + idx * 170;
+    const x = 12 + idx * 145;
     return `<rect x="${x}" y="6" width="14" height="3" fill="${color}"/>
             <text x="${x + 20}" y="13" fill="#cfc6bc" font-size="11">${m.modeName}: ${m.metrics.netPctLev >= 0 ? "+" : ""}${m.metrics.netPctLev.toFixed(0)}% lev</text>`;
   }).join("\n");
@@ -1192,7 +1192,7 @@ HTF rules use Phase 2 LTF confirm (5m Stoch 20/80 OR 15m S/R 0.4%, max wait ${CO
 </div>
 
 <div class="card">
-  <h2>📈 EQUITY OVERLAY · 5 modes (Mode E = full TF rules NO 5m baseline)</h2>
+  <h2>📈 EQUITY OVERLAY · 6 modes (Mode E = no 5m:1; Mode F = no 5m:1 + 5m ALL BALANCED)</h2>
   ${overlay}
 </div>
 
@@ -1214,6 +1214,7 @@ let modeBResult: ModeResult | undefined;
 let modeCResult: ModeResult | undefined;
 let modeDResult: ModeResult | undefined;
 let modeEResult: ModeResult | undefined;
+let modeFResult: ModeResult | undefined;
 
 (async () => {
   console.log(`\n=== LIVE FullTF + 5m ALL Engine BACKTEST 3Y · BTC/USDT ===`);
@@ -1387,6 +1388,20 @@ let modeEResult: ModeResult | undefined;
   );
   console.log(`  ${modeEResult.metrics.trades} trades · NET ${modeEResult.metrics.netPctLev}% · MaxDD -${modeEResult.metrics.maxDD}% · PF ${modeEResult.metrics.profitFactor === 999 ? "∞" : modeEResult.metrics.profitFactor}`);
 
+  // Mode F = Mode E pool + 5m ALL Engine BALANCED preset
+  console.log(`\n[Mode F] Full TF rules NO 5m baseline + 5m ALL ${ALL5M_PRESETS.BALANCED.emoji} BALANCED...`);
+  const modeFCdOverrides = { [`5mall:BALANCED`]: ALL5M_PRESETS.BALANCED.cooldownMin };
+  const modeFCandidates = [...fullTfNoBaselineCandidates, ...all5mCandidatesByPreset.BALANCED];
+  modeFResult = runModeSimulation(
+    "Mode F",
+    `Full TF rules NO 5m:1 + 5m ALL ${ALL5M_PRESETS.BALANCED.emoji} BALANCED (TP${ALL5M_PRESETS.BALANCED.tpPct}/SL${ALL5M_PRESETS.BALANCED.slPct}, stoch ${ALL5M_PRESETS.BALANCED.stochLongLevel}/${ALL5M_PRESETS.BALANCED.stochShortLevel}, cd ${ALL5M_PRESETS.BALANCED.cooldownMin}m) + Phase 2 LTF + LIVE PRESET B`,
+    modeFCandidates,
+    candles5m,
+    LIVE_STACK_CFG.perRuleCooldownMin,
+    modeFCdOverrides,
+  );
+  console.log(`  ${modeFResult.metrics.trades} trades · NET ${modeFResult.metrics.netPctLev}% · MaxDD -${modeFResult.metrics.maxDD}% · PF ${modeFResult.metrics.profitFactor === 999 ? "∞" : modeFResult.metrics.profitFactor}`);
+
   function strip(m: ModeResult) {
     // Avoid dumping every trade in JSON (would balloon file). Keep summary + curve only.
     return {
@@ -1402,7 +1417,7 @@ let modeEResult: ModeResult | undefined;
     };
   }
 
-  const modes = [modeA, modeBResult!, modeCResult!, modeDResult!, modeEResult!];
+  const modes = [modeA, modeBResult!, modeCResult!, modeDResult!, modeEResult!, modeFResult!];
 
   const out = {
     generatedAt: Date.now(),
@@ -1432,6 +1447,22 @@ let modeEResult: ModeResult | undefined;
       deltaWinRate: Math.round((modeEResult!.metrics.winRate - modeA.metrics.winRate) * 100) / 100,
       deltaProfitFactor: Math.round((modeEResult!.metrics.profitFactor - modeA.metrics.profitFactor) * 100) / 100,
     },
+    modeFvsE: {
+      addedEngine: "5m ALL BALANCED",
+      deltaNetPctLev: Math.round((modeFResult!.metrics.netPctLev - modeEResult!.metrics.netPctLev) * 100) / 100,
+      deltaMaxDD: Math.round((modeFResult!.metrics.maxDD - modeEResult!.metrics.maxDD) * 100) / 100,
+      deltaTrades: modeFResult!.metrics.trades - modeEResult!.metrics.trades,
+      deltaWinRate: Math.round((modeFResult!.metrics.winRate - modeEResult!.metrics.winRate) * 100) / 100,
+      deltaProfitFactor: Math.round((modeFResult!.metrics.profitFactor - modeEResult!.metrics.profitFactor) * 100) / 100,
+      deltaSharpe: Math.round((modeFResult!.metrics.sharpeLike - modeEResult!.metrics.sharpeLike) * 100) / 100,
+    },
+    modeFvsA: {
+      deltaNetPctLev: Math.round((modeFResult!.metrics.netPctLev - modeA.metrics.netPctLev) * 100) / 100,
+      deltaMaxDD: Math.round((modeFResult!.metrics.maxDD - modeA.metrics.maxDD) * 100) / 100,
+      deltaTrades: modeFResult!.metrics.trades - modeA.metrics.trades,
+      deltaWinRate: Math.round((modeFResult!.metrics.winRate - modeA.metrics.winRate) * 100) / 100,
+      deltaProfitFactor: Math.round((modeFResult!.metrics.profitFactor - modeA.metrics.profitFactor) * 100) / 100,
+    },
   };
 
   const jsonPath = join(__dirname, "..", "assets", "backtest_live_fulltf_5mall_3y.json");
@@ -1445,7 +1476,7 @@ let modeEResult: ModeResult | undefined;
   // Final summary
   console.log(`\n=== Summary ===`);
   console.log(`Mode A (baseline full TF rules): NET ${modeA.metrics.netPctLev}%, MaxDD -${modeA.metrics.maxDD}%, ${modeA.metrics.trades} trades, WR ${modeA.metrics.winRate}%, PF ${modeA.metrics.profitFactor === 999 ? "∞" : modeA.metrics.profitFactor}, Sharpe ${modeA.metrics.sharpeLike}`);
-  for (const m of [modeBResult!, modeCResult!, modeDResult!, modeEResult!]) {
+  for (const m of [modeBResult!, modeCResult!, modeDResult!, modeEResult!, modeFResult!]) {
     console.log(`${m.modeName} (${m.description.slice(0, 60)}): NET ${m.metrics.netPctLev}%, MaxDD -${m.metrics.maxDD}%, ${m.metrics.trades} trades, WR ${m.metrics.winRate}%, PF ${m.metrics.profitFactor === 999 ? "∞" : m.metrics.profitFactor}, Sharpe ${m.metrics.sharpeLike}`);
   }
   const sortedByNet = [...modes].sort((a, b) => b.metrics.netPctLev - a.metrics.netPctLev);
@@ -1461,4 +1492,16 @@ let modeEResult: ModeResult | undefined;
   console.log(`Δ Trades = ${modeEResult!.metrics.trades - modeA.metrics.trades} (E ${modeEResult!.metrics.trades} vs A ${modeA.metrics.trades})`);
   console.log(`Δ WR    = ${(modeEResult!.metrics.winRate - modeA.metrics.winRate).toFixed(2)}pp (E ${modeEResult!.metrics.winRate}% vs A ${modeA.metrics.winRate}%)`);
   console.log(`Δ PF    = ${(modeEResult!.metrics.profitFactor - modeA.metrics.profitFactor).toFixed(2)} (E ${modeEResult!.metrics.profitFactor} vs A ${modeA.metrics.profitFactor})`);
+
+  console.log(`\n=== Mode F vs Mode E (adding 5m ALL BALANCED on top of "no 5m:1") ===`);
+  console.log(`Δ NET   = ${(modeFResult!.metrics.netPctLev - modeEResult!.metrics.netPctLev).toFixed(2)}% lev (F ${modeFResult!.metrics.netPctLev}% vs E ${modeEResult!.metrics.netPctLev}%)`);
+  console.log(`Δ MaxDD = ${(modeFResult!.metrics.maxDD - modeEResult!.metrics.maxDD).toFixed(2)}% lev (F -${modeFResult!.metrics.maxDD}% vs E -${modeEResult!.metrics.maxDD}%)`);
+  console.log(`Δ Trades = ${modeFResult!.metrics.trades - modeEResult!.metrics.trades} (F ${modeFResult!.metrics.trades} vs E ${modeEResult!.metrics.trades})`);
+  console.log(`Δ WR    = ${(modeFResult!.metrics.winRate - modeEResult!.metrics.winRate).toFixed(2)}pp (F ${modeFResult!.metrics.winRate}% vs E ${modeEResult!.metrics.winRate}%)`);
+  console.log(`Δ PF    = ${(modeFResult!.metrics.profitFactor - modeEResult!.metrics.profitFactor).toFixed(2)} (F ${modeFResult!.metrics.profitFactor} vs E ${modeEResult!.metrics.profitFactor})`);
+  console.log(`Δ Sharpe = ${(modeFResult!.metrics.sharpeLike - modeEResult!.metrics.sharpeLike).toFixed(2)} (F ${modeFResult!.metrics.sharpeLike} vs E ${modeEResult!.metrics.sharpeLike})`);
+
+  console.log(`\n=== Mode F vs Mode A (Mode F = no 5m:1 + 5m ALL BALANCED) ===`);
+  console.log(`Δ NET   = ${(modeFResult!.metrics.netPctLev - modeA.metrics.netPctLev).toFixed(2)}% lev (F ${modeFResult!.metrics.netPctLev}% vs A ${modeA.metrics.netPctLev}%)`);
+  console.log(`Δ MaxDD = ${(modeFResult!.metrics.maxDD - modeA.metrics.maxDD).toFixed(2)}% lev (F -${modeFResult!.metrics.maxDD}% vs A -${modeA.metrics.maxDD}%)`);
 })();
