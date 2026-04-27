@@ -1532,6 +1532,46 @@
         "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777309674784,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 5m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674789,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674792,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674795,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
