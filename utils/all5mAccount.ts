@@ -21,20 +21,24 @@ export const INITIAL_CAPITAL = 1000;
 export const MARGIN_PER_TRADE = 30;
 export const LEVERAGE = 100;
 export const NOTIONAL = MARGIN_PER_TRADE * LEVERAGE;
-export const STOCH_LONG_LEVEL = 10;
-export const STOCH_SHORT_LEVEL = 90;
-export const COOLDOWN_MS = 10 * 60 * 1000;  // 10 phút giữa các entry (tổng, mọi side)
-export const SR_PROXIMITY_PCT = 0.3;
-export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000; // tối thiểu 10m giữa 2 entry CÙNG side
 export const FEE_PER_SIDE_PCT = 0.05;
 export const FEE_PER_SIDE = NOTIONAL * (FEE_PER_SIDE_PCT / 100);
 export const FEE_PER_TRADE = FEE_PER_SIDE * 2;
 
+// Defaults (display fallback) — actual values dùng từ active preset
+export const STOCH_LONG_LEVEL = 10;
+export const STOCH_SHORT_LEVEL = 90;
+export const COOLDOWN_MS = 10 * 60 * 1000;
+export const SR_PROXIMITY_PCT = 0.3;
+export const SR_LOOKBACK_15M = 50;
+export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000;
+
 // ════════════════════════════════════════════════════════════════════
-// 🎯 PRESETS (anh Tommy v4.7.0): 3 chế độ switch trong UI
-//   - AGGRESSIVE 🔴 WHALE  → Highest PnL (3y backtest +725k, MaxDD $5.2k)
-//   - BALANCED   🟡 EAGLE  → Balanced (3y backtest +392k, MaxDD $3k)
-//   - SAFE       🟢 TURTLE → Lowest MaxDD (3y backtest +299k, MaxDD $993)
+// 🎯 PRESETS v2 (anh Tommy v4.7.1 — Phase 2 sweep tuned)
+//   3 chế độ switch trong UI, sweep one-at-a-time tuning per anchor:
+//   - AGGRESSIVE 🔴 WHALE  → Highest PnL (3y backtest +$1.52M, MaxDD $5.9k)
+//   - BALANCED   🟡 EAGLE  → Balanced     (3y backtest +$634k, MaxDD $1.98k)
+//   - SAFE       🟢 TURTLE → Lowest MaxDD (3y backtest +$241k, MaxDD $792)
 // ════════════════════════════════════════════════════════════════════
 
 export type PresetKey = "AGGRESSIVE" | "BALANCED" | "SAFE";
@@ -44,38 +48,54 @@ export interface Preset {
   label: string;
   emoji: string;
   description: string;
+  // Trade exit
   tpPct: number;
   slPct: number;
+  // Stack gates
   stackMaxPerSide: number;
   stackMinEntryDistPct: number;
+  stackPerSideSpacingMin: number;
+  // Entry gates
+  cooldownMin: number;
+  stochLongLevel: number;
+  stochShortLevel: number;
+  srProximityPct: number;
+  srLookback15m: number;
+  // Backtest expectations (3y)
   expectedNet3y: number;
   expectedMaxDd3y: number;
 }
 
 export const PRESETS: Record<PresetKey, Preset> = {
   AGGRESSIVE: {
-    key: "AGGRESSIVE",
-    label: "WHALE",
-    emoji: "🔴",
+    key: "AGGRESSIVE", label: "WHALE", emoji: "🔴",
     description: "Highest PnL · vốn lớn",
-    tpPct: 4, slPct: 2, stackMaxPerSide: 50, stackMinEntryDistPct: 0,
-    expectedNet3y: 725319, expectedMaxDd3y: 5217,
+    tpPct: 5, slPct: 2.5,
+    stackMaxPerSide: 75, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    cooldownMin: 5,
+    stochLongLevel: 10, stochShortLevel: 90,
+    srProximityPct: 0.4, srLookback15m: 30,
+    expectedNet3y: 1516473, expectedMaxDd3y: 5874,
   },
   BALANCED: {
-    key: "BALANCED",
-    label: "EAGLE",
-    emoji: "🟡",
+    key: "BALANCED", label: "EAGLE", emoji: "🟡",
     description: "Balanced · vốn vừa",
-    tpPct: 4, slPct: 2, stackMaxPerSide: 30, stackMinEntryDistPct: 0.2,
-    expectedNet3y: 392019, expectedMaxDd3y: 3069,
+    tpPct: 5, slPct: 2.5,
+    stackMaxPerSide: 30, stackMinEntryDistPct: 0.1, stackPerSideSpacingMin: 10,
+    cooldownMin: 5,
+    stochLongLevel: 15, stochShortLevel: 85,
+    srProximityPct: 0.4, srLookback15m: 50,
+    expectedNet3y: 633753, expectedMaxDd3y: 1983,
   },
   SAFE: {
-    key: "SAFE",
-    label: "TURTLE",
-    emoji: "🟢",
+    key: "SAFE", label: "TURTLE", emoji: "🟢",
     description: "Lowest MaxDD · vốn ít",
-    tpPct: 5, slPct: 2.5, stackMaxPerSide: 15, stackMinEntryDistPct: 0.3,
-    expectedNet3y: 299133, expectedMaxDd3y: 993,
+    tpPct: 3.5, slPct: 2,
+    stackMaxPerSide: 15, stackMinEntryDistPct: 0.3, stackPerSideSpacingMin: 10,
+    cooldownMin: 15,
+    stochLongLevel: 10, stochShortLevel: 90,
+    srProximityPct: 0.4, srLookback15m: 80,
+    expectedNet3y: 240975, expectedMaxDd3y: 792,
   },
 };
 
@@ -105,6 +125,11 @@ export async function setActivePresetKey(key: PresetKey): Promise<void> {
 export async function getActivePreset(): Promise<Preset> {
   const k = await getActivePresetKey();
   return PRESETS[k];
+}
+
+/** Sync getter — dùng cho UI display (countdown) khi không await được. Trả về cached hoặc DEFAULT. */
+export function getCachedActivePreset(): Preset {
+  return PRESETS[_activePresetCache ?? DEFAULT_PRESET_KEY];
 }
 
 // Backward-compat: TP_PCT / SL_PCT / STACK_MAX_PER_SIDE / STACK_MIN_ENTRY_DIST_PCT
@@ -238,34 +263,33 @@ export async function tryEntry5mBar(
   const acc = await loadAccount();
   if (acc.positions.some((p) => p.bar5mTime === bar5mTime)) return null;
   const now = Date.now();
-  if (now - acc.stats.lastEntryMs < COOLDOWN_MS) return null;
-  if (freeMargin(acc) < MARGIN_PER_TRADE) return null;
 
   // Đọc active preset (cache RAM, gần như miễn phí sau lần đầu)
   const preset = await getActivePreset();
 
+  if (now - acc.stats.lastEntryMs < preset.cooldownMin * 60 * 1000) return null;
+  if (freeMargin(acc) < MARGIN_PER_TRADE) return null;
+
   let side: Side | null = null;
   let source: EntrySource | null = null;
 
-  if (stoch5mK !== null && stoch5mK < STOCH_LONG_LEVEL) { side = "LONG"; source = "stoch_long"; }
-  else if (stoch5mK !== null && stoch5mK > STOCH_SHORT_LEVEL) { side = "SHORT"; source = "stoch_short"; }
+  if (stoch5mK !== null && stoch5mK < preset.stochLongLevel) { side = "LONG"; source = "stoch_long"; }
+  else if (stoch5mK !== null && stoch5mK > preset.stochShortLevel) { side = "SHORT"; source = "stoch_short"; }
   else if (support15m !== null && resistance15m !== null) {
     const distSup = ((fillPrice - support15m) / support15m) * 100;
     const distRes = ((resistance15m - fillPrice) / fillPrice) * 100;
-    if (distSup >= 0 && distSup <= SR_PROXIMITY_PCT) { side = "LONG"; source = "sr_long"; }
-    else if (distRes >= 0 && distRes <= SR_PROXIMITY_PCT) { side = "SHORT"; source = "sr_short"; }
+    if (distSup >= 0 && distSup <= preset.srProximityPct) { side = "LONG"; source = "sr_long"; }
+    else if (distRes >= 0 && distRes <= preset.srProximityPct) { side = "SHORT"; source = "sr_short"; }
   }
   if (!side || !source) return null;
 
-  // SMART STACK gates — dùng PRESET đang active (anh Tommy v4.7.0):
-  //   1. Max N OPEN cùng side (preset.stackMaxPerSide)
-  //   2. Min spacing 10m giữa 2 entry CÙNG side
-  //   3. Min distance % giữa entry mới và entry gần nhất cùng side (preset.stackMinEntryDistPct)
+  // SMART STACK gates — dùng PRESET đang active (anh Tommy v4.7.1):
   const sameSideOpen = acc.positions.filter((p) => p.status === "OPEN" && p.side === side);
   if (sameSideOpen.length >= preset.stackMaxPerSide) return null;
   if (sameSideOpen.length > 0) {
     const lastSame = sameSideOpen.reduce((a, b) => (a.entryMs > b.entryMs ? a : b));
-    if (now - lastSame.entryMs < STACK_PER_SIDE_SPACING_MS) return null;
+    const spacingMs = preset.stackPerSideSpacingMin * 60 * 1000;
+    if (spacingMs > 0 && now - lastSame.entryMs < spacingMs) return null;
     if (preset.stackMinEntryDistPct > 0) {
       const distPct = Math.abs(fillPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
       if (distPct < preset.stackMinEntryDistPct) return null;
@@ -393,7 +417,8 @@ export function summarize(acc: All5mAccount): AccountSummary {
   const used = usedMargin(acc);
   const open = acc.positions.filter((p) => p.status === "OPEN").length;
   const wr = acc.stats.totalClosed > 0 ? (acc.stats.wins / acc.stats.totalClosed) * 100 : 0;
-  const cooldownRemain = Math.max(0, acc.stats.lastEntryMs + COOLDOWN_MS - Date.now());
+  const cdMs = getCachedActivePreset().cooldownMin * 60 * 1000;
+  const cooldownRemain = Math.max(0, acc.stats.lastEntryMs + cdMs - Date.now());
   return {
     capital: acc.capital,
     equity: acc.capital,

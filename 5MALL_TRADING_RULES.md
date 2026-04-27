@@ -154,6 +154,70 @@ TP=4%, SL=2%, stackMax=50/side, distance=0%, spacing=0m, cooldown=10m
 
 ---
 
+## 🧠 LEARNING IMPROVE — Phase 2 Sweep (v2.0)
+
+**Sweep tool:** `tools/sweep-5mall-improve-v2.ts` · 81 runs · one-at-a-time tuning per anchor
+**Output:** `assets/sweep_5mall_v2.json` · `assets/sweep_5mall_v2_report.html`
+
+### Knob grid tested
+
+| Knob | Values |
+|---|---|
+| `cooldownMin` | 5, 10, 15 |
+| `stochThr` (long/short) | 10/90, 5/95, 15/85 |
+| `srProxPct` | 0.2, 0.3, 0.4 |
+| `srLookback15m` | 30, 50, 80 |
+| `distPct` (entry distance) | 0, 0.1, 0.2, 0.3, 0.5 |
+| `stackMax` | 15, 30, 50, 75 |
+| `tpsl` | 3.5/2, 4/2, 4.5/2.25, 5/2.5 |
+
+### 🏆 3 PRESET MỚI (đã apply vào engine)
+
+| Preset | NET v1 | NET v2 | Δ NET | DD v1 | DD v2 | Δ DD |
+|---|---|---|---|---|---|---|
+| 🔴 WHALE | $725k | **$1,516k** | **+109%** ⭐ | $5,217 | $5,874 | +13% |
+| 🟡 EAGLE | $392k | **$634k** | **+62%** ⭐ | $3,069 | **$1,983** | **-35%** ⭐ |
+| 🟢 TURTLE | $299k | $241k | -19% | $993 | **$792** | **-20%** ⭐ |
+
+**Đánh giá:**
+- 🔴 **WHALE**: +109% NET cho cùng risk envelope (DD chỉ tăng nhẹ 13%) — **win lớn**
+- 🟡 **EAGLE**: +62% NET VÀ giảm DD -35% — **win cả 2 mặt**, preset balance đẹp nhất
+- 🟢 **TURTLE**: theo criterion "lowest MaxDD" — DD giảm 20%, đổi lại NET giảm 19% (proportional)
+
+### 🔬 KNOB SENSITIVITY (insight chính)
+
+1. **`tpsl` 5/2.5 thắng cho cả AGGRESSIVE + BALANCED** — TP rộng cho phép trade đi trọn cú trend, không bị scalp out sớm. Chỉ SAFE chọn 3.5/2 (cắt nhanh)
+2. **`srProxPct` 0.4% thắng all 3 anchor** — proximity cao hơn bắt được nhiều cú reversal hơn (vs 0.3% gốc)
+3. **`stackMax` 75 cho AGGRESSIVE** (vs 50 gốc) — đẩy stack tới ngưỡng vốn cho phép → +50% NET single change
+4. **`stochThr` 15/85 cho BALANCED** (vs 10/90) — relax stoch giúp bắt nhiều entry hơn, NET tăng mà DD vẫn quản được
+5. **`cooldownMin` 5m thắng AGGRESSIVE/BALANCED, 15m thắng SAFE** — high-freq cho aggressive, low-freq cho safe — hợp lý
+6. **`srLookback15m`**: 30 cho AGGRESSIVE (S/R nhạy hơn), 80 cho SAFE (S/R bền hơn)
+
+### 📋 CONFIG ĐẦY ĐỦ 3 PRESET (sau Phase 2)
+
+```typescript
+// AGGRESSIVE 🔴 WHALE
+{ tpPct: 5, slPct: 2.5, stackMaxPerSide: 75, stackMinEntryDistPct: 0,
+  stackPerSideSpacingMin: 0, cooldownMin: 5,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 30 }
+
+// BALANCED 🟡 EAGLE
+{ tpPct: 5, slPct: 2.5, stackMaxPerSide: 30, stackMinEntryDistPct: 0.1,
+  stackPerSideSpacingMin: 10, cooldownMin: 5,
+  stochLongLevel: 15, stochShortLevel: 85,
+  srProximityPct: 0.4, srLookback15m: 50 }
+
+// SAFE 🟢 TURTLE
+{ tpPct: 3.5, slPct: 2, stackMaxPerSide: 15, stackMinEntryDistPct: 0.3,
+  stackPerSideSpacingMin: 10, cooldownMin: 15,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 80 }
+```
+
+---
+
 ## 📝 CHANGELOG
 
+- **v2.0** (2026-04-27): Phase 2 sweep — 3 preset re-tuned via 81-run one-at-a-time sweep. WHALE +109% NET, EAGLE +62% NET & -35% DD, TURTLE -20% DD. New knobs exposed in Preset interface (cooldown, stoch, srProx, srLookback)
 - **v1.0** (2026-04-27): Initial doc với 3 preset SAFE/BALANCED/AGGRESSIVE từ 11-variant sweep

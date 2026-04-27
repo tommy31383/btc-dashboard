@@ -13,12 +13,13 @@ import {
   All5mAccount, AccountSummary, closePositionManual, emptyAccount,
   loadAccount, processOpen, pullAccountFromGist, resetAccount, summarize, tryEntry5mBar,
   PresetKey, getActivePresetKey, setActivePresetKey, DEFAULT_PRESET_KEY,
+  PRESETS,
 } from "../utils/all5mAccount";
 
 const FOLLOWER_PULL_MS = 120 * 1000; // anh Tommy v4.5.3: 60s → 120s
 import { TFAnalysis, Kline, RawKlinesMap } from "./useBinanceKlines";
 
-const SR_LOOKBACK_15M = 50;
+// SR lookback now per-preset (PRESETS[key].srLookback15m). Used in pivotSR.
 
 export interface Use5mAllTraderResult {
   account: All5mAccount;
@@ -30,10 +31,10 @@ export interface Use5mAllTraderResult {
   setPreset: (key: PresetKey) => Promise<void>;
 }
 
-function pivotSR(klines15m: Kline[] | undefined): { support: number | null; resistance: number | null } {
-  if (!klines15m || klines15m.length < SR_LOOKBACK_15M + 1) return { support: null, resistance: null };
+function pivotSR(klines15m: Kline[] | undefined, lookback: number): { support: number | null; resistance: number | null } {
+  if (!klines15m || klines15m.length < lookback + 1) return { support: null, resistance: null };
   // exclude in-progress bar (last)
-  const closedTail = klines15m.slice(-SR_LOOKBACK_15M - 1, -1);
+  const closedTail = klines15m.slice(-lookback - 1, -1);
   let lo = Infinity, hi = -Infinity;
   for (const c of closedTail) {
     if (c.low < lo) lo = c.low;
@@ -69,7 +70,7 @@ export function use5mAllTrader(
     lastBarTimeRef.current = closedBar.time;
 
     const stoch5m = tfData.find((t) => t.key === "5m")?.stochK ?? null;
-    const { support, resistance } = pivotSR(rawKlines["15m"]);
+    const { support, resistance } = pivotSR(rawKlines["15m"], PRESETS[presetKey].srLookback15m);
 
     (async () => {
       const created = await tryEntry5mBar(closedBar.time, closedBar.close, stoch5m, support, resistance);
