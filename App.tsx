@@ -62,7 +62,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.18";
+const APP_VERSION = "4.7.19";
 const BUILD_DATE = "2026-04-27";
 
 /**
@@ -344,7 +344,7 @@ export default function App() {
             onNotifications={() => {}}
             onSettings={() => setShowSettings(true)}
           />
-          <LiveTab live={live} />
+          <LiveTab live={live} price5mBars={(rawKlines["5m"] ?? []).map((k) => ({ time: k.time, close: k.close }))} />
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}

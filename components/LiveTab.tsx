@@ -16,6 +16,7 @@ import { PRESETS, PresetKey, getActivePresetKey } from "../utils/all5mAccount";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions,
 } from "react-native";
+import Svg, { Polyline, Polygon, Circle, Line as SvgLine } from "react-native-svg";
 import { P } from "../utils/v2Theme";
 import { MaterialIcon } from "./v2/MaterialIcon";
 import { UseBinanceLiveResult } from "../hooks/useBinanceLive";
@@ -26,6 +27,8 @@ const CLAIM_LEADER_PASSWORD = "30318384";
 
 interface Props {
   live: UseBinanceLiveResult;
+  /** Price 5m bars cho chart entry/exit markers (anh Tommy v4.7.19) */
+  price5mBars?: { time: number; close: number }[];
 }
 
 /** Shared hook — đọc active preset từ AsyncStorage (đồng bộ với tab 5m ALL).
@@ -42,7 +45,7 @@ function useActivePreset(): PresetKey {
   return key;
 }
 
-export default function LiveTab({ live }: Props) {
+export default function LiveTab({ live, price5mBars }: Props) {
   const { width } = useWindowDimensions();
   const isWide = width >= 900;
   const presetKey = useActivePreset();
@@ -76,6 +79,7 @@ export default function LiveTab({ live }: Props) {
           <SettingsCard live={live} />
         </View>
         <View style={[isWide && styles.col]}>
+          <LivePriceChartCard live={live} price5mBars={price5mBars} />
           <TrackedPositionsCard live={live} />
           <PositionsCard live={live} />
           <OpenOrdersCard live={live} />
@@ -766,6 +770,104 @@ function computeSideSummary(tracked: { side: string; qty: number; entryPrice: nu
     ? (side === "LONG" ? (markPrice - avgEntry) : (avgEntry - markPrice)) * sumQty
     : 0;
   return { count: list.length, sumQty, sumNotional, avgEntry, avgTp, avgSl, upnlPct, upnlUsd };
+}
+
+// ── PRICE CHART + ENTRY/EXIT MARKERS (anh Tommy v4.7.19) ──────────────────
+// Last 120 cây 5m (~10h). Marker compact:
+//   ▲ green = LONG entry · ▼ red = SHORT entry
+//   ● green = WIN exit (TP hit) · ● red = LOSS exit (SL hit)
+//   Faint dash entry → exit
+function LivePriceChartCard({ live, price5mBars }: { live: UseBinanceLiveResult; price5mBars?: { time: number; close: number }[] }) {
+  if (!price5mBars || price5mBars.length < 2) return null;
+  const tracked = live.state.trackedPositions;
+  const journal = live.state.journal;
+  const width = 760;
+  const height = 220;
+  const maxBars = 120;
+  const slice = price5mBars.slice(-maxBars);
+  const tMin = slice[0].time;
+  const tMax = slice[slice.length - 1].time;
+  const range = tMax - tMin || 1;
+  const closes = slice.map((b) => b.close);
+  const pMin = Math.min(...closes);
+  const pMax = Math.max(...closes);
+  const pRange = pMax - pMin || 1;
+  const pad = 8;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const xOf = (t: number) => pad + ((t - tMin) / range) * w;
+  const yOf = (p: number) => pad + h - ((p - pMin) / pRange) * h;
+  const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
+
+  // Visible OPEN tracked positions
+  const visibleOpen = tracked.filter((t) => t.entryMs >= tMin - 60_000);
+
+  // Recent CLOSE entries from journal (within visible window)
+  const closes_ = journal.filter((j) => j.action.kind === "CLOSE" && j.ts >= tMin - 60_000 && j.ts <= tMax + 60_000);
+
+  // Match each CLOSE with its entry — find entry by ruleId in journal (entry kind, same ruleId, ts < close ts)
+  type CloseMark = { side: "LONG" | "SHORT"; closePrice: number; closeMs: number; entryPrice?: number; entryMs?: number; trigger: "TP" | "SL" };
+  const closeMarks: CloseMark[] = closes_.map((j) => {
+    const a: any = j.action;
+    const matchEntry = journal.slice().reverse().find((e) => e.action.kind === "ENTRY" && e.ruleId === j.ruleId && e.ts < j.ts);
+    const ea: any = matchEntry?.action;
+    return {
+      side: a.side,
+      closePrice: a.closePrice,
+      closeMs: j.ts,
+      entryPrice: ea?.entryPrice,
+      entryMs: matchEntry?.ts,
+      trigger: a.trigger,
+    };
+  });
+
+  return (
+    <Card icon="auto_graph" title={`PRICE 5m + ENTRIES (last ${slice.length} cây)`}>
+      <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
+        <Svg width={width} height={height}>
+          <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.2} opacity={0.85} />
+          {/* OPEN tracked entries — triangle markers */}
+          {visibleOpen.map((p) => {
+            const eX = xOf(p.entryMs);
+            const eY = yOf(p.entryPrice);
+            const longSide = p.side === "LONG";
+            const color = longSide ? P.green : P.error;
+            const tri = longSide
+              ? `${eX},${eY - 4} ${eX - 3.5},${eY + 2} ${eX + 3.5},${eY + 2}`
+              : `${eX},${eY + 4} ${eX - 3.5},${eY - 2} ${eX + 3.5},${eY - 2}`;
+            return <Polygon key={`open-${p.id}`} points={tri} fill={color} opacity={0.95} />;
+          })}
+          {/* CLOSE markers — circle dots + line back to entry if known */}
+          {closeMarks.map((c, i) => {
+            const cX = xOf(c.closeMs);
+            const cY = yOf(c.closePrice);
+            const win = c.trigger === "TP";
+            const dotColor = win ? P.green : P.error;
+            const lineEl = c.entryPrice && c.entryMs && c.entryMs >= tMin - 60_000 ? (
+              <SvgLine
+                x1={xOf(c.entryMs)} y1={yOf(c.entryPrice)} x2={cX} y2={cY}
+                stroke={dotColor} strokeWidth={0.5} strokeDasharray="2,2" opacity={0.4}
+              />
+            ) : null;
+            return (
+              <React.Fragment key={`close-${i}`}>
+                {lineEl}
+                <Circle cx={cX} cy={cY} r={2.5} fill={dotColor} opacity={0.9} />
+              </React.Fragment>
+            );
+          })}
+        </Svg>
+        <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12 }}>
+          <Text style={{ color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMax.toFixed(0)}</Text>
+          <Text style={{ color: P.green, fontSize: 9, fontFamily: "monospace" }}>▲ LONG  ● TP</Text>
+          <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT  ● SL</Text>
+        </View>
+        <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>
+          ${pMin.toFixed(0)} · {visibleOpen.length} open · {closeMarks.length} closed
+        </Text>
+      </View>
+    </Card>
+  );
 }
 
 function TrackedPositionsCard({ live }: Props) {
