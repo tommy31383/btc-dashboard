@@ -827,6 +827,7 @@ function computeSideSummary(tracked: { side: string; qty: number; entryPrice: nu
 //   Faint dash entry → exit
 function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; klinesByTf?: Record<string, { time: number; close: number }[]> }) {
   const [tf, setTf] = useChartTf();
+  const { width: winW } = useWindowDimensions();
   const bars = klinesByTf?.[tf] ?? [];
   if (bars.length < 2) {
     return (
@@ -840,10 +841,21 @@ function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; 
   }
   const tracked = live.state.trackedPositions;
   const journal = live.state.journal;
-  const width = 760;
-  const height = 220;
+  // Responsive width: card padding ~28, container max 880 (col layout)
+  const width = Math.max(320, Math.min(winW - 60, 880));
+  const height = 240;
   const maxBars = 120;
-  const slice = bars.slice(-maxBars);
+  let slice = bars.slice(-maxBars);
+  // AUTO-EXTEND tMin: nếu có OPEN position cũ hơn slice[0] → mở rộng window để show
+  // (anh Tommy v4.7.22: tránh markers bị cắt ngoài window)
+  if (tracked.length > 0) {
+    const oldestOpen = Math.min(...tracked.map((t) => t.entryMs));
+    if (oldestOpen < slice[0].time) {
+      // Find index in bars closest to oldestOpen
+      const startIdx = Math.max(0, bars.findIndex((b) => b.time >= oldestOpen) - 1);
+      slice = bars.slice(startIdx);
+    }
+  }
   const tMin = slice[0].time;
   const tMax = slice[slice.length - 1].time;
   const range = tMax - tMin || 1;
@@ -886,16 +898,23 @@ function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; 
       <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
         <Svg width={width} height={height}>
           <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.2} opacity={0.85} />
-          {/* OPEN tracked entries — triangle markers */}
+          {/* OPEN tracked entries — bigger triangle markers + vertical guide line */}
           {visibleOpen.map((p) => {
             const eX = xOf(p.entryMs);
             const eY = yOf(p.entryPrice);
             const longSide = p.side === "LONG";
             const color = longSide ? P.green : P.error;
+            // Triangle 8px (bigger so visible)
             const tri = longSide
-              ? `${eX},${eY - 4} ${eX - 3.5},${eY + 2} ${eX + 3.5},${eY + 2}`
-              : `${eX},${eY + 4} ${eX - 3.5},${eY - 2} ${eX + 3.5},${eY - 2}`;
-            return <Polygon key={`open-${p.id}`} points={tri} fill={color} opacity={0.95} />;
+              ? `${eX},${eY - 6} ${eX - 5},${eY + 3} ${eX + 5},${eY + 3}`
+              : `${eX},${eY + 6} ${eX - 5},${eY - 3} ${eX + 5},${eY - 3}`;
+            return (
+              <React.Fragment key={`open-${p.id}`}>
+                {/* Vertical dotted guide line từ entry xuống đáy chart */}
+                <SvgLine x1={eX} y1={eY} x2={eX} y2={height - pad} stroke={color} strokeWidth={0.4} strokeDasharray="2,3" opacity={0.3} />
+                <Polygon points={tri} fill={color} opacity={1} stroke={P.surface} strokeWidth={0.5} />
+              </React.Fragment>
+            );
           })}
           {/* CLOSE markers — circle dots + line back to entry if known */}
           {closeMarks.map((c, i) => {
@@ -912,7 +931,7 @@ function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; 
             return (
               <React.Fragment key={`close-${i}`}>
                 {lineEl}
-                <Circle cx={cX} cy={cY} r={2.5} fill={dotColor} opacity={0.9} />
+                <Circle cx={cX} cy={cY} r={4} fill={dotColor} opacity={1} stroke={P.surface} strokeWidth={0.5} />
               </React.Fragment>
             );
           })}
@@ -923,7 +942,7 @@ function LivePriceChartCard({ live, klinesByTf }: { live: UseBinanceLiveResult; 
           <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT  ● SL</Text>
         </View>
         <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>
-          ${pMin.toFixed(0)} · {visibleOpen.length} open · {closeMarks.length} closed
+          ${pMin.toFixed(0)} · {visibleOpen.length}/{tracked.length} open shown · {closeMarks.length} closed · window {((tMax - tMin) / 3600000).toFixed(1)}h
         </Text>
       </View>
     </Card>
