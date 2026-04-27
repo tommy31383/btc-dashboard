@@ -17,6 +17,28 @@ export default function ServerTab() {
   const live = useBackendLive();
   const [pwInput, setPwInput] = useState("");
 
+  // ALL hooks MUST be at top — Rules of Hooks (anh Tommy v4.8.7 fix crash)
+  const s = live.state;
+  const trackedAll = s?.trackedPositions ?? [];
+  const symPosAll = s?.binanceSnapshot?.positions?.find((p: any) => p.symbol === (s?.settings?.symbol ?? "BTCUSDT"));
+  const markPriceAll = symPosAll ? parseFloat(symPosAll.markPrice) : null;
+  const memoLists = useMemo(() => {
+    const long: any[] = [];
+    const short: any[] = [];
+    let lUpnl = 0, sUpnl = 0;
+    for (const t of trackedAll) {
+      if (t.side === "LONG") long.push(t);
+      else if (t.side === "SHORT") short.push(t);
+    }
+    long.sort((a, b) => b.entryMs - a.entryMs);
+    short.sort((a, b) => b.entryMs - a.entryMs);
+    if (markPriceAll !== null) {
+      for (const t of long) lUpnl += (markPriceAll - t.entryPrice) * t.qty;
+      for (const t of short) sUpnl += (t.entryPrice - markPriceAll) * t.qty;
+    }
+    return { longList: long, shortList: short, longCount: long.length, shortCount: short.length, longUpnl: lUpnl, shortUpnl: sUpnl };
+  }, [trackedAll, markPriceAll]);
+
   if (live.loading) {
     return (
       <View style={styles.center}>
@@ -50,31 +72,11 @@ export default function ServerTab() {
     );
   }
 
-  // Authed view
-  const s = live.state;
+  // Authed view — reuse hooks computed above
   const sched = live.scheduler;
-  const tracked = s?.trackedPositions ?? [];
-  // Mark price từ Binance snapshot
-  const symPos = s?.binanceSnapshot?.positions?.find((p: any) => p.symbol === (s?.settings?.symbol ?? "BTCUSDT"));
-  const markPrice = symPos ? parseFloat(symPos.markPrice) : null;
-
-  // Memoize sort + filter to avoid recompute mỗi render (anh Tommy v0.3 perf)
-  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl } = useMemo(() => {
-    const long: any[] = [];
-    const short: any[] = [];
-    let lUpnl = 0, sUpnl = 0;
-    for (const t of tracked) {
-      if (t.side === "LONG") long.push(t);
-      else if (t.side === "SHORT") short.push(t);
-    }
-    long.sort((a, b) => b.entryMs - a.entryMs);
-    short.sort((a, b) => b.entryMs - a.entryMs);
-    if (markPrice !== null) {
-      for (const t of long) lUpnl += (markPrice - t.entryPrice) * t.qty;
-      for (const t of short) sUpnl += (t.entryPrice - markPrice) * t.qty;
-    }
-    return { longList: long, shortList: short, longCount: long.length, shortCount: short.length, longUpnl: lUpnl, shortUpnl: sUpnl };
-  }, [tracked, markPrice]);
+  const tracked = trackedAll;
+  const markPrice = markPriceAll;
+  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl } = memoLists;
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
