@@ -6,8 +6,28 @@
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const SERVER_URL = "https://tommybtc.duckdns.org";
+// User có thể override qua AsyncStorage @backend_url_v1 (vd nếu DNS issue)
+const DEFAULT_SERVER_URL = "https://tommybtc.duckdns.org";
+const URL_KEY = "@backend_url_v1";
 const TOKEN_KEY = "@backend_token_v1";
+
+let _cachedUrl: string | null = null;
+export async function getServerUrl(): Promise<string> {
+  if (_cachedUrl) return _cachedUrl;
+  try {
+    const u = await AsyncStorage.getItem(URL_KEY);
+    if (u) { _cachedUrl = u; return u; }
+  } catch {}
+  _cachedUrl = DEFAULT_SERVER_URL;
+  return DEFAULT_SERVER_URL;
+}
+export async function setServerUrl(url: string): Promise<void> {
+  _cachedUrl = url || DEFAULT_SERVER_URL;
+  if (url && url !== DEFAULT_SERVER_URL) await AsyncStorage.setItem(URL_KEY, url);
+  else await AsyncStorage.removeItem(URL_KEY);
+}
+// Backward-compat: SERVER_URL constant for static reads (use getServerUrl() in async paths)
+export const SERVER_URL = DEFAULT_SERVER_URL;
 
 let _cachedToken: string | null = null;
 
@@ -30,7 +50,8 @@ async function request<T>(path: string, method: "GET" | "POST" = "GET", body?: a
   const token = await getToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch(`${SERVER_URL}${path}`, {
+  const url = await getServerUrl();
+  const res = await fetch(`${url}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
@@ -80,7 +101,8 @@ let _wsReconnectTimer: ReturnType<typeof setTimeout> | null = null;
 async function connectWs(): Promise<void> {
   const token = await getToken();
   if (!token) return;
-  const wsUrl = SERVER_URL.replace(/^http/, "ws") + `/ws?token=${encodeURIComponent(token)}`;
+  const url = await getServerUrl();
+  const wsUrl = url.replace(/^http/, "ws") + `/ws?token=${encodeURIComponent(token)}`;
   try {
     _ws = new WebSocket(wsUrl);
     _ws.onopen = () => console.log("[backend ws] connected");

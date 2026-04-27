@@ -370,10 +370,24 @@ function ControlsCard({ live }: Props) {
   const isPaused = live.state.pausedUntilMs > Date.now();
   const credsSet = !!live.state.apiKey && !!live.state.apiSecret;
   const isFollower = live.role === "FOLLOWER";
-  const canControl = !isFollower; // anh Tommy: follower chỉ XEM, không bật AUTO/REAL
+  // v4.8.2 (anh Tommy): SERVER OWNS TRADING — LIVE tab read-only
+  const SERVER_OWNS = true;
+  const canControl = !isFollower && !SERVER_OWNS;
   return (
-    <CollapsibleCard storageKey="@live_card_controls" icon="bolt" title={`CONTROLS${isFollower ? " · READ-ONLY (FOLLOWER)" : ""}`}>
-      {isFollower && (
+    <CollapsibleCard storageKey="@live_card_controls" icon="bolt" title={`CONTROLS${SERVER_OWNS ? " · 🔒 SERVER OWNS" : isFollower ? " · READ-ONLY (FOLLOWER)" : ""}`}>
+      {SERVER_OWNS && (
+        <View style={{ backgroundColor: P.error + "12", borderWidth: 1, borderColor: P.error + "55", padding: 10, borderRadius: 4, marginBottom: 8 }}>
+          <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 12, marginBottom: 4 }}>
+            🔒 LIVE TAB DEPRECATED — SERVER controls trading
+          </Text>
+          <Text style={{ color: P.text, fontFamily: "monospace", fontSize: 10, lineHeight: 14 }}>
+            Cloud server (https://tommybtc.duckdns.org) đang own Binance API + auto-trade 24/7.
+            {"\n"}LIVE tab này chỉ READ-ONLY. Mọi action (close, edit TP/SL, settings) phải dùng tab SERVER.
+            {"\n"}Bật cả 2 cùng lúc → DUPLICATE entry + lệch state.
+          </Text>
+        </View>
+      )}
+      {isFollower && !SERVER_OWNS && (
         <Text style={[styles.warn, { color: P.bitcoinOrange }]}>
           🔒 Bạn đang ở FOLLOWER mode — KHÔNG được bật AUTO / đổi DRY/REAL / reset / clear / close.
           Bấm CLAIM LEADER ở STATUS để takeover.

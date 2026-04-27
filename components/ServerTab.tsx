@@ -81,23 +81,34 @@ export default function ServerTab() {
         <Text style={styles.dim}>{SERVER_URL} · last update {Math.round((Date.now() - live.lastUpdateMs) / 1000)}s ago</Text>
       </View>
 
-      {/* MODE + AUTO toggles */}
+      {/* ENGINE START/STOP — clearer for new entries vs Plan B */}
       <View style={styles.card}>
-        <Text style={styles.h2}>⚙️ ENGINE</Text>
+        <Text style={styles.h2}>⚙️ ENGINE — NEW ENTRIES</Text>
         <View style={styles.row}>
           <TouchableOpacity
-            style={[styles.chip, { borderColor: s?.autoEnabled ? P.green : P.dim, backgroundColor: s?.autoEnabled ? P.green + "22" : P.surface }]}
-            onPress={() => live.setAuto(!s?.autoEnabled)}
+            style={[styles.chip, {
+              borderColor: s?.autoEnabled ? P.green : P.error,
+              backgroundColor: (s?.autoEnabled ? P.green : P.error) + "22",
+              paddingHorizontal: 18, paddingVertical: 10,
+            }]}
+            onPress={() => {
+              if (!s?.autoEnabled) {
+                if (typeof window !== "undefined" && !window.confirm("▶️ START? Server sẽ tự vào lệnh mới khi rule fire. Plan B vẫn monitor positions hiện có.")) return;
+                live.setAuto(true);
+              } else {
+                if (typeof window !== "undefined" && !window.confirm("⏸ STOP new entries? Plan B vẫn close positions hiện có khi hit TP/SL.")) return;
+                live.setAuto(false);
+              }
+            }}
           >
-            <Text style={{ color: s?.autoEnabled ? P.green : P.dim, fontFamily: "monospace", fontWeight: "800" }}>
-              AUTO {s?.autoEnabled ? "ON ✓" : "OFF"}
+            <Text style={{ color: s?.autoEnabled ? P.green : P.error, fontFamily: "monospace", fontWeight: "900", fontSize: 13, letterSpacing: 1 }}>
+              {s?.autoEnabled ? "▶️ RUNNING (STOP)" : "⏸ STOPPED (START)"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.chip, { borderColor: s?.dryRun ? P.bitcoinOrange : P.error, backgroundColor: (s?.dryRun ? P.bitcoinOrange : P.error) + "22" }]}
             onPress={() => {
               if (s?.dryRun) {
-                // Switching to REAL needs password
                 const pw = askPw();
                 if (pw) live.setDryRun(false, pw);
               } else {
@@ -110,6 +121,10 @@ export default function ServerTab() {
             </Text>
           </TouchableOpacity>
         </View>
+        <Text style={[styles.dim, { marginTop: 6 }]}>
+          💡 STOP/START chỉ block lệnh MỚI. Plan B vẫn monitor TP/SL của lệnh hiện có 24/7.
+          {"\n"}💡 DRY = log only · REAL = MARKET thật trên Binance (cần password switch).
+        </Text>
       </View>
 
       {/* KPIs */}
