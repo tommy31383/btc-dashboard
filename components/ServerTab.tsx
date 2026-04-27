@@ -25,18 +25,20 @@ export default function ServerTab() {
   const memoLists = useMemo(() => {
     const long: any[] = [];
     const short: any[] = [];
-    let lUpnl = 0, sUpnl = 0;
+    let lUpnl = 0, sUpnl = 0, lSize = 0, sSize = 0;
     for (const t of trackedAll) {
       if (t.side === "LONG") long.push(t);
       else if (t.side === "SHORT") short.push(t);
     }
     long.sort((a, b) => b.entryMs - a.entryMs);
     short.sort((a, b) => b.entryMs - a.entryMs);
+    for (const t of long) lSize += t.qty * t.entryPrice;
+    for (const t of short) sSize += t.qty * t.entryPrice;
     if (markPriceAll !== null) {
       for (const t of long) lUpnl += (markPriceAll - t.entryPrice) * t.qty;
       for (const t of short) sUpnl += (t.entryPrice - markPriceAll) * t.qty;
     }
-    return { longList: long, shortList: short, longCount: long.length, shortCount: short.length, longUpnl: lUpnl, shortUpnl: sUpnl };
+    return { longList: long, shortList: short, longCount: long.length, shortCount: short.length, longUpnl: lUpnl, shortUpnl: sUpnl, longSize: lSize, shortSize: sSize };
   }, [trackedAll, markPriceAll]);
 
   if (live.loading) {
@@ -76,7 +78,7 @@ export default function ServerTab() {
   const sched = live.scheduler;
   const tracked = trackedAll;
   const markPrice = markPriceAll;
-  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl } = memoLists;
+  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl, longSize, shortSize } = memoLists;
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
@@ -217,11 +219,13 @@ export default function ServerTab() {
               if (list.length === 0) return null;
               const sideColor = side === "LONG" ? P.green : P.error;
               const sideUpnlUsd = side === "LONG" ? longUpnl : shortUpnl;
+              const sideSizeUsd = side === "LONG" ? longSize : shortSize;
               return (
                 <View key={side} style={{ marginTop: 8 }}>
                   <Text style={[styles.h2, { color: sideColor, marginTop: 4 }]}>
                     {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) ·
-                    <Text style={{ color: sideUpnlUsd >= 0 ? P.green : P.error }}> total uPnL {sideUpnlUsd >= 0 ? "+" : ""}${sideUpnlUsd.toFixed(2)}</Text>
+                    <Text style={{ color: P.bitcoinOrange }}> size ${sideSizeUsd.toFixed(0)}</Text> ·
+                    <Text style={{ color: sideUpnlUsd >= 0 ? P.green : P.error }}> uPnL {sideUpnlUsd >= 0 ? "+" : ""}${sideUpnlUsd.toFixed(2)}</Text>
                   </Text>
                   {list.map((t: any, i: number) => {
                     const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
@@ -229,10 +233,12 @@ export default function ServerTab() {
                     const upnlUsd = diff * t.qty;
                     const upnlPct = markPrice !== null ? (diff / t.entryPrice) * 100 : 0;
                     const upnlColor = upnlUsd >= 0 ? P.green : P.error;
+                    const sizeUsd = t.qty * t.entryPrice;
                     return (
                       <View key={t.id} style={styles.posRow}>
                         <Text style={[styles.dim, { width: 24 }]}>{i + 1}</Text>
                         <Text style={[styles.dim, { width: 70 }]}>${t.entryPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: P.bitcoinOrange, width: 70, fontWeight: "700" }]}>${sizeUsd.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: P.green, width: 70 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: P.error, width: 70 }]}>SL ${t.slPrice.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: upnlColor, width: 75, fontWeight: "700" }]}>
