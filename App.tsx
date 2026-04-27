@@ -42,6 +42,7 @@ import { useRiskRadar } from "./hooks/useRiskRadar";
 import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
 // PaperTradeJournal removed (trùng với LIVE journal + 5m ALL panel)
 import UnifiedTradesPanel from "./components/UnifiedTradesPanel";
+import ServerTab from "./components/ServerTab";
 // LiveTradingPanel moved to dedicated LiveTab
 import LiveTab from "./components/LiveTab";
 import All5mPanel from "./components/All5mPanel";
@@ -62,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.7.31";
+const APP_VERSION = "4.8.0";
 const BUILD_DATE = "2026-04-28";
 
 /**
@@ -127,7 +128,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "live" | "all5m">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "live" | "all5m" | "server">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -242,6 +243,7 @@ export default function App() {
     else if (t === "gptRule") setActiveTab("gptRule");
     else if (t === "live") setActiveTab("live");
     else if (t === "all5m") setActiveTab("all5m");
+    else if (t === "server") setActiveTab("server");
     else setActiveTab("dashboard");
   }, []);
 
@@ -284,6 +286,31 @@ export default function App() {
             settings={settings}
             onUpdate={updateSettings}
           />
+          <BottomNavBar
+            active={navTab}
+            tradesBadge={firingGoldensCount}
+            onSelect={handleNavSelect}
+          />
+        </SafeAreaView>
+      </ErrorBoundary>
+    );
+  }
+
+  if (activeTab === "server") {
+    return (
+      <ErrorBoundary>
+        <SafeAreaView style={styles.safe}>
+          <StatusBar style="light" />
+          <TopAppBar
+            title="BTC DASHBOARD"
+            version={APP_VERSION}
+            buildDate={BUILD_DATE}
+            lastUpdate={lastUpdate}
+            onNotifications={() => {}}
+            onSettings={() => setShowSettings(true)}
+          />
+          <ServerTab />
+          <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}
             tradesBadge={firingGoldensCount}

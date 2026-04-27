@@ -1,0 +1,233 @@
+/**
+ * ServerTab — connect to btc-trader-server (cloud 24/7).
+ *
+ * If not authed → login form.
+ * If authed → state + scheduler + alerts + control buttons.
+ */
+import React, { useState } from "react";
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { P } from "../utils/v2Theme";
+import DebugLabel from "./DebugLabel";
+import { useBackendLive } from "../hooks/useBackendLive";
+import { SERVER_URL } from "../utils/backendApi";
+
+const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
+
+export default function ServerTab() {
+  const live = useBackendLive();
+  const [pwInput, setPwInput] = useState("");
+
+  if (live.loading) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.dim}>⏳ Connecting to {SERVER_URL}...</Text>
+      </View>
+    );
+  }
+
+  if (!live.authed) {
+    return (
+      <View style={styles.center}>
+        <DebugLabel name="ServerTab.Login" />
+        <Text style={styles.h1}>🔐 LOGIN — btc-trader-server</Text>
+        <Text style={styles.dim}>Server: {SERVER_URL}</Text>
+        <TextInput
+          value={pwInput}
+          onChangeText={setPwInput}
+          secureTextEntry
+          placeholder="password (30318384)"
+          placeholderTextColor={P.dim}
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.btnPrimary} onPress={async () => {
+          const ok = await live.login(pwInput);
+          if (ok) setPwInput("");
+        }}>
+          <Text style={styles.btnPrimaryText}>LOGIN</Text>
+        </TouchableOpacity>
+        {live.lastError && <Text style={styles.error}>❌ {live.lastError}</Text>}
+      </View>
+    );
+  }
+
+  // Authed view
+  const s = live.state;
+  const sched = live.scheduler;
+  const tracked = s?.trackedPositions ?? [];
+  const longCount = tracked.filter((t: any) => t.side === "LONG").length;
+  const shortCount = tracked.filter((t: any) => t.side === "SHORT").length;
+  const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
+  const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
+  const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
+  const lastPollSec = sched?.lastPollOkMs > 0 ? Math.round((Date.now() - sched.lastPollOkMs) / 1000) : "—";
+  const lastEvalSec = sched?.lastRuleEvalMs > 0 ? Math.round((Date.now() - sched.lastRuleEvalMs) / 1000) : "—";
+
+  const askPw = (): string | null => {
+    if (typeof window === "undefined") return null;
+    const v = window.prompt(PASSWORD_PROMPT);
+    return v && v.trim();
+  };
+
+  return (
+    <ScrollView style={styles.scroll}>
+      <DebugLabel name="ServerTab" />
+      <View style={styles.card}>
+        <View style={styles.headerRow}>
+          <Text style={styles.h1}>☁️ BTC TRADER SERVER · 24/7</Text>
+          <TouchableOpacity onPress={live.logout} style={styles.btnGhost}>
+            <Text style={styles.btnGhostText}>LOGOUT</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.dim}>{SERVER_URL} · last update {Math.round((Date.now() - live.lastUpdateMs) / 1000)}s ago</Text>
+      </View>
+
+      {/* MODE + AUTO toggles */}
+      <View style={styles.card}>
+        <Text style={styles.h2}>⚙️ ENGINE</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={[styles.chip, { borderColor: s?.autoEnabled ? P.green : P.dim, backgroundColor: s?.autoEnabled ? P.green + "22" : P.surface }]}
+            onPress={() => live.setAuto(!s?.autoEnabled)}
+          >
+            <Text style={{ color: s?.autoEnabled ? P.green : P.dim, fontFamily: "monospace", fontWeight: "800" }}>
+              AUTO {s?.autoEnabled ? "ON ✓" : "OFF"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.chip, { borderColor: s?.dryRun ? P.bitcoinOrange : P.error, backgroundColor: (s?.dryRun ? P.bitcoinOrange : P.error) + "22" }]}
+            onPress={() => {
+              if (s?.dryRun) {
+                // Switching to REAL needs password
+                const pw = askPw();
+                if (pw) live.setDryRun(false, pw);
+              } else {
+                live.setDryRun(true);
+              }
+            }}
+          >
+            <Text style={{ color: s?.dryRun ? P.bitcoinOrange : P.error, fontFamily: "monospace", fontWeight: "800" }}>
+              {s?.dryRun ? "DRY RUN" : "REAL ‼️"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* KPIs */}
+      <View style={styles.card}>
+        <Text style={styles.h2}>📊 STATUS</Text>
+        <View style={styles.kpiGrid}>
+          <Kpi label="WALLET" value={`$${parseFloat(wallet).toFixed(2)}`} />
+          <Kpi label="uPnL" value={`$${parseFloat(upnl).toFixed(2)}`} color={parseFloat(upnl) >= 0 ? P.green : P.error} />
+          <Kpi label="DAILY" value={`$${dailyPnl.toFixed(2)}`} color={dailyPnl >= 0 ? P.green : P.error} />
+        </View>
+        <View style={styles.kpiGrid}>
+          <Kpi label="LONG" value={`${longCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.green} />
+          <Kpi label="SHORT" value={`${shortCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.error} />
+          <Kpi label="HEDGE" value={s?.hedgeMode ? "✅" : "❌"} />
+        </View>
+        <Text style={styles.dim}>
+          poll {lastPollSec}s ago · ruleEval {lastEvalSec}s ago · alerts {sched?.lastRuleAlerts ?? 0}
+        </Text>
+        {s?.pauseReason && (
+          <Text style={[styles.error, { marginTop: 6 }]}>
+            🛑 PAUSED ({s.pauseReason}) — until {new Date(s.pausedUntilMs).toLocaleTimeString()}
+          </Text>
+        )}
+      </View>
+
+      {/* Active firing rules */}
+      <View style={styles.card}>
+        <Text style={styles.h2}>🔔 ACTIVE FIRING ({live.alerts.length})</Text>
+        {live.alerts.length === 0 ? (
+          <Text style={styles.dim}>không có rule nào fire</Text>
+        ) : (
+          live.alerts.slice(0, 10).map((a: any, i: number) => (
+            <Text key={i} style={[styles.dim, { marginBottom: 2 }]}>
+              <Text style={{ color: a.side === "LONG" ? P.green : P.error, fontWeight: "700" }}>{a.tfKey}#{a.id.split(":").pop()} {a.side}</Text>
+              {"  "}@ ${a.entryPrice.toFixed(0)} TP ${a.tpPrice.toFixed(0)} SL ${a.slPrice.toFixed(0)}
+            </Text>
+          ))
+        )}
+      </View>
+
+      {/* Tracked positions */}
+      <View style={styles.card}>
+        <Text style={styles.h2}>📈 TRACKED ({tracked.length})</Text>
+        {tracked.length === 0 ? (
+          <Text style={styles.dim}>chưa có position nào</Text>
+        ) : (
+          <>
+            <View style={styles.row}>
+              <TouchableOpacity style={[styles.chip, { borderColor: P.green }]}
+                onPress={() => { const pw = askPw(); if (pw) live.bulkClose("PROFIT", pw); }}>
+                <Text style={{ color: P.green, fontFamily: "monospace", fontWeight: "700", fontSize: 10 }}>✓ CLOSE PROFIT</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.chip, { borderColor: P.error }]}
+                onPress={() => { const pw = askPw(); if (pw) live.bulkClose("LOSS", pw); }}>
+                <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "700", fontSize: 10 }}>✗ CLOSE LOSS</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.chip, { borderColor: P.error, backgroundColor: P.error + "22" }]}
+                onPress={() => { const pw = askPw(); if (pw) live.bulkClose("ALL", pw); }}>
+                <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 10 }}>🔥 CLOSE ALL</Text>
+              </TouchableOpacity>
+            </View>
+            {tracked.slice(0, 20).map((t: any) => {
+              const sideColor = t.side === "LONG" ? P.green : P.error;
+              const heldH = ((Date.now() - t.entryMs) / 3600000).toFixed(1);
+              return (
+                <View key={t.id} style={styles.posRow}>
+                  <Text style={[styles.dim, { color: sideColor, fontWeight: "800", width: 60 }]}>{t.side}</Text>
+                  <Text style={[styles.dim, { width: 80 }]}>${t.entryPrice.toFixed(0)}</Text>
+                  <Text style={[styles.dim, { color: P.green, width: 80 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
+                  <Text style={[styles.dim, { color: P.error, width: 80 }]}>SL ${t.slPrice.toFixed(0)}</Text>
+                  <Text style={[styles.dim, { width: 50 }]}>{heldH}h</Text>
+                  <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
+                    <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕ CLOSE</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </>
+        )}
+      </View>
+
+      {live.lastError && (
+        <View style={[styles.card, { borderColor: P.error, borderWidth: 1 }]}>
+          <Text style={styles.error}>⚠️ {live.lastError}</Text>
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+function Kpi({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <View style={styles.kpi}>
+      <Text style={styles.kpiLabel}>{label}</Text>
+      <Text style={[styles.kpiValue, color ? { color } : null]}>{value}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: P.bg },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 20, backgroundColor: P.bg },
+  card: { backgroundColor: P.elevated, borderRadius: 4, padding: 12, margin: 8 },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  h1: { color: P.text, fontSize: 14, fontWeight: "800", letterSpacing: 1, fontFamily: "SpaceGrotesk_700Bold" },
+  h2: { color: P.text2, fontSize: 11, fontWeight: "800", letterSpacing: 1, fontFamily: "SpaceGrotesk_700Bold", marginBottom: 8 },
+  dim: { color: P.dim, fontSize: 11, fontFamily: "JetBrainsMono_500Medium" },
+  error: { color: P.error, fontSize: 12, fontFamily: "JetBrainsMono_500Medium" },
+  input: { borderWidth: 1, borderColor: P.borderSoft, color: P.text, padding: 10, marginVertical: 10, width: 240, fontFamily: "monospace", fontSize: 14 },
+  btnPrimary: { backgroundColor: P.bitcoinOrange, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 4 },
+  btnPrimaryText: { color: P.bg, fontWeight: "800", letterSpacing: 1 },
+  btnGhost: { borderWidth: 1, borderColor: P.borderSoft, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 3 },
+  btnGhostText: { color: P.dim, fontSize: 10, fontFamily: "monospace", fontWeight: "700" },
+  row: { flexDirection: "row", gap: 6, flexWrap: "wrap", marginBottom: 8 },
+  chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 3, borderWidth: 1 },
+  kpiGrid: { flexDirection: "row", gap: 6, marginBottom: 6 },
+  kpi: { flex: 1, padding: 8, backgroundColor: P.surface, borderRadius: 3, borderWidth: 1, borderColor: P.borderSoft },
+  kpiLabel: { color: P.dim, fontSize: 9, letterSpacing: 1, fontWeight: "700" },
+  kpiValue: { color: P.text, fontSize: 14, fontWeight: "800", fontFamily: "JetBrainsMono_700Bold", marginTop: 2 },
+  posRow: { flexDirection: "row", alignItems: "center", paddingVertical: 4, gap: 4, borderBottomWidth: 1, borderBottomColor: P.surface },
+});
