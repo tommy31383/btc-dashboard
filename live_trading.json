@@ -1174,12 +1174,27 @@
         "reason": "per-rule cooldown 7m (rule 15m:16)"
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777279533666,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 77671.29,
+        "tpPrice": 78836.35934999998,
+        "slPrice": 69904.161,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
     "15m:22": 1777270313312,
     "15m:23": 1777270313616,
-    "15m:16": 1777278610892
+    "15m:16": 1777279533670
   },
   "trackedPositions": [
     {
@@ -1370,6 +1385,15 @@
       "tpPrice": 78716.52844999998,
       "slPrice": 69797.90699999999,
       "entryMs": 1777278611221
+    },
+    {
+      "id": "15m:16",
+      "side": "LONG",
+      "qty": 0.001,
+      "entryPrice": 77671.29,
+      "tpPrice": 78836.35934999998,
+      "slPrice": 69904.161,
+      "entryMs": 1777279533988
     }
   ],
   "pendingAlerts": [],
@@ -31063,5 +31087,5 @@
     ],
     "dailyPnl": -1.00573334
   },
-  "lastTrackedMutationMs": 1777278611221
+  "lastTrackedMutationMs": 1777279533988
 }
