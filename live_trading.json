@@ -1597,12 +1597,139 @@
         "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
+    },
+    {
+      "ts": 1777310261422,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 9m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261426,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76763.71,
+        "tpPct": 3.000000000000009,
+        "slPct": 1.4999999999999856
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261432,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76763.71,
+        "tpPct": 3.000000000000009,
+        "slPct": 1.0000000000000093
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261436,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76763.71,
+        "tpPct": 3.000000000000009,
+        "slPct": 1.0000000000000093
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262044,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76744.9,
+        "tpPrice": 74442.55299999999,
+        "slPrice": 77896.07349999998,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=81.9 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262289,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262297,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76744.9,
+        "tpPrice": 74442.55299999999,
+        "slPrice": 77512.349,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=81.9 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262511,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262523,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76744.9,
+        "tpPrice": 74442.55299999999,
+        "slPrice": 77512.349,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=81.9 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262758,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
     }
   ],
   "firedIds": {
     "15m:22": 1777286013803,
     "15m:23": 1777286014085,
-    "15m:16": 1777310172068
+    "15m:16": 1777310172068,
+    "1h:10": 1777310262046,
+    "1h:4": 1777310262301,
+    "1h:5": 1777310262528
   },
   "trackedPositions": [
     {
