@@ -19,7 +19,7 @@
     "equityDdPausePct": 30,
     "equityDdPauseHours": 4,
     "use5mAllEngineMode": false,
-    "stackBetterEntryMode": "off",
+    "stackBetterEntryMode": "vs-avg",
     "tpPct": 4,
     "slPct": 2
   },
@@ -1331,1660 +1331,500 @@
       "dryRun": false
     },
     {
-      "ts": 1777299421667,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $77702 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777299421681,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $77702 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777302586876,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $77531 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777302586889,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $77531 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306767487,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $77126 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306767499,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $77126 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777306767508,
-      "ruleId": "4h:40",
-      "tfKey": "4h",
-      "action": {
-        "kind": "PENDING",
-        "side": "LONG",
-        "htfEntryPrice": 77125.96,
-        "tpPct": 5.000000000000012,
-        "slPct": 2.500000000000006
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777308649210,
+      "ts": 1777306666084,
       "ruleId": "15m:16",
       "tfKey": "15m",
       "action": {
         "kind": "ENTRY",
         "side": "LONG",
-        "entryPrice": 76868.01,
-        "tpPrice": 78021.03014999999,
-        "slPrice": 69181.209,
+        "entryPrice": 76833.35,
+        "tpPrice": 77985.85025,
+        "slPrice": 69150.01500000001,
         "qty": 0.001,
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
     },
     {
-      "ts": 1777308649962,
+      "ts": 1777306666698,
       "ruleId": "15m:16",
       "tfKey": "15m",
       "action": {
         "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777309355412,
-      "ruleId": "4h:40",
-      "tfKey": "4h",
-      "action": {
-        "kind": "DISCARD",
-        "reason": "rule no longer firing"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309355443,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76640.71,
-        "tpPrice": 77790.32065,
-        "slPrice": 68976.63900000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309356120,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309356126,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309356129,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309356133,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309361662,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 10m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309361666,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309361671,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309361674,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309674784,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 5m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309674789,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309674792,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777309674795,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777310172057,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76708.75,
-        "tpPrice": 77859.38124999999,
-        "slPrice": 69037.875,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777310172309,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777310261422,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 9m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777310261426,
+      "ts": 1777306666709,
       "ruleId": "1h:10",
       "tfKey": "1h",
       "action": {
         "kind": "PENDING",
         "side": "SHORT",
-        "htfEntryPrice": 76763.71,
-        "tpPct": 3.000000000000009,
-        "slPct": 1.4999999999999856
+        "htfEntryPrice": 76833.35,
+        "tpPct": 3.0000000000000115,
+        "slPct": 1.4999999999999964
       },
       "dryRun": false
     },
     {
-      "ts": 1777310261432,
+      "ts": 1777306666722,
       "ruleId": "1h:4",
       "tfKey": "1h",
       "action": {
         "kind": "PENDING",
         "side": "SHORT",
-        "htfEntryPrice": 76763.71,
-        "tpPct": 3.000000000000009,
-        "slPct": 1.0000000000000093
+        "htfEntryPrice": 76833.35,
+        "tpPct": 3.0000000000000115,
+        "slPct": 1.0000000000000102
       },
       "dryRun": false
     },
     {
-      "ts": 1777310261436,
+      "ts": 1777306666733,
       "ruleId": "1h:5",
       "tfKey": "1h",
       "action": {
         "kind": "PENDING",
         "side": "SHORT",
-        "htfEntryPrice": 76763.71,
-        "tpPct": 3.000000000000009,
-        "slPct": 1.0000000000000093
+        "htfEntryPrice": 76833.35,
+        "tpPct": 3.0000000000000115,
+        "slPct": 1.0000000000000102
       },
       "dryRun": false
     },
     {
-      "ts": 1777310262044,
+      "ts": 1777306802238,
       "ruleId": "1h:10",
       "tfKey": "1h",
       "action": {
         "kind": "ENTRY",
         "side": "SHORT",
-        "entryPrice": 76744.9,
-        "tpPrice": 74442.55299999999,
-        "slPrice": 77896.07349999998,
+        "entryPrice": 76831.43,
+        "tpPrice": 74526.48709999998,
+        "slPrice": 77983.90144999999,
         "qty": 0.001,
-        "confirmedBy": "Stoch5m K=81.9 > 80"
+        "confirmedBy": "Stoch5m K=84.4 > 80"
       },
       "dryRun": false
     },
     {
-      "ts": 1777310262289,
+      "ts": 1777306802582,
       "ruleId": "1h:10",
       "tfKey": "1h",
       "action": {
         "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777310262297,
+      "ts": 1777306802594,
       "ruleId": "1h:4",
       "tfKey": "1h",
       "action": {
         "kind": "ENTRY",
         "side": "SHORT",
-        "entryPrice": 76744.9,
-        "tpPrice": 74442.55299999999,
-        "slPrice": 77512.349,
+        "entryPrice": 76831.43,
+        "tpPrice": 74526.48709999998,
+        "slPrice": 77599.74429999999,
         "qty": 0.001,
-        "confirmedBy": "Stoch5m K=81.9 > 80"
+        "confirmedBy": "Stoch5m K=84.4 > 80"
       },
       "dryRun": false
     },
     {
-      "ts": 1777310262511,
+      "ts": 1777306802940,
       "ruleId": "1h:4",
       "tfKey": "1h",
       "action": {
         "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777310262523,
+      "ts": 1777306802951,
       "ruleId": "1h:5",
       "tfKey": "1h",
       "action": {
         "kind": "ENTRY",
         "side": "SHORT",
-        "entryPrice": 76744.9,
-        "tpPrice": 74442.55299999999,
-        "slPrice": 77512.349,
+        "entryPrice": 76831.43,
+        "tpPrice": 74526.48709999998,
+        "slPrice": 77599.74429999999,
         "qty": 0.001,
-        "confirmedBy": "Stoch5m K=81.9 > 80"
+        "confirmedBy": "Stoch5m K=84.4 > 80"
       },
       "dryRun": false
     },
     {
-      "ts": 1777310262758,
+      "ts": 1777306803340,
       "ruleId": "1h:5",
       "tfKey": "1h",
       "action": {
         "kind": "ERROR",
-        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777310754941,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 1m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777311041985,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76895.69,
-        "tpPrice": 78049.12535,
-        "slPrice": 69206.121,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777311972037,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76889.88,
-        "tpPrice": 78043.2282,
-        "slPrice": 69200.892,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777311972436,
-      "ruleId": "reconcile",
-      "tfKey": "live",
-      "action": {
-        "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.018→0.017 (binance 0.017), SHORT 0.014→0.014 (binance 0.014)."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312025573,
-      "ruleId": "reconcile",
-      "tfKey": "live",
-      "action": {
-        "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.017→0.018 (binance 0.018), SHORT 0.014→0.014 (binance 0.014). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312043994,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 9m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312272042,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "PENDING",
-        "side": "SHORT",
-        "htfEntryPrice": 76779.88,
-        "tpPct": 2.9999999999999973,
-        "slPct": 1.4999999999999987
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312272061,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "PENDING",
-        "side": "SHORT",
-        "htfEntryPrice": 76779.88,
-        "tpPct": 2.9999999999999973,
-        "slPct": 1.0000000000000053
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312272071,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "PENDING",
-        "side": "SHORT",
-        "htfEntryPrice": 76779.88,
-        "tpPct": 2.9999999999999973,
-        "slPct": 1.0000000000000053
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312872026,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76709.05,
-        "tpPrice": 77859.68574999999,
-        "slPrice": 69038.145,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312873447,
-      "ruleId": "reconcile",
-      "tfKey": "live",
-      "action": {
-        "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.019→0.018 (binance 0.018), SHORT 0.014→0.014 (binance 0.014)."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312873464,
-      "ruleId": "1h:10",
-      "tfKey": "1h",
-      "action": {
-        "kind": "DISCARD",
-        "reason": "rule no longer firing"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312873468,
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "action": {
-        "kind": "DISCARD",
-        "reason": "rule no longer firing"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312873471,
-      "ruleId": "1h:5",
-      "tfKey": "1h",
-      "action": {
-        "kind": "DISCARD",
-        "reason": "rule no longer firing"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777312932947,
-      "ruleId": "reconcile",
-      "tfKey": "live",
-      "action": {
-        "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.018→0.019 (binance 0.019), SHORT 0.014→0.014 (binance 0.014). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777313771990,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76753.8,
-        "tpPrice": 77905.10699999999,
-        "slPrice": 69078.42,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777314672048,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76682.01,
-        "tpPrice": 77832.24014999998,
-        "slPrice": 69013.809,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777314672914,
-      "ruleId": "reconcile",
-      "tfKey": "live",
-      "action": {
-        "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.021→0.020 (binance 0.020), SHORT 0.014→0.014 (binance 0.014)."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777314732829,
-      "ruleId": "reconcile",
-      "tfKey": "live",
-      "action": {
-        "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.020→0.021 (binance 0.021), SHORT 0.014→0.014 (binance 0.014). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777315511167,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76729.24,
-        "tpPrice": 77880.1786,
-        "slPrice": 69056.316,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777316411140,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76833.17,
-        "tpPrice": 77985.66754999998,
-        "slPrice": 69149.853,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317311425,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76894.7,
-        "tpPrice": 78048.12049999999,
-        "slPrice": 69205.23,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317911193,
+      "ts": 1777306922262,
       "ruleId": "15m:2",
       "tfKey": "15m",
       "action": {
         "kind": "ENTRY",
         "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 74436.1316,
-        "slPrice": 77889.35419999999,
+        "entryPrice": 76761.01,
+        "tpPrice": 74458.1797,
+        "slPrice": 77912.42514999998,
         "qty": 0.001,
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
     },
     {
-      "ts": 1777317911436,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 75203.5144,
-        "slPrice": 78273.0456,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317911667,
-      "ruleId": "15m:11",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 75203.5144,
-        "slPrice": 78273.0456,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317911940,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 75203.5144,
-        "slPrice": 78273.0456,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317912186,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 75203.5144,
-        "slPrice": 78273.0456,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317912473,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 74436.1316,
-        "slPrice": 77889.35419999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317912702,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 75203.5144,
-        "slPrice": 78273.0456,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777317912976,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76738.28,
-        "tpPrice": 75203.5144,
-        "slPrice": 78273.0456,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211203,
+      "ts": 1777306922604,
       "ruleId": "15m:2",
       "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 5m (rule 15m:2)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211205,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:8)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211208,
-      "ruleId": "15m:11",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:11)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211210,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:12)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211212,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:9)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211214,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:3)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211217,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:22)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318211219,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:23)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777318871152,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76694.24,
-        "tpPrice": 77844.6536,
-        "slPrice": 69024.816,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777319111163,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 6m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777320072105,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76868.01,
-        "tpPrice": 78021.03014999999,
-        "slPrice": 69181.209,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777320072515,
-      "ruleId": "reconcile",
-      "tfKey": "live",
       "action": {
         "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.026→0.025 (binance 0.025), SHORT 0.022→0.022 (binance 0.022)."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777320132344,
-      "ruleId": "reconcile",
-      "tfKey": "live",
+      "ts": 1777306922635,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76761.01,
+        "tpPrice": 75225.7898,
+        "slPrice": 78296.23019999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306922991,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
       "action": {
         "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.025→0.026 (binance 0.026), SHORT 0.022→0.022 (binance 0.022). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777320911143,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76910.63,
-        "tpPrice": 78064.28945,
-        "slPrice": 69219.56700000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777321811146,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76990.64,
-        "tpPrice": 78145.4996,
-        "slPrice": 69291.576,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777322711183,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76992.95,
-        "tpPrice": 78147.84425,
-        "slPrice": 69293.655,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777322771153,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76940.53,
-        "tpPrice": 75401.7194,
-        "slPrice": 78479.3406,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777322771408,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76940.53,
-        "tpPrice": 75401.7194,
-        "slPrice": 78479.3406,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777323611155,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76935.94,
-        "tpPrice": 75397.2212,
-        "slPrice": 78474.6588,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777323611429,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76935.94,
-        "tpPrice": 75397.2212,
-        "slPrice": 78474.6588,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324391155,
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76842.89,
-        "tpPrice": 74537.6033,
-        "slPrice": 77995.53335,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324391476,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76842.89,
-        "tpPrice": 75306.0322,
-        "slPrice": 78379.7478,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324391710,
+      "ts": 1777306923022,
       "ruleId": "15m:11",
       "tfKey": "15m",
       "action": {
         "kind": "ENTRY",
         "side": "SHORT",
-        "entryPrice": 76842.89,
-        "tpPrice": 75306.0322,
-        "slPrice": 78379.7478,
+        "entryPrice": 76761.01,
+        "tpPrice": 75225.7898,
+        "slPrice": 78296.23019999999,
         "qty": 0.001,
         "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
     },
     {
-      "ts": 1777324391934,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76842.89,
-        "tpPrice": 75306.0322,
-        "slPrice": 78379.7478,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324392189,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76842.89,
-        "tpPrice": 75306.0322,
-        "slPrice": 78379.7478,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324392428,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76842.89,
-        "tpPrice": 74537.6033,
-        "slPrice": 77995.53335,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324511183,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76873.97,
-        "tpPrice": 75336.4906,
-        "slPrice": 78411.4494,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777324511418,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76873.97,
-        "tpPrice": 75336.4906,
-        "slPrice": 78411.4494,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777325676025,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76940.42,
-        "tpPrice": 75401.6116,
-        "slPrice": 78479.22839999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777325676394,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76940.42,
-        "tpPrice": 75401.6116,
-        "slPrice": 78479.22839999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777325843455,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76981.53,
-        "tpPrice": 78136.25295,
-        "slPrice": 69283.37700000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326323527,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76882.93,
-        "tpPrice": 75345.2714,
-        "slPrice": 78420.58859999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326323751,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76882.93,
-        "tpPrice": 75345.2714,
-        "slPrice": 78420.58859999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326367549,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 10m (rule 15m:22)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326367560,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 10m (rule 15m:23)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326474314,
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76850,
-        "tpPrice": 74544.5,
-        "slPrice": 78002.74999999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326474633,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76850,
-        "tpPrice": 75313,
-        "slPrice": 78387,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326474867,
+      "ts": 1777306923354,
       "ruleId": "15m:11",
       "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76850,
-        "tpPrice": 75313,
-        "slPrice": 78387,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326475142,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76850,
-        "tpPrice": 75313,
-        "slPrice": 78387,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326475377,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76850,
-        "tpPrice": 75313,
-        "slPrice": 78387,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777326475664,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76850,
-        "tpPrice": 74544.5,
-        "slPrice": 78002.74999999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327254527,
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76784.72,
-        "tpPrice": 74481.1784,
-        "slPrice": 77936.4908,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327254845,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76784.72,
-        "tpPrice": 75249.0256,
-        "slPrice": 78320.41440000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327255096,
-      "ruleId": "15m:11",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76784.72,
-        "tpPrice": 75249.0256,
-        "slPrice": 78320.41440000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327255335,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76784.72,
-        "tpPrice": 75249.0256,
-        "slPrice": 78320.41440000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327255556,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76784.72,
-        "tpPrice": 75249.0256,
-        "slPrice": 78320.41440000001,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327255792,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "SHORT",
-        "entryPrice": 76784.72,
-        "tpPrice": 74481.1784,
-        "slPrice": 77936.4908,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327256037,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777327256043,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328154335,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328154337,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328394255,
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328394260,
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328394265,
-      "ruleId": "15m:11",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328394268,
-      "ruleId": "15m:12",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328394272,
-      "ruleId": "15m:9",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328394275,
-      "ruleId": "15m:3",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328718904,
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777328718911,
-      "ruleId": "15m:23",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "stack full 50/50 SHORT"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777329005829,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76979.4,
-        "tpPrice": 78134.09099999999,
-        "slPrice": 69281.45999999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777329120515,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 9m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777329604515,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 1m (rule 15m:16)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777329620298,
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "action": {
-        "kind": "ENTRY",
-        "side": "LONG",
-        "entryPrice": 76961.9,
-        "tpPrice": 78116.32849999999,
-        "slPrice": 69265.70999999999,
-        "qty": 0.001,
-        "confirmedBy": "15m skip-LTF (entry HTF close)"
-      },
-      "dryRun": false
-    },
-    {
-      "ts": 1777329620618,
-      "ruleId": "reconcile",
-      "tfKey": "live",
       "action": {
         "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.032→0.031 (binance 0.031), SHORT 0.050→0.050 (binance 0.050)."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777329650691,
-      "ruleId": "reconcile",
-      "tfKey": "live",
+      "ts": 1777306923386,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76761.01,
+        "tpPrice": 75225.7898,
+        "slPrice": 78296.23019999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306923733,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
       "action": {
         "kind": "ERROR",
-        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.031→0.032 (binance 0.032), SHORT 0.050→0.050 (binance 0.050). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777329741341,
-      "ruleId": "15m:16",
+      "ts": 1777306923767,
+      "ruleId": "15m:9",
       "tfKey": "15m",
       "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 8m (rule 15m:16)"
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76761.01,
+        "tpPrice": 75225.7898,
+        "slPrice": 78296.23019999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
       },
       "dryRun": false
     },
     {
-      "ts": 1777329769491,
-      "ruleId": "15m:16",
+      "ts": 1777306924120,
+      "ruleId": "15m:9",
       "tfKey": "15m",
       "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 8m (rule 15m:16)"
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     },
     {
-      "ts": 1777329937300,
+      "ts": 1777306924158,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76761.01,
+        "tpPrice": 74458.1797,
+        "slPrice": 77912.42514999998,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306924513,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306924549,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76761.01,
+        "tpPrice": 75225.7898,
+        "slPrice": 78296.23019999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306924894,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306924930,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76761.01,
+        "tpPrice": 75225.7898,
+        "slPrice": 78296.23019999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306925282,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.199.57.110\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347798522,
       "ruleId": "15m:16",
       "tfKey": "15m",
       "action": {
-        "kind": "BLOCK",
-        "reason": "per-rule cooldown 5m (rule 15m:16)"
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76802.6,
+        "tpPrice": 77954.639,
+        "slPrice": 69122.34000000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347798766,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.63.123.180\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347798808,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76802.6,
+        "tpPct": 3.000000000000011,
+        "slPct": 1.4999999999999867
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347798850,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76802.6,
+        "tpPct": 3.000000000000011,
+        "slPct": 0.9999999999999974
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347798884,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76802.6,
+        "tpPct": 3.000000000000011,
+        "slPct": 0.9999999999999974
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347806680,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76802.6,
+        "tpPrice": 74498.522,
+        "slPrice": 77954.639,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=97.4 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347807018,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.63.123.180\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347807073,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76802.6,
+        "tpPrice": 74498.522,
+        "slPrice": 77570.626,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=97.4 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347807336,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.63.123.180\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347807352,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76802.6,
+        "tpPrice": 74498.522,
+        "slPrice": 77570.626,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=97.4 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777347807602,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 103.63.123.180\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
       },
       "dryRun": false
     }
   ],
   "firedIds": {
-    "15m:22": 1777326323530,
-    "15m:23": 1777326323755,
-    "15m:16": 1777329620307,
-    "1h:10": 1777310262046,
-    "1h:4": 1777310262301,
-    "1h:5": 1777310262528,
-    "15m:2": 1777327254529,
-    "15m:8": 1777327254852,
-    "15m:11": 1777327255098,
-    "15m:12": 1777327255339,
-    "15m:9": 1777327255562,
-    "15m:3": 1777327255798
+    "15m:22": 1777306924561,
+    "15m:23": 1777306924942,
+    "1h:24": 1777188934551,
+    "1h:26": 1777180445851,
+    "1h:25": 1777180446145,
+    "15m:16": 1777347798533,
+    "1h:10": 1777347806684,
+    "1h:4": 1777347807086,
+    "1h:5": 1777347807358,
+    "15m:2": 1777306922270,
+    "15m:8": 1777306922649,
+    "15m:11": 1777306923034,
+    "15m:12": 1777306923398,
+    "15m:9": 1777306923778,
+    "15m:3": 1777306924170
   },
   "trackedPositions": [
     {
@@ -3094,6 +1934,15 @@
       "entryMs": 1777271453584,
       "tpPrice": 81509.92500000003,
       "slPrice": 75687.78750000002
+    },
+    {
+      "id": "manual:1777272066775-LONG-0-qn8s4",
+      "side": "LONG",
+      "qty": 0.001,
+      "entryPrice": 77578.90000001004,
+      "entryMs": 1777272066775,
+      "tpPrice": 81457.84500001054,
+      "slPrice": 75639.42750000978
     },
     {
       "id": "manual:1777272774288-LONG-0-lyawh",
@@ -3229,488 +2078,11 @@
       "tpPrice": 76247.479,
       "slPrice": 79359.621,
       "entryMs": 1777286014411
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76895.69,
-      "tpPrice": 78049.12535,
-      "slPrice": 69206.121,
-      "entryMs": 1777311042350
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76889.88,
-      "tpPrice": 78043.2282,
-      "slPrice": 69200.892,
-      "entryMs": 1777311972384
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76709.05,
-      "tpPrice": 77859.68574999999,
-      "slPrice": 69038.145,
-      "entryMs": 1777312873391
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76753.8,
-      "tpPrice": 77905.10699999999,
-      "slPrice": 69078.42,
-      "entryMs": 1777313774177
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76682.01,
-      "tpPrice": 77832.24014999998,
-      "slPrice": 69013.809,
-      "entryMs": 1777314672883
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76729.24,
-      "tpPrice": 77880.1786,
-      "slPrice": 69056.316,
-      "entryMs": 1777315511448
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76833.17,
-      "tpPrice": 77985.66754999998,
-      "slPrice": 69149.853,
-      "entryMs": 1777316411381
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76894.7,
-      "tpPrice": 78048.12049999999,
-      "slPrice": 69205.23,
-      "entryMs": 1777317311775
-    },
-    {
-      "id": "15m:2",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 74436.1316,
-      "slPrice": 77889.35419999999,
-      "entryMs": 1777317911428
-    },
-    {
-      "id": "15m:8",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 75203.5144,
-      "slPrice": 78273.0456,
-      "entryMs": 1777317911664
-    },
-    {
-      "id": "15m:11",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 75203.5144,
-      "slPrice": 78273.0456,
-      "entryMs": 1777317911934
-    },
-    {
-      "id": "15m:12",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 75203.5144,
-      "slPrice": 78273.0456,
-      "entryMs": 1777317912181
-    },
-    {
-      "id": "15m:9",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 75203.5144,
-      "slPrice": 78273.0456,
-      "entryMs": 1777317912465
-    },
-    {
-      "id": "15m:3",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 74436.1316,
-      "slPrice": 77889.35419999999,
-      "entryMs": 1777317912695
-    },
-    {
-      "id": "15m:22",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 75203.5144,
-      "slPrice": 78273.0456,
-      "entryMs": 1777317912968
-    },
-    {
-      "id": "15m:23",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76738.28,
-      "tpPrice": 75203.5144,
-      "slPrice": 78273.0456,
-      "entryMs": 1777317913207
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76694.24,
-      "tpPrice": 77844.6536,
-      "slPrice": 69024.816,
-      "entryMs": 1777318871610
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76868.01,
-      "tpPrice": 78021.03014999999,
-      "slPrice": 69181.209,
-      "entryMs": 1777320072464
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76910.63,
-      "tpPrice": 78064.28945,
-      "slPrice": 69219.56700000001,
-      "entryMs": 1777320911477
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76990.64,
-      "tpPrice": 78145.4996,
-      "slPrice": 69291.576,
-      "entryMs": 1777321811396
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76992.95,
-      "tpPrice": 78147.84425,
-      "slPrice": 69293.655,
-      "entryMs": 1777322711508
-    },
-    {
-      "id": "15m:22",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76940.53,
-      "tpPrice": 75401.7194,
-      "slPrice": 78479.3406,
-      "entryMs": 1777322771400
-    },
-    {
-      "id": "15m:23",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76940.53,
-      "tpPrice": 75401.7194,
-      "slPrice": 78479.3406,
-      "entryMs": 1777322771678
-    },
-    {
-      "id": "15m:22",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76935.94,
-      "tpPrice": 75397.2212,
-      "slPrice": 78474.6588,
-      "entryMs": 1777323611421
-    },
-    {
-      "id": "15m:23",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76935.94,
-      "tpPrice": 75397.2212,
-      "slPrice": 78474.6588,
-      "entryMs": 1777323611683
-    },
-    {
-      "id": "15m:2",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76842.89,
-      "tpPrice": 74537.6033,
-      "slPrice": 77995.53335,
-      "entryMs": 1777324391468
-    },
-    {
-      "id": "15m:8",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76842.89,
-      "tpPrice": 75306.0322,
-      "slPrice": 78379.7478,
-      "entryMs": 1777324391706
-    },
-    {
-      "id": "15m:11",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76842.89,
-      "tpPrice": 75306.0322,
-      "slPrice": 78379.7478,
-      "entryMs": 1777324391928
-    },
-    {
-      "id": "15m:12",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76842.89,
-      "tpPrice": 75306.0322,
-      "slPrice": 78379.7478,
-      "entryMs": 1777324392183
-    },
-    {
-      "id": "15m:9",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76842.89,
-      "tpPrice": 75306.0322,
-      "slPrice": 78379.7478,
-      "entryMs": 1777324392419
-    },
-    {
-      "id": "15m:3",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76842.89,
-      "tpPrice": 74537.6033,
-      "slPrice": 77995.53335,
-      "entryMs": 1777324392726
-    },
-    {
-      "id": "15m:22",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76873.97,
-      "tpPrice": 75336.4906,
-      "slPrice": 78411.4494,
-      "entryMs": 1777324511411
-    },
-    {
-      "id": "15m:23",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76873.97,
-      "tpPrice": 75336.4906,
-      "slPrice": 78411.4494,
-      "entryMs": 1777324511651
-    },
-    {
-      "id": "15m:22",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76940.42,
-      "tpPrice": 75401.6116,
-      "slPrice": 78479.22839999999,
-      "entryMs": 1777325676385
-    },
-    {
-      "id": "15m:23",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76940.42,
-      "tpPrice": 75401.6116,
-      "slPrice": 78479.22839999999,
-      "entryMs": 1777325676613
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76981.53,
-      "tpPrice": 78136.25295,
-      "slPrice": 69283.37700000001,
-      "entryMs": 1777325843689
-    },
-    {
-      "id": "15m:22",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76882.93,
-      "tpPrice": 75345.2714,
-      "slPrice": 78420.58859999999,
-      "entryMs": 1777326323745
-    },
-    {
-      "id": "15m:23",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76882.93,
-      "tpPrice": 75345.2714,
-      "slPrice": 78420.58859999999,
-      "entryMs": 1777326323983
-    },
-    {
-      "id": "15m:2",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76850,
-      "tpPrice": 74544.5,
-      "slPrice": 78002.74999999999,
-      "entryMs": 1777326474619
-    },
-    {
-      "id": "15m:8",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76850,
-      "tpPrice": 75313,
-      "slPrice": 78387,
-      "entryMs": 1777326474864
-    },
-    {
-      "id": "15m:11",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76850,
-      "tpPrice": 75313,
-      "slPrice": 78387,
-      "entryMs": 1777326475136
-    },
-    {
-      "id": "15m:12",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76850,
-      "tpPrice": 75313,
-      "slPrice": 78387,
-      "entryMs": 1777326475369
-    },
-    {
-      "id": "15m:9",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76850,
-      "tpPrice": 75313,
-      "slPrice": 78387,
-      "entryMs": 1777326475656
-    },
-    {
-      "id": "15m:3",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76850,
-      "tpPrice": 74544.5,
-      "slPrice": 78002.74999999999,
-      "entryMs": 1777326475915
-    },
-    {
-      "id": "15m:2",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76784.72,
-      "tpPrice": 74481.1784,
-      "slPrice": 77936.4908,
-      "entryMs": 1777327254837
-    },
-    {
-      "id": "15m:8",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76784.72,
-      "tpPrice": 75249.0256,
-      "slPrice": 78320.41440000001,
-      "entryMs": 1777327255093
-    },
-    {
-      "id": "15m:11",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76784.72,
-      "tpPrice": 75249.0256,
-      "slPrice": 78320.41440000001,
-      "entryMs": 1777327255328
-    },
-    {
-      "id": "15m:12",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76784.72,
-      "tpPrice": 75249.0256,
-      "slPrice": 78320.41440000001,
-      "entryMs": 1777327255549
-    },
-    {
-      "id": "15m:9",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76784.72,
-      "tpPrice": 75249.0256,
-      "slPrice": 78320.41440000001,
-      "entryMs": 1777327255784
-    },
-    {
-      "id": "15m:3",
-      "side": "SHORT",
-      "qty": 0.001,
-      "entryPrice": 76784.72,
-      "tpPrice": 74481.1784,
-      "slPrice": 77936.4908,
-      "entryMs": 1777327256029
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76979.4,
-      "tpPrice": 78134.09099999999,
-      "slPrice": 69281.45999999999,
-      "entryMs": 1777329006113
-    },
-    {
-      "id": "15m:16",
-      "side": "LONG",
-      "qty": 0.001,
-      "entryPrice": 76961.9,
-      "tpPrice": 78116.32849999999,
-      "slPrice": 69265.70999999999,
-      "entryMs": 1777329620594
-    },
-    {
-      "id": "manual:1777329650687-LONG-0-k0nim",
-      "side": "LONG",
-      "qty": 0.00099999999999998,
-      "entryPrice": 76673.85000001211,
-      "entryMs": 1777329650687,
-      "tpPrice": 80507.54250001273,
-      "slPrice": 74757.0037500118
     }
   ],
   "pendingAlerts": [],
   "binanceSnapshot": {
-    "ts": 1777330070542,
+    "ts": 1777288467717,
     "account": {
       "feeTier": 0,
       "canTrade": true,
@@ -3720,17 +2092,17 @@
       "tradeGroupId": -1,
       "updateTime": 0,
       "multiAssetsMargin": false,
-      "totalInitialMargin": "50.52259473",
-      "totalMaintMargin": "25.26129735",
-      "totalWalletBalance": "75.96497522",
-      "totalUnrealizedProfit": "-5.37980887",
-      "totalMarginBalance": "70.58516635",
-      "totalPositionInitialMargin": "50.52259473",
+      "totalInitialMargin": "18.64930224",
+      "totalMaintMargin": "9.32465111",
+      "totalWalletBalance": "77.95304814",
+      "totalUnrealizedProfit": "1.20635193",
+      "totalMarginBalance": "79.15940007",
+      "totalPositionInitialMargin": "18.64930224",
       "totalOpenOrderInitialMargin": "0.00000000",
-      "totalCrossWalletBalance": "75.96497522",
-      "totalCrossUnPnl": "-5.37980887",
-      "availableBalance": "20.01935585",
-      "maxWithdrawAmount": "20.01935585",
+      "totalCrossWalletBalance": "77.95304814",
+      "totalCrossUnPnl": "1.20635193",
+      "availableBalance": "60.50008230",
+      "maxWithdrawAmount": "60.50008230",
       "assets": [
         {
           "asset": "FDUSD",
@@ -3862,19 +2234,19 @@
         },
         {
           "asset": "USDT",
-          "walletBalance": "75.96497522",
-          "unrealizedProfit": "-5.37980887",
-          "marginBalance": "70.58516635",
-          "maintMargin": "25.26129735",
-          "initialMargin": "50.52259473",
-          "positionInitialMargin": "50.52259473",
+          "walletBalance": "77.95304814",
+          "unrealizedProfit": "1.20635193",
+          "marginBalance": "79.15940007",
+          "maintMargin": "9.32465111",
+          "initialMargin": "18.64930224",
+          "positionInitialMargin": "18.64930224",
           "openOrderInitialMargin": "0.00000000",
-          "maxWithdrawAmount": "20.01935585",
-          "crossWalletBalance": "75.96497522",
-          "crossUnPnl": "-5.37980887",
-          "availableBalance": "20.01935585",
+          "maxWithdrawAmount": "60.50008230",
+          "crossWalletBalance": "77.95304814",
+          "crossUnPnl": "1.20635193",
+          "availableBalance": "60.50008230",
           "marginAvailable": true,
-          "updateTime": 1777329620555
+          "updateTime": 1777286014373
         },
         {
           "asset": "USD1",
@@ -31272,41 +29644,41 @@
         },
         {
           "symbol": "BTCUSDT",
-          "initialMargin": "19.71613453",
-          "maintMargin": "9.85806726",
-          "unrealizedProfit": "-7.53978423",
-          "positionInitialMargin": "19.71613453",
+          "initialMargin": "9.94629453",
+          "maintMargin": "4.97314726",
+          "unrealizedProfit": "0.46261553",
+          "positionInitialMargin": "9.94629453",
           "openOrderInitialMargin": "0",
           "leverage": "125",
           "isolated": false,
-          "entryPrice": "77251.76875",
-          "breakEvenPrice": "77305.63947186",
+          "entryPrice": "77676.5125",
+          "breakEvenPrice": "77745.84043125",
           "maxNotional": "300000",
           "positionSide": "LONG",
-          "positionAmt": "0.032",
-          "notional": "2464.51681576",
+          "positionAmt": "0.016",
+          "notional": "1243.28681553",
           "isolatedWallet": "0",
-          "updateTime": 1777329620555,
+          "updateTime": 1777279533946,
           "bidNotional": "0",
           "askNotional": "0"
         },
         {
           "symbol": "BTCUSDT",
-          "initialMargin": "30.80646020",
-          "maintMargin": "15.40323009",
-          "unrealizedProfit": "2.15997536",
-          "positionInitialMargin": "30.80646020",
+          "initialMargin": "8.70300771",
+          "maintMargin": "4.35150385",
+          "unrealizedProfit": "0.74373640",
+          "positionInitialMargin": "8.70300771",
           "openOrderInitialMargin": "0",
           "leverage": "125",
           "isolated": false,
-          "entryPrice": "77059.34999998",
-          "breakEvenPrice": "77020.82032499",
+          "entryPrice": "77758.55",
+          "breakEvenPrice": "77719.670725",
           "maxNotional": "300000",
           "positionSide": "SHORT",
-          "positionAmt": "-0.050",
-          "notional": "-3850.80752463",
+          "positionAmt": "-0.014",
+          "notional": "-1087.87596359",
           "isolatedWallet": "0",
-          "updateTime": 1777327255994,
+          "updateTime": 1777286014373,
           "bidNotional": "0",
           "askNotional": "0"
         },
@@ -32555,849 +30927,848 @@
     "positions": [
       {
         "symbol": "BTCUSDT",
-        "positionAmt": "0.032",
-        "entryPrice": "77251.76875",
-        "breakEvenPrice": "77305.63947186",
-        "markPrice": "77016.15049275",
-        "unRealizedProfit": "-7.53978423",
-        "liquidationPrice": "79489.08092640",
+        "positionAmt": "0.016",
+        "entryPrice": "77676.5125",
+        "breakEvenPrice": "77745.84043125",
+        "markPrice": "77705.42597101",
+        "unRealizedProfit": "0.46261553",
+        "liquidationPrice": "40559.28290426",
         "leverage": "125",
         "maxNotionalValue": "300000",
         "marginType": "cross",
         "isolatedMargin": "0.00000000",
         "isAutoAddMargin": "false",
         "positionSide": "LONG",
-        "notional": "2464.51681576",
+        "notional": "1243.28681553",
         "isolatedWallet": "0",
-        "updateTime": 1777329620555,
+        "updateTime": 1777279533946,
         "isolated": false,
-        "adlQuantile": 0
+        "adlQuantile": 2
       },
       {
         "symbol": "BTCUSDT",
-        "positionAmt": "-0.050",
-        "entryPrice": "77059.34999998",
-        "breakEvenPrice": "77020.82032499",
-        "markPrice": "77016.15049275",
-        "unRealizedProfit": "2.15997536",
-        "liquidationPrice": "79489.08092640",
+        "positionAmt": "-0.014",
+        "entryPrice": "77758.55",
+        "breakEvenPrice": "77719.670725",
+        "markPrice": "77705.42597101",
+        "unRealizedProfit": "0.74373640",
+        "liquidationPrice": "40559.28290426",
         "leverage": "125",
         "maxNotionalValue": "300000",
         "marginType": "cross",
         "isolatedMargin": "0.00000000",
         "isAutoAddMargin": "false",
         "positionSide": "SHORT",
-        "notional": "-3850.80752463",
+        "notional": "-1087.87596359",
         "isolatedWallet": "0",
-        "updateTime": 1777327255994,
+        "updateTime": 1777286014373,
         "isolated": false,
-        "adlQuantile": 2
+        "adlQuantile": 0
       }
     ],
     "openOrders": [],
     "recentTrades": [
       {
         "symbol": "BTCUSDT",
-        "id": 7608347827,
-        "orderId": 997316247911,
+        "id": 7599546538,
+        "orderId": 994437215834,
         "side": "BUY",
-        "price": "76748.90",
+        "price": "77642.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.74890",
-        "commission": "0.03837444",
+        "quoteQty": "77.64220",
+        "commission": "0.03882109",
         "commissionAsset": "USDT",
-        "time": 1777312873244,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777006029144,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608370373,
-        "orderId": 997326530433,
+        "id": 7599546539,
+        "orderId": 994437215834,
         "side": "BUY",
-        "price": "76749",
+        "price": "77642.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.74900",
-        "commission": "0.03837450",
+        "quoteQty": "77.64220",
+        "commission": "0.03882109",
         "commissionAsset": "USDT",
-        "time": 1777313774042,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777006029144,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608389987,
-        "orderId": 997335799706,
+        "id": 7599546540,
+        "orderId": 994437215834,
         "side": "BUY",
-        "price": "76667.20",
+        "price": "77642.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.66720",
-        "commission": "0.03833360",
+        "quoteQty": "77.64220",
+        "commission": "0.03882109",
         "commissionAsset": "USDT",
-        "time": 1777314672843,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777006029144,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608404208,
-        "orderId": 997344186316,
+        "id": 7599546541,
+        "orderId": 994437215834,
         "side": "BUY",
-        "price": "76691.80",
+        "price": "77642.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.69180",
-        "commission": "0.03834590",
+        "quoteQty": "77.64220",
+        "commission": "0.03882109",
         "commissionAsset": "USDT",
-        "time": 1777315511415,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777006029144,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608423131,
-        "orderId": 997353302134,
+        "id": 7599546542,
+        "orderId": 994437215834,
         "side": "BUY",
-        "price": "76800",
+        "price": "77642.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.80000",
-        "commission": "0.03839999",
+        "quoteQty": "77.64220",
+        "commission": "0.03882109",
         "commissionAsset": "USDT",
-        "time": 1777316411355,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777006029144,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608442135,
-        "orderId": 997362031653,
+        "id": 7599546543,
+        "orderId": 994437215834,
         "side": "BUY",
-        "price": "76863",
+        "price": "77642.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.86300",
-        "commission": "0.03843150",
+        "quoteQty": "77.64220",
+        "commission": "0.03882109",
         "commissionAsset": "USDT",
-        "time": 1777317311733,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777006029144,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608453659,
-        "orderId": 997368732343,
+        "id": 7601512676,
+        "orderId": 994980130903,
         "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
+        "price": "77495.40",
+        "qty": "0.006",
+        "realizedPnl": "-0.88080000",
+        "quoteQty": "464.97240",
+        "commission": "0.23248620",
         "commissionAsset": "USDT",
-        "time": 1777317911404,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
+        "time": 1777052051793,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": false
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608453666,
-        "orderId": 997368733585,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317911642,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608453667,
-        "orderId": 997368734966,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317911915,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608453670,
-        "orderId": 997368737299,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317912162,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608453675,
-        "orderId": 997368738748,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317912445,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608453676,
-        "orderId": 997368740094,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317912674,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608453678,
-        "orderId": 997368742144,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317912925,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608453681,
-        "orderId": 997368744929,
-        "side": "SELL",
-        "price": "76697",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.69700",
-        "commission": "0.03834850",
-        "commissionAsset": "USDT",
-        "time": 1777317913183,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608525082,
-        "orderId": 997381088535,
+        "id": 7602892111,
+        "orderId": 995691168469,
         "side": "BUY",
-        "price": "76670",
+        "price": "77237.20",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.67000",
-        "commission": "0.03833500",
+        "quoteQty": "77.23720",
+        "commission": "0.03861860",
         "commissionAsset": "USDT",
-        "time": 1777318871583,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777140633575,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608560014,
-        "orderId": 997393071460,
+        "id": 7603267112,
+        "orderId": 995906561655,
+        "side": "SELL",
+        "price": "77340",
+        "qty": "0.001",
+        "realizedPnl": "0.10280000",
+        "quoteQty": "77.34000",
+        "commission": "0.03867000",
+        "commissionAsset": "USDT",
+        "time": 1777175580387,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603267119,
+        "orderId": 995906568414,
+        "side": "SELL",
+        "price": "77340",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.34000",
+        "commission": "0.03867000",
+        "commissionAsset": "USDT",
+        "time": 1777175581049,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603272547,
+        "orderId": 995910441088,
+        "side": "SELL",
+        "price": "77340.30",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.34030",
+        "commission": "0.03867015",
+        "commissionAsset": "USDT",
+        "time": 1777176060516,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603272555,
+        "orderId": 995910450656,
+        "side": "SELL",
+        "price": "77340.30",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.34030",
+        "commission": "0.03867015",
+        "commissionAsset": "USDT",
+        "time": 1777176061159,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603278564,
+        "orderId": 995914663065,
         "side": "BUY",
-        "price": "76818.10",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.81810",
-        "commission": "0.03840905",
+        "price": "77397.10",
+        "qty": "0.003",
+        "realizedPnl": "-0.17070000",
+        "quoteQty": "232.19130",
+        "commission": "0.11609565",
         "commissionAsset": "USDT",
-        "time": 1777320072443,
-        "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "time": 1777176660440,
+        "positionSide": "BOTH",
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608584729,
-        "orderId": 997399664367,
+        "id": 7603322631,
+        "orderId": 995932174568,
         "side": "BUY",
-        "price": "76870",
+        "price": "77720.30",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.87000",
-        "commission": "0.03843499",
+        "quoteQty": "77.72030",
+        "commission": "0.03886015",
         "commissionAsset": "USDT",
-        "time": 1777320911463,
+        "time": 1777178974026,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608596956,
-        "orderId": 997405421952,
+        "id": 7603348774,
+        "orderId": 995938821616,
         "side": "BUY",
-        "price": "76944.90",
+        "price": "77730.50",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.94490",
-        "commission": "0.03847245",
+        "quoteQty": "77.73050",
+        "commission": "0.03886524",
         "commissionAsset": "USDT",
-        "time": 1777321811365,
+        "time": 1777179613818,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608612920,
-        "orderId": 997412634273,
+        "id": 7603359395,
+        "orderId": 995943260305,
         "side": "BUY",
-        "price": "76949.60",
+        "price": "77750",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.94960",
-        "commission": "0.03847480",
+        "quoteQty": "77.75000",
+        "commission": "0.03887500",
         "commissionAsset": "USDT",
-        "time": 1777322711458,
+        "time": 1777180145754,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608615052,
-        "orderId": 997413452681,
-        "side": "SELL",
-        "price": "76905.50",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.90550",
-        "commission": "0.03845275",
-        "commissionAsset": "USDT",
-        "time": 1777322771371,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608615054,
-        "orderId": 997413463655,
-        "side": "SELL",
-        "price": "76905.50",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.90550",
-        "commission": "0.03845275",
-        "commissionAsset": "USDT",
-        "time": 1777322771647,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608625496,
-        "orderId": 997420081703,
-        "side": "SELL",
-        "price": "76893.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.89340",
-        "commission": "0.03844670",
-        "commissionAsset": "USDT",
-        "time": 1777323611394,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608625497,
-        "orderId": 997420083530,
-        "side": "SELL",
-        "price": "76893.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.89340",
-        "commission": "0.03844670",
-        "commissionAsset": "USDT",
-        "time": 1777323611643,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608636088,
-        "orderId": 997425381118,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777324391386,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608636092,
-        "orderId": 997425384671,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777324391679,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608636093,
-        "orderId": 997425386523,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777324391901,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608636103,
-        "orderId": 997425390673,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777324392151,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608636174,
-        "orderId": 997425408036,
-        "side": "SELL",
-        "price": "76793.10",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79310",
-        "commission": "0.03839655",
-        "commissionAsset": "USDT",
-        "time": 1777324392389,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608636179,
-        "orderId": 997425410037,
-        "side": "SELL",
-        "price": "76793.10",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79310",
-        "commission": "0.03839655",
-        "commissionAsset": "USDT",
-        "time": 1777324392698,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608637813,
-        "orderId": 997426335252,
-        "side": "SELL",
-        "price": "76831.70",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.83170",
-        "commission": "0.03841585",
-        "commissionAsset": "USDT",
-        "time": 1777324511384,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608637814,
-        "orderId": 997426335576,
-        "side": "SELL",
-        "price": "76831.70",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.83170",
-        "commission": "0.03841585",
-        "commissionAsset": "USDT",
-        "time": 1777324511623,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608650424,
-        "orderId": 997432956094,
-        "side": "SELL",
-        "price": "76907.20",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.90720",
-        "commission": "0.03845359",
-        "commissionAsset": "USDT",
-        "time": 1777325676336,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608650425,
-        "orderId": 997432957077,
-        "side": "SELL",
-        "price": "76907.20",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.90720",
-        "commission": "0.03845359",
-        "commissionAsset": "USDT",
-        "time": 1777325676589,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608652000,
-        "orderId": 997433522114,
+        "id": 7603401102,
+        "orderId": 995946751220,
         "side": "BUY",
-        "price": "76936.70",
+        "price": "78062.50",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.93670",
-        "commission": "0.03846835",
+        "quoteQty": "78.06250",
+        "commission": "0.03903125",
         "commissionAsset": "USDT",
-        "time": 1777325843659,
+        "time": 1777180446122,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608658489,
-        "orderId": 997437594645,
-        "side": "SELL",
-        "price": "76836.60",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.83660",
-        "commission": "0.03841830",
-        "commissionAsset": "USDT",
-        "time": 1777326323719,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608658490,
-        "orderId": 997437597639,
-        "side": "SELL",
-        "price": "76836.60",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.83660",
-        "commission": "0.03841830",
-        "commissionAsset": "USDT",
-        "time": 1777326323951,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608660670,
-        "orderId": 997439036191,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777326474588,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608660671,
-        "orderId": 997439036472,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777326474832,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608660672,
-        "orderId": 997439038286,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777326475109,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608660674,
-        "orderId": 997439040098,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777326475341,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608660675,
-        "orderId": 997439042388,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777326475623,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608660677,
-        "orderId": 997439044174,
-        "side": "SELL",
-        "price": "76797.40",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.79740",
-        "commission": "0.03839870",
-        "commissionAsset": "USDT",
-        "time": 1777326475870,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608678947,
-        "orderId": 997447455853,
-        "side": "SELL",
-        "price": "76743.80",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.74380",
-        "commission": "0.03837190",
-        "commissionAsset": "USDT",
-        "time": 1777327254810,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608678948,
-        "orderId": 997447456593,
-        "side": "SELL",
-        "price": "76743.80",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.74380",
-        "commission": "0.03837190",
-        "commissionAsset": "USDT",
-        "time": 1777327255054,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608678949,
-        "orderId": 997447456962,
-        "side": "SELL",
-        "price": "76743.80",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.74380",
-        "commission": "0.03837190",
-        "commissionAsset": "USDT",
-        "time": 1777327255302,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608678957,
-        "orderId": 997447457785,
-        "side": "SELL",
-        "price": "76743.80",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.74380",
-        "commission": "0.03837190",
-        "commissionAsset": "USDT",
-        "time": 1777327255522,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608678959,
-        "orderId": 997447458114,
-        "side": "SELL",
-        "price": "76743.80",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.74380",
-        "commission": "0.03837190",
-        "commissionAsset": "USDT",
-        "time": 1777327255754,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608678960,
-        "orderId": 997447458615,
-        "side": "SELL",
-        "price": "76743.80",
-        "qty": "0.001",
-        "realizedPnl": "0",
-        "quoteQty": "76.74380",
-        "commission": "0.03837190",
-        "commissionAsset": "USDT",
-        "time": 1777327255993,
-        "positionSide": "SHORT",
-        "buyer": false,
-        "maker": false
-      },
-      {
-        "symbol": "BTCUSDT",
-        "id": 7608710136,
-        "orderId": 997463869305,
+        "id": 7603401109,
+        "orderId": 995946752589,
         "side": "BUY",
-        "price": "76938.60",
+        "price": "78062.50",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.93860",
-        "commission": "0.03846930",
+        "quoteQty": "78.06250",
+        "commission": "0.03903125",
         "commissionAsset": "USDT",
-        "time": 1777329006094,
+        "time": 1777180446404,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
       },
       {
         "symbol": "BTCUSDT",
-        "id": 7608724256,
-        "orderId": 997469179919,
+        "id": 7603490852,
+        "orderId": 995968409167,
         "side": "BUY",
-        "price": "76922.10",
+        "price": "78003.40",
         "qty": "0.001",
         "realizedPnl": "0",
-        "quoteQty": "76.92210",
-        "commission": "0.03846104",
+        "quoteQty": "78.00340",
+        "commission": "0.03900170",
         "commissionAsset": "USDT",
-        "time": 1777329620554,
+        "time": 1777182398510,
         "positionSide": "LONG",
-        "buyer": true,
-        "maker": false
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603509155,
+        "orderId": 995976043110,
+        "side": "BUY",
+        "price": "77990.70",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.99070",
+        "commission": "0.03899535",
+        "commissionAsset": "USDT",
+        "time": 1777183254582,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603582182,
+        "orderId": 996020425192,
+        "side": "BUY",
+        "price": "77923.80",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.92380",
+        "commission": "0.03896190",
+        "commissionAsset": "USDT",
+        "time": 1777188934814,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7603582183,
+        "orderId": 996020425235,
+        "side": "BUY",
+        "price": "77923.80",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.92380",
+        "commission": "0.03896190",
+        "commissionAsset": "USDT",
+        "time": 1777188934815,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606146852,
+        "orderId": 996798991310,
+        "side": "SELL",
+        "price": "77904.10",
+        "qty": "0.006",
+        "realizedPnl": "-0.02039999",
+        "quoteQty": "467.42460",
+        "commission": "0.23371230",
+        "commissionAsset": "USDT",
+        "time": 1777267209648,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606221455,
+        "orderId": 996804695447,
+        "side": "SELL",
+        "price": "77776.40",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.77640",
+        "commission": "0.03888820",
+        "commissionAsset": "USDT",
+        "time": 1777267562053,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606221533,
+        "orderId": 996804702948,
+        "side": "SELL",
+        "price": "77776.40",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.77640",
+        "commission": "0.03888820",
+        "commissionAsset": "USDT",
+        "time": 1777267562392,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606366059,
+        "orderId": 996818363449,
+        "side": "SELL",
+        "price": "77746.50",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.74650",
+        "commission": "0.03887325",
+        "commissionAsset": "USDT",
+        "time": 1777268582174,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606366066,
+        "orderId": 996818364823,
+        "side": "SELL",
+        "price": "77746.50",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.74650",
+        "commission": "0.03887325",
+        "commissionAsset": "USDT",
+        "time": 1777268582494,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606416184,
+        "orderId": 996827062405,
+        "side": "SELL",
+        "price": "77763.90",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.76390",
+        "commission": "0.03888195",
+        "commissionAsset": "USDT",
+        "time": 1777269374265,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606416187,
+        "orderId": 996827064634,
+        "side": "SELL",
+        "price": "77763.90",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.76390",
+        "commission": "0.03888195",
+        "commissionAsset": "USDT",
+        "time": 1777269374575,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606426667,
+        "orderId": 996829428273,
+        "side": "BUY",
+        "price": "77707.70",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.70770",
+        "commission": "0.03885385",
+        "commissionAsset": "USDT",
+        "time": 1777269602214,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606466221,
+        "orderId": 996837042833,
+        "side": "BUY",
+        "price": "77734.40",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.73440",
+        "commission": "0.03886719",
+        "commissionAsset": "USDT",
+        "time": 1777270266183,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606468042,
+        "orderId": 996837564692,
+        "side": "SELL",
+        "price": "77700.10",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.70010",
+        "commission": "0.03885004",
+        "commissionAsset": "USDT",
+        "time": 1777270313570,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606468045,
+        "orderId": 996837567523,
+        "side": "SELL",
+        "price": "77700.10",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.70010",
+        "commission": "0.03885004",
+        "commissionAsset": "USDT",
+        "time": 1777270313882,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606514048,
+        "orderId": 996849840244,
+        "side": "BUY",
+        "price": "77628.50",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.62850",
+        "commission": "0.03881425",
+        "commissionAsset": "USDT",
+        "time": 1777271423466,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606564063,
+        "orderId": 996857834927,
+        "side": "BUY",
+        "price": "77578.90",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.57890",
+        "commission": "0.03878945",
+        "commissionAsset": "USDT",
+        "time": 1777272036722,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606586132,
+        "orderId": 996866051017,
+        "side": "BUY",
+        "price": "77638.70",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.63870",
+        "commission": "0.03881935",
+        "commissionAsset": "USDT",
+        "time": 1777272744293,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606597058,
+        "orderId": 996871615619,
+        "side": "BUY",
+        "price": "77630.60",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.63060",
+        "commission": "0.03881529",
+        "commissionAsset": "USDT",
+        "time": 1777273211166,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606629206,
+        "orderId": 996881830214,
+        "side": "BUY",
+        "price": "77599.20",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.59920",
+        "commission": "0.03879959",
+        "commissionAsset": "USDT",
+        "time": 1777274111181,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606654248,
+        "orderId": 996892812311,
+        "side": "BUY",
+        "price": "77629.40",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.62940",
+        "commission": "0.03881470",
+        "commissionAsset": "USDT",
+        "time": 1777275011443,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606675674,
+        "orderId": 996903418018,
+        "side": "BUY",
+        "price": "77655.10",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.65510",
+        "commission": "0.03882755",
+        "commissionAsset": "USDT",
+        "time": 1777275911132,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606698472,
+        "orderId": 996910147663,
+        "side": "BUY",
+        "price": "77562.40",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.56240",
+        "commission": "0.03878120",
+        "commissionAsset": "USDT",
+        "time": 1777276811150,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606723624,
+        "orderId": 996917065031,
+        "side": "BUY",
+        "price": "77600.50",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.60050",
+        "commission": "0.03880025",
+        "commissionAsset": "USDT",
+        "time": 1777277711150,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606745495,
+        "orderId": 996925199907,
+        "side": "BUY",
+        "price": "77504.60",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.50460",
+        "commission": "0.03875230",
+        "commissionAsset": "USDT",
+        "time": 1777278611176,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606769315,
+        "orderId": 996934432585,
+        "side": "BUY",
+        "price": "77631.70",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.63170",
+        "commission": "0.03881585",
+        "commissionAsset": "USDT",
+        "time": 1777279533946,
+        "positionSide": "LONG",
+        "maker": false,
+        "buyer": true
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606916825,
+        "orderId": 996986447368,
+        "side": "SELL",
+        "price": "77775.50",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.77550",
+        "commission": "0.03888775",
+        "commissionAsset": "USDT",
+        "time": 1777284406072,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606916943,
+        "orderId": 996986450503,
+        "side": "SELL",
+        "price": "77771.20",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.77120",
+        "commission": "0.03888560",
+        "commissionAsset": "USDT",
+        "time": 1777284406365,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606928082,
+        "orderId": 996992756258,
+        "side": "SELL",
+        "price": "77779.90",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.77990",
+        "commission": "0.03888995",
+        "commissionAsset": "USDT",
+        "time": 1777285066265,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606928085,
+        "orderId": 996992758556,
+        "side": "SELL",
+        "price": "77779.90",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.77990",
+        "commission": "0.03888995",
+        "commissionAsset": "USDT",
+        "time": 1777285066602,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606939842,
+        "orderId": 996999225186,
+        "side": "SELL",
+        "price": "77769.70",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.76970",
+        "commission": "0.03888485",
+        "commissionAsset": "USDT",
+        "time": 1777286014037,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
+      },
+      {
+        "symbol": "BTCUSDT",
+        "id": 7606939843,
+        "orderId": 996999227080,
+        "side": "SELL",
+        "price": "77769.70",
+        "qty": "0.001",
+        "realizedPnl": "0",
+        "quoteQty": "77.76970",
+        "commission": "0.03888485",
+        "commissionAsset": "USDT",
+        "time": 1777286014373,
+        "positionSide": "SHORT",
+        "maker": false,
+        "buyer": false
       }
     ],
-    "dailyPnl": -3.26594506
-  },
-  "lastTrackedMutationMs": 1777329650687
+    "dailyPnl": -1.27787214
+  }
 }
