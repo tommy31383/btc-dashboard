@@ -45,7 +45,7 @@ export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000;
 //   - SAFE       🟢 TURTLE → Lowest MaxDD (3y backtest +$241k, MaxDD $792)
 // ════════════════════════════════════════════════════════════════════
 
-export type PresetKey = "AGGRESSIVE" | "BALANCED" | "SAFE";
+export type PresetKey = "AGGRESSIVE" | "BALANCED" | "SAFE" | "TOMI";
 
 export interface Preset {
   key: PresetKey;
@@ -67,12 +67,36 @@ export interface Preset {
   stochShortLevel: number;
   srProximityPct: number;
   srLookback15m: number;
+  /**
+   * Trailing SL theo PnL% milestone (anh Tommy v4.8.22 — Tomi5mALL):
+   * true → KHÔNG dùng fixed TP. Mỗi lần leveraged PnL% hit milestone N×100%,
+   * SL update lên tương ứng (N-1)×100% PnL (lag 1 milestone = 1% raw price × 100x).
+   * - PnL hit 100% → SL về 0% = breakeven
+   * - PnL hit 200% → SL về 100%
+   * - PnL hit N×100% → SL về (N-1)×100%
+   * Không có fixed TP — vị thế chỉ đóng khi giá chạm SL.
+   */
+  trailingStopEnabled?: boolean;
   // Backtest expectations (3y)
   expectedNet3y: number;
   expectedMaxDd3y: number;
 }
 
 export const PRESETS: Record<PresetKey, Preset> = {
+  // ─── TOMI (anh Tommy v4.8.22): Stoch K<5/K>95 + S/R 0.2% · TP+4% / SL-4% ───
+  // Grid sweep 70 combo TP×SL → TP4/SL4 best NET/DD ratio (ratio 1014, 3y backtest).
+  // SL rộng 4% để tránh bị quét sớm khi Stoch extreme thường có pullback trước.
+  TOMI: {
+    key: "TOMI", label: "TOMI", emoji: "🔵",
+    description: "Extreme entry K<5/K>95 · TP+4%/SL-4%",
+    tpPct: 4, slPct: 4,
+    stackMaxPerSide: 50, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    stackBetterEntryMode: "off",
+    cooldownMin: 5,
+    stochLongLevel: 5, stochShortLevel: 95,
+    srProximityPct: 0.2, srLookback15m: 50,
+    expectedNet3y: 1165062, expectedMaxDd3y: 1149,
+  },
   AGGRESSIVE: {
     key: "AGGRESSIVE", label: "WHALE", emoji: "🔴",
     description: "Highest PnL · vốn lớn",
@@ -117,7 +141,7 @@ export async function getActivePresetKey(): Promise<PresetKey> {
   if (_activePresetCache) return _activePresetCache;
   try {
     const raw = await AsyncStorage.getItem(PRESET_STORAGE_KEY);
-    if (raw && (raw === "AGGRESSIVE" || raw === "BALANCED" || raw === "SAFE")) {
+    if (raw && (raw === "AGGRESSIVE" || raw === "BALANCED" || raw === "SAFE" || raw === "TOMI")) {
       _activePresetCache = raw;
       return raw;
     }
@@ -168,6 +192,10 @@ export interface Position {
   exitFeeUsd?: number;
   pnlUsd?: number;        // gross
   pnlNetUsd?: number;     // net (gross − 2× fee)
+  /** Tomi5mALL: trailing SL active trên vị thế này */
+  trailingStopEnabled?: boolean;
+  /** Tomi5mALL: milestone PnL% cao nhất đã hit (0 = chưa trailing) */
+  lastTrailMilestone?: number;
 }
 
 export interface AccountStats {
@@ -346,6 +374,8 @@ export async function tryEntry5mBar(
     entryMs: now,
     tpPrice, slPrice,
     entryFeeUsd: FEE_PER_SIDE,
+    // Tomi5mALL: trailing SL per-position flag
+    ...(preset.trailingStopEnabled ? { trailingStopEnabled: true, lastTrailMilestone: 0 } : {}),
   };
   acc.positions.unshift(pos);
 
@@ -362,17 +392,55 @@ export async function processOpen(currentPrice: number): Promise<number> {
   const acc = await loadAccount();
   const now = Date.now();
   let closed = 0;
+  let trailMutated = false; // Tomi5mALL: SL updated but not closed → cần save
+
   for (const p of acc.positions) {
     if (p.status !== "OPEN") continue;
     let outcome: "WIN" | "LOSS" | null = null;
     let exitPrice = currentPrice;
-    if (p.side === "LONG") {
-      if (currentPrice >= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
-      else if (currentPrice <= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
+
+    if (p.trailingStopEnabled) {
+      // ── Tomi5mALL trailing SL milestone logic ──────────────────────────
+      // leveragedPnlPct = raw price move % × 100x leverage
+      const leveragedPnlPct = (p.side === "LONG"
+        ? (currentPrice - p.entryPrice) / p.entryPrice
+        : (p.entryPrice - currentPrice) / p.entryPrice) * 100 * LEVERAGE;
+      const milestone = Math.max(0, Math.floor(leveragedPnlPct / 100));
+      const lastMilestone = p.lastTrailMilestone ?? 0;
+
+      if (milestone > lastMilestone && milestone >= 1) {
+        // SL ratchet: milestone N → SL tại (N-1)×100% PnL
+        // trailRawPct = (milestone - 1) / LEVERAGE  (raw price %)
+        const trailRawPct = (milestone - 1) / LEVERAGE;
+        const newSl = p.side === "LONG"
+          ? p.entryPrice * (1 + trailRawPct)
+          : p.entryPrice * (1 - trailRawPct);
+        // Chỉ dịch SL theo hướng có lợi — không bao giờ lùi SL lại
+        if (p.side === "LONG" && newSl > p.slPrice) { p.slPrice = newSl; trailMutated = true; }
+        if (p.side === "SHORT" && newSl < p.slPrice) { p.slPrice = newSl; trailMutated = true; }
+        p.lastTrailMilestone = milestone;
+      }
+
+      // Chỉ exit qua SL (không có TP cố định)
+      // WIN nếu SL đã trail lên trên entry (profitable), LOSS nếu dưới entry
+      if (p.side === "LONG" && currentPrice <= p.slPrice) {
+        outcome = p.slPrice >= p.entryPrice ? "WIN" : "LOSS";
+        exitPrice = p.slPrice;
+      } else if (p.side === "SHORT" && currentPrice >= p.slPrice) {
+        outcome = p.slPrice <= p.entryPrice ? "WIN" : "LOSS";
+        exitPrice = p.slPrice;
+      }
     } else {
-      if (currentPrice <= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
-      else if (currentPrice >= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
+      // ── Normal fixed TP / SL ──────────────────────────────────────────
+      if (p.side === "LONG") {
+        if (currentPrice >= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
+        else if (currentPrice <= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
+      } else {
+        if (currentPrice <= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
+        else if (currentPrice >= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
+      }
     }
+
     if (!outcome) continue;
 
     const rawPct = p.side === "LONG"
@@ -398,7 +466,7 @@ export async function processOpen(currentPrice: number): Promise<number> {
     acc.equityHistory.push({ t: now, equity: acc.capital });
     closed++;
   }
-  if (closed > 0) {
+  if (closed > 0 || trailMutated) {
     if (acc.equityHistory.length > 1000) acc.equityHistory = acc.equityHistory.slice(-1000);
     await saveAccount(acc);
   }

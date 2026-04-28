@@ -260,8 +260,18 @@ const OpenPositionRow = memo(function OpenPositionRow({
       <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
       <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
       <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
-      <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
-      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
+      {p.trailingStopEnabled
+        ? <Text style={[styles.cellW, { color: "#3b82f6", fontSize: 10 }]}>
+            TRAIL m{p.lastTrailMilestone ?? 0} · SL ${p.slPrice.toFixed(0)}
+          </Text>
+        : <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
+      }
+      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>
+        {p.trailingStopEnabled
+          ? `dist ${distSlPct.toFixed(2)}%`
+          : `SL $${p.slPrice.toFixed(0)} (${distSlPct.toFixed(2)}%)`
+        }
+      </Text>
       <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
@@ -346,7 +356,11 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <View style={{ flex: 1 }}>
           <Text style={styles.h1}>⚡ 5m ALL — RULE: SMART STACK</Text>
           <Text style={styles.subtitle}>
-            Preset: <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>{preset.emoji} {preset.label}</Text> · TP+{TP_PCT}%/SL-{SL_PCT}% · stack {STACK_MAX_PER_SIDE}/side · dist {STACK_MIN_ENTRY_DIST_PCT}%
+            Preset: <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>{preset.emoji} {preset.label}</Text>
+            {preset.trailingStopEnabled
+              ? ` · K<${STOCH_LONG}/K>${STOCH_SHORT} · trail SL · stack ${STACK_MAX_PER_SIDE}/side`
+              : ` · TP+${TP_PCT}%/SL-${SL_PCT}% · stack ${STACK_MAX_PER_SIDE}/side · dist ${STACK_MIN_ENTRY_DIST_PCT}%`
+            }
           </Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
@@ -354,12 +368,12 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </TouchableOpacity>
       </View>
 
-      {/* PRESET SWITCHER (anh Tommy v4.7.0): 3 chế độ — click để swap */}
+      {/* PRESET SWITCHER (anh Tommy v4.7.0): 4 chế độ — click để swap */}
       <View style={styles.presetRow}>
-        {(["AGGRESSIVE", "BALANCED", "SAFE"] as PresetKey[]).map((k) => {
+        {(["AGGRESSIVE", "BALANCED", "SAFE", "TOMI"] as PresetKey[]).map((k) => {
           const p = PRESETS[k];
           const active = k === presetKey;
-          const accentColor = k === "AGGRESSIVE" ? P.error : k === "BALANCED" ? P.bitcoinOrange : P.green;
+          const accentColor = k === "AGGRESSIVE" ? P.error : k === "BALANCED" ? P.bitcoinOrange : k === "SAFE" ? P.green : "#3b82f6";
           return (
             <TouchableOpacity
               key={k}
@@ -373,7 +387,9 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
                 {p.emoji} {p.label} {active ? "✓" : ""}
               </Text>
               <Text style={styles.presetSub}>
-                TP+{p.tpPct}%/SL-{p.slPct}% · stack {p.stackMaxPerSide} · dist {p.stackMinEntryDistPct}%
+                {p.trailingStopEnabled
+                  ? `K<${p.stochLongLevel}/K>${p.stochShortLevel} · trail SL · stack ${p.stackMaxPerSide}`
+                  : `TP+${p.tpPct}%/SL-${p.slPct}% · stack ${p.stackMaxPerSide} · dist ${p.stackMinEntryDistPct}%`}
               </Text>
               <Text style={[styles.presetMetric, { color: accentColor }]}>
                 3y: +${(p.expectedNet3y / 1000).toFixed(0)}k · DD ${(p.expectedMaxDd3y / 1000).toFixed(1)}k
@@ -407,8 +423,12 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROX_PCT}%</Text> dưới Resistance → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
         </Text>
         <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Exit (per-lệnh):</Text> TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> raw price.
-          {"\n"}  Mỗi tick scan TỪNG lệnh OPEN riêng, hit TP/SL → close độc lập (không ảnh hưởng lệnh khác).
+          <Text style={styles.ruleStrong}>Exit (per-lệnh):</Text>{" "}
+          {preset.trailingStopEnabled
+            ? <>Initial SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> · Trailing: PnL hit N×100% → SL ratchet (N-1)×100%{"\n"}  Không có TP cố định — chỉ exit qua SL. Milestone 1→SL breakeven, 2→+100%...</>
+            : <>TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> raw price.</>
+          }
+          {"\n"}  Mỗi tick scan TỪNG lệnh OPEN riêng, hit exit → close độc lập (không ảnh hưởng lệnh khác).
         </Text>
         <Text style={styles.ruleLine}>
           <Text style={styles.ruleStrong}>Risk per lệnh:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
