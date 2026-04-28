@@ -66,11 +66,23 @@ interface RarityInfo {
   glow: boolean;         // pulse animation
 }
 function getRarity(rank: number): RarityInfo {
-  if (rank <= 2)  return { tier: "LEGENDARY", label: "🔥 LEGEND",   color: "#ff6b1a", borderWidth: 4, gradientBg: "rgba(255,107,26,0.10)", glow: true };
-  if (rank <= 5)  return { tier: "EPIC",      label: "💎 EPIC",     color: "#c77dff", borderWidth: 3, gradientBg: "rgba(199,125,255,0.08)", glow: false };
-  if (rank <= 10) return { tier: "RARE",      label: "⚡ RARE",     color: "#4aa8ff", borderWidth: 3, gradientBg: "rgba(74,168,255,0.06)",  glow: false };
-  if (rank <= 20) return { tier: "UNCOMMON",  label: "🟢 UNCOMMON", color: "#7dd87d", borderWidth: 2, gradientBg: null, glow: false };
-  return             { tier: "COMMON",    label: "⚪ COMMON",   color: "#9f8e80", borderWidth: 1, gradientBg: null, glow: false };
+  // 2026-04-23 BUG#5 fix: guard rank invalid (undefined/NaN/<1) → COMMON fallback,
+  // tránh render "#undefined" hoặc rơi qua tất cả branch (NaN <= 2 → false silently).
+  if (!Number.isFinite(rank) || rank < 1) {
+    return { tier: "COMMON", label: "⚪", color: "#9f8e80", borderWidth: 1, gradientBg: null, glow: false };
+  }
+  // 2026-04-23 BUG#4 fix: rarity badge giờ chỉ emoji 1 ký tự (không full label
+  // "🔥 LEGEND" 9 chars) — tránh push title→0 width trên màn 360px.
+  // Full label dùng trong expanded detail qua rarityFullLabel().
+  if (rank <= 2)  return { tier: "LEGENDARY", label: "🔥",  color: "#ff6b1a", borderWidth: 4, gradientBg: "rgba(255,107,26,0.10)", glow: true };
+  if (rank <= 5)  return { tier: "EPIC",      label: "💎",  color: "#c77dff", borderWidth: 3, gradientBg: "rgba(199,125,255,0.08)", glow: false };
+  if (rank <= 10) return { tier: "RARE",      label: "⚡",  color: "#4aa8ff", borderWidth: 3, gradientBg: "rgba(74,168,255,0.06)", glow: false };
+  if (rank <= 20) return { tier: "UNCOMMON",  label: "🟢", color: "#7dd87d", borderWidth: 2, gradientBg: null, glow: false };
+  return             { tier: "COMMON",    label: "⚪", color: "#9f8e80", borderWidth: 1, gradientBg: null, glow: false };
+}
+// 2026-04-23: full label cho expanded detail view (BUG#4 paired)
+function rarityFullLabel(t: RarityTier): string {
+  return ({ LEGENDARY: "🔥 LEGENDARY", EPIC: "💎 EPIC", RARE: "⚡ RARE", UNCOMMON: "🟢 UNCOMMON", COMMON: "⚪ COMMON" } as const)[t];
 }
 
 // Human-readable condition labels (Vietnamese, short)
@@ -79,12 +91,6 @@ const COND_FULL: Record<string, string> = {
   divergence: "Phân kỳ giá/RSI", bollingerTouch: "Chạm Bollinger",
   macdCross: "MACD đổi chiều", candleReversal: "Candle reversal",
 };
-function condLive(k: string, conds: Record<string, any>, ind?: { rsi?: number | null; stochK?: number | null; macdCross?: string | null }): string {
-  if (k === "rsiExtreme" && ind?.rsi != null) return `RSI=${ind.rsi.toFixed(1)}`;
-  if (k === "stochExtreme" && ind?.stochK != null) return `K=${ind.stochK.toFixed(1)}`;
-  if (k === "macdCross") return conds[k] ? "cross ✓" : "—";
-  return conds[k] ? "✓" : "—";
-}
 
 /** Mini equity curve sparkline. Color = trend (UP/FLAT/DOWN). */
 function EquitySparkline({ curve, trend, width = 90, height = 26 }: {
@@ -202,27 +208,31 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
 
   // 2026-04-23: Rarity theo rank
   const rarity = getRarity(qualityRank);
-  // Pulse animation cho LEGENDARY (or FIRING)
+  // 2026-04-23 BUG#2 fix: pulse phải work cả Android — dùng opacity overlay (native-driven)
+  // thay vì shadowRadius (chỉ iOS). useNativeDriver: true → chạy native thread, đỡ JS.
   const pulse = useRef(new Animated.Value(0)).current;
+  const glowActive = rarity.glow || isFiring;
   useEffect(() => {
-    if (!rarity.glow && !isFiring) return;
+    if (!glowActive) {
+      pulse.setValue(0);
+      return;
+    }
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: isFiring ? 600 : 900, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
-        Animated.timing(pulse, { toValue: 0, duration: isFiring ? 600 : 900, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 1, duration: isFiring ? 600 : 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0, duration: isFiring ? 600 : 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
       ]),
     );
     loop.start();
     return () => loop.stop();
-  }, [rarity.glow, isFiring, pulse]);
-  const glowShadowRadius = pulse.interpolate({ inputRange: [0, 1], outputRange: [4, isFiring ? 18 : 12] });
-  const glowColor = isFiring ? P.bitcoinOrange : rarity.color;
+  }, [glowActive, isFiring, pulse]);
+  const glowOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.15, isFiring ? 0.7 : 0.45] });
   const accentColor = isFiring ? P.bitcoinOrange : rarity.color;
   const accentBorderWidth = isFiring ? 4 : rarity.borderWidth;
   const cardBgTint = isFiring ? P.bitcoinOrange + "15" : rarity.gradientBg || undefined;
 
   return (
-    <Animated.View style={[
+    <View style={[
       styles.cardV2,
       {
         borderLeftColor: accentColor,
@@ -230,15 +240,21 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
         backgroundColor: cardBgTint || P.cardAlt,
         opacity: rarity.tier === "COMMON" && !isFiring && !isTracked ? 0.88 : 1,
       },
-      (rarity.glow || isFiring) && {
-        shadowColor: glowColor,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.55,
-        shadowRadius: glowShadowRadius as any,
-        elevation: 6,
-      },
       isHighlighted && { borderLeftColor: P.primaryContainer, borderLeftWidth: 4 },
     ]}>
+      {/* Pulse glow overlay — work cả iOS & Android via opacity (native-driven) */}
+      {glowActive && (
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: 0, top: 0, bottom: 0,
+            width: accentBorderWidth + 6,
+            backgroundColor: accentColor,
+            opacity: glowOpacity,
+          }}
+        />
+      )}
       <TouchableOpacity onPress={() => setExpanded(!expanded)} activeOpacity={0.7}>
         {/* HEADER ROW: SIDE pill · #rank · title · rarity · WR pill · switch */}
         <View style={styles.rcHead}>
@@ -485,6 +501,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
 
       {expanded && (
         <View style={styles.detail}>
+          <DetailRow label="Rarity" value={`${rarityFullLabel(rarity.tier)} · rank #${qualityRank}`} color={rarity.color} />
           <DetailRow label="Hướng" value={side ? (side === "LONG" ? "🟢 LONG (mua, lời khi giá tăng)" : "🔴 SHORT (bán khống, lời khi giá giảm)") : "⇅ Cả 2 hướng"} />
           <DetailRow label="Hình dạng rule" value={
             isGA
@@ -556,7 +573,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
           )}
         </View>
       )}
-    </Animated.View>
+    </View>
   );
 });
 

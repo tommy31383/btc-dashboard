@@ -586,7 +586,6 @@ function ruleMatchesSmart(
       const inverted = cfg.htfTrendFilter.invertedFromFlip === true;
       const baseWant: Trend = side === "LONG" ? "UP" : "DOWN";
       const want: Trend = inverted ? (baseWant === "UP" ? "DOWN" : "UP") : baseWant;
-      const modeStr = typeof mode === "string" ? mode : JSON.stringify(mode);
       if (mode === "near_match" && trendNear !== want) { setReason("htfTrend", `HTF gần cần ${want}, đang ${trendNear}`, side); continue; }
       else if (mode === "far_match" && trendFar !== want) { setReason("htfTrend", `HTF xa cần ${want}, đang ${trendFar}`, side); continue; }
       else if (mode === "both_match" && (trendNear !== want || trendFar !== want)) { setReason("htfTrend", `cần ${want} cả 2 HTF (gần=${trendNear}, xa=${trendFar})`, side); continue; }
@@ -955,6 +954,27 @@ export function useRuleAlerts(
       // HTF trends for this TF
       const tfHTF = htfTrends[tfKey] || { near: "FLAT" as Trend, far: "FLAT" as Trend };
       const [nearTFKey] = HTF_MAP[tfKey] || ["1h", "4h"];
+
+      // 2026-04-23 BUG#1 fix: rule disabled/delegatedTo — KHÔNG compute condDetail.
+      // Trước đây caller vẫn tính `candleReversal` / `price_above_ema50` trực tiếp từ
+      // `ind` ngay cả khi ruleMatchesSmart return early → user thấy "✓candleReversal"
+      // trên rule chết. Guard sớm + emit OFF + skipReason rõ.
+      const cfgEarly = rule.config as any;
+      const statsEarly = rule.stats as any;
+      if (cfgEarly.disabled === true || cfgEarly.delegatedTo) {
+        const ruleSideEarly: "LONG" | "SHORT" | undefined = statsEarly.side || cfgEarly.forceSide;
+        newStatus[id] = "OFF";
+        newDetails[id] = {
+          status: "OFF", matched: 0, required: 0, condDetail: {},
+          htfMatch: null, htfRsiMatch: null, htfRsiValue: null, htfRsiFilter: null,
+          htfFiltersStatus: null, featFiltersStatus: null,
+          side: ruleSideEarly || "BOTH",
+          skipReason: cfgEarly.delegatedTo
+            ? `🛡 ${cfgEarly.delegatedTo} đã handle rule này`
+            : "rule đã tắt",
+        };
+        continue;
+      }
 
       // Match using per-rule thresholds (the core fix!)
       const { matches, effectiveSide, conds, bits, skipReason } = ruleMatchesSmart(
