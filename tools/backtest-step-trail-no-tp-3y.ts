@@ -56,6 +56,10 @@ const STEP_TRAIL_STEPS = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]; // 
 const STEP_TRAIL_STEPS_EXTENDED = Array.from({ length: 20 }, (_, i) => 0.5 * (i + 1)); // 0.5..10.0
 // Unlimited: 200 steps (100× tpDist) — đủ lớn để không bao giờ hit cap trong 3y backtest
 const STEP_TRAIL_STEPS_UNLIMITED = Array.from({ length: 200 }, (_, i) => 0.5 * (i + 1));
+// 2026-04-28 (anh Tommy): PnL-based step trail. Mỗi step = 100% PnL (= 1% price với lev 100).
+// Cap 20 = max 2000% PnL profit lock. Steps[i] = i+1 (= multiple of 100% PnL).
+// Trong simulator stepPrices được compute differently khi stepMode==="noTpPnl".
+const STEP_TRAIL_STEPS_PNL = Array.from({ length: 20 }, (_, i) => i + 1); // [1, 2, ..., 20]
 const STEP_TRAIL_TFS = new Set<string>(["15m"]); // 15m ONLY
 
 // LIVE PRESET B
@@ -390,7 +394,7 @@ function srAtTime(
 
 // ─── Trade simulation ───────────────────────────────────────────────────────
 type HitType = "TP" | "ORIG_SL" | "STEP_SL" | "TIME";
-type StepMode = "off" | "fixedTp" | "noTp" | "noTpUnlimited";
+type StepMode = "off" | "fixedTp" | "noTp" | "noTpUnlimited" | "noTpPnl";
 
 interface TradeOutcome {
   source: string;
@@ -459,11 +463,19 @@ function simulateTradeStepTrail(
   const tpDist = side === "LONG" ? tp - entryPrice : entryPrice - tp;
 
   // Step price levels (only meaningful when stepMode !== "off")
-  const stepPrices = steps.map((s) =>
-    side === "LONG" ? entryPrice + s * tpDist : entryPrice - s * tpDist,
-  );
-  // step100 index = where step value === 1.0 (i.e., reached TP target)
-  const step100Index = steps.findIndex((s) => Math.abs(s - 1.0) < 1e-9) + 1; // 1-based; 0 if not present
+  // 2026-04-28 (anh Tommy): noTpPnl mode dùng PnL-based step thay vì TP-distance-based.
+  //   Mỗi step[i] = (i+1) × 100% PnL, với lev=100 → 1 step = 1% price move.
+  //   stepPrices[i] = entry ± steps[i] × (entry / leverage).
+  const LEVERAGE_FOR_PNL = 100; // LIVE_STACK_CFG.leverage
+  const stepPrices = steps.map((s) => {
+    const priceUnit = stepMode === "noTpPnl" ? entryPrice / LEVERAGE_FOR_PNL : tpDist;
+    return side === "LONG" ? entryPrice + s * priceUnit : entryPrice - s * priceUnit;
+  });
+  // step100 index = where step value === 1.0 (i.e., reached TP target).
+  // KHÔNG áp dụng cho noTpPnl (steps là PnL multiples, không phải TP fractions).
+  const step100Index = stepMode === "noTpPnl"
+    ? 0
+    : steps.findIndex((s) => Math.abs(s - 1.0) < 1e-9) + 1;
 
   let lastStep = 0;
   let reachedStep100 = false;
@@ -472,9 +484,10 @@ function simulateTradeStepTrail(
     const c = ltfCandles[i];
 
     let effectiveSL = origSLPrice;
-    if (stepMode === "noTpUnlimited") {
+    if (stepMode === "noTpUnlimited" || stepMode === "noTpPnl") {
       // Lag fix: SL = 1 step sau trigger → SL không bao giờ = giá hiện tại
       // lastStep=1 → SL = origSL (breakeven chưa lock), lastStep=N → SL = stepPrices[N-2]
+      // (anh Tommy: noTpPnl áp dụng cùng pattern để tránh same-tick close khi tail step trigger)
       if (lastStep >= 2) effectiveSL = stepPrices[lastStep - 2];
     } else if (stepMode !== "off" && lastStep >= 1) {
       effectiveSL = stepPrices[lastStep - 1];
@@ -978,9 +991,7 @@ function runModeSimulation(
       : c.entryPrice * (1 + c.slPct / 100);
 
     // Step trail enabled only on 15m TF; HTF always "off"
-    const useMode: StepMode = (stepMode !== "off" && stepMode !== "noTpUnlimited" && STEP_TRAIL_TFS.has(c.tfKey)) ? stepMode
-      : (stepMode === "noTpUnlimited" && STEP_TRAIL_TFS.has(c.tfKey)) ? "noTpUnlimited"
-      : "off";
+    const useMode: StepMode = STEP_TRAIL_TFS.has(c.tfKey) && stepMode !== "off" ? stepMode : "off";
 
     const sim = simulateTradeStepTrail(
       candles5m, c.entryIdx5m, c.side, c.entryPrice,
@@ -1379,6 +1390,7 @@ HTF (1h/4h/1d/1w) keep fixed TP/SL.
     { name: "E-T15-NoTP",            desc: "Step trail 15m, NO fixed TP (trail keeps running past TP target)",                          mode: "noTp",         steps: STEP_TRAIL_STEPS },
     { name: "E-T15-NoTP-Extended",   desc: `NoTP + extended steps (${STEP_TRAIL_STEPS_EXTENDED.length} levels, 50% → 1000%)`,           mode: "noTp",         steps: STEP_TRAIL_STEPS_EXTENDED },
     { name: "E-T15-NoTP-Unlimited",  desc: "NoTP + unlimited steps + lag fix (SL 1 step behind trigger, production v0.2.2 logic)",      mode: "noTpUnlimited", steps: STEP_TRAIL_STEPS_UNLIMITED },
+    { name: "E-T15-NoTP-PnL100-S20", desc: `NEW (anh Tommy 2026-04-28): PnL-based step trail, mỗi step = 100% PnL (= 1% price w/ lev 100), cap ${STEP_TRAIL_STEPS_PNL.length} steps. SL lag 1 step. Để compare với TP-distance-based.`, mode: "noTpPnl",      steps: STEP_TRAIL_STEPS_PNL },
   ];
   const results: ModeResult[] = [];
   for (const def of runDefs) {
