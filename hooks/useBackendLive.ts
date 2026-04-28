@@ -9,6 +9,21 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { api, getToken, setToken, startWs, stopWs, onWsMessage } from "../utils/backendApi";
 
+// Module-level cache — persist across mount/unmount khi user switch tab
+// (anh Tommy v4.8.14: switch tab không reload từ đầu)
+const _cache = {
+  authed: false,
+  state: null as any,
+  scheduler: null as any,
+  alerts: [] as any[],
+  journal: [] as any[],
+  lastUpdateMs: 0,
+  initialized: false,
+};
+let _wsStarted = false;
+const _stateSubscribers = new Set<() => void>();
+function _notifyAll() { for (const fn of _stateSubscribers) fn(); }
+
 export interface BackendLiveState {
   authed: boolean;
   loading: boolean;
@@ -33,71 +48,91 @@ export interface BackendLiveActions {
 }
 
 export function useBackendLive(): BackendLiveState & BackendLiveActions {
-  const [authed, setAuthed] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // Sử dụng cache module-level làm initial state — instant render khi remount
+  const [authed, setAuthed] = useState(_cache.authed);
+  const [loading, setLoading] = useState(!_cache.initialized);
   const [lastError, setLastError] = useState<string | null>(null);
-  const [state, setStateLocal] = useState<any | null>(null);
-  const [scheduler, setScheduler] = useState<any | null>(null);
-  const [alerts, setAlerts] = useState<any[]>([]);
-  const [journal, setJournal] = useState<any[]>([]);
-  const [lastUpdateMs, setLastUpdateMs] = useState(0);
+  const [state, setStateLocal] = useState<any | null>(_cache.state);
+  const [scheduler, setScheduler] = useState<any | null>(_cache.scheduler);
+  const [alerts, setAlerts] = useState<any[]>(_cache.alerts);
+  const [journal, setJournal] = useState<any[]>(_cache.journal);
+  const [lastUpdateMs, setLastUpdateMs] = useState(_cache.lastUpdateMs);
   const refreshTimerRef = useRef<any>(null);
 
   const refresh = useCallback(async () => {
     try {
       const r = await api.state();
-      setStateLocal(r.state);
-      setScheduler(r.scheduler);
-      setLastUpdateMs(Date.now());
+      _cache.state = r.state; setStateLocal(r.state);
+      _cache.scheduler = r.scheduler; setScheduler(r.scheduler);
+      _cache.lastUpdateMs = Date.now(); setLastUpdateMs(_cache.lastUpdateMs);
       setLastError(null);
       try {
         const a = await api.alerts();
-        setAlerts(a.alerts || []);
+        _cache.alerts = a.alerts || []; setAlerts(_cache.alerts);
       } catch {}
       try {
         const j = await api.journal(100);
-        setJournal(j.entries || []);
+        _cache.journal = j.entries || []; setJournal(_cache.journal);
       } catch {}
+      _notifyAll();
     } catch (e: any) {
       setLastError(e?.message ?? String(e));
     }
   }, []);
 
-  // Init: check token, start WS, fetch state
+  // Init: check token, start WS, fetch state — chạy 1 LẦN cho cả app
   useEffect(() => {
-    (async () => {
-      const t = await getToken();
-      if (!t) { setLoading(false); return; }
-      try {
-        await api.me();
-        setAuthed(true);
-        await refresh();
-        startWs();
-      } catch {
-        setToken(null);
-        setAuthed(false);
-      } finally {
-        setLoading(false);
-      }
-    })();
-    // Periodic refresh fallback every 15s (in case WS drops)
-    refreshTimerRef.current = setInterval(() => {
-      if (authed) refresh().catch(() => {});
-    }, 15000);
+    // Subscribe để nhận update từ instances khác (cùng cache)
+    const sync = () => {
+      setAuthed(_cache.authed);
+      setStateLocal(_cache.state);
+      setScheduler(_cache.scheduler);
+      setAlerts(_cache.alerts);
+      setJournal(_cache.journal);
+      setLastUpdateMs(_cache.lastUpdateMs);
+    };
+    _stateSubscribers.add(sync);
+
+    // Init chỉ chạy 1 lần global
+    if (!_cache.initialized) {
+      _cache.initialized = true;
+      (async () => {
+        const t = await getToken();
+        if (!t) { setLoading(false); return; }
+        try {
+          await api.me();
+          _cache.authed = true; setAuthed(true);
+          await refresh();
+          if (!_wsStarted) { startWs(); _wsStarted = true; }
+        } catch {
+          setToken(null);
+          _cache.authed = false; setAuthed(false);
+        } finally {
+          setLoading(false);
+        }
+      })();
+      // Single global refresh interval — không multi-instance
+      refreshTimerRef.current = setInterval(() => {
+        if (_cache.authed) refresh().catch(() => {});
+      }, 15000);
+    } else {
+      setLoading(false);
+    }
     return () => {
-      if (refreshTimerRef.current) clearInterval(refreshTimerRef.current);
-      stopWs();
+      _stateSubscribers.delete(sync);
+      // KHÔNG clear interval / stop WS — giữ persistent qua mount/unmount
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // WS subscriber
+  // WS subscriber — update cache + notify all instances
   useEffect(() => {
     if (!authed) return;
     const off = onWsMessage((msg) => {
       if (msg?.type === "state" && msg.state) {
-        setStateLocal(msg.state);
-        setLastUpdateMs(msg.ts ?? Date.now());
+        _cache.state = msg.state; setStateLocal(msg.state);
+        _cache.lastUpdateMs = msg.ts ?? Date.now(); setLastUpdateMs(_cache.lastUpdateMs);
+        _notifyAll();
       }
     });
     return off;
@@ -109,9 +144,10 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
     try {
       const r = await api.login(password);
       await setToken(r.token);
-      setAuthed(true);
+      _cache.authed = true; setAuthed(true);
       await refresh();
-      startWs();
+      if (!_wsStarted) { startWs(); _wsStarted = true; }
+      _notifyAll();
       return true;
     } catch (e: any) {
       setLastError(e?.message ?? String(e));
@@ -124,11 +160,13 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
   const logout = useCallback(async () => {
     try { await api.logout(); } catch {}
     await setToken(null);
-    stopWs();
-    setAuthed(false);
-    setStateLocal(null);
-    setScheduler(null);
-    setAlerts([]);
+    stopWs(); _wsStarted = false;
+    _cache.authed = false; setAuthed(false);
+    _cache.state = null; setStateLocal(null);
+    _cache.scheduler = null; setScheduler(null);
+    _cache.alerts = []; setAlerts([]);
+    _cache.journal = []; setJournal([]);
+    _notifyAll();
   }, []);
 
   const setAuto = useCallback(async (value: boolean) => {
