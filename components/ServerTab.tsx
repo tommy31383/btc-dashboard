@@ -111,6 +111,7 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
   const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl, longSize, shortSize, longQty, shortQty, longAvgEntry, shortAvgEntry } = memoLists;
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
+  const avail = s?.binanceSnapshot?.account?.availableBalance ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
   const lastPollMs = sched?.lastPollOkMs ?? 0;
   const lastEvalMs = sched?.lastRuleEvalMs ?? 0;
@@ -188,13 +189,13 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         <Text style={styles.h2}>📊 STATUS</Text>
         <View style={styles.kpiGrid}>
           <Kpi label="WALLET" value={`$${parseFloat(wallet).toFixed(2)}`} />
+          <Kpi label="AVAIL" value={`$${parseFloat(avail).toFixed(2)}`} color={P.bitcoinOrange} />
           <Kpi label="uPnL" value={`$${parseFloat(upnl).toFixed(2)}`} color={parseFloat(upnl) >= 0 ? P.green : P.error} />
-          <Kpi label="DAILY" value={`$${dailyPnl.toFixed(2)}`} color={dailyPnl >= 0 ? P.green : P.error} />
         </View>
         <View style={styles.kpiGrid}>
+          <Kpi label="DAILY" value={`$${dailyPnl.toFixed(2)}`} color={dailyPnl >= 0 ? P.green : P.error} />
           <Kpi label="LONG" value={`${longCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.green} />
           <Kpi label="SHORT" value={`${shortCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.error} />
-          <Kpi label="HEDGE" value={s?.hedgeMode ? "✅" : "❌"} />
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
           <Text style={styles.dim}>poll </Text><LiveAgo timestampMs={lastPollMs} suffix=" ago" />
@@ -272,7 +273,8 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         </Text>
       </View>
 
-      {/* SYNC CHECK — compare app tracked sum vs Binance position (anh Tommy v4.8.16) */}
+      {/* SYNC CHECK moved inside TRACKED card (anh Tommy v4.8.17) */}
+      {false && (
       <View style={styles.card}>
         <Text style={styles.h2}>🔄 SYNC CHECK · App tracked vs Binance</Text>
         <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
@@ -331,6 +333,7 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
           💡 Tolerance: qty ±0.0005 BTC · entry ±$50. MISMATCH → reconcile sẽ tự fix tại cycle poll kế (max 30s).
         </Text>
       </View>
+      )}
 
       {/* Chart entry/exit markers */}
       <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
@@ -363,6 +366,45 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       {/* Tracked positions */}
       <View style={styles.card}>
         <Text style={styles.h2}>📈 TRACKED ({tracked.length})</Text>
+
+        {/* SYNC CHECK inline (anh Tommy v4.8.17) — compare app vs Binance */}
+        <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+          {(["LONG", "SHORT"] as const).map((side) => {
+            const sideColor = side === "LONG" ? P.green : P.error;
+            const appQty = side === "LONG" ? longQty : shortQty;
+            const appAvg = side === "LONG" ? longAvgEntry : shortAvgEntry;
+            const appCount = side === "LONG" ? longCount : shortCount;
+            const binPos = side === "LONG" ? binanceLongPos : binanceShortPos;
+            const binQty = binPos ? Math.abs(parseFloat(binPos.positionAmt)) : 0;
+            const binEntry = binPos ? parseFloat(binPos.entryPrice) : 0;
+            const qtyDiff = appQty - binQty;
+            const entryDiff = appAvg - binEntry;
+            const TOL_QTY = 0.0005, TOL_ENTRY = 50;
+            const qtyOk = Math.abs(qtyDiff) <= TOL_QTY;
+            const entryOk = appAvg === 0 || binEntry === 0 || Math.abs(entryDiff) <= TOL_ENTRY;
+            const ok = qtyOk && entryOk;
+            return (
+              <View key={side} style={{
+                flex: 1, minWidth: 200, padding: 6, borderRadius: 3, borderWidth: 1,
+                borderColor: ok ? sideColor + "55" : P.error,
+                backgroundColor: ok ? P.surface : P.error + "12",
+              }}>
+                <Text style={{ color: ok ? sideColor : P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 11 }}>
+                  {ok ? "✅" : "⚠️"} {side} {ok ? "SYNC" : "MISMATCH"} · {appCount} app vs 1 bin
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 9 }}>
+                  qty: <Text style={{ color: P.text }}>{appQty.toFixed(4)}</Text> vs <Text style={{ color: P.text }}>{binQty.toFixed(4)}</Text>
+                  {!qtyOk && <Text style={{ color: P.error }}> ({qtyDiff >= 0 ? "+" : ""}{qtyDiff.toFixed(4)})</Text>}
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 9 }}>
+                  entry: <Text style={{ color: P.text }}>${appAvg.toFixed(0)}</Text> vs <Text style={{ color: P.text }}>${binEntry.toFixed(0)}</Text>
+                  {!entryOk && <Text style={{ color: P.error }}> (${entryDiff >= 0 ? "+" : ""}{entryDiff.toFixed(0)})</Text>}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+
         {tracked.length === 0 ? (
           <Text style={styles.dim}>chưa có position nào</Text>
         ) : (
