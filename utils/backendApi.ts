@@ -74,6 +74,12 @@ export const api = {
   // LIVE
   state: () => request<any>("/api/live/state"),
   journal: (limit = 100) => request<any>(`/api/live/journal?limit=${limit}`),
+  // 2026-04-28: 7-day rolling journal — lazy load history per day, KHÔNG cache vào state
+  // (anh Tommy: optimized RAM — chỉ giữ 100 entry RAM, history fetch on-demand).
+  journalHistory: (date: string) =>
+    request<{ entries: any[]; count: number }>(`/api/live/journal/history?date=${encodeURIComponent(date)}`),
+  journalDays: () =>
+    request<{ days: string[] }>("/api/live/journal/days"),
   alerts: () => request<any>("/api/live/alerts"),
   trackedRules: () => request<any>("/api/live/tracked-rules"),
   setAuto: (value: boolean) => request<any>("/api/live/auto", "POST", { value }),

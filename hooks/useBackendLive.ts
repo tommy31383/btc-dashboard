@@ -9,6 +9,15 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { api, getToken, setToken, startWs, stopWs, onWsMessage } from "../utils/backendApi";
 
+// 2026-04-28 (anh Tommy): RAM cap journal client-side. Server-side cũng cap 100,
+// disk rolling 7 ngày, lazy history per-day. KHÔNG cache history vào _cache.
+const CLIENT_JOURNAL_CAP = 100;
+
+// Dedup key cho journal entries (timestamp + ruleId + actionKind)
+function journalKey(e: any): string {
+  return `${e?.ts ?? e?.t ?? 0}|${e?.ruleId ?? e?.r ?? "?"}|${e?.action?.kind ?? e?.actionKind ?? e?.a ?? "?"}`;
+}
+
 // Module-level cache — persist across mount/unmount khi user switch tab
 // (anh Tommy v4.8.14: switch tab không reload từ đầu)
 const _cache = {
@@ -45,6 +54,9 @@ export interface BackendLiveActions {
   closePosition: (id: string, password: string) => Promise<void>;
   editTpSl: (id: string, newTp?: number, newSl?: number, password?: string) => Promise<void>;
   bulkClose: (filter: "ALL" | "PROFIT" | "LOSS" | "OLD_HOURS", password: string) => Promise<void>;
+  // 2026-04-28: lazy history loader — KHÔNG cache vào state, caller tự manage memory.
+  loadJournalHistory: (date: string) => Promise<any[]>;
+  loadJournalDays: () => Promise<string[]>;
 }
 
 export function useBackendLive(): BackendLiveState & BackendLiveActions {
@@ -71,8 +83,10 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
         _cache.alerts = a.alerts || []; setAlerts(_cache.alerts);
       } catch {}
       try {
-        const j = await api.journal(100);
-        _cache.journal = j.entries || []; setJournal(_cache.journal);
+        const j = await api.journal(CLIENT_JOURNAL_CAP);
+        // 2026-04-28: cap RAM client-side dù server có trả về nhiều hơn.
+        _cache.journal = (j.entries || []).slice(0, CLIENT_JOURNAL_CAP);
+        setJournal(_cache.journal);
       } catch {}
       _notifyAll();
     } catch (e: any) {
@@ -132,6 +146,26 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
       if (msg?.type === "state" && msg.state) {
         _cache.state = msg.state; setStateLocal(msg.state);
         _cache.lastUpdateMs = msg.ts ?? Date.now(); setLastUpdateMs(_cache.lastUpdateMs);
+        _notifyAll();
+        return;
+      }
+      // 2026-04-28: server push DELTA append, KHÔNG full state — bandwidth -99.8%.
+      if (msg?.type === "journal_append" && msg.entry) {
+        const entry = msg.entry;
+        const k = journalKey(entry);
+        const existing = _cache.journal;
+        // dedup theo timestamp+ruleId+actionKind (tránh duplicate khi WS retry)
+        if (existing.some((e) => journalKey(e) === k)) return;
+        const next = [entry, ...existing].slice(0, CLIENT_JOURNAL_CAP);
+        _cache.journal = next; setJournal(next);
+        _cache.lastUpdateMs = msg.ts ?? Date.now(); setLastUpdateMs(_cache.lastUpdateMs);
+        _notifyAll();
+        return;
+      }
+      // Bulk replace (server có thể push lại nếu reconnect mất delta)
+      if (msg?.type === "journal_snapshot" && Array.isArray(msg.entries)) {
+        const next = msg.entries.slice(0, CLIENT_JOURNAL_CAP);
+        _cache.journal = next; setJournal(next);
         _notifyAll();
       }
     });
@@ -193,9 +227,31 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
     try { await api.bulkClose(filter, password); await refresh(); } catch (e: any) { setLastError(e?.message); }
   }, [refresh]);
 
+  // 2026-04-28: lazy loaders — KHÔNG cache vào _cache, caller tự dispose để giữ RAM thấp.
+  const loadJournalHistory = useCallback(async (date: string): Promise<any[]> => {
+    try {
+      const r = await api.journalHistory(date);
+      return r.entries || [];
+    } catch (e: any) {
+      setLastError(e?.message ?? String(e));
+      return [];
+    }
+  }, []);
+
+  const loadJournalDays = useCallback(async (): Promise<string[]> => {
+    try {
+      const r = await api.journalDays();
+      return r.days || [];
+    } catch (e: any) {
+      setLastError(e?.message ?? String(e));
+      return [];
+    }
+  }, []);
+
   return {
     authed, loading, lastError, state, scheduler, alerts, journal, lastUpdateMs,
     login, logout, refresh, setAuto, setDryRun, setSettings,
     closePosition, editTpSl, bulkClose,
+    loadJournalHistory, loadJournalDays,
   };
 }

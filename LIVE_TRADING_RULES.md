@@ -697,6 +697,113 @@ Output: `assets/backtest_compare_3y.json` + `report.html`
 
 ---
 
+## 🗂️ JOURNAL STORAGE (3-tier rolling, anh Tommy 2026-04-28)
+
+**Constraint:** giữ 7 ngày · cap entries · tối ưu RAM/disk/bandwidth.
+
+### Tier 1 — RAM (server + client) · cap **100 entries**
+- Server `state.journal[]` cap 100 entries gần nhất → broadcast WS realtime
+- Client `_cache.journal` cap 100 (constant `CLIENT_JOURNAL_CAP`)
+- RAM footprint: ~10 KB mỗi tier
+
+### Tier 2 — Disk (server) · 7 file rolling daily
+```
+logs/journal-2026-04-22.jsonl    ← cũ nhất (sẽ bị xoá)
+logs/journal-2026-04-23.jsonl
+...
+logs/journal-2026-04-28.jsonl    ← hôm nay (đang ghi)
+```
+- 1 file/ngày, append-only (`fs.appendFileSync`)
+- Cap **1000 entries/file** (tránh runaway)
+- Cron daily 00:05 UTC: `find logs -name "journal-*.jsonl" -mtime +7 -delete`
+- Disk total: ~7000 entries × 80 bytes = **~560 KB cố định**
+
+### Tier 3 — Client lazy load · KHÔNG cache vào state
+- UI mặc định show 100 entries (RAM)
+- "Xem thêm" → gọi `useBackendLive().loadJournalHistory(date)` → trả về data, **caller tự manage memory** (mount-scoped, KHÔNG vào `_cache`)
+- `loadJournalDays()` list ngày có data: `["2026-04-22",...,"2026-04-28"]`
+
+### Schema compact (1 entry ~70-90 bytes)
+```jsonl
+{"t":1714294800000,"a":"C","r":"5m:1","s":"L","p":63565.8,"x":"TP","pnl":11.45}
+```
+| Key | Type | Mô tả |
+|---|---|---|
+| `t` | int ms | timestamp |
+| `a` | "E"\|"C"\|"S" | Entry / Close / Skip |
+| `r` | string | ruleId compact (`tf:rank`) |
+| `s` | "L"\|"S" | side |
+| `p` | float | price (entry hoặc close) |
+| `x` | "TP"\|"SL"\|"MAN" | trigger (chỉ cho CLOSE) |
+| `pnl` | float | PnL net USD (chỉ CLOSE) |
+
+### WebSocket broadcast — DELTA (không full state)
+| Event type | Payload | Khi nào |
+|---|---|---|
+| `state` | `{ state }` | thay đổi auto/dryRun/settings (không thay đổi journal) |
+| `journal_append` | `{ entry }` ~150B | khi 1 entry mới được log (E/C/S) |
+| `journal_snapshot` | `{ entries: [] }` | khi client reconnect (sync lại) |
+
+Client dedup theo key `${ts}|${ruleId}|${actionKind}` để tránh nhân đôi entry khi WS retry.
+
+### Bandwidth tiết kiệm
+| Channel | Trước | Sau | Giảm |
+|---|---|---|---|
+| `/api/live/state` | ~75 KB (embed journal 500) | ~5 KB | -93% |
+| `/api/live/journal?limit=100` | ~75 KB (500) | ~8 KB (100 cap) | -89% |
+| WS event journal | full state ~80 KB | delta ~150B | -99.8% |
+| History (lazy) | N/A | ~80 KB/ngày on-demand | — |
+
+Polling 30s × 24h: **~1 GB/day → ~14 MB/day** (-98.6%).
+
+### API endpoints (server `tommybtc.duckdns.org`)
+| Endpoint | Mô tả |
+|---|---|
+| `GET /api/live/journal?limit=100` | RAM rolling, default 100 |
+| `GET /api/live/journal/history?date=YYYY-MM-DD` | Load 1 file ngày từ disk (lazy) |
+| `GET /api/live/journal/days` | List ngày có data (max 7) |
+
+### Server-side implementation (anh Tommy push)
+```js
+const DAILY_FILE_CAP = 1000;
+const RAM_CAP = 100;
+const DAYS_KEEP = 7;
+
+function appendJournal(entry) {
+  state.journal.unshift(entry);
+  if (state.journal.length > RAM_CAP) state.journal.length = RAM_CAP;
+
+  const day = new Date(entry.t).toISOString().slice(0, 10);
+  const file = `logs/journal-${day}.jsonl`;
+  if (countLines(file) < DAILY_FILE_CAP) {
+    fs.appendFileSync(file, JSON.stringify(entry) + "\n");
+  }
+
+  broadcastWs({ type: "journal_append", entry });
+}
+
+// Cron 00:05 UTC daily
+function rotateLogs() {
+  for (const f of fs.readdirSync("logs/")) {
+    if (!f.startsWith("journal-")) continue;
+    const day = f.slice(8, 18);
+    if ((Date.now() - Date.parse(day)) / 86400_000 > DAYS_KEEP) {
+      fs.unlinkSync(`logs/${f}`);
+    }
+  }
+}
+```
+
+### Client-side (đã apply trong repo này)
+- `utils/backendApi.ts`: `journalHistory(date)`, `journalDays()`
+- `hooks/useBackendLive.ts`:
+  - `CLIENT_JOURNAL_CAP = 100` cap RAM
+  - WS handler `journal_append` (delta) + `journal_snapshot` (reconnect)
+  - Dedup `journalKey()` theo `ts|ruleId|actionKind`
+  - `loadJournalHistory(date)` + `loadJournalDays()` lazy, KHÔNG cache vào `_cache`
+
+---
+
 ## 📜 VERSION HISTORY
 
 | Version | Change |
