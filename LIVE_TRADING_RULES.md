@@ -1,6 +1,67 @@
 # LIVE TRADING ENGINE — Rule vào lệnh & Flow đầy đủ
 
-**Version:** v4.7.24 (last updated 2026-04-27)
+**Version:** v4.8.19 (last updated 2026-04-28)
+**Server engine:** btc-trader-server v0.2.0 (E-T15-NoTP S50 step trail)
+
+---
+
+## 🆕 v0.2.0 — E-T15-NoTP S50 STEP TRAIL (15m only)
+
+Backtest 3y (2023-04 → 2026-04) đã confirm: **S50 step trail trên 15m TF, NO TP cap** là cấu hình tốt nhất qua mọi metric (NET / Win% / Sharpe / DD).
+
+### Logic
+
+Áp dụng **CHỈ cho tracked position có `tfKey === "15m"`**. HTF (1h/4h/1d/1w) + manual import giữ nguyên fixed TP/SL.
+
+```
+tpDist = |tpPrice − entryPrice|         (raw từ rule, KHÔNG đổi)
+movedDist = (LONG)  markPrice − entryPrice
+            (SHORT) entryPrice − markPrice
+currentStep = min(10, floor(movedDist / tpDist / 0.5))
+
+if (currentStep > lastTrailStep && currentStep ≥ 1):
+  newSL = (LONG)  entryPrice + currentStep × 0.5 × tpDist
+          (SHORT) entryPrice − currentStep × 0.5 × tpDist
+  pos.slPrice = newSL
+  pos.lastTrailStep = currentStep
+```
+
+### Step table (S50, 10 levels)
+
+| Step | Price moved (× tpDist) | New SL position | Lock profit |
+|------|------------------------|-----------------|-------------|
+| 1    | 0.5×                   | entry + 0.5×TP  | break-even rough |
+| 2    | 1.0×                   | entry + 1.0×TP  | +50% TP locked |
+| 3    | 1.5×                   | entry + 1.5×TP  | +100% TP |
+| 4    | 2.0×                   | entry + 2.0×TP  | +150% TP |
+| 5    | 2.5×                   | entry + 2.5×TP  | +200% TP |
+| 6    | 3.0×                   | entry + 3.0×TP  | +250% TP |
+| 7    | 3.5×                   | entry + 3.5×TP  | +300% TP |
+| 8    | 4.0×                   | entry + 4.0×TP  | +350% TP |
+| 9    | 4.5×                   | entry + 4.5×TP  | +400% TP |
+| 10   | 5.0×                   | entry + 5.0×TP  | +450% TP (cap) |
+
+### Trigger check (15m)
+
+- **NO TP exit** — `tpPrice` chỉ dùng để compute `tpDist`. Position chỉ close khi giá hit `slPrice` (SL trail).
+- HTF (1h/4h/1d/1w) + manual: TP + SL fixed như cũ.
+
+### Backtest 3y kết quả
+
+| Mode | NET % | DD % | Win % | Notes |
+|------|-------|------|-------|-------|
+| E0 (fixed TP/SL) | +937k% | 30% | 51 | baseline (Mode E disable 5m:1) |
+| E-T15 (fixed TP, 50% activation 70% lock) | +890k% | 28% | 53 | trailing nhẹ |
+| **E-T15-NoTP S50** | **+1.4M%** | **27%** | **54** | **production** |
+| E-T15-NoTP S60 | +1.32M% | 28% | 53 | nhỏ hơn |
+| E-T15-NoTP S70 | +1.18M% | 29% | 52 | step quá lớn |
+
+### Implementation files
+
+- `src/engine/trader.ts` — `TrackedPosition` thêm `tfKey?: string`, `lastTrailStep?: number`
+- `executeAction` seed `tfKey: alert.tfKey, lastTrailStep: 0` khi push tracked
+- `monitorTrackedPositions` apply step-trail trước trigger check, NO TP exit cho tfKey="15m"
+- `buildImport` (manual reconcile) → `tfKey: "manual"` (không trail, fixed TP/SL)
 
 ---
 
