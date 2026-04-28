@@ -353,6 +353,12 @@ export function emptyAccount(): All5mAccount {
   };
 }
 
+/** Sync getter — chỉ dùng sau khi loadAccount() đã chạy ít nhất 1 lần. */
+export function getAccountCached(): All5mAccount {
+  if (!_accountCache) _accountCache = emptyAccount();
+  return _accountCache;
+}
+
 export async function loadAccount(): Promise<All5mAccount> {
   if (_accountCache) return _accountCache;
   try {
@@ -499,22 +505,6 @@ export async function tryEntry5mBar(
       const distPct = Math.abs(fillPrice - lastSame.entryPrice) / lastSame.entryPrice * 100;
       if (distPct < preset.stackMinEntryDistPct) return null;
     }
-    // BETTER ENTRY ONLY (anh Tommy v4.7.27): entry mới tốt hơn benchmark cùng side
-    if (preset.stackBetterEntryMode && preset.stackBetterEntryMode !== "off") {
-      let benchmark: number;
-      if (preset.stackBetterEntryMode === "vs-last") benchmark = lastSame.entryPrice;
-      else if (preset.stackBetterEntryMode === "vs-best") {
-        benchmark = side === "LONG"
-          ? Math.min(...sameSideOpen.map((p) => p.entryPrice))
-          : Math.max(...sameSideOpen.map((p) => p.entryPrice));
-      } else { // vs-avg
-        const sumQ = sameSideOpen.reduce((a, b) => a + 1, 0);  // 5m ALL qty không track sẵn — dùng count
-        const sumE = sameSideOpen.reduce((a, b) => a + b.entryPrice, 0);
-        benchmark = sumE / sumQ;
-      }
-      if (side === "LONG" && fillPrice >= benchmark) return null;
-      if (side === "SHORT" && fillPrice <= benchmark) return null;
-    }
   }
 
   const tpPrice = side === "LONG" ? fillPrice * (1 + preset.tpPct / 100) : fillPrice * (1 - preset.tpPct / 100);
@@ -529,8 +519,6 @@ export async function tryEntry5mBar(
     entryMs: now,
     tpPrice, slPrice,
     entryFeeUsd: FEE_PER_SIDE,
-    // Tomi5mALL: trailing SL per-position flag
-    ...(preset.trailingStopEnabled ? { trailingStopEnabled: true, lastTrailMilestone: 0 } : {}),
   };
   acc.positions.unshift(pos);
 
@@ -544,62 +532,26 @@ export async function tryEntry5mBar(
 }
 
 export async function processOpen(currentPrice: number): Promise<number> {
-  const acc = await loadAccount();
+  const acc = getAccountCached();
   const now = Date.now();
   let closed = 0;
-  let trailMutated = false; // Tomi5mALL: SL updated but not closed → cần save
 
   for (const p of acc.positions) {
     if (p.status !== "OPEN") continue;
+    // Early-exit: skip lệnh price chưa gần TP/SL (tránh loop vô ích khi nhiều open)
+    const tpDist = Math.abs(currentPrice - p.tpPrice) / p.tpPrice;
+    const slDist = Math.abs(currentPrice - p.slPrice) / p.slPrice;
+    if (tpDist > 0.005 && slDist > 0.005) continue;
     let outcome: "WIN" | "LOSS" | null = null;
     let exitPrice = currentPrice;
 
-    if (p.trailingStopEnabled) {
-      // ── Tomi5mALL trailing SL milestone logic ──────────────────────────
-      // ⚠️ DEAD CODE PATH (v4.8.23): TẤT CẢ 5 preset hiện tại đều KHÔNG set
-      // trailingStopEnabled=true → branch này không được run trong production.
-      // Logic giữ lại để Tommy re-enable cho preset cụ thể khi backtest đủ.
-      // Decision log: bỏ trailing để TP4/SL4 fixed consistency với WHALE TP5/SL2.5.
-      // Xem 5MALL_TRADING_RULES.md section "TRAILING STOP" để chi tiết.
-      // ────────────────────────────────────────────────────────────────────
-      // leveragedPnlPct = raw price move % × 100x leverage
-      const leveragedPnlPct = (p.side === "LONG"
-        ? (currentPrice - p.entryPrice) / p.entryPrice
-        : (p.entryPrice - currentPrice) / p.entryPrice) * 100 * LEVERAGE;
-      const milestone = Math.max(0, Math.floor(leveragedPnlPct / 100));
-      const lastMilestone = p.lastTrailMilestone ?? 0;
-
-      if (milestone > lastMilestone && milestone >= 1) {
-        // SL ratchet: milestone N → SL tại (N-1)×100% PnL
-        // trailRawPct = (milestone - 1) / LEVERAGE  (raw price %)
-        const trailRawPct = (milestone - 1) / LEVERAGE;
-        const newSl = p.side === "LONG"
-          ? p.entryPrice * (1 + trailRawPct)
-          : p.entryPrice * (1 - trailRawPct);
-        // Chỉ dịch SL theo hướng có lợi — không bao giờ lùi SL lại
-        if (p.side === "LONG" && newSl > p.slPrice) { p.slPrice = newSl; trailMutated = true; }
-        if (p.side === "SHORT" && newSl < p.slPrice) { p.slPrice = newSl; trailMutated = true; }
-        p.lastTrailMilestone = milestone;
-      }
-
-      // Chỉ exit qua SL (không có TP cố định)
-      // WIN nếu SL đã trail lên trên entry (profitable), LOSS nếu dưới entry
-      if (p.side === "LONG" && currentPrice <= p.slPrice) {
-        outcome = p.slPrice >= p.entryPrice ? "WIN" : "LOSS";
-        exitPrice = p.slPrice;
-      } else if (p.side === "SHORT" && currentPrice >= p.slPrice) {
-        outcome = p.slPrice <= p.entryPrice ? "WIN" : "LOSS";
-        exitPrice = p.slPrice;
-      }
+    // ── Fixed TP / SL ──────────────────────────────────────────────────
+    if (p.side === "LONG") {
+      if (currentPrice >= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
+      else if (currentPrice <= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
     } else {
-      // ── Normal fixed TP / SL ──────────────────────────────────────────
-      if (p.side === "LONG") {
-        if (currentPrice >= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
-        else if (currentPrice <= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
-      } else {
-        if (currentPrice <= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
-        else if (currentPrice >= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
-      }
+      if (currentPrice <= p.tpPrice) { outcome = "WIN"; exitPrice = p.tpPrice; }
+      else if (currentPrice >= p.slPrice) { outcome = "LOSS"; exitPrice = p.slPrice; }
     }
 
     if (!outcome) continue;
@@ -627,8 +579,7 @@ export async function processOpen(currentPrice: number): Promise<number> {
     acc.equityHistory.push({ t: now, equity: acc.capital });
     closed++;
   }
-  if (closed > 0 || trailMutated) {
-    if (acc.equityHistory.length > 1000) acc.equityHistory = acc.equityHistory.slice(-1000);
+  if (closed > 0) {
     await saveAccount(acc);
   }
   return closed;

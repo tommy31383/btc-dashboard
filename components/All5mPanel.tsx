@@ -4,8 +4,9 @@
  * Strategy: mỗi 5m closed → quyết định LONG/SHORT theo StochRSI K (LONG K<10,
  * SHORT K>90), fallback S/R 15m. TP+4%/SL-2%. Cooldown 15m sau entry.
  */
-import React, { useMemo, useState, useCallback, memo } from "react";
+import React, { useMemo, useState, useCallback, memo, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Polyline, Line, Polygon, Circle } from "react-native-svg";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
@@ -35,7 +36,6 @@ interface Props {
 }
 
 type Filter = "ALL" | "WIN" | "LOSS";
-const MAX_OPEN_ROWS_PER_SIDE = 30;
 
 function fmtUsd(n: number, sign = false) { return (sign && n > 0 ? "+" : "") + "$" + n.toFixed(2); }
 function fmtPct(n: number, sign = true) { return (sign && n > 0 ? "+" : "") + n.toFixed(2) + "%"; }
@@ -281,18 +281,8 @@ const OpenPositionRow = memo(function OpenPositionRow({
       <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
       <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
       <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
-      {p.trailingStopEnabled
-        ? <Text style={[styles.cellW, { color: "#3b82f6", fontSize: 10 }]}>
-            TRAIL m{p.lastTrailMilestone ?? 0} · SL ${p.slPrice.toFixed(0)}
-          </Text>
-        : <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
-      }
-      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>
-        {p.trailingStopEnabled
-          ? `dist ${distSlPct.toFixed(2)}%`
-          : `SL $${p.slPrice.toFixed(0)} (${distSlPct.toFixed(2)}%)`
-        }
-      </Text>
+      <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
+      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
       <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
@@ -305,8 +295,112 @@ const OpenPositionRow = memo(function OpenPositionRow({
   );
 });
 
+// ─── EngineStatus memo component ────────────────────────────────────────────
+const EngineStatus = memo(function EngineStatus({
+  openLong, openShort, stoch5mK, cooldownRemainMs, freeMargin,
+  currentPrice, preset, support15m, resistance15m,
+}: {
+  openLong: Position[]; openShort: Position[];
+  stoch5mK: number | null; cooldownRemainMs: number; freeMargin: number;
+  currentPrice: number | null;
+  preset: import("../utils/all5mAccount").Preset;
+  support15m: number | null; resistance15m: number | null;
+}) {
+  const STACK_MAX = preset.stackMaxPerSide;
+  const SPACING_MIN = preset.stackPerSideSpacingMin;
+  const DIST_PCT = preset.stackMinEntryDistPct;
+  const STOCH_L = preset.stochLongLevel;
+  const STOCH_S = preset.stochShortLevel;
+  const SR_PROX = preset.srProximityPct;
+  const MIN_MARGIN = 30;
+  const now = Date.now();
+
+  const evalSide = (side: "LONG" | "SHORT", list: Position[]) => {
+    const count = list.length;
+    const lastEntry = list[0] ?? null;
+    const blocks: string[] = [];
+    if (cooldownRemainMs > 0) blocks.push(`cooldown ${fmtCountdown(cooldownRemainMs)}`);
+    if (freeMargin < MIN_MARGIN) blocks.push(`free margin $${freeMargin.toFixed(0)} < $${MIN_MARGIN}`);
+    if (count >= STACK_MAX) blocks.push(`STACK FULL ${count}/${STACK_MAX}`);
+    if (lastEntry && SPACING_MIN > 0) {
+      const sinceMin = (now - lastEntry.entryMs) / 60000;
+      if (sinceMin < SPACING_MIN) blocks.push(`spacing còn ${(SPACING_MIN - sinceMin).toFixed(1)}m`);
+    }
+    if (lastEntry && currentPrice !== null && DIST_PCT > 0) {
+      const distPct = Math.abs(currentPrice - lastEntry.entryPrice) / lastEntry.entryPrice * 100;
+      if (distPct < DIST_PCT) blocks.push(`dist ${distPct.toFixed(2)}% < ${DIST_PCT}%`);
+    }
+    const k = stoch5mK;
+    const stochTriggered = side === "LONG" ? (k !== null && k < STOCH_L) : (k !== null && k > STOCH_S);
+    let srTriggered = false;
+    let srInfo = "";
+    if (currentPrice !== null) {
+      if (side === "LONG" && support15m) {
+        const d = ((currentPrice - support15m) / support15m) * 100;
+        srTriggered = d >= 0 && d <= SR_PROX;
+        srInfo = `Sup $${support15m.toFixed(0)} (${d.toFixed(2)}%)`;
+      } else if (side === "SHORT" && resistance15m) {
+        const d = ((resistance15m - currentPrice) / currentPrice) * 100;
+        srTriggered = d >= 0 && d <= SR_PROX;
+        srInfo = `Res $${resistance15m.toFixed(0)} (${d.toFixed(2)}%)`;
+      }
+    }
+    const triggered = stochTriggered || srTriggered;
+    let trigger: string;
+    if (stochTriggered) trigger = `✅ K=${stoch5mK?.toFixed(1)} ${side === "LONG" ? `<${STOCH_L}` : `>${STOCH_S}`} (stoch)`;
+    else if (srTriggered) trigger = `✅ ${srInfo} (S/R fallback)`;
+    else { const sk = k !== null ? `K=${k.toFixed(1)}` : "K=—"; trigger = `⏳ no signal · ${sk}${srInfo ? " · " + srInfo : ""}`; }
+    if (!triggered) blocks.push("no signal");
+    return { count, blocks, trigger };
+  };
+
+  const longE = evalSide("LONG", openLong);
+  const shortE = evalSide("SHORT", openShort);
+  return (
+    <View style={esStyles.box}>
+      <Text style={esStyles.header}>
+        🎯 ENGINE STATUS — {preset.emoji} {preset.label} · K={stoch5mK !== null ? stoch5mK.toFixed(1) : "—"} · ${currentPrice?.toFixed(0) ?? "—"}
+      </Text>
+      {(["LONG", "SHORT"] as const).map((side) => {
+        const e = side === "LONG" ? longE : shortE;
+        const ready = e.blocks.length === 0;
+        const c = side === "LONG" ? P.green : P.error;
+        return (
+          <View key={side} style={{ marginBottom: 3 }}>
+            <Text style={[esStyles.line, { color: c, fontWeight: "700" }]}>
+              {ready ? "✅" : "⏸"} {side} {e.count}/{STACK_MAX} — {ready ? "READY" : "BLOCKED"}
+            </Text>
+            <Text style={[esStyles.line, { color: ready ? P.green : P.bitcoinOrange }]}>  · {e.trigger}</Text>
+            {e.blocks.length > 0 && <Text style={[esStyles.line, { color: P.error }]}>  · block: {e.blocks.join(" · ")}</Text>}
+          </View>
+        );
+      })}
+    </View>
+  );
+});
+const esStyles = StyleSheet.create({
+  box: { backgroundColor: P.surface, borderWidth: 1, borderColor: P.borderSoft, borderRadius: 4, padding: 10, marginBottom: 12 },
+  header: { color: P.text, fontSize: 12, fontWeight: "700", marginBottom: 6, fontFamily: "JetBrainsMono_500Medium" },
+  line: { fontSize: 10, fontFamily: "JetBrainsMono_400Regular", lineHeight: 15 },
+});
+
+const RULE_OPEN_KEY = "@all5m_rule_open";
+
 export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, support15m, resistance15m, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
+  const [ruleOpen, setRuleOpen] = useState(false);
+
+  // Persist ruleOpen state (anh Tommy: "nhớ rule đã chọn")
+  useEffect(() => {
+    AsyncStorage.getItem(RULE_OPEN_KEY).then((v) => { if (v === "1") setRuleOpen(true); }).catch(() => {});
+  }, []);
+  const toggleRule = useCallback(() => {
+    setRuleOpen((v) => {
+      const next = !v;
+      AsyncStorage.setItem(RULE_OPEN_KEY, next ? "1" : "0").catch(() => {});
+      return next;
+    });
+  }, []);
   const preset = getEffectivePreset(presetKey);
   // ALL tunable values từ active preset (anh Tommy v4.7.1)
   const TP_PCT = preset.tpPct;
@@ -326,8 +420,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
   const closed = useMemo(() => filter === "ALL" ? closedAll : closedAll.filter((p) => p.status === filter), [closedAll, filter]);
   const openLong = useMemo(() => open.filter((p) => p.side === "LONG").sort((a, b) => b.entryMs - a.entryMs), [open]);
   const openShort = useMemo(() => open.filter((p) => p.side === "SHORT").sort((a, b) => b.entryMs - a.entryMs), [open]);
-  const openLongVisible = useMemo(() => openLong.slice(0, MAX_OPEN_ROWS_PER_SIDE), [openLong]);
-  const openShortVisible = useMemo(() => openShort.slice(0, MAX_OPEN_ROWS_PER_SIDE), [openShort]);
+  // v4.8.31: show all open positions (removed 30-row cap per Tommy request)
 
   const handleSwitchPreset = useCallback((key: PresetKey) => {
     if (key === presetKey) return;
@@ -380,10 +473,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           <Text style={styles.h1}>⚡ 5m ALL — RULE: SMART STACK</Text>
           <Text style={styles.subtitle}>
             Preset: <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>{preset.emoji} {preset.label}</Text>
-            {preset.trailingStopEnabled
-              ? ` · K<${STOCH_LONG}/K>${STOCH_SHORT} · trail SL · stack ${STACK_MAX_PER_SIDE}/side`
-              : ` · TP+${TP_PCT}%/SL-${SL_PCT}% · stack ${STACK_MAX_PER_SIDE}/side · dist ${STACK_MIN_ENTRY_DIST_PCT}%`
-            }
+            {` · TP+${TP_PCT}%/SL-${SL_PCT}% · stack ${STACK_MAX_PER_SIDE}/side · K<${STOCH_LONG}/${STOCH_SHORT}`}
           </Text>
         </View>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
@@ -391,13 +481,11 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </TouchableOpacity>
       </View>
 
-      {/* PRESET SWITCHER (anh Tommy v4.8.24): 10 picks từ TPSL_GRID_v1 SHORTLIST_v1
-        * 7 candidates (composite rank 3.25-5.75) + 3 legacy current prod (6.75-9.50) */}
+      {/* PRESET SWITCHER — 7 picks từ TPSL_GRID_v1 (composite rank 3.25-5.75) */}
       <View style={styles.presetRow}>
         {([
           "WHALE_MAX_66", "WHALE_MAX_48", "WHALE_MAX_38", "WHALE_MAX_88",
           "TOMI_MAX_55", "WHALE_MID_66", "TOMI_MIN_66",
-          "WHALE_MAX", "WHALE_MID", "TOMI_MAX",
         ] as PresetKey[]).map((k) => {
           const p = getEffectivePreset(k);
           const active = k === presetKey;
@@ -421,9 +509,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
                 {p.emoji} {p.label} {active ? "✓" : ""}
               </Text>
               <Text style={styles.presetSub}>
-                {p.trailingStopEnabled
-                  ? `K<${p.stochLongLevel}/K>${p.stochShortLevel} · trail SL · stack ${p.stackMaxPerSide}`
-                  : `TP+${p.tpPct}%/SL-${p.slPct}% · stack ${p.stackMaxPerSide} · dist ${p.stackMinEntryDistPct}%`}
+                {`TP+${p.tpPct}%/SL-${p.slPct}% · stack ${p.stackMaxPerSide} · K<${p.stochLongLevel}/${p.stochShortLevel}`}
               </Text>
               <Text style={[styles.presetMetric, { color: accentColor }]}>
                 3y: +${(p.expectedNet3y / 1000).toFixed(0)}k · DD ${(p.expectedMaxDd3y / 1000).toFixed(1)}k
@@ -434,46 +520,31 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         })}
       </View>
 
-      {/* RULE LOGIC — dynamic theo active preset (anh Tommy v4.7.1) */}
-      <View style={styles.ruleBox}>
-        <Text style={styles.ruleTitle}>📋 RULE: SMART STACK [{preset.emoji} {preset.label}] — nhiều lệnh cùng side, mỗi lệnh TP/SL riêng</Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Stack gates per side (preset {preset.label}):</Text>
-          {"\n"}  • Tối đa <Text style={[styles.ruleNum, { color: P.bitcoinOrange }]}>{STACK_MAX_PER_SIDE}</Text> lệnh OPEN cùng side (LONG / SHORT đếm riêng)
-          {"\n"}  • Tối thiểu <Text style={styles.ruleNum}>{STACK_SPACING_MIN} phút</Text> giữa 2 entry CÙNG side
-          {"\n"}  • Entry mới phải xa entry gần nhất CÙNG side ≥ <Text style={styles.ruleNum}>{STACK_MIN_ENTRY_DIST_PCT}%</Text> (tránh nhồi 1 vùng)
+      {/* RULE LOGIC — collapsible (v4.8.31) */}
+      <TouchableOpacity onPress={toggleRule} style={styles.ruleToggle} activeOpacity={0.7}>
+        <Text style={styles.ruleToggleText}>
+          {ruleOpen ? "▼" : "▶"} 📋 RULE: SMART STACK [{preset.emoji} {preset.label}]
+          {!ruleOpen ? `  · TP+${TP_PCT}%/SL-${SL_PCT}% · stack ${STACK_MAX_PER_SIDE}/side · K<${STOCH_LONG}/${STOCH_SHORT}` : ""}
         </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Trigger:</Text> mỗi cây 5m vừa đóng (close-bar evaluate)
-        </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Primary signal — StochRSI 5m K(14,14,3,3):</Text>
-          {"\n"}  • K &lt; <Text style={styles.ruleNum}>{STOCH_LONG}</Text> → vào <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
-          {"\n"}  • K &gt; <Text style={styles.ruleNum}>{STOCH_SHORT}</Text> → vào <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
-        </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Fallback — S/R 15m (pivot {SR_LOOKBACK} cây gần nhất):</Text>
-          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROX_PCT}%</Text> trên Support → <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text>
-          {"\n"}  • Nếu close ≤ <Text style={styles.ruleNum}>{SR_PROX_PCT}%</Text> dưới Resistance → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
-        </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Exit (per-lệnh):</Text>{" "}
-          {preset.trailingStopEnabled
-            ? <>Initial SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> · Trailing: PnL hit N×100% → SL ratchet (N-1)×100%{"\n"}  Không có TP cố định — chỉ exit qua SL. Milestone 1→SL breakeven, 2→+100%...</>
-            : <>TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> raw price.</>
-          }
-          {"\n"}  Mỗi tick scan TỪNG lệnh OPEN riêng, hit exit → close độc lập (không ảnh hưởng lệnh khác).
-        </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Risk per lệnh:</Text> margin <Text style={styles.ruleNum}>${MARGIN_PER_TRADE}</Text> × <Text style={styles.ruleNum}>{LEVERAGE}x</Text> = notional <Text style={styles.ruleNum}>${MARGIN_PER_TRADE * LEVERAGE}</Text> · fee <Text style={styles.ruleNum}>${FEE_PER_SIDE.toFixed(2)}</Text>/side
-        </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Cooldown chung:</Text> <Text style={styles.ruleNum}>{COOLDOWN_MIN} phút</Text> giữa các entry (mọi side) · không vào trùng cây 5m
-        </Text>
-        <Text style={styles.ruleLine}>
-          <Text style={styles.ruleStrong}>Tên rule:</Text> <Text style={[styles.ruleNum, { color: P.tertiary }]}>SMART_STACK_5M_v2 · {preset.label}</Text> · expected 3y NET +${(preset.expectedNet3y / 1000).toFixed(0)}k · DD ${preset.expectedMaxDd3y}
-        </Text>
-      </View>
+      </TouchableOpacity>
+      {ruleOpen && (
+        <View style={styles.ruleBox}>
+          <Text style={styles.ruleLine}>
+            <Text style={styles.ruleStrong}>Stack gates per side:</Text>
+            {"\n"}  • Tối đa <Text style={[styles.ruleNum, { color: P.bitcoinOrange }]}>{STACK_MAX_PER_SIDE}</Text> lệnh OPEN cùng side
+            {"\n"}  • Spacing {STACK_SPACING_MIN} phút · dist ≥ {STACK_MIN_ENTRY_DIST_PCT}% giữa entries cùng side
+          </Text>
+          <Text style={styles.ruleLine}>
+            <Text style={styles.ruleStrong}>Primary:</Text> K &lt; <Text style={styles.ruleNum}>{STOCH_LONG}</Text> → <Text style={[styles.ruleStrong, { color: P.green }]}>LONG</Text> · K &gt; <Text style={styles.ruleNum}>{STOCH_SHORT}</Text> → <Text style={[styles.ruleStrong, { color: P.error }]}>SHORT</Text>
+            {"\n"}<Text style={styles.ruleStrong}>Fallback S/R 15m ({SR_LOOKBACK} cây):</Text> close ≤ {SR_PROX_PCT}% từ Support/Resistance
+          </Text>
+          <Text style={styles.ruleLine}>
+            <Text style={styles.ruleStrong}>Exit:</Text> TP <Text style={[styles.ruleNum, { color: P.green }]}>+{TP_PCT}%</Text> · SL <Text style={[styles.ruleNum, { color: P.error }]}>-{SL_PCT}%</Text> · Cooldown {COOLDOWN_MIN}m
+            {"\n"}<Text style={styles.ruleStrong}>Risk:</Text> ${MARGIN_PER_TRADE} × {LEVERAGE}x = ${MARGIN_PER_TRADE * LEVERAGE} · fee ${FEE_PER_SIDE.toFixed(2)}/side
+            {"\n"}<Text style={styles.ruleStrong}>3y backtest:</Text> NET +${(preset.expectedNet3y / 1000).toFixed(0)}k · MaxDD $${preset.expectedMaxDd3y.toLocaleString()}
+          </Text>
+        </View>
+      )}
 
       {/* KPI */}
       <View style={styles.kpiGrid}>
@@ -485,109 +556,17 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <Kpi label="OPEN" value={`${summary.openCount}`} color={P.primaryContainer} sub={`free $${summary.freeMargin.toFixed(0)}`} />
       </View>
 
-      {/* Status detail — memoized theo open/stoch/price thay đổi */}
-      {useMemo(() => {
-        const longCount = openLong.length;
-        const shortCount = openShort.length;
-        const k = stoch5mK;
-        const cd = summary.cooldownRemainMs;
-        const freeM = summary.freeMargin;
-        const minMargin = 30;
-        const lastLong = openLong[0] ?? null;
-        const lastShort = openShort[0] ?? null;
-        const now = Date.now();
-
-        // Eval per side
-        const evalSide = (side: "LONG" | "SHORT", count: number, lastEntry: Position | null) => {
-          const blocks: string[] = [];
-          // 1. Cooldown chung
-          if (cd > 0) blocks.push(`cooldown ${fmtCountdown(cd)}`);
-          // 2. Free margin
-          if (freeM < minMargin) blocks.push(`free margin $${freeM.toFixed(0)} < $${minMargin}`);
-          // 3. Stack max
-          if (count >= STACK_MAX_PER_SIDE) blocks.push(`STACK FULL ${count}/${STACK_MAX_PER_SIDE}`);
-          // 4. Spacing per side
-          if (lastEntry && STACK_SPACING_MIN > 0) {
-            const sinceLastMin = (now - lastEntry.entryMs) / 60000;
-            if (sinceLastMin < STACK_SPACING_MIN) {
-              blocks.push(`spacing còn ${(STACK_SPACING_MIN - sinceLastMin).toFixed(1)}m`);
-            }
-          }
-          // 5. Distance per side (only valid if currentPrice known)
-          if (lastEntry && currentPrice !== null && STACK_MIN_ENTRY_DIST_PCT > 0) {
-            const distPct = Math.abs(currentPrice - lastEntry.entryPrice) / lastEntry.entryPrice * 100;
-            if (distPct < STACK_MIN_ENTRY_DIST_PCT) {
-              blocks.push(`dist ${distPct.toFixed(2)}% < ${STACK_MIN_ENTRY_DIST_PCT}%`);
-            }
-          }
-          // 6. Trigger condition (signal)
-          let trigger: string;
-          let triggered = false;
-          const stochTriggered = side === "LONG" ? (k !== null && k < STOCH_LONG) : (k !== null && k > STOCH_SHORT);
-          let srTriggered = false;
-          let srInfo = "";
-          if (currentPrice !== null) {
-            if (side === "LONG" && support15m) {
-              const distSup = ((currentPrice - support15m) / support15m) * 100;
-              srTriggered = distSup >= 0 && distSup <= SR_PROX_PCT;
-              srInfo = `Support $${support15m.toFixed(0)} (cách ${distSup.toFixed(2)}%, trigger ≤${SR_PROX_PCT}%)`;
-            } else if (side === "SHORT" && resistance15m) {
-              const distRes = ((resistance15m - currentPrice) / currentPrice) * 100;
-              srTriggered = distRes >= 0 && distRes <= SR_PROX_PCT;
-              srInfo = `Resistance $${resistance15m.toFixed(0)} (cách ${distRes.toFixed(2)}%, trigger ≤${SR_PROX_PCT}%)`;
-            }
-          }
-          triggered = stochTriggered || srTriggered;
-          if (stochTriggered) {
-            trigger = `✅ Stoch K=${k?.toFixed(1)} ${side === "LONG" ? `<${STOCH_LONG}` : `>${STOCH_SHORT}`} (PRIMARY)`;
-          } else if (srTriggered) {
-            trigger = `✅ ${srInfo} (FALLBACK)`;
-          } else {
-            const stochInfo = k !== null ? `K=${k.toFixed(1)} (chờ ${side === "LONG" ? `<${STOCH_LONG}` : `>${STOCH_SHORT}`})` : "K=—";
-            trigger = `⏳ Chưa trigger · ${stochInfo}${srInfo ? " · " + srInfo : ""}`;
-          }
-
-          if (!triggered) blocks.push("no signal");
-          return { triggered, blocks, trigger };
-        };
-
-        const longEval = evalSide("LONG", longCount, lastLong);
-        const shortEval = evalSide("SHORT", shortCount, lastShort);
-        const longReady = longEval.blocks.length === 0;
-        const shortReady = shortEval.blocks.length === 0;
-
-        const Bullet = ({ side, count, max, ready, blocks, trigger }: {
-          side: "LONG" | "SHORT"; count: number; max: number; ready: boolean; blocks: string[]; trigger: string;
-        }) => {
-          const sideColor = side === "LONG" ? P.green : P.error;
-          const statusColor = ready ? P.green : P.bitcoinOrange;
-          return (
-            <View style={{ marginBottom: 4 }}>
-              <Text style={[styles.cdBannerText, { color: sideColor, textAlign: "left", fontWeight: "700" }]}>
-                {ready ? "✅" : "⏸"} {side} {count}/{max} — {ready ? "READY (cây 5m kế đóng → vào lệnh)" : "BLOCKED"}
-              </Text>
-              <Text style={[styles.cdBannerText, { color: P.dim, textAlign: "left", fontSize: 10 }]}>
-                · Trigger: <Text style={{ color: statusColor }}>{trigger}</Text>
-              </Text>
-              {blocks.length > 0 && (
-                <Text style={[styles.cdBannerText, { color: P.error, textAlign: "left", fontSize: 10 }]}>
-                  · Block: {blocks.join(" · ")}
-                </Text>
-              )}
-            </View>
-          );
-        };
-
-        return (
-          <View style={[styles.cdBanner, { backgroundColor: P.surface, borderWidth: 1, borderColor: P.borderSoft, padding: 10 }]}>
-            <Text style={[styles.cdBannerText, { color: P.text, fontWeight: "700", marginBottom: 6 }]}>
-              🎯 ENGINE STATUS — preset {preset.emoji} {preset.label} · K={k !== null ? k.toFixed(1) : "—"} · price ${currentPrice?.toFixed(0) ?? "—"}
-            </Text>
-            <Bullet side="LONG" count={longCount} max={STACK_MAX_PER_SIDE} ready={longReady} blocks={longEval.blocks} trigger={longEval.trigger} />
-            <Bullet side="SHORT" count={shortCount} max={STACK_MAX_PER_SIDE} ready={shortReady} blocks={shortEval.blocks} trigger={shortEval.trigger} />
-          </View>
-        );
-      }, [openLong, openShort, stoch5mK, summary.cooldownRemainMs, summary.freeMargin, currentPrice, preset, STACK_MAX_PER_SIDE, STACK_SPACING_MIN, STACK_MIN_ENTRY_DIST_PCT, STOCH_LONG, STOCH_SHORT, SR_PROX_PCT, support15m, resistance15m])}
+      {/* ENGINE STATUS — memo component (v4.8.31) */}
+      <EngineStatus
+        openLong={openLong} openShort={openShort}
+        stoch5mK={stoch5mK}
+        cooldownRemainMs={summary.cooldownRemainMs}
+        freeMargin={summary.freeMargin}
+        currentPrice={currentPrice}
+        preset={preset}
+        support15m={support15m ?? null}
+        resistance15m={resistance15m ?? null}
+      />
 
       {/* Price 5m + entry/exit markers (anh Tommy v4.7.12) */}
       {price5mBars && price5mBars.length >= 2 && (
@@ -609,7 +588,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         {open.length === 0 ? (
           <Text style={styles.empty}>chưa có lệnh nào đang mở</Text>
         ) : (
-          ([["LONG", openLong, openLongVisible], ["SHORT", openShort, openShortVisible]] as const).map(([side, list, visibleList]) => {
+          ([["LONG", openLong], ["SHORT", openShort]] as const).map(([side, list]) => {
             if (list.length === 0) return null;
             let sideUpnl = 0;
             if (currentPrice !== null) {
@@ -626,12 +605,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
                 <Text style={[styles.sectionTitle, { color: sideColor, marginTop: 4 }]}>
                   {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) · uPnL <Text style={{ color: sideUpnl >= 0 ? P.green : P.error }}>{fmtUsd(sideUpnl, true)}</Text>
                 </Text>
-                {list.length > visibleList.length ? (
-                  <Text style={styles.openListHint}>
-                    hiện {visibleList.length}/{list.length} lệnh mới nhất để mobile đỡ lag
-                  </Text>
-                ) : null}
-                {visibleList.map((p, i) => (
+                {list.map((p, i) => (
                   <OpenPositionRow key={p.id} p={p} i={i} currentPrice={currentPrice} onCloseManual={onCloseManual} />
                 ))}
               </View>
@@ -713,14 +687,20 @@ const styles = StyleSheet.create({
   kpiLabel: { color: P.dim, fontSize: 9, letterSpacing: 1.2, fontFamily: "JetBrainsMono_500Medium" },
   kpiValue: { fontSize: 18, fontWeight: "800", marginTop: 4, fontFamily: "JetBrainsMono_700Bold" },
   kpiSub: { color: P.dim, fontSize: 10, marginTop: 2, fontFamily: "JetBrainsMono_400Regular" },
+  ruleToggle: {
+    flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10,
+    backgroundColor: P.elevated, borderWidth: 1, borderColor: P.border,
+    borderLeftWidth: 4, borderLeftColor: P.bitcoinOrange,
+    borderRadius: 4, marginBottom: 6,
+  },
+  ruleToggleText: {
+    color: P.bitcoinOrange, fontFamily: "JetBrainsMono_700Bold",
+    fontSize: 11, fontWeight: "700", flex: 1,
+  },
   ruleBox: {
     backgroundColor: P.elevated, borderWidth: 1, borderColor: P.border,
     borderLeftWidth: 4, borderLeftColor: P.bitcoinOrange,
     borderRadius: 4, padding: 12, marginBottom: 14,
-  },
-  ruleTitle: {
-    color: P.bitcoinOrange, fontFamily: "JetBrainsMono_700Bold",
-    fontSize: 12, fontWeight: "900", letterSpacing: 1, marginBottom: 8,
   },
   ruleLine: {
     color: P.text2, fontFamily: "monospace", fontSize: 11, lineHeight: 16, marginBottom: 6,
@@ -733,7 +713,6 @@ const styles = StyleSheet.create({
   sectionTitle: { color: P.text, fontSize: 13, fontWeight: "700", marginBottom: 8, letterSpacing: 0.4 },
   closedChartTitle: { color: P.tertiary, fontSize: 11, fontWeight: "700", marginBottom: 8, letterSpacing: 0.3 },
   empty: { color: P.dim, fontStyle: "italic", paddingVertical: 8, fontSize: 12 },
-  openListHint: { color: P.dim, fontSize: 10, marginBottom: 6, fontStyle: "italic" },
   row: { flexDirection: "row", alignItems: "center", paddingVertical: 5, borderBottomColor: P.borderSoft, borderBottomWidth: 1, gap: 10, flexWrap: "wrap" },
   cellW: { flexBasis: 110, flexShrink: 0, fontFamily: "JetBrainsMono_500Medium", fontSize: 11 },
   cellNarrow: { flexBasis: 70, flexShrink: 0, fontFamily: "JetBrainsMono_500Medium", fontSize: 11 },

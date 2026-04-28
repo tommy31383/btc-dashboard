@@ -21,7 +21,7 @@ export type NavTab = "radar" | "trades" | "gptRule" | "live" | "all5m" | "server
 const ALL_TABS: { key: NavTab; label: string; icon: React.ComponentProps<typeof MaterialIcon>["name"]; pcOnly?: boolean }[] = [
   { key: "radar",   label: "RULE",    icon: "radar" },
   { key: "live",    label: "LIVE",    icon: "bolt" },
-  { key: "all5m",   label: "5m ALL",  icon: "auto_graph", pcOnly: true },
+  { key: "all5m",   label: "5m ALL",  icon: "auto_graph" },
   { key: "server",  label: "SERVER",  icon: "monitoring" },
 ];
 

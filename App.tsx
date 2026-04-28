@@ -63,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.8.30";
+const APP_VERSION = "4.8.31";
 const BUILD_DATE = "2026-04-28";
 
 /**
@@ -197,10 +197,8 @@ export default function App() {
   // const all15m = use15mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all15m");
 
   // v4.3.47 — 5m All trader: chạy nền liên tục để tích luỹ history (không gate theo tab)
-  // 5m ALL: chỉ device LEADER (trong leader election) mới run engine + push state lên gist.
-  // Device chưa connect (DISCONNECTED) coi như leader cho local-only mode (không sync).
-  const isLeaderFor5m = live.role === "LEADER" || live.role === "DISCONNECTED";
-  const all5m = use5mAllTrader(rawKlines, tfData, priceData?.price ?? null, true, isLeaderFor5m);
+  // v4.8.31: removed leader/follower mode — server owns trading, front-end is display only
+  const all5m = use5mAllTrader(rawKlines, tfData, priceData?.price ?? null, true);
 
   // v4.3.37 — Auto-pull paper trades từ Gist khi app mount (best-effort).
   useEffect(() => {
