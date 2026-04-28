@@ -4,6 +4,19 @@
 
 ---
 
+## 📊 BACKTEST DATASETS REGISTRY
+
+Xem **`BACKTEST_REGISTRY.md`** để full list dataset đã test. Quick reference (current truth):
+
+- **`TPSL_GRID_v1`** — 280 combo TP/SL grid 3y · canonical 5m ALL TP/SL truth
+- **`SHORTLIST_v1`** — 7 picks Tommy curated từ `TPSL_GRID_v1` (yolo → starter ladder)
+- **`STEP_TRAIL_v1`** — LIVE engine step-trail (E-T15-NoTP cap 10 winner, applied server v0.2.4)
+- **`STACK_SWEEP_v1`** — superseded, basis cho 5 preset v4.8.23
+
+**Naming convention:** `<DOMAIN>_<TYPE>_v<N>` (vd `STOCH_SWEEP_v1`). Khi backtest mới → đăng ký vào `BACKTEST_REGISTRY.md` thay vì nhớ filename.
+
+---
+
 ## 📈 BACKTEST PHẢI LƯU EQUITY CURVE (PnL CHART)
 
 Mỗi lần chạy backtest cho 1 rule, **BẮT BUỘC** lưu equity curve (cumulative PnL theo
