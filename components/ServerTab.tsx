@@ -27,8 +27,13 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
   // ALL hooks MUST be at top — Rules of Hooks (anh Tommy v4.8.7 fix crash)
   const s = live.state;
   const trackedAll = s?.trackedPositions ?? [];
-  const symPosAll = s?.binanceSnapshot?.positions?.find((p: any) => p.symbol === (s?.settings?.symbol ?? "BTCUSDT"));
+  const allPos = s?.binanceSnapshot?.positions ?? [];
+  const symbol = s?.settings?.symbol ?? "BTCUSDT";
+  const symPosAll = allPos.find((p: any) => p.symbol === symbol);
   const markPriceAll = symPosAll ? parseFloat(symPosAll.markPrice) : null;
+  // Binance hedge mode: 2 records per symbol (LONG + SHORT)
+  const binanceLongPos = allPos.find((p: any) => p.symbol === symbol && p.positionSide === "LONG");
+  const binanceShortPos = allPos.find((p: any) => p.symbol === symbol && p.positionSide === "SHORT");
   const memoLists = useMemo(() => {
     const long: any[] = [];
     const short: any[] = [];
@@ -200,6 +205,55 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         )}
       </View>
 
+      {/* BINANCE POSITIONS — net hedge state lấy từ /fapi/v2/positionRisk thật (anh Tommy v4.8.13) */}
+      <View style={styles.card}>
+        <Text style={styles.h2}>🏦 BINANCE POSITIONS (live · {symbol})</Text>
+        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+          {(["LONG", "SHORT"] as const).map((side) => {
+            const p = side === "LONG" ? binanceLongPos : binanceShortPos;
+            const sideColor = side === "LONG" ? P.green : P.error;
+            const amt = p ? parseFloat(p.positionAmt) : 0;
+            const hasPos = Math.abs(amt) > 0;
+            const entry = p ? parseFloat(p.entryPrice) : 0;
+            const mark = p ? parseFloat(p.markPrice) : 0;
+            const upnl = p ? parseFloat(p.unRealizedProfit) : 0;
+            const liq = p ? parseFloat(p.liquidationPrice) : 0;
+            const lev = p ? parseInt(p.leverage) : 0;
+            const notional = Math.abs(amt) * mark;
+            const upnlPct = entry > 0 ? ((side === "LONG" ? mark - entry : entry - mark) / entry) * 100 : 0;
+            return (
+              <View key={side} style={{ flex: 1, minWidth: 280, padding: 8, backgroundColor: P.surface, borderRadius: 4, borderWidth: 1, borderColor: hasPos ? sideColor : P.borderSoft }}>
+                <Text style={{ color: sideColor, fontFamily: "monospace", fontWeight: "800", fontSize: 12, marginBottom: 4 }}>
+                  {side === "LONG" ? "🟢" : "🔴"} {side} {hasPos ? `· ${Math.abs(amt).toFixed(4)} BTC` : "· trống"}
+                </Text>
+                {hasPos ? (
+                  <>
+                    <Text style={{ color: P.text, fontFamily: "monospace", fontSize: 11 }}>
+                      avg entry <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>${entry.toFixed(2)}</Text>
+                      {"  "}· notional <Text style={{ fontWeight: "700" }}>${notional.toFixed(0)}</Text>
+                    </Text>
+                    <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 11 }}>
+                      mark <Text style={{ color: P.text }}>${mark.toFixed(2)}</Text>
+                      {"  "}· lev <Text style={{ color: P.text }}>{lev}x</Text>
+                      {"  "}· liq <Text style={{ color: P.error }}>${liq.toFixed(0)}</Text>
+                    </Text>
+                    <Text style={{ fontFamily: "monospace", fontSize: 12, fontWeight: "800", color: upnl >= 0 ? P.green : P.error, marginTop: 2 }}>
+                      uPnL {upnl >= 0 ? "+" : ""}${upnl.toFixed(2)} ({upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%)
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={[styles.dim, { fontStyle: "italic" }]}>không có position</Text>
+                )}
+              </View>
+            );
+          })}
+        </View>
+        <Text style={[styles.dim, { marginTop: 6, fontStyle: "italic" }]}>
+          💡 Lấy từ /fapi/v2/positionRisk · refresh poll {sched?.pollMs ? `${Math.round(sched.pollMs / 1000)}s` : "30s"}.
+          App tracked card bên dưới = N entries logical với TP/SL riêng (Plan B).
+        </Text>
+      </View>
+
       {/* Chart entry/exit markers */}
       <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -346,10 +400,16 @@ function ServerPriceChart({ bars, tracked, journal, width, tf }: {
   const tMax = Math.max(slice[slice.length - 1].time, ...tracked.map((t) => t.entryMs), Date.now());
   const range = tMax - tMin || 1;
   const closes = slice.map((b) => b.close);
+  // SMART RANGE (anh Tommy v4.8.13): chỉ dùng closes + tracked entryPrice (NOT tp/sl —
+  // tránh outlier SL/TP xa kéo lệch chart). Markers ngoài range sẽ clamp tới edge.
   const pricePoints: number[] = [...closes];
-  for (const t of tracked) pricePoints.push(t.entryPrice, t.tpPrice, t.slPrice);
-  const pMin = Math.min(...pricePoints);
-  const pMax = Math.max(...pricePoints);
+  for (const t of tracked) pricePoints.push(t.entryPrice);
+  let pMin = Math.min(...pricePoints);
+  let pMax = Math.max(...pricePoints);
+  // Padding 5% trên dưới để có không gian thở
+  const pad5 = (pMax - pMin) * 0.05;
+  pMin -= pad5;
+  pMax += pad5;
   const pRange = pMax - pMin || 1;
   const pad = 8;
   const w = width - pad * 2;
@@ -359,14 +419,26 @@ function ServerPriceChart({ bars, tracked, journal, width, tf }: {
     if (t > tMax) return width - pad;
     return pad + ((t - tMin) / range) * w;
   };
-  const yOf = (p: number) => pad + h - ((p - pMin) / pRange) * h;
+  const yOf = (p: number) => {
+    // Clamp price ra ngoài range vào edge (anh Tommy v4.8.13)
+    const clamped = Math.max(pMin, Math.min(pMax, p));
+    return pad + h - ((clamped - pMin) / pRange) * h;
+  };
   const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
 
   // CLOSE markers từ journal (last 30 closes)
   const closesJ = journal.filter((j) => j.actionKind === "CLOSE").slice(0, 30);
+  // Y-axis ticks (5 levels) + current price line
+  const currentPrice = closes[closes.length - 1];
+  const ticks = [pMax, pMax - (pMax - pMin) * 0.25, (pMax + pMin) / 2, pMin + (pMax - pMin) * 0.25, pMin];
   return (
     <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft, marginTop: 8 }}>
       <Svg width={width} height={height}>
+        {/* Y-axis grid lines + current price horizontal line */}
+        {ticks.map((p, i) => (
+          <SvgLine key={`tick-${i}`} x1={pad} y1={yOf(p)} x2={width - 50} y2={yOf(p)} stroke={P.borderSoft} strokeWidth={0.3} strokeDasharray="2,4" opacity={0.4} />
+        ))}
+        <SvgLine x1={pad} y1={yOf(currentPrice)} x2={width - 50} y2={yOf(currentPrice)} stroke={P.bitcoinOrange} strokeWidth={0.6} strokeDasharray="3,2" opacity={0.6} />
         <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.4} opacity={0.85} />
         {tracked.map((p) => {
           const eX = xOf(p.entryMs);
@@ -393,13 +465,28 @@ function ServerPriceChart({ bars, tracked, journal, width, tf }: {
           return <Circle key={`close-${i}`} cx={cX} cy={cY} r={4} fill={dotColor} opacity={1} stroke={P.surface} strokeWidth={0.5} />;
         })}
       </Svg>
-      <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12 }}>
-        <Text style={{ color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMax.toFixed(0)}</Text>
+      {/* Y-axis tick value labels (right edge) */}
+      {ticks.map((p, i) => {
+        const y = yOf(p);
+        if (y < 12 || y > height - 4) return null;
+        return (
+          <Text key={`lbl-${i}`} style={{
+            position: "absolute", right: 4, top: y - 7,
+            color: P.dim, fontSize: 9, fontFamily: "monospace",
+          }}>${p.toFixed(0)}</Text>
+        );
+      })}
+      {/* Current price label (highlight cam) */}
+      <Text style={{
+        position: "absolute", right: 4, top: yOf(currentPrice) - 7,
+        color: P.bitcoinOrange, fontSize: 10, fontFamily: "monospace", fontWeight: "800",
+      }}>${currentPrice.toFixed(0)}</Text>
+      <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
         <Text style={{ color: P.green, fontSize: 9, fontFamily: "monospace" }}>▲ LONG ● TP</Text>
         <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT ● SL</Text>
       </View>
       <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>
-        ${pMin.toFixed(0)} · {tracked.length} open · {closesJ.length} closed · {((tMax - tMin) / 3600000).toFixed(1)}h
+        range ${(pMax - pMin).toFixed(0)} · {tracked.length} open · {closesJ.length} closed · {((tMax - tMin) / 3600000).toFixed(1)}h
       </Text>
     </View>
   );
