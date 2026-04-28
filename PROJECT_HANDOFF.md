@@ -635,3 +635,134 @@ Available gate:      avail < marginUsd → BLOCK (v0.2.1+)
 Journal tiers:       RAM 100 / disk 7-day JSONL / client lazy per-day (v0.2.2+)
 5m ALL presets:      WHALE_MAX/WHALE_MID/TOMI_MAX/TOMI_MID★/TOMI_MIN (v4.8.23+)
 ```
+
+---
+
+## 18. ARCHITECTURE OVERVIEW — Where Things Run (anh Tommy v4.8.34)
+
+Câu hỏi cốt lõi: **API key Binance ở đâu? GitHub vai trò gì? "Worker" là gì?**
+
+### A) Server cloud (DigitalOcean Singapore VPS) — TRADING BRAIN
+
+- **Path:** `/opt/btc-trader-server/` (compiled `dist/index.js`)
+- **Runtime:** Node.js + PM2 (`ecosystem.config.cjs`) → 1 process duy nhất, autorestart, max RAM 400MB
+- **Process model:** **KHÔNG** dùng worker_threads / cluster. Tất cả chạy trong cùng 1 event loop.
+- **Cái mọi người gọi là "worker" thực ra là 5 setInterval loops trong cùng process:**
+
+  | Loop | Tần suất | File | Việc |
+  |------|----------|------|------|
+  | `pollTimer` | 30s | `engine/scheduler.ts` | Poll Binance REST account + positions |
+  | `klinesTimer` | 60s | `engine/scheduler.ts` → `engine/klines.ts` | Refresh klines (5m, 15m, 1h, 4h) |
+  | `ruleTimer` | 60s | `engine/scheduler.ts` → `engine/ruleAlerts.ts` | Eval `hard_rules.json` → fire alerts |
+  | `tickTimer` | 5s | `engine/scheduler.ts` → `engine/trader.ts` | Monitor tracked positions, hit TP/SL → MARKET reduceOnly exit |
+  | `markPriceStream` | WS realtime | `engine/markPriceStream.ts` | Binance mark price WebSocket |
+
+- Adaptive interval: khi market price thay đổi nhanh → loop tăng tần suất, khi yên → giảm để tiết kiệm rate limit.
+
+### B) API key Binance — NẰM Ở ĐÂU?
+
+**🔑 100% trên cloud server.** Không bao giờ ra ngoài server.
+
+- File: `/etc/btc-trader/env`
+  ```
+  BINANCE_API_KEY=xxx
+  BINANCE_API_SECRET=xxx
+  JWT_SECRET=xxx
+  ```
+- PM2 load qua `env_file` → inject vào `process.env` → `src/config.ts` đọc → `src/engine/binance.ts` HMAC-SHA256 sign request.
+- **Frontend (BTC Dashboard) KHÔNG CÓ KEY.** SERVER_OWNS_TRADING = true. Frontend chỉ display.
+- Cũ có legacy `@live_trader_secret_v1` AsyncStorage key cho phép frontend tự trade — đã hard-killed v4.7+.
+
+### C) GitHub vai trò — 3 việc riêng biệt
+
+#### 1. Source code repo
+- `github.com/tommy31383/btc-dashboard` (public) — frontend Expo
+- `github.com/tommy31383/btc-trader-server` (private) — backend Node
+
+#### 2. Static hosting (GitHub Pages)
+- Build flow: `npx expo export -p web` → `dist/` → copy vô `docs/app/` → commit master → GitHub Pages tự deploy
+- URL: `https://tommy31383.github.io/btc-dashboard/app/`
+- → Khi anh F5 dashboard chính là từ đây
+- Server cloud KHÔNG serve frontend — chỉ serve `/api/*` + WebSocket `/ws`
+
+#### 3. State sync cho 5m ALL paper engine (branch `paper-data`)
+- File `utils/gistSync.ts`: dùng GitHub Contents API push/pull JSON state
+- Dùng branch riêng `paper-data` để KHÔNG trigger Pages rebuild mỗi lần ghi
+- Files sync: `all5m_account.json`, `paper_trades.json`...
+- → Frontend không cần backend riêng cho persistence (zero cost)
+- LƯU Ý: chỉ paper engine 5m ALL dùng cách này. **LIVE trading state nằm trong SQLite trên server**, không sync GitHub.
+
+### D) Data flow tổng thể
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  [Mobile / PC Browser]                                  │
+│         │                                               │
+│         │ HTTPS GET                                     │
+│         ▼                                               │
+│  [GitHub Pages]                                         │
+│  tommy31383.github.io/btc-dashboard/app/                │
+│         │ ── serve static JS bundle                     │
+│         ▼                                               │
+│  [Dashboard SPA boot]                                   │
+│         │                                               │
+│         ├─ WebSocket  wss://tommybtc.duckdns.org/ws    │
+│         │       ↕ realtime state push                   │
+│         │                                               │
+│         ├─ REST       /api/health, /api/state, etc     │
+│         │       ↕ on-demand fetches                     │
+│         │                                               │
+│         ▼                                               │
+│  [Cloud VPS — Singapore — 159.223.90.60]                │
+│  PM2 process "btc-trader-server"                        │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  Express HTTP + ws WebSocket on port 3000       │   │
+│  │  (Caddy reverse proxy → HTTPS public 443)       │   │
+│  │                                                 │   │
+│  │  scheduler.ts → 5 timer loops async             │   │
+│  │       │                                         │   │
+│  │       ├─ binance.ts (HMAC sign w/ API key)      │   │
+│  │       │     ↕ Binance Futures REST + WS         │   │
+│  │       │                                         │   │
+│  │       ├─ trader.ts → executeAction(MARKET)      │   │
+│  │       │     ↕ ENTRY / TP / SL on Binance       │   │
+│  │       │                                         │   │
+│  │       ├─ state.ts → SQLite WAL                  │   │
+│  │       │     /var/lib/btc-trader/state.db        │   │
+│  │       │                                         │   │
+│  │       └─ journalDisk.ts → JSONL append          │   │
+│  │             /var/lib/btc-trader/journal/        │   │
+│  │             journal-YYYY-MM-DD.jsonl (7-day)    │   │
+│  └─────────────────────────────────────────────────┘   │
+│         │                                               │
+│         │ env file: /etc/btc-trader/env                 │
+│         │   BINANCE_API_KEY / SECRET / JWT_SECRET      │
+│         ▼                                               │
+└─────────────────────────────────────────────────────────┘
+                       │
+                       ▼
+              [Binance Futures]
+              api.binance.com
+              fstream.binance.com
+```
+
+### E) Tóm gọn 1 dòng
+
+| Component | Vai trò |
+|-----------|---------|
+| **Cloud VPS** | 1 Node process + 5 timer loops + Binance API key → trade thật |
+| **GitHub repo** | Source code |
+| **GitHub Pages** | Static frontend hosting |
+| **GitHub branch `paper-data`** | State sync cho 5m ALL paper engine (KHÔNG cho LIVE) |
+| **SQLite trên server** | LIVE trading state persistence (Plan B trades, journal) |
+| **JSONL files trên server** | Journal 7-day rolling history |
+| **Frontend dashboard** | Display only — gọi `/api/*` + `/ws` của server |
+| **API key Binance** | CHỈ ở `/etc/btc-trader/env` trên server. Không bao giờ vào GitHub hay browser |
+
+### F) Pitfalls cho Claude tiếp theo
+
+1. **Đừng tưởng "worker" là worker_threads** — chỉ là setInterval loops. Sửa scheduler = sửa loops.
+2. **Đừng add API key vào frontend code** — sẽ leak qua GitHub public repo. Server-only.
+3. **Đừng ghi LIVE trading state vào branch `paper-data`** — sẽ chậm + race condition. SQLite trên server là source of truth.
+4. **Build frontend rồi PHẢI copy `dist/` → `docs/app/`** — không có CI/CD auto, GitHub Pages serve thẳng từ `docs/app/`.
+5. **Server deploy:** SSH `root@159.223.90.60` → `cd /opt/btc-trader-server && git pull && npm run build && pm2 restart btc-trader-server`.
