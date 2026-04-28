@@ -38,19 +38,37 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
     const long: any[] = [];
     const short: any[] = [];
     let lUpnl = 0, sUpnl = 0, lSize = 0, sSize = 0;
+    let lQty = 0, sQty = 0, lQtyEntry = 0, sQtyEntry = 0;
     for (const t of trackedAll) {
       if (t.side === "LONG") long.push(t);
       else if (t.side === "SHORT") short.push(t);
     }
     long.sort((a, b) => b.entryMs - a.entryMs);
     short.sort((a, b) => b.entryMs - a.entryMs);
-    for (const t of long) lSize += t.qty * t.entryPrice;
-    for (const t of short) sSize += t.qty * t.entryPrice;
+    for (const t of long) {
+      lSize += t.qty * t.entryPrice;
+      lQty += t.qty;
+      lQtyEntry += t.qty * t.entryPrice;
+    }
+    for (const t of short) {
+      sSize += t.qty * t.entryPrice;
+      sQty += t.qty;
+      sQtyEntry += t.qty * t.entryPrice;
+    }
     if (markPriceAll !== null) {
       for (const t of long) lUpnl += (markPriceAll - t.entryPrice) * t.qty;
       for (const t of short) sUpnl += (t.entryPrice - markPriceAll) * t.qty;
     }
-    return { longList: long, shortList: short, longCount: long.length, shortCount: short.length, longUpnl: lUpnl, shortUpnl: sUpnl, longSize: lSize, shortSize: sSize };
+    const lAvgEntry = lQty > 0 ? lQtyEntry / lQty : 0;
+    const sAvgEntry = sQty > 0 ? sQtyEntry / sQty : 0;
+    return {
+      longList: long, shortList: short,
+      longCount: long.length, shortCount: short.length,
+      longUpnl: lUpnl, shortUpnl: sUpnl,
+      longSize: lSize, shortSize: sSize,
+      longQty: lQty, shortQty: sQty,
+      longAvgEntry: lAvgEntry, shortAvgEntry: sAvgEntry,
+    };
   }, [trackedAll, markPriceAll]);
 
   if (live.loading) {
@@ -90,7 +108,7 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
   const sched = live.scheduler;
   const tracked = trackedAll;
   const markPrice = markPriceAll;
-  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl, longSize, shortSize } = memoLists;
+  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl, longSize, shortSize, longQty, shortQty, longAvgEntry, shortAvgEntry } = memoLists;
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
   const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
@@ -251,6 +269,66 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         <Text style={[styles.dim, { marginTop: 6, fontStyle: "italic" }]}>
           💡 Lấy từ /fapi/v2/positionRisk · refresh poll {sched?.pollMs ? `${Math.round(sched.pollMs / 1000)}s` : "30s"}.
           App tracked card bên dưới = N entries logical với TP/SL riêng (Plan B).
+        </Text>
+      </View>
+
+      {/* SYNC CHECK — compare app tracked sum vs Binance position (anh Tommy v4.8.16) */}
+      <View style={styles.card}>
+        <Text style={styles.h2}>🔄 SYNC CHECK · App tracked vs Binance</Text>
+        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+          {(["LONG", "SHORT"] as const).map((side) => {
+            const sideColor = side === "LONG" ? P.green : P.error;
+            const appQty = side === "LONG" ? longQty : shortQty;
+            const appAvg = side === "LONG" ? longAvgEntry : shortAvgEntry;
+            const appSize = side === "LONG" ? longSize : shortSize;
+            const appUpnl = side === "LONG" ? longUpnl : shortUpnl;
+            const appCount = side === "LONG" ? longCount : shortCount;
+            const binPos = side === "LONG" ? binanceLongPos : binanceShortPos;
+            const binQty = binPos ? Math.abs(parseFloat(binPos.positionAmt)) : 0;
+            const binEntry = binPos ? parseFloat(binPos.entryPrice) : 0;
+            const binMark = binPos ? parseFloat(binPos.markPrice) : 0;
+            const binSize = binQty * binMark;
+            const binUpnl = binPos ? parseFloat(binPos.unRealizedProfit) : 0;
+            // Diff
+            const qtyDiff = appQty - binQty;
+            const entryDiff = appAvg - binEntry;
+            const TOL_QTY = 0.0005; // 0.0005 BTC
+            const TOL_ENTRY = 50;   // $50
+            const qtyOk = Math.abs(qtyDiff) <= TOL_QTY;
+            const entryOk = appAvg === 0 || binEntry === 0 || Math.abs(entryDiff) <= TOL_ENTRY;
+            const allOk = qtyOk && entryOk;
+            return (
+              <View key={side} style={{
+                flex: 1, minWidth: 280, padding: 8, borderRadius: 4, borderWidth: 1,
+                borderColor: allOk ? sideColor + "55" : P.error,
+                backgroundColor: allOk ? P.surface : P.error + "12",
+              }}>
+                <Text style={{ color: allOk ? sideColor : P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 12, marginBottom: 4 }}>
+                  {allOk ? "✅" : "⚠️"} {side} {allOk ? "SYNC" : "MISMATCH"}
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
+                  qty: app <Text style={{ color: P.text }}>{appQty.toFixed(4)}</Text> vs bin <Text style={{ color: P.text }}>{binQty.toFixed(4)}</Text>
+                  {!qtyOk && <Text style={{ color: P.error }}> · diff {qtyDiff >= 0 ? "+" : ""}{qtyDiff.toFixed(4)}</Text>}
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
+                  avg entry: app <Text style={{ color: P.text }}>${appAvg.toFixed(0)}</Text> vs bin <Text style={{ color: P.text }}>${binEntry.toFixed(0)}</Text>
+                  {!entryOk && <Text style={{ color: P.error }}> · diff ${entryDiff >= 0 ? "+" : ""}{entryDiff.toFixed(0)}</Text>}
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
+                  size: app <Text style={{ color: P.bitcoinOrange }}>${appSize.toFixed(0)}</Text> vs bin <Text style={{ color: P.bitcoinOrange }}>${binSize.toFixed(0)}</Text>
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
+                  uPnL: app <Text style={{ color: appUpnl >= 0 ? P.green : P.error }}>${appUpnl.toFixed(2)}</Text> vs bin <Text style={{ color: binUpnl >= 0 ? P.green : P.error }}>${binUpnl.toFixed(2)}</Text>
+                </Text>
+                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 9, fontStyle: "italic", marginTop: 2 }}>
+                  app {appCount} entries · bin 1 net
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+        <Text style={[styles.dim, { marginTop: 6, fontStyle: "italic" }]}>
+          💡 Tolerance: qty ±0.0005 BTC · entry ±$50. MISMATCH → reconcile sẽ tự fix tại cycle poll kế (max 30s).
         </Text>
       </View>
 
