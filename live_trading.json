@@ -19,7 +19,7 @@
     "equityDdPausePct": 30,
     "equityDdPauseHours": 4,
     "use5mAllEngineMode": false,
-    "stackBetterEntryMode": "vs-avg",
+    "stackBetterEntryMode": "off",
     "tpPct": 4,
     "slPct": 2
   },
@@ -1331,6 +1331,46 @@
       "dryRun": false
     },
     {
+      "ts": 1777299421667,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77702 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777299421681,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77702 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777302586876,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77531 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777302586889,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77531 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
       "ts": 1777306666084,
       "ruleId": "15m:16",
       "tfKey": "15m",
@@ -1391,6 +1431,39 @@
         "htfEntryPrice": 76833.35,
         "tpPct": 3.0000000000000115,
         "slPct": 1.0000000000000102
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306767487,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77126 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306767499,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $77126 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777306767508,
+      "ruleId": "4h:40",
+      "tfKey": "4h",
+      "action": {
+        "kind": "PENDING",
+        "side": "LONG",
+        "htfEntryPrice": 77125.96,
+        "tpPct": 5.000000000000012,
+        "slPct": 2.500000000000006
       },
       "dryRun": false
     },
@@ -1670,6 +1743,1574 @@
       "dryRun": false
     },
     {
+      "ts": 1777308649210,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76868.01,
+        "tpPrice": 78021.03014999999,
+        "slPrice": 69181.209,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777308649962,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309355412,
+      "ruleId": "4h:40",
+      "tfKey": "4h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309355443,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76640.71,
+        "tpPrice": 77790.32065,
+        "slPrice": 68976.63900000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356120,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356126,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356129,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309356133,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76641 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361662,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 10m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361666,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361671,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309361674,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76701 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674784,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 5m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674789,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674792,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777309674795,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "entry $76739 ≤ avg SHORT $77798 — chỉ vào nếu CAO hơn (better entry only vs-avg)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310172057,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76708.75,
+        "tpPrice": 77859.38124999999,
+        "slPrice": 69037.875,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310172309,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261422,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 9m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261426,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76763.71,
+        "tpPct": 3.000000000000009,
+        "slPct": 1.4999999999999856
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261432,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76763.71,
+        "tpPct": 3.000000000000009,
+        "slPct": 1.0000000000000093
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310261436,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76763.71,
+        "tpPct": 3.000000000000009,
+        "slPct": 1.0000000000000093
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262044,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76744.9,
+        "tpPrice": 74442.55299999999,
+        "slPrice": 77896.07349999998,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=81.9 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262289,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262297,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76744.9,
+        "tpPrice": 74442.55299999999,
+        "slPrice": 77512.349,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=81.9 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262511,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262523,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76744.9,
+        "tpPrice": 74442.55299999999,
+        "slPrice": 77512.349,
+        "qty": 0.001,
+        "confirmedBy": "Stoch5m K=81.9 > 80"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310262758,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "ERROR",
+        "message": "Binance POST /fapi/v1/order → -2015: Invalid API-key, IP, or permissions for action, request ip: 14.169.38.132\n💡 IP máy không nằm trong whitelist Binance, hoặc key thiếu permission Futures. Vào Binance API Mgmt → check IP + tick Enable Futures."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777310754941,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 1m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777311041985,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76895.69,
+        "tpPrice": 78049.12535,
+        "slPrice": 69206.121,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777311972037,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76889.88,
+        "tpPrice": 78043.2282,
+        "slPrice": 69200.892,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777311972436,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.018→0.017 (binance 0.017), SHORT 0.014→0.014 (binance 0.014)."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312025573,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.017→0.018 (binance 0.018), SHORT 0.014→0.014 (binance 0.014). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312043994,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 9m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312272042,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76779.88,
+        "tpPct": 2.9999999999999973,
+        "slPct": 1.4999999999999987
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312272061,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76779.88,
+        "tpPct": 2.9999999999999973,
+        "slPct": 1.0000000000000053
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312272071,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "PENDING",
+        "side": "SHORT",
+        "htfEntryPrice": 76779.88,
+        "tpPct": 2.9999999999999973,
+        "slPct": 1.0000000000000053
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312872026,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76709.05,
+        "tpPrice": 77859.68574999999,
+        "slPrice": 69038.145,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312873447,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.019→0.018 (binance 0.018), SHORT 0.014→0.014 (binance 0.014)."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312873464,
+      "ruleId": "1h:10",
+      "tfKey": "1h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312873468,
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312873471,
+      "ruleId": "1h:5",
+      "tfKey": "1h",
+      "action": {
+        "kind": "DISCARD",
+        "reason": "rule no longer firing"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777312932947,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.018→0.019 (binance 0.019), SHORT 0.014→0.014 (binance 0.014). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777313771990,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76753.8,
+        "tpPrice": 77905.10699999999,
+        "slPrice": 69078.42,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777314672048,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76682.01,
+        "tpPrice": 77832.24014999998,
+        "slPrice": 69013.809,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777314672914,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.021→0.020 (binance 0.020), SHORT 0.014→0.014 (binance 0.014)."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777314732829,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.020→0.021 (binance 0.021), SHORT 0.014→0.014 (binance 0.014). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777315511167,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76729.24,
+        "tpPrice": 77880.1786,
+        "slPrice": 69056.316,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777316411140,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76833.17,
+        "tpPrice": 77985.66754999998,
+        "slPrice": 69149.853,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317311425,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76894.7,
+        "tpPrice": 78048.12049999999,
+        "slPrice": 69205.23,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317911193,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 74436.1316,
+        "slPrice": 77889.35419999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317911436,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 75203.5144,
+        "slPrice": 78273.0456,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317911667,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 75203.5144,
+        "slPrice": 78273.0456,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317911940,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 75203.5144,
+        "slPrice": 78273.0456,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317912186,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 75203.5144,
+        "slPrice": 78273.0456,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317912473,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 74436.1316,
+        "slPrice": 77889.35419999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317912702,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 75203.5144,
+        "slPrice": 78273.0456,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777317912976,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76738.28,
+        "tpPrice": 75203.5144,
+        "slPrice": 78273.0456,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211203,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 5m (rule 15m:2)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211205,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:8)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211208,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:11)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211210,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:12)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211212,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:9)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211214,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:3)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211217,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:22)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318211219,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:23)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777318871152,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76694.24,
+        "tpPrice": 77844.6536,
+        "slPrice": 69024.816,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777319111163,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 6m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777320072105,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76868.01,
+        "tpPrice": 78021.03014999999,
+        "slPrice": 69181.209,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777320072515,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.026→0.025 (binance 0.025), SHORT 0.022→0.022 (binance 0.022)."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777320132344,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.025→0.026 (binance 0.026), SHORT 0.022→0.022 (binance 0.022). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777320911143,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76910.63,
+        "tpPrice": 78064.28945,
+        "slPrice": 69219.56700000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777321811146,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76990.64,
+        "tpPrice": 78145.4996,
+        "slPrice": 69291.576,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777322711183,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76992.95,
+        "tpPrice": 78147.84425,
+        "slPrice": 69293.655,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777322771153,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76940.53,
+        "tpPrice": 75401.7194,
+        "slPrice": 78479.3406,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777322771408,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76940.53,
+        "tpPrice": 75401.7194,
+        "slPrice": 78479.3406,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777323611155,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76935.94,
+        "tpPrice": 75397.2212,
+        "slPrice": 78474.6588,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777323611429,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76935.94,
+        "tpPrice": 75397.2212,
+        "slPrice": 78474.6588,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324391155,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76842.89,
+        "tpPrice": 74537.6033,
+        "slPrice": 77995.53335,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324391476,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76842.89,
+        "tpPrice": 75306.0322,
+        "slPrice": 78379.7478,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324391710,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76842.89,
+        "tpPrice": 75306.0322,
+        "slPrice": 78379.7478,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324391934,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76842.89,
+        "tpPrice": 75306.0322,
+        "slPrice": 78379.7478,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324392189,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76842.89,
+        "tpPrice": 75306.0322,
+        "slPrice": 78379.7478,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324392428,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76842.89,
+        "tpPrice": 74537.6033,
+        "slPrice": 77995.53335,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324511183,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76873.97,
+        "tpPrice": 75336.4906,
+        "slPrice": 78411.4494,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777324511418,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76873.97,
+        "tpPrice": 75336.4906,
+        "slPrice": 78411.4494,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777325676025,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76940.42,
+        "tpPrice": 75401.6116,
+        "slPrice": 78479.22839999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777325676394,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76940.42,
+        "tpPrice": 75401.6116,
+        "slPrice": 78479.22839999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777325843455,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76981.53,
+        "tpPrice": 78136.25295,
+        "slPrice": 69283.37700000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326323527,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76882.93,
+        "tpPrice": 75345.2714,
+        "slPrice": 78420.58859999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326323751,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76882.93,
+        "tpPrice": 75345.2714,
+        "slPrice": 78420.58859999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326367549,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 10m (rule 15m:22)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326367560,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 10m (rule 15m:23)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326474314,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76850,
+        "tpPrice": 74544.5,
+        "slPrice": 78002.74999999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326474633,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76850,
+        "tpPrice": 75313,
+        "slPrice": 78387,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326474867,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76850,
+        "tpPrice": 75313,
+        "slPrice": 78387,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326475142,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76850,
+        "tpPrice": 75313,
+        "slPrice": 78387,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326475377,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76850,
+        "tpPrice": 75313,
+        "slPrice": 78387,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777326475664,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76850,
+        "tpPrice": 74544.5,
+        "slPrice": 78002.74999999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327254527,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76784.72,
+        "tpPrice": 74481.1784,
+        "slPrice": 77936.4908,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327254845,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76784.72,
+        "tpPrice": 75249.0256,
+        "slPrice": 78320.41440000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327255096,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76784.72,
+        "tpPrice": 75249.0256,
+        "slPrice": 78320.41440000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327255335,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76784.72,
+        "tpPrice": 75249.0256,
+        "slPrice": 78320.41440000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327255556,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76784.72,
+        "tpPrice": 75249.0256,
+        "slPrice": 78320.41440000001,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327255792,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "SHORT",
+        "entryPrice": 76784.72,
+        "tpPrice": 74481.1784,
+        "slPrice": 77936.4908,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327256037,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777327256043,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328154335,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328154337,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328394255,
+      "ruleId": "15m:2",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328394260,
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328394265,
+      "ruleId": "15m:11",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328394268,
+      "ruleId": "15m:12",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328394272,
+      "ruleId": "15m:9",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328394275,
+      "ruleId": "15m:3",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328718904,
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777328718911,
+      "ruleId": "15m:23",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "stack full 50/50 SHORT"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329005829,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76979.4,
+        "tpPrice": 78134.09099999999,
+        "slPrice": 69281.45999999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329120515,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 9m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329604515,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 1m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329620298,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "ENTRY",
+        "side": "LONG",
+        "entryPrice": 76961.9,
+        "tpPrice": 78116.32849999999,
+        "slPrice": 69265.70999999999,
+        "qty": 0.001,
+        "confirmedBy": "15m skip-LTF (entry HTF close)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329620618,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (1 dropped, 0 auto-imported). LONG 0.032→0.031 (binance 0.031), SHORT 0.050→0.050 (binance 0.050)."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329650691,
+      "ruleId": "reconcile",
+      "tfKey": "live",
+      "action": {
+        "kind": "ERROR",
+        "message": "⚠️ SMART RECONCILE: Binance khác app (0 dropped, 1 auto-imported). LONG 0.031→0.032 (binance 0.032), SHORT 0.050→0.050 (binance 0.050). ✅ Auto-imported 1 lệnh manual (TP/SL từ active 5m preset). Plan B sẽ monitor."
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329741341,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 8m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329769491,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 8m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
+      "ts": 1777329937300,
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "action": {
+        "kind": "BLOCK",
+        "reason": "per-rule cooldown 5m (rule 15m:16)"
+      },
+      "dryRun": false
+    },
+    {
       "ts": 1777347798522,
       "ruleId": "15m:16",
       "tfKey": "15m",
@@ -1734,7 +3375,7 @@
       "dryRun": false
     },
     {
-      "ts": 1777347806680,
+      "ts": 1777347814291,
       "ruleId": "1h:10",
       "tfKey": "1h",
       "action": {
@@ -1749,7 +3390,7 @@
       "dryRun": false
     },
     {
-      "ts": 1777347807018,
+      "ts": 1777347814539,
       "ruleId": "1h:10",
       "tfKey": "1h",
       "action": {
@@ -1759,7 +3400,7 @@
       "dryRun": false
     },
     {
-      "ts": 1777347807073,
+      "ts": 1777347814559,
       "ruleId": "1h:4",
       "tfKey": "1h",
       "action": {
@@ -1774,7 +3415,7 @@
       "dryRun": false
     },
     {
-      "ts": 1777347807336,
+      "ts": 1777347814788,
       "ruleId": "1h:4",
       "tfKey": "1h",
       "action": {
@@ -1784,7 +3425,7 @@
       "dryRun": false
     },
     {
-      "ts": 1777347807352,
+      "ts": 1777347814810,
       "ruleId": "1h:5",
       "tfKey": "1h",
       "action": {
@@ -1799,7 +3440,7 @@
       "dryRun": false
     },
     {
-      "ts": 1777347807602,
+      "ts": 1777347815047,
       "ruleId": "1h:5",
       "tfKey": "1h",
       "action": {
@@ -1810,21 +3451,21 @@
     }
   ],
   "firedIds": {
-    "15m:22": 1777306924561,
-    "15m:23": 1777306924942,
+    "15m:22": 1777326323530,
+    "15m:23": 1777326323755,
     "1h:24": 1777188934551,
     "1h:26": 1777180445851,
     "1h:25": 1777180446145,
-    "15m:16": 1777347798533,
-    "1h:10": 1777347806684,
-    "1h:4": 1777347807086,
-    "1h:5": 1777347807358,
-    "15m:2": 1777306922270,
-    "15m:8": 1777306922649,
-    "15m:11": 1777306923034,
-    "15m:12": 1777306923398,
-    "15m:9": 1777306923778,
-    "15m:3": 1777306924170
+    "15m:16": 1777329620307,
+    "1h:10": 1777347814302,
+    "1h:4": 1777347814566,
+    "1h:5": 1777347814818,
+    "15m:2": 1777327254529,
+    "15m:8": 1777327254852,
+    "15m:11": 1777327255098,
+    "15m:12": 1777327255339,
+    "15m:9": 1777327255562,
+    "15m:3": 1777327255798
   },
   "trackedPositions": [
     {
