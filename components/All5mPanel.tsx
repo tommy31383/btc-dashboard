@@ -632,6 +632,12 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
             ))}
           </View>
         </View>
+        {price5mBars && price5mBars.length >= 2 && closed.length > 0 ? (
+          <View style={{ marginBottom: 10 }}>
+            <Text style={styles.closedChartTitle}>📉 CLOSE MAP (last 120 cây ≈ 10h)</Text>
+            <PriceChartWithMarkersSvg bars={price5mBars} positions={closed.slice(0, 50)} height={180} />
+          </View>
+        ) : null}
         {closed.length === 0
           ? <Text style={styles.empty}>chưa có lệnh đóng</Text>
           : closed.slice(0, 50).map((p) => {
@@ -705,6 +711,7 @@ const styles = StyleSheet.create({
   cdBannerText: { color: P.onTertiaryContainer, fontSize: 12, textAlign: "center", fontFamily: "JetBrainsMono_500Medium" },
   section: { marginBottom: 18 },
   sectionTitle: { color: P.text, fontSize: 13, fontWeight: "700", marginBottom: 8, letterSpacing: 0.4 },
+  closedChartTitle: { color: P.tertiary, fontSize: 11, fontWeight: "700", marginBottom: 8, letterSpacing: 0.3 },
   empty: { color: P.dim, fontStyle: "italic", paddingVertical: 8, fontSize: 12 },
   openListHint: { color: P.dim, fontSize: 10, marginBottom: 6, fontStyle: "italic" },
   row: { flexDirection: "row", alignItems: "center", paddingVertical: 5, borderBottomColor: P.borderSoft, borderBottomWidth: 1, gap: 10, flexWrap: "wrap" },
