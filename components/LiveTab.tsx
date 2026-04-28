@@ -12,7 +12,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DebugLabel from "./DebugLabel";
-import { PRESETS, PresetKey, getActivePresetKey } from "../utils/all5mAccount";
+import { PRESETS, PresetKey, getActivePresetKey, DEFAULT_PRESET_KEY } from "../utils/all5mAccount";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions,
 } from "react-native";
@@ -81,7 +81,7 @@ function ChartTfPicker({ tf, onChange }: { tf: ChartTfKey; onChange: (k: ChartTf
 /** Shared hook — đọc active preset từ AsyncStorage (đồng bộ với tab 5m ALL).
  *  Poll 5s để detect khi user đổi preset bên tab 5m ALL → reflect trong LIVE. */
 function useActivePreset(): PresetKey {
-  const [key, setKey] = useState<PresetKey>("BALANCED");
+  const [key, setKey] = useState<PresetKey>(DEFAULT_PRESET_KEY);
   useEffect(() => {
     let alive = true;
     const refresh = () => { getActivePresetKey().then((k) => { if (alive) setKey(k); }); };

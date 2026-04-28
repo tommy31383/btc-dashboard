@@ -1,6 +1,39 @@
 # 5m ALL TRADING ENGINE — Rule & Preset
 
-**Version:** v2.1 (last updated 2026-04-28)
+**Version:** v3.0 (last updated 2026-04-28 — anh Tommy v4.8.23)
+
+---
+
+## 🆕 v3.0 — 5 PRESETS từ Stack-Sweep Backtest (12 combo 3y)
+
+EAGLE/BALANCED + TURTLE bị **bỏ luôn** vì dominated bởi WHALE/TOMI ở mọi stack size.
+3 preset cũ × 4 stack [50/75/100/200] = 12 combo, em pick 5 winner:
+
+| Key | Label | Emoji | TP/SL | Stack | NET 3y | DD % | WR | PF | Vai trò |
+|-----|-------|-------|-------|-------|--------|------|----|----|---------|
+| `WHALE_MAX` | WHALE 200 | 🔴 | 5/2.5 | 200 | $3.03M | 8.0% | 34% | 2.31 | Max NET — yolo |
+| `WHALE_MID` | WHALE 100 | 🟠 | 5/2.5 | 100 | $1.89M | 2.6% | 34% | 2.27 | WHALE balanced |
+| `TOMI_MAX` | TOMI 200 | 🔵 | 4/4 | 200 | $2.63M | 0.3% | 50% | 3.51 | TOMI scaled max |
+| **`TOMI_MID`** ★ | **TOMI 100** | 🟢 | 4/4 | 100 | $1.87M | **0.2%** | **50%** | **3.55** | **DEFAULT — best risk-adj** |
+| `TOMI_MIN` | TOMI 50 | ⚪ | 4/4 | 50 | $1.16M | 0.3% | 50% | 3.52 | Starter — vốn ít |
+
+### Migration legacy keys (auto trong `getActivePresetKey`):
+
+| Legacy | → v4.8.23 |
+|--------|-----------|
+| `AGGRESSIVE` | `WHALE_MID` (gần với WHALE-75 cũ nhất) |
+| `BALANCED`   | `TOMI_MID`  (EAGLE bỏ → TOMI safest) |
+| `TURTLE`     | `TOMI_MIN`  |
+| `TOMI`       | `TOMI_MIN`  (TOMI cũ stack=50) |
+
+### Decision log:
+- **EAGLE bỏ:** dominated. TOMI cùng stack luôn NET cao hơn + DD thấp hơn + WR cao hơn.
+- **WHALE giữ 2:** stack 200 (max yolo) + 100 (balanced). Stack 75/50 dominated bởi TOMI cùng range.
+- **TOMI giữ 3:** 200/100/50 phủ đều profile vốn từ ít → max.
+- **TOMI-75 bỏ:** không ưu việt hơn TOMI-100. DD% 2.0% chỉ là artifact timing (DD xảy ra sớm khi capital base nhỏ); DD absolute $1.86k gần với TOMI-50/100.
+- **TOMI bỏ trailing:** test TP4/SL4 fixed cho consistency với WHALE. Có thể re-enable trailing cho TOMI variants sau.
+
+---
 **Engine:** `utils/all5mAccount.ts` + `hooks/use5mAllTrader.ts`
 **Backtest:** `tools/backtest-5mall-3y.ts` + `tools/sweep-5mall-improve.ts` + `tools/sweep-5mall-improve-v2.ts`
 **Account:** Paper $5000 (local AsyncStorage `@all5m_data_v1`; gist mirror leader/follower qua `all5m_account.json`)

@@ -38,14 +38,26 @@ export const SR_LOOKBACK_15M = 50;
 export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000;
 
 // ════════════════════════════════════════════════════════════════════
-// 🎯 PRESETS v3 (anh Tommy v4.8.22 — TURTLE removed, TOMI added)
-//   3 chế độ switch trong UI:
-//   - AGGRESSIVE 🔴 WHALE  → Highest PnL (3y backtest +$1.52M, MaxDD $5.9k)
-//   - BALANCED   🟡 EAGLE  → Balanced     (3y backtest +$635k, MaxDD $1.98k)
-//   - TOMI       🔵 TOMI   → Best risk-adjusted (3y backtest +$1.16M, MaxDD $1.1k, PF 3.52)
+// 🎯 PRESETS v4 (anh Tommy v4.8.20 — Stack sweep winner picks, EAGLE removed)
+//   5 chế độ switch trong UI (chọn từ stack-sweep 12-combo backtest 3y):
+//   - WHALE_MAX  🔴 WHALE 200  → Max NET (+$3.03M, DD 8.0%, WR 34%, PF 2.31) — yolo
+//   - WHALE_MID  🟠 WHALE 100  → WHALE balanced (+$1.89M, DD 2.6%, WR 34%, PF 2.27)
+//   - TOMI_MAX   🔵 TOMI 200   → Max TOMI (+$2.63M, DD 0.3%, WR 50%, PF 3.51)
+//   - TOMI_MID   🟢 TOMI 100   → Best risk-adjusted (+$1.87M, DD 0.2%, WR 50%, PF 3.55) ★ DEFAULT
+//   - TOMI_MIN   ⚪ TOMI 50    → Starter (+$1.16M, DD 0.3%, WR 50%, PF 3.52) — vốn ít
 // ════════════════════════════════════════════════════════════════════
 
-export type PresetKey = "AGGRESSIVE" | "BALANCED" | "TOMI";
+export type PresetKey = "WHALE_MAX" | "WHALE_MID" | "TOMI_MAX" | "TOMI_MID" | "TOMI_MIN";
+
+const VALID_KEYS: PresetKey[] = ["WHALE_MAX", "WHALE_MID", "TOMI_MAX", "TOMI_MID", "TOMI_MIN"];
+
+/** Migration map: legacy key (v4.8.19 trở về trước) → v4.8.20 key gần nhất. */
+const LEGACY_KEY_MAP: Record<string, PresetKey> = {
+  AGGRESSIVE: "WHALE_MID",   // WHALE stack=75 cũ → WHALE_MID stack=100 (gần nhất)
+  BALANCED:   "TOMI_MID",    // EAGLE bị bỏ → TOMI_MID (best safe replacement)
+  TURTLE:     "TOMI_MIN",    // TURTLE cũ (đã bỏ ở v4.8.22) → TOMI_MIN
+  TOMI:       "TOMI_MIN",    // TOMI cũ stack=50 → TOMI_MIN
+};
 
 export interface Preset {
   key: PresetKey;
@@ -83,12 +95,58 @@ export interface Preset {
 }
 
 export const PRESETS: Record<PresetKey, Preset> = {
-  // ─── TOMI (anh Tommy v4.8.22): Stoch K<5/K>95 + S/R 0.2% · TP+4% / SL-4% ───
-  // Grid sweep 70 combo TP×SL → TP4/SL4 best NET/DD ratio (ratio 1014, 3y backtest).
-  // SL rộng 4% để tránh bị quét sớm khi Stoch extreme thường có pullback trước.
-  TOMI: {
-    key: "TOMI", label: "TOMI", emoji: "🔵",
-    description: "Extreme entry K<5/K>95 · TP+4%/SL-4%",
+  // ─── WHALE_MAX 🔴 (stack 200): max NET, DD 8% (yolo) ─────────────────────
+  WHALE_MAX: {
+    key: "WHALE_MAX", label: "WHALE 200", emoji: "🔴",
+    description: "Max NET · yolo · vốn lớn (DD 8%)",
+    tpPct: 5, slPct: 2.5,
+    stackMaxPerSide: 200, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    stackBetterEntryMode: "off",
+    cooldownMin: 5,
+    stochLongLevel: 10, stochShortLevel: 90,
+    srProximityPct: 0.4, srLookback15m: 30,
+    expectedNet3y: 3028056, expectedMaxDd3y: 15627,
+  },
+  // ─── WHALE_MID 🟠 (stack 100): WHALE balanced (DD 2.6%) ──────────────────
+  WHALE_MID: {
+    key: "WHALE_MID", label: "WHALE 100", emoji: "🟠",
+    description: "WHALE balanced · vốn vừa (DD 2.6%)",
+    tpPct: 5, slPct: 2.5,
+    stackMaxPerSide: 100, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    stackBetterEntryMode: "off",
+    cooldownMin: 5,
+    stochLongLevel: 10, stochShortLevel: 90,
+    srProximityPct: 0.4, srLookback15m: 30,
+    expectedNet3y: 1888767, expectedMaxDd3y: 7359,
+  },
+  // ─── TOMI_MAX 🔵 (stack 200): max TOMI scaled (DD 0.3%) ──────────────────
+  TOMI_MAX: {
+    key: "TOMI_MAX", label: "TOMI 200", emoji: "🔵",
+    description: "TOMI scaled max · DD 0.3%",
+    tpPct: 4, slPct: 4,
+    stackMaxPerSide: 200, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    stackBetterEntryMode: "off",
+    cooldownMin: 5,
+    stochLongLevel: 5, stochShortLevel: 95,
+    srProximityPct: 0.2, srLookback15m: 50,
+    expectedNet3y: 2633499, expectedMaxDd3y: 2424,
+  },
+  // ─── TOMI_MID 🟢 (stack 100): best risk-adjusted (DD 0.2%, PF 3.55) ★ DEFAULT
+  TOMI_MID: {
+    key: "TOMI_MID", label: "TOMI 100", emoji: "🟢",
+    description: "Best risk-adjusted · DD 0.2% · PF 3.55 ★",
+    tpPct: 4, slPct: 4,
+    stackMaxPerSide: 100, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+    stackBetterEntryMode: "off",
+    cooldownMin: 5,
+    stochLongLevel: 5, stochShortLevel: 95,
+    srProximityPct: 0.2, srLookback15m: 50,
+    expectedNet3y: 1865622, expectedMaxDd3y: 2046,
+  },
+  // ─── TOMI_MIN ⚪ (stack 50): starter / vốn ít (DD 0.3%) ──────────────────
+  TOMI_MIN: {
+    key: "TOMI_MIN", label: "TOMI 50", emoji: "⚪",
+    description: "Starter · vốn ít · max margin $1.5k",
     tpPct: 4, slPct: 4,
     stackMaxPerSide: 50, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
     stackBetterEntryMode: "off",
@@ -97,32 +155,11 @@ export const PRESETS: Record<PresetKey, Preset> = {
     srProximityPct: 0.2, srLookback15m: 50,
     expectedNet3y: 1165062, expectedMaxDd3y: 1149,
   },
-  AGGRESSIVE: {
-    key: "AGGRESSIVE", label: "WHALE", emoji: "🔴",
-    description: "Highest PnL · vốn lớn",
-    tpPct: 5, slPct: 2.5,
-    stackMaxPerSide: 75, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 10, stochShortLevel: 90,
-    srProximityPct: 0.4, srLookback15m: 30,
-    expectedNet3y: 1516473, expectedMaxDd3y: 5874,
-  },
-  BALANCED: {
-    key: "BALANCED", label: "EAGLE", emoji: "🟡",
-    description: "Balanced · vốn vừa",
-    tpPct: 5, slPct: 2.5,
-    stackMaxPerSide: 30, stackMinEntryDistPct: 0.1, stackPerSideSpacingMin: 10,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 15, stochShortLevel: 85,
-    srProximityPct: 0.4, srLookback15m: 50,
-    expectedNet3y: 633753, expectedMaxDd3y: 1983,
-  },
-
 };
 
-export const DEFAULT_PRESET_KEY: PresetKey = "BALANCED";
+// Default = TOMI_MID (best risk-adjusted: DD 0.2%, PF 3.55, NET $1.87M).
+// Anh switch lên _MAX khi muốn yolo.
+export const DEFAULT_PRESET_KEY: PresetKey = "TOMI_MID";
 
 // Cache trong RAM để tryEntry5mBar không phải đọc AsyncStorage mỗi lần
 let _activePresetCache: PresetKey | null = null;
@@ -131,9 +168,19 @@ export async function getActivePresetKey(): Promise<PresetKey> {
   if (_activePresetCache) return _activePresetCache;
   try {
     const raw = await AsyncStorage.getItem(PRESET_STORAGE_KEY);
-    if (raw && (raw === "AGGRESSIVE" || raw === "BALANCED" || raw === "TOMI")) {
-      _activePresetCache = raw;
-      return raw;
+    if (raw) {
+      // Hit on new key
+      if ((VALID_KEYS as string[]).includes(raw)) {
+        _activePresetCache = raw as PresetKey;
+        return _activePresetCache;
+      }
+      // Migration: legacy key → map sang key v4.8.20 gần nhất + persist lại
+      const migrated = LEGACY_KEY_MAP[raw];
+      if (migrated) {
+        _activePresetCache = migrated;
+        try { await AsyncStorage.setItem(PRESET_STORAGE_KEY, migrated); } catch {}
+        return migrated;
+      }
     }
   } catch {}
   _activePresetCache = DEFAULT_PRESET_KEY;
@@ -156,11 +203,11 @@ export function getCachedActivePreset(): Preset {
 }
 
 // Backward-compat: TP_PCT / SL_PCT / STACK_MAX_PER_SIDE / STACK_MIN_ENTRY_DIST_PCT
-// vẫn export để code cũ (All5mPanel chart axis...) không vỡ. Giá trị = BALANCED preset.
-export const TP_PCT = PRESETS.BALANCED.tpPct;
-export const SL_PCT = PRESETS.BALANCED.slPct;
-export const STACK_MAX_PER_SIDE = PRESETS.BALANCED.stackMaxPerSide;
-export const STACK_MIN_ENTRY_DIST_PCT = PRESETS.BALANCED.stackMinEntryDistPct;
+// vẫn export để code cũ (All5mPanel chart axis...) không vỡ. Giá trị = DEFAULT preset (TOMI_MID).
+export const TP_PCT = PRESETS.TOMI_MID.tpPct;
+export const SL_PCT = PRESETS.TOMI_MID.slPct;
+export const STACK_MAX_PER_SIDE = PRESETS.TOMI_MID.stackMaxPerSide;
+export const STACK_MIN_ENTRY_DIST_PCT = PRESETS.TOMI_MID.stackMinEntryDistPct;
 
 export type EntrySource = "stoch_long" | "stoch_short" | "sr_long" | "sr_short";
 export type Side = "LONG" | "SHORT";

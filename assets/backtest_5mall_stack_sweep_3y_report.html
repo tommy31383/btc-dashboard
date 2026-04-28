@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>5m ALL Stack Sweep 3y</title>
+<style>
+body { font-family: -apple-system, sans-serif; background: #0a0a1a; color: #e8e8f0; padding: 24px; max-width: 1400px; margin: 0 auto; }
+h1 { color: #ffd700; }
+.meta { color: #888; margin-bottom: 24px; font-size: 13px; }
+table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+th, td { border: 1px solid #2a2a40; padding: 8px 12px; text-align: right; }
+th:nth-child(2), td:nth-child(2) { text-align: left; }
+th { background: #1a1a2e; color: #ffd700; }
+tr:nth-child(even) { background: #11111e; }
+tr:hover { background: #222238; }
+.pos { color: #4ade80; font-weight: 600; }
+.neg { color: #f87171; font-weight: 600; }
+.legend { margin-top: 16px; font-size: 13px; color: #aaa; }
+.legend b { color: #ffd700; }
+</style></head>
+<body>
+<h1>🎯 5m ALL — Stack Size Sweep (3y backtest)</h1>
+<div class="meta">
+  Period: 2023-04-27 → 2026-04-26 · Capital $5000 · Margin $30×100x · Fee 0.05%/side<br>
+  3 PRESET (WHALE / EAGLE / TOMI) × 4 STACK [50/75/100/200] = 12 combo · TOMI trailing OFF (fixed TP4/SL4)
+</div>
+
+<table>
+<thead><tr>
+  <th>RANK</th><th>PRESET</th><th>STACK</th><th>TRADES</th><th>WR</th>
+  <th>NET $</th><th>MAX DD $</th><th>DD %</th><th>PF</th><th>TREND</th><th>AVG HOLD</th>
+</tr></thead>
+<tbody><tr>
+      <td>1 🏆</td>
+      <td>🔴 <b>WHALE</b></td>
+      <td>200</td>
+      <td>106628</td>
+      <td>34.1%</td>
+      <td class="pos">$3,028,056</td>
+      <td>$15,627</td>
+      <td>8.0%</td>
+      <td>2.306</td>
+      <td>🟢 UP</td>
+      <td>813.9b</td>
+    </tr>
+<tr>
+      <td>2</td>
+      <td>🔵 <b>TOMI</b></td>
+      <td>200</td>
+      <td>63247</td>
+      <td>49.8%</td>
+      <td class="pos">$2,633,499</td>
+      <td>$2,424</td>
+      <td>0.3%</td>
+      <td>3.511</td>
+      <td>🟢 UP</td>
+      <td>1079.7b</td>
+    </tr>
+<tr>
+      <td>3</td>
+      <td>🔴 <b>WHALE</b></td>
+      <td>100</td>
+      <td>67881</td>
+      <td>33.8%</td>
+      <td class="pos">$1,888,767</td>
+      <td>$7,359</td>
+      <td>2.6%</td>
+      <td>2.274</td>
+      <td>🟢 UP</td>
+      <td>754.1b</td>
+    </tr>
+<tr>
+      <td>4 🛡️</td>
+      <td>🔵 <b>TOMI</b></td>
+      <td>100</td>
+      <td>44366</td>
+      <td>50.0%</td>
+      <td class="pos">$1,865,622</td>
+      <td>$2,046</td>
+      <td>0.2%</td>
+      <td>3.55</td>
+      <td>🟢 UP</td>
+      <td>1014.5b</td>
+    </tr>
+<tr>
+      <td>5</td>
+      <td>🔵 <b>TOMI</b></td>
+      <td>75</td>
+      <td>37078</td>
+      <td>50.0%</td>
+      <td class="pos">$1,554,876</td>
+      <td>$1,863</td>
+      <td>2.0%</td>
+      <td>3.539</td>
+      <td>🟢 UP</td>
+      <td>983.1b</td>
+    </tr>
+<tr>
+      <td>6</td>
+      <td>🟡 <b>EAGLE</b></td>
+      <td>200</td>
+      <td>54059</td>
+      <td>34.2%</td>
+      <td class="pos">$1,545,513</td>
+      <td>$15,936</td>
+      <td>29.0%</td>
+      <td>2.317</td>
+      <td>🟢 UP</td>
+      <td>842.0b</td>
+    </tr>
+<tr>
+      <td>7</td>
+      <td>🔴 <b>WHALE</b></td>
+      <td>75</td>
+      <td>54956</td>
+      <td>33.7%</td>
+      <td class="pos">$1,523,472</td>
+      <td>$5,874</td>
+      <td>2.6%</td>
+      <td>2.268</td>
+      <td>🟢 UP</td>
+      <td>732.2b</td>
+    </tr>
+<tr>
+      <td>8</td>
+      <td>🟡 <b>EAGLE</b></td>
+      <td>100</td>
+      <td>46203</td>
+      <td>34.0%</td>
+      <td class="pos">$1,298,421</td>
+      <td>$9,384</td>
+      <td>16.7%</td>
+      <td>2.289</td>
+      <td>🟢 UP</td>
+      <td>798.1b</td>
+    </tr>
+<tr>
+      <td>9</td>
+      <td>🔵 <b>TOMI</b></td>
+      <td>50</td>
+      <td>27936</td>
+      <td>49.8%</td>
+      <td class="pos">$1,165,062</td>
+      <td>$1,149</td>
+      <td>0.3%</td>
+      <td>3.518</td>
+      <td>🟢 UP</td>
+      <td>944.7b</td>
+    </tr>
+<tr>
+      <td>10</td>
+      <td>🟡 <b>EAGLE</b></td>
+      <td>75</td>
+      <td>40808</td>
+      <td>34.0%</td>
+      <td class="pos">$1,149,756</td>
+      <td>$5,277</td>
+      <td>7.3%</td>
+      <td>2.293</td>
+      <td>🟢 UP</td>
+      <td>778.9b</td>
+    </tr>
+<tr>
+      <td>11</td>
+      <td>🔴 <b>WHALE</b></td>
+      <td>50</td>
+      <td>39933</td>
+      <td>33.9%</td>
+      <td class="pos">$1,117,251</td>
+      <td>$4,224</td>
+      <td>7.9%</td>
+      <td>2.282</td>
+      <td>🟢 UP</td>
+      <td>705.3b</td>
+    </tr>
+<tr>
+      <td>12</td>
+      <td>🟡 <b>EAGLE</b></td>
+      <td>50</td>
+      <td>32606</td>
+      <td>33.8%</td>
+      <td class="pos">$906,162</td>
+      <td>$3,066</td>
+      <td>4.9%</td>
+      <td>2.272</td>
+      <td>🟢 UP</td>
+      <td>747.2b</td>
+    </tr></tbody>
+</table>
+
+<div class="legend">
+  <b>🏆 WINNER</b> = highest NET · <b>🛡️ SAFEST</b> = lowest DD% · <b>TREND</b> = equity curve slope (UP/FLAT/DOWN)<br>
+  PF = Profit Factor (gross win / gross loss). PF > 1 = profitable, > 2 = strong edge.
+</div>
+
+</body></html>

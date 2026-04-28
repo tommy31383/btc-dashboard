@@ -368,12 +368,17 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </TouchableOpacity>
       </View>
 
-      {/* PRESET SWITCHER (anh Tommy v4.7.0): 4 chế độ — click để swap */}
+      {/* PRESET SWITCHER (anh Tommy v4.8.20): 5 chế độ từ stack-sweep 12-combo */}
       <View style={styles.presetRow}>
-        {(["AGGRESSIVE", "BALANCED", "TOMI"] as PresetKey[]).map((k) => {
+        {(["WHALE_MAX", "WHALE_MID", "TOMI_MAX", "TOMI_MID", "TOMI_MIN"] as PresetKey[]).map((k) => {
           const p = PRESETS[k];
           const active = k === presetKey;
-          const accentColor = k === "AGGRESSIVE" ? P.error : k === "BALANCED" ? P.bitcoinOrange : "#3b82f6";
+          const accentColor =
+            k === "WHALE_MAX" ? P.error :        // 🔴
+            k === "WHALE_MID" ? P.bitcoinOrange : // 🟠
+            k === "TOMI_MAX"  ? "#3b82f6" :       // 🔵
+            k === "TOMI_MID"  ? "#22c55e" :       // 🟢
+            /* TOMI_MIN */      "#9ca3af";        // ⚪
           return (
             <TouchableOpacity
               key={k}
