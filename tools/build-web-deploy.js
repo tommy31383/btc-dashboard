@@ -22,7 +22,6 @@ function run(cmd, args, opts = {}) {
   return execFileSync(cmd, args, {
     cwd: ROOT,
     stdio: "inherit",
-    shell: process.platform === "win32",
     ...opts,
   });
 }
@@ -105,7 +104,11 @@ function main() {
   ensureGitRepo();
   const { nextVersion, buildDate } = updateVersions();
   console.log(`\nBumped to v${nextVersion} (${buildDate})\n`);
-  run("npx", ["expo", "export", "-p", "web"]);
+  if (process.platform === "win32") {
+    run("cmd", ["/c", "npx", "expo", "export", "-p", "web"]);
+  } else {
+    run("npx", ["expo", "export", "-p", "web"]);
+  }
   syncDistToDocs();
   commitAndPush(nextVersion);
   console.log(`\nDone: v${nextVersion} deployed to docs/app and pushed.\n`);
