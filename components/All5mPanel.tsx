@@ -73,8 +73,24 @@ const PriceChartWithMarkersSvg = memo(function PriceChartWithMarkersSvg({
       <Text style={styles.chartEmpty}>chưa có price data 5m</Text>
     </View>;
   }
-  // Slice last N bars
-  const slice = bars.slice(-maxBars);
+  const sortedPositions = [...positions].sort((a, b) => a.entryMs - b.entryMs);
+  const intervalMs = bars.length >= 2 ? Math.max(1, bars[1].time - bars[0].time) : 300_000;
+  const markerStart = sortedPositions.length > 0
+    ? Math.min(...sortedPositions.map((p) => Math.min(p.entryMs, p.exitMs ?? p.entryMs)))
+    : null;
+  const markerEnd = sortedPositions.length > 0
+    ? Math.max(...sortedPositions.map((p) => Math.max(p.entryMs, p.exitMs ?? p.entryMs)))
+    : null;
+
+  let slice = bars.slice(-maxBars);
+  if (markerStart !== null && markerEnd !== null) {
+    const padMs = intervalMs * 6; // ~30m mỗi phía cho chart 5m
+    const ranged = bars.filter((b) => b.time >= markerStart - padMs && b.time <= markerEnd + padMs);
+    if (ranged.length >= 2) {
+      slice = ranged.length > maxBars ? ranged.slice(-maxBars) : ranged;
+    }
+  }
+
   const tMin = slice[0].time;
   const tMax = slice[slice.length - 1].time;
   const range = tMax - tMin || 1;
@@ -93,7 +109,11 @@ const PriceChartWithMarkersSvg = memo(function PriceChartWithMarkersSvg({
   const yOf = (p: number) => pad + h - ((p - pMin) / pRange) * h;
   const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
   // Filter positions có time trong range
-  const visible = positions.filter((p) => p.entryMs >= tMin - 60_000); // include slight extension
+  const visible = positions.filter((p) => {
+    const firstMs = Math.min(p.entryMs, p.exitMs ?? p.entryMs);
+    const lastMs = Math.max(p.entryMs, p.exitMs ?? p.entryMs);
+    return lastMs >= tMin - intervalMs && firstMs <= tMax + intervalMs;
+  });
   return (
     <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft }}>
       <Svg width={width} height={height}>
@@ -111,7 +131,7 @@ const PriceChartWithMarkersSvg = memo(function PriceChartWithMarkersSvg({
             : `${eX},${eY + 4} ${eX - 3.5},${eY - 2} ${eX + 3.5},${eY - 2}`;
           // Exit dot if closed and within range
           let exitMark = null;
-          if (p.exitMs && p.exitPrice && p.exitMs <= tMax + 60_000 && p.exitMs >= tMin - 60_000) {
+          if (p.exitMs && p.exitPrice && p.exitMs <= tMax + intervalMs && p.exitMs >= tMin - intervalMs) {
             const xX = xOf(p.exitMs);
             const xY = yOf(p.exitPrice);
             const win = p.status === "WIN";
@@ -634,8 +654,8 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </View>
         {price5mBars && price5mBars.length >= 2 && closed.length > 0 ? (
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.closedChartTitle}>📉 CLOSE MAP (last 120 cây ≈ 10h)</Text>
-            <PriceChartWithMarkersSvg bars={price5mBars} positions={closed.slice(0, 50)} height={180} />
+            <Text style={styles.closedChartTitle}>📉 CLOSE MAP (auto zoom theo lệnh đóng)</Text>
+            <PriceChartWithMarkersSvg bars={price5mBars} positions={closed.slice(0, 50)} height={180} maxBars={500} />
           </View>
         ) : null}
         {closed.length === 0
