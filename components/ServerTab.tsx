@@ -224,13 +224,13 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
             return (
               <View key={side} style={{ flex: 1, minWidth: 280, padding: 8, backgroundColor: P.surface, borderRadius: 4, borderWidth: 1, borderColor: hasPos ? sideColor : P.borderSoft }}>
                 <Text style={{ color: sideColor, fontFamily: "monospace", fontWeight: "800", fontSize: 12, marginBottom: 4 }}>
-                  {side === "LONG" ? "🟢" : "🔴"} {side} {hasPos ? `· ${Math.abs(amt).toFixed(4)} BTC` : "· trống"}
+                  {side === "LONG" ? "🟢" : "🔴"} {side} {hasPos ? `· $${notional.toFixed(0)} USDT` : "· trống"}
                 </Text>
                 {hasPos ? (
                   <>
                     <Text style={{ color: P.text, fontFamily: "monospace", fontSize: 11 }}>
-                      avg entry <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>${entry.toFixed(2)}</Text>
-                      {"  "}· notional <Text style={{ fontWeight: "700" }}>${notional.toFixed(0)}</Text>
+                      qty <Text style={{ color: P.dim }}>{Math.abs(amt).toFixed(4)} BTC</Text>
+                      {"  "}· avg entry <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>${entry.toFixed(2)}</Text>
                     </Text>
                     <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 11 }}>
                       mark <Text style={{ color: P.text }}>${mark.toFixed(2)}</Text>
