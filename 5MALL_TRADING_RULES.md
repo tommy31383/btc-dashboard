@@ -1,37 +1,51 @@
 # 5m ALL TRADING ENGINE — Rule & Preset
 
-**Version:** v3.1 (last updated 2026-04-28 — anh Tommy v4.8.23, doc cleanup pass)
+**Version:** v3.2 (last updated 2026-04-28 — anh Tommy v4.8.24, 10 preset từ TPSL_GRID_v1)
 
 ---
 
-## 🆕 v3.0 — 5 PRESETS từ Stack-Sweep Backtest (12 combo 3y)
+## 🆕 v3.2 — 10 PRESETS từ TPSL_GRID_v1 SHORTLIST_v1 (280 combos 3y)
 
-EAGLE/BALANCED + TURTLE bị **bỏ luôn** vì dominated bởi WHALE/TOMI ở mọi stack size.
-3 preset cũ × 4 stack [50/75/100/200] = 12 combo, em pick 5 winner:
+Source: `BACKTEST_REGISTRY.md` → `SHORTLIST_v1` (em curated 7 candidates từ 280-combo TP/SL grid + 3 current production = 10 picks).
+Composite rank = avg of 4 metric ranks (NET, MaxDD, WR, PF) · **thấp = tốt hơn**.
 
-| Key | Label | Emoji | TP/SL | Stack | NET 3y | DD % | WR | PF | Vai trò |
-|-----|-------|-------|-------|-------|--------|------|----|----|---------|
-| `WHALE_MAX` | WHALE 200 | 🔴 | 5/2.5 | 200 | $3.03M | 8.0% | 34% | 2.31 | Max NET — yolo |
-| `WHALE_MID` | WHALE 100 | 🟠 | 5/2.5 | 100 | $1.89M | 2.6% | 34% | 2.27 | WHALE balanced |
-| `TOMI_MAX` | TOMI 200 | 🔵 | 4/4 | 200 | $2.63M | 0.3% | 50% | 3.51 | TOMI scaled max |
-| **`TOMI_MID`** ★ | **TOMI 100** | 🟢 | 4/4 | 100 | $1.87M | **0.2%** | **50%** | **3.55** | **DEFAULT — best risk-adj** |
-| `TOMI_MIN` | TOMI 50 | ⚪ | 4/4 | 50 | $1.16M | 0.3% | 50% | 3.52 | Starter — vốn ít |
+### 7 CANDIDATE (composite < 6 — đáng adopt):
+
+| Rank | Key | Label | Emoji | TP/SL | Stack | NET 3y | MaxDD $ | DD % | WR | PF | Composite | Role |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 🥇 | `WHALE_MAX_48` | WHALE 4/8 | 🔴 | 4/8 | 200 | $3.91M | $6,534 | 0.39% | 65.9% | 6.85 | **3.25** | Overall winner — high-WR yolo |
+| 🥈 | **`WHALE_MAX_66`** ★ | WHALE 6/6 ⭐ | 🔴 | 6/6 | 200 | **$4.09M** | $2,772 | 0.87% | 50.1% | 5.38 | **3.75** | **DEFAULT — MAIN top NET với DD<1%** |
+| 🥉 | `WHALE_MAX_38` | WHALE 3/8 | 🔴 | 3/8 | 200 | $3.87M | $6,534 | 0.39% | **72.0%** | 6.80 | 3.75 | Top WR — dễ tâm lý |
+| 4 | `WHALE_MAX_88` | WHALE 8/8 | 🔴 | 8/8 | 200 | $3.65M | $2,970 | **0.14%** | 50.0% | **7.18** | 4.00 | Min DD yolo |
+| 5 | `WHALE_MID_66` | WHALE 100 6/6 | 🟠 | 6/6 | 100 | $2.31M | $1,683 | 0.10% | 50.2% | 5.41 | 4.25 | Mid balanced |
+| 6 | `TOMI_MAX_55` | TOMI 200 5/5 | 🔵 | 5/5 | 200 | $3.05M | $2,385 | 0.10% | 49.8% | 4.43 | 5.50 | TOMI 200 stable |
+| 7 | `TOMI_MIN_66` | TOMI 50 6/6 | ⚪ | 6/6 | 50 | $1.15M | **$957** | 0.60% | 50.0% | 5.36 | 5.75 | Starter cực bảo thủ |
+
+### 3 LEGACY CURRENT (kept for compat — composite > 6, kém alternatives):
+
+| Rank | Key | Label | TP/SL | Stack | NET 3y | MaxDD $ | DD % | Composite | Note |
+|---|---|---|---|---|---|---|---|---|---|
+| 8 | `TOMI_MAX` | TOMI 200 4/4 (legacy) | 4/4 | 200 | $2.63M | $2,424 | 0.28% | 6.75 | symmetric kém asymmetric |
+| 9 | `WHALE_MAX` | WHALE 5/2.5 (legacy) | 5/2.5 | 200 | $3.03M | $15,627 | 8.02% | 8.50 | DD rank 10/10 (worst) |
+| 10 | `WHALE_MID` | WHALE 100 5/2.5 (legacy) | 5/2.5 | 100 | $1.89M | $7,359 | 2.59% | 9.50 | Last place mọi metric |
 
 ### Migration legacy keys (auto trong `getActivePresetKey`):
 
-| Legacy | → v4.8.23 |
-|--------|-----------|
-| `AGGRESSIVE` | `WHALE_MID` (gần với WHALE-75 cũ nhất) |
-| `BALANCED`   | `TOMI_MID`  (EAGLE bỏ → TOMI safest) |
-| `TURTLE`     | `TOMI_MIN`  |
-| `TOMI`       | `TOMI_MIN`  (TOMI cũ stack=50) |
+| Legacy v4.8.19- | v4.8.23 (interim) | → v4.8.24 |
+|---|---|---|
+| `AGGRESSIVE` | `WHALE_MID` | `WHALE_MAX` (giữ legacy 5/2.5) |
+| `BALANCED` | `TOMI_MID` | **`WHALE_MAX_66`** (upgrade lên ⭐ MAIN) |
+| `TURTLE` | `TOMI_MIN` | `TOMI_MIN_66` (upgrade 4/4 → 6/6) |
+| `TOMI` | `TOMI_MIN` | `TOMI_MIN_66` |
+| `TOMI_MID` | (giữ) | `WHALE_MID_66` (TOMI_MID 4/4 bỏ → WHALE 100 6/6 cùng stack, NET cao hơn) |
+| `TOMI_MIN` | (giữ) | `TOMI_MIN_66` (4/4 → 6/6 better) |
 
-### Decision log:
-- **EAGLE bỏ:** dominated. TOMI cùng stack luôn NET cao hơn + DD thấp hơn + WR cao hơn.
-- **WHALE giữ 2:** stack 200 (max yolo) + 100 (balanced). Stack 75/50 dominated bởi TOMI cùng range.
-- **TOMI giữ 3:** 200/100/50 phủ đều profile vốn từ ít → max.
-- **TOMI-75 bỏ:** không ưu việt hơn TOMI-100. DD% 2.0% chỉ là artifact timing (DD xảy ra sớm khi capital base nhỏ); DD absolute $1.86k gần với TOMI-50/100.
-- **TOMI bỏ trailing:** test TP4/SL4 fixed cho consistency với WHALE. Có thể re-enable trailing cho TOMI variants sau.
+### Decision log v3.2:
+- **DEFAULT switch:** `TOMI_MID` → **`WHALE_MAX_66`**. Lý do: composite 3.75, NET $4.09M (gấp 2.2× TOMI_MID), DD vẫn <1%.
+- **`TOMI_MID` 4/4 stack 100 bỏ:** dominated bởi `WHALE_MID_66` cùng stack (NET $2.31M vs $1.87M, DD $1.7k vs $2.0k).
+- **`TOMI_MIN` 4/4 stack 50 → upgrade `TOMI_MIN_66`:** 6/6 win 4/4 cả NET ($1.15M vs $1.17M nhỏ hơn) — wait số gần bằng, nhưng MaxDD $957 vs $1149 → 6/6 vẫn nhỉnh hơn về DD/PF.
+- **3 legacy giữ:** cho ai muốn rollback hoặc compare A/B. Tommy có thể tắt sau khi confirm 7 candidate ổn.
+- **Insight key:** TP < SL (asymmetric) thắng symmetric. SL=2.5 là tử huyệt → DD rank cuối.
 
 ---
 **Engine:** `utils/all5mAccount.ts` + `hooks/use5mAllTrader.ts`
@@ -318,6 +332,7 @@ TOMI_MAX: {
 
 ## 📝 CHANGELOG
 
+- **v3.2** (2026-04-28): 10 PRESETS từ TPSL_GRID_v1 SHORTLIST_v1 — 7 candidate (composite 3.25-5.75) + 3 legacy current (composite 6.75-9.50). DEFAULT switch TOMI_MID → WHALE_MAX_66 (NET 2.2×). Bỏ TOMI_MID 4/4 (dominated). UI All5mPanel hiện 10 preset selectable.
 - **v3.1** (2026-04-28): Doc cleanup — xóa 2 section cũ tự mâu thuẫn (3 preset TURTLE/EAGLE/WHALE + "Apply preset programmatically" Phase 2 v2). Toàn bộ doc giờ đồng nhất với 5 preset v4.8.23. Thêm section Trailing Stop (dead code — chờ re-enable).
 - **v3.0** (2026-04-28): 5 PRESET mới từ stack-sweep 12-combo backtest. Bỏ EAGLE/BALANCED + TURTLE (dominated). Bumped to WHALE_MAX/MID + TOMI_MAX/MID/MIN với DEFAULT = TOMI_MID (PF 3.55, DD 0.2%).
 - **v2.1** (2026-04-28): Doc sync với code v4.7.27 — full Preset interface (cooldown/stoch/srProx/srLB), Better Entry Mode + Capital Migration v4.7.20 + Leader/Follower

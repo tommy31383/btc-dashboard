@@ -368,17 +368,23 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </TouchableOpacity>
       </View>
 
-      {/* PRESET SWITCHER (anh Tommy v4.8.20): 5 chế độ từ stack-sweep 12-combo */}
+      {/* PRESET SWITCHER (anh Tommy v4.8.24): 10 picks từ TPSL_GRID_v1 SHORTLIST_v1
+        * 7 candidates (composite rank 3.25-5.75) + 3 legacy current prod (6.75-9.50) */}
       <View style={styles.presetRow}>
-        {(["WHALE_MAX", "WHALE_MID", "TOMI_MAX", "TOMI_MID", "TOMI_MIN"] as PresetKey[]).map((k) => {
+        {([
+          "WHALE_MAX_66", "WHALE_MAX_48", "WHALE_MAX_38", "WHALE_MAX_88",
+          "TOMI_MAX_55", "WHALE_MID_66", "TOMI_MIN_66",
+          "WHALE_MAX", "WHALE_MID", "TOMI_MAX",
+        ] as PresetKey[]).map((k) => {
           const p = PRESETS[k];
           const active = k === presetKey;
+          // Color theo prefix: WHALE_MAX = đỏ, WHALE_MID = cam, TOMI_MAX = xanh, TOMI_MIN = trắng
           const accentColor =
-            k === "WHALE_MAX" ? P.error :        // 🔴
-            k === "WHALE_MID" ? P.bitcoinOrange : // 🟠
-            k === "TOMI_MAX"  ? "#3b82f6" :       // 🔵
-            k === "TOMI_MID"  ? "#22c55e" :       // 🟢
-            /* TOMI_MIN */      "#9ca3af";        // ⚪
+            k.startsWith("WHALE_MAX") ? P.error :
+            k.startsWith("WHALE_MID") ? P.bitcoinOrange :
+            k.startsWith("TOMI_MAX")  ? "#3b82f6" :
+            k.startsWith("TOMI_MIN")  ? "#9ca3af" :
+            "#22c55e";
           return (
             <TouchableOpacity
               key={k}

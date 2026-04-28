@@ -39,25 +39,46 @@ export const SR_LOOKBACK_15M = 50;
 export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000;
 
 // ════════════════════════════════════════════════════════════════════
-// 🎯 PRESETS v4 (anh Tommy v4.8.20 — Stack sweep winner picks, EAGLE removed)
-//   5 chế độ switch trong UI (chọn từ stack-sweep 12-combo backtest 3y):
-//   - WHALE_MAX  🔴 WHALE 200  → Max NET (+$3.03M, DD 8.0%, WR 34%, PF 2.31) — yolo
-//   - WHALE_MID  🟠 WHALE 100  → WHALE balanced (+$1.89M, DD 2.6%, WR 34%, PF 2.27)
-//   - TOMI_MAX   🔵 TOMI 200   → Max TOMI (+$2.63M, DD 0.3%, WR 50%, PF 3.51)
-//   - TOMI_MID   🟢 TOMI 100   → Best risk-adjusted (+$1.87M, DD 0.2%, WR 50%, PF 3.55) ★ DEFAULT
-//   - TOMI_MIN   ⚪ TOMI 50    → Starter (+$1.16M, DD 0.3%, WR 50%, PF 3.52) — vốn ít
+// 🎯 PRESETS v5 (anh Tommy v4.8.24 — TPSL_GRID_v1 SHORTLIST_v1, 10 picks)
+//   Source: assets/preset_shortlist_v1.json (curated từ 280-combo TP/SL grid 3y).
+//   Composite rank = avg of (NET/MaxDD/WR/PF) ranks · thấp = tốt hơn.
+//   Naming: 3 LEGACY keys giữ nguyên (current prod) + 7 NEW keys với suffix TP/SL.
+//
+//   Top 4 (composite < 4) — đáng adopt:
+//   - WHALE_MAX_48 🔴 WHALE 4/8     → 3.25 ⭐ overall winner (high-WR yolo)
+//   - WHALE_MAX_66 🔴 WHALE 6/6     → 3.75 ⭐ MAIN (top NET + DD<1%) ★ DEFAULT
+//   - WHALE_MAX_38 🔴 WHALE 3/8     → 3.75 (top WR 72%)
+//   - WHALE_MAX_88 🔴 WHALE 8/8     → 4.00 (min DD 0.14%)
+//   Mid (composite 4-6):
+//   - WHALE_MID_66 🟠 mid 6/6       → 4.25 (mid balanced stack 100)
+//   - TOMI_MAX_55  🔵 TOMI 5/5      → 5.50 (TOMI 200 stable)
+//   - TOMI_MIN_66  ⚪ TOMI 50 6/6   → 5.75 (starter cực bảo thủ)
+//   Legacy production (kept for compat — composite 6.75-9.50, kém hơn alternatives):
+//   - TOMI_MAX     🔵 TOMI 4/4      → 6.75 (legacy)
+//   - WHALE_MAX    🔴 WHALE 5/2.5   → 8.50 (legacy, DD 8% tệ)
+//   - WHALE_MID    🟠 WHALE 5/2.5   → 9.50 (legacy, last place)
 // ════════════════════════════════════════════════════════════════════
 
-export type PresetKey = "WHALE_MAX" | "WHALE_MID" | "TOMI_MAX" | "TOMI_MID" | "TOMI_MIN";
+export type PresetKey =
+  | "WHALE_MAX_66" | "WHALE_MAX_48" | "WHALE_MAX_38" | "WHALE_MAX_88"
+  | "TOMI_MAX_55" | "WHALE_MID_66" | "TOMI_MIN_66"
+  | "WHALE_MAX" | "WHALE_MID" | "TOMI_MAX"; // 3 legacy current prod
 
-const VALID_KEYS: PresetKey[] = ["WHALE_MAX", "WHALE_MID", "TOMI_MAX", "TOMI_MID", "TOMI_MIN"];
+const VALID_KEYS: PresetKey[] = [
+  "WHALE_MAX_66", "WHALE_MAX_48", "WHALE_MAX_38", "WHALE_MAX_88",
+  "TOMI_MAX_55", "WHALE_MID_66", "TOMI_MIN_66",
+  "WHALE_MAX", "WHALE_MID", "TOMI_MAX",
+];
 
-/** Migration map: legacy key (v4.8.19 trở về trước) → v4.8.20 key gần nhất. */
+/** Migration map: legacy key (v4.8.23 trở về trước) → v4.8.24 key gần nhất.
+ *  TOMI_MID/TOMI_MIN cũ (4/4) bị bỏ — map sang upgraded variants. */
 const LEGACY_KEY_MAP: Record<string, PresetKey> = {
-  AGGRESSIVE: "WHALE_MID",   // WHALE stack=75 cũ → WHALE_MID stack=100 (gần nhất)
-  BALANCED:   "TOMI_MID",    // EAGLE bị bỏ → TOMI_MID (best safe replacement)
-  TURTLE:     "TOMI_MIN",    // TURTLE cũ (đã bỏ ở v4.8.22) → TOMI_MIN
-  TOMI:       "TOMI_MIN",    // TOMI cũ stack=50 → TOMI_MIN
+  AGGRESSIVE: "WHALE_MAX",      // giữ current legacy (5/2.5)
+  BALANCED:   "WHALE_MAX_66",   // upgrade lên ⭐ MAIN
+  TURTLE:     "TOMI_MIN_66",    // upgrade từ TURTLE cũ → TOMI_MIN 6/6
+  TOMI:       "TOMI_MIN_66",
+  TOMI_MID:   "WHALE_MID_66",   // TOMI_MID 4/4 cũ → WHALE_MID 6/6 (cùng stack 100, NET cao hơn)
+  TOMI_MIN:   "TOMI_MIN_66",    // upgrade 4/4 → 6/6 (NET cao hơn, DD thấp hơn)
 };
 
 export interface Preset {
@@ -95,72 +116,114 @@ export interface Preset {
   expectedMaxDd3y: number;
 }
 
+// ─── Helper: WHALE base config (stoch 10/90, srProx 0.4, srLB 30) ──────
+const WHALE_BASE = {
+  stackBetterEntryMode: "off" as const,
+  cooldownMin: 5,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 30,
+  stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+};
+// ─── Helper: TOMI base config (stoch 5/95, srProx 0.2, srLB 50) ────────
+const TOMI_BASE = {
+  stackBetterEntryMode: "off" as const,
+  cooldownMin: 5,
+  stochLongLevel: 5, stochShortLevel: 95,
+  srProximityPct: 0.2, srLookback15m: 50,
+  stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+};
+
 export const PRESETS: Record<PresetKey, Preset> = {
-  // ─── WHALE_MAX 🔴 (stack 200): max NET, DD 8% (yolo) ─────────────────────
+  // ════════════ 7 CANDIDATE từ TPSL_GRID_v1 (composite rank thấp = tốt) ═══════════
+
+  // ─── #1 ⭐ MAIN: WHALE_MAX 6/6 (composite 3.75) ──────────────────────────
+  WHALE_MAX_66: {
+    key: "WHALE_MAX_66", label: "WHALE 6/6 ⭐", emoji: "🔴",
+    description: "MAIN ⭐ · Top NET với DD<1% · NET $4.09M, DD 0.87% (TPSL_GRID_v1)",
+    tpPct: 6, slPct: 6,
+    stackMaxPerSide: 200, ...WHALE_BASE,
+    expectedNet3y: 4090815, expectedMaxDd3y: 2772,
+  },
+  // ─── #2 high-WR yolo: WHALE_MAX 4/8 (composite 3.25 — overall winner) ──
+  WHALE_MAX_48: {
+    key: "WHALE_MAX_48", label: "WHALE 4/8", emoji: "🔴",
+    description: "High-WR yolo · NET $3.91M, WR 65.9%, DD 0.39%",
+    tpPct: 4, slPct: 8,
+    stackMaxPerSide: 200, ...WHALE_BASE,
+    expectedNet3y: 3911061, expectedMaxDd3y: 6534,
+  },
+  // ─── #3 top WR: WHALE_MAX 3/8 (composite 3.75) ──────────────────────────
+  WHALE_MAX_38: {
+    key: "WHALE_MAX_38", label: "WHALE 3/8", emoji: "🔴",
+    description: "Top WR 72% · NET $3.87M, dễ tâm lý",
+    tpPct: 3, slPct: 8,
+    stackMaxPerSide: 200, ...WHALE_BASE,
+    expectedNet3y: 3873390, expectedMaxDd3y: 6534,
+  },
+  // ─── #4 min DD yolo: WHALE_MAX 8/8 (composite 4.00) ─────────────────────
+  WHALE_MAX_88: {
+    key: "WHALE_MAX_88", label: "WHALE 8/8", emoji: "🔴",
+    description: "Min DD yolo · NET $3.65M, DD chỉ 0.14%, PF 7.18",
+    tpPct: 8, slPct: 8,
+    stackMaxPerSide: 200, ...WHALE_BASE,
+    expectedNet3y: 3648270, expectedMaxDd3y: 2970,
+  },
+  // ─── #5 mid balanced: WHALE_MID 6/6 (composite 4.25) ────────────────────
+  WHALE_MID_66: {
+    key: "WHALE_MID_66", label: "WHALE 100 6/6", emoji: "🟠",
+    description: "Mid balanced · NET $2.31M, DD 0.10% · stack 100",
+    tpPct: 6, slPct: 6,
+    stackMaxPerSide: 100, ...WHALE_BASE,
+    expectedNet3y: 2305122, expectedMaxDd3y: 1683,
+  },
+  // ─── #6 TOMI 200 stable: TOMI_MAX 5/5 (composite 5.50) ──────────────────
+  TOMI_MAX_55: {
+    key: "TOMI_MAX_55", label: "TOMI 200 5/5", emoji: "🔵",
+    description: "TOMI 200 stable · NET $3.05M, DD 0.10%",
+    tpPct: 5, slPct: 5,
+    stackMaxPerSide: 200, ...TOMI_BASE,
+    expectedNet3y: 3050910, expectedMaxDd3y: 2385,
+  },
+  // ─── #7 starter: TOMI_MIN 6/6 (composite 5.75) ──────────────────────────
+  TOMI_MIN_66: {
+    key: "TOMI_MIN_66", label: "TOMI 50 6/6", emoji: "⚪",
+    description: "Starter cực bảo thủ · NET $1.15M, MaxDD chỉ $957",
+    tpPct: 6, slPct: 6,
+    stackMaxPerSide: 50, ...TOMI_BASE,
+    expectedNet3y: 1145433, expectedMaxDd3y: 957,
+  },
+
+  // ════════════ 3 LEGACY current production (kept cho rollback) ════════════════
+
+  // ─── Legacy WHALE_MAX 5/2.5 (composite 8.50 — DD tệ) ────────────────────
   WHALE_MAX: {
-    key: "WHALE_MAX", label: "WHALE 200", emoji: "🔴",
-    description: "Max NET · yolo · vốn lớn (DD 8%)",
+    key: "WHALE_MAX", label: "WHALE 5/2.5 (legacy)", emoji: "🔴",
+    description: "LEGACY current · NET $3.03M nhưng DD 8.0% (kém alternatives)",
     tpPct: 5, slPct: 2.5,
-    stackMaxPerSide: 200, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 10, stochShortLevel: 90,
-    srProximityPct: 0.4, srLookback15m: 30,
+    stackMaxPerSide: 200, ...WHALE_BASE,
     expectedNet3y: 3028056, expectedMaxDd3y: 15627,
   },
-  // ─── WHALE_MID 🟠 (stack 100): WHALE balanced (DD 2.6%) ──────────────────
+  // ─── Legacy WHALE_MID 5/2.5 (composite 9.50 — last place) ──────────────
   WHALE_MID: {
-    key: "WHALE_MID", label: "WHALE 100", emoji: "🟠",
-    description: "WHALE balanced · vốn vừa (DD 2.6%)",
+    key: "WHALE_MID", label: "WHALE 100 5/2.5 (legacy)", emoji: "🟠",
+    description: "LEGACY current · NET $1.89M, DD 2.59%",
     tpPct: 5, slPct: 2.5,
-    stackMaxPerSide: 100, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 10, stochShortLevel: 90,
-    srProximityPct: 0.4, srLookback15m: 30,
+    stackMaxPerSide: 100, ...WHALE_BASE,
     expectedNet3y: 1888767, expectedMaxDd3y: 7359,
   },
-  // ─── TOMI_MAX 🔵 (stack 200): max TOMI scaled (DD 0.3%) ──────────────────
+  // ─── Legacy TOMI_MAX 4/4 (composite 6.75) ───────────────────────────────
   TOMI_MAX: {
-    key: "TOMI_MAX", label: "TOMI 200", emoji: "🔵",
-    description: "TOMI scaled max · DD 0.3%",
+    key: "TOMI_MAX", label: "TOMI 200 4/4 (legacy)", emoji: "🔵",
+    description: "LEGACY current · NET $2.63M, DD 0.28%, symmetric",
     tpPct: 4, slPct: 4,
-    stackMaxPerSide: 200, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 5, stochShortLevel: 95,
-    srProximityPct: 0.2, srLookback15m: 50,
+    stackMaxPerSide: 200, ...TOMI_BASE,
     expectedNet3y: 2633499, expectedMaxDd3y: 2424,
-  },
-  // ─── TOMI_MID 🟢 (stack 100): best risk-adjusted (DD 0.2%, PF 3.55) ★ DEFAULT
-  TOMI_MID: {
-    key: "TOMI_MID", label: "TOMI 100", emoji: "🟢",
-    description: "Best risk-adjusted · DD 0.2% · PF 3.55 ★",
-    tpPct: 4, slPct: 4,
-    stackMaxPerSide: 100, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 5, stochShortLevel: 95,
-    srProximityPct: 0.2, srLookback15m: 50,
-    expectedNet3y: 1865622, expectedMaxDd3y: 2046,
-  },
-  // ─── TOMI_MIN ⚪ (stack 50): starter / vốn ít (DD 0.3%) ──────────────────
-  TOMI_MIN: {
-    key: "TOMI_MIN", label: "TOMI 50", emoji: "⚪",
-    description: "Starter · vốn ít · max margin $1.5k",
-    tpPct: 4, slPct: 4,
-    stackMaxPerSide: 50, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-    stackBetterEntryMode: "off",
-    cooldownMin: 5,
-    stochLongLevel: 5, stochShortLevel: 95,
-    srProximityPct: 0.2, srLookback15m: 50,
-    expectedNet3y: 1165062, expectedMaxDd3y: 1149,
   },
 };
 
-// Default = TOMI_MID (best risk-adjusted: DD 0.2%, PF 3.55, NET $1.87M).
-// Anh switch lên _MAX khi muốn yolo.
-export const DEFAULT_PRESET_KEY: PresetKey = "TOMI_MID";
+// Default = WHALE_MAX_66 ⭐ MAIN (composite 3.75, NET $4.09M, DD 0.87%).
+// Anh muốn safer → switch TOMI_MIN_66 (composite 5.75, MaxDD chỉ $957).
+export const DEFAULT_PRESET_KEY: PresetKey = "WHALE_MAX_66";
 
 // Cache trong RAM để tryEntry5mBar không phải đọc AsyncStorage mỗi lần
 let _activePresetCache: PresetKey | null = null;
@@ -204,11 +267,11 @@ export function getCachedActivePreset(): Preset {
 }
 
 // Backward-compat: TP_PCT / SL_PCT / STACK_MAX_PER_SIDE / STACK_MIN_ENTRY_DIST_PCT
-// vẫn export để code cũ (All5mPanel chart axis...) không vỡ. Giá trị = DEFAULT preset (TOMI_MID).
-export const TP_PCT = PRESETS.TOMI_MID.tpPct;
-export const SL_PCT = PRESETS.TOMI_MID.slPct;
-export const STACK_MAX_PER_SIDE = PRESETS.TOMI_MID.stackMaxPerSide;
-export const STACK_MIN_ENTRY_DIST_PCT = PRESETS.TOMI_MID.stackMinEntryDistPct;
+// vẫn export để code cũ (All5mPanel chart axis...) không vỡ. Giá trị = DEFAULT preset (WHALE_MAX_66).
+export const TP_PCT = PRESETS.WHALE_MAX_66.tpPct;
+export const SL_PCT = PRESETS.WHALE_MAX_66.slPct;
+export const STACK_MAX_PER_SIDE = PRESETS.WHALE_MAX_66.stackMaxPerSide;
+export const STACK_MIN_ENTRY_DIST_PCT = PRESETS.WHALE_MAX_66.stackMinEntryDistPct;
 
 export type EntrySource = "stoch_long" | "stoch_short" | "sr_long" | "sr_short";
 export type Side = "LONG" | "SHORT";
