@@ -94,6 +94,14 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
         _cache.journal = (j.entries || []).slice(0, CLIENT_JOURNAL_CAP);
         setJournal(_cache.journal);
       } catch {}
+      // Anh Tommy v4.8.24: refresh server version + uptime mỗi tick (15s) — trước
+      // chỉ chạy 1 lần ở init/login → version stale sau server deploy. Public endpoint
+      // (no auth, ~120B/req) → cheap.
+      try {
+        const [info, health] = await Promise.all([api.root(), api.health()]);
+        _cache.serverInfo = info; setServerInfo(info);
+        _cache.serverHealth = health; setServerHealth(health);
+      } catch {}
       _notifyAll();
     } catch (e: any) {
       setLastError(e?.message ?? String(e));
