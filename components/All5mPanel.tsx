@@ -135,13 +135,8 @@ const PriceChartWithMarkersSvg = memo(function PriceChartWithMarkersSvg({
             const xX = xOf(p.exitMs);
             const xY = yOf(p.exitPrice);
             const win = p.status === "WIN";
-            exitMark = (
-              <>
-                <Circle cx={xX} cy={xY} r={2.5} fill={win ? P.green : P.error} opacity={0.9} />
-                {/* Connect line entry → exit faint */}
-                <Line x1={eX} y1={eY} x2={xX} y2={xY} stroke={win ? P.green : P.error} strokeWidth={0.5} strokeDasharray="2,2" opacity={0.4} />
-              </>
-            );
+            // v4.8.33: bỏ connect line entry→exit (stack 200 → chart bị rối)
+            exitMark = <Circle cx={xX} cy={xY} r={2.5} fill={win ? P.green : P.error} opacity={0.9} />;
           }
           return (
             <React.Fragment key={p.id}>
