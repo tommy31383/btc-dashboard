@@ -29,17 +29,18 @@ import BinanceChart from "./components/BinanceChart";
 import SettingsPanel from "./components/SettingsPanel";
 import AlertBanner from "./components/AlertBanner";
 import TimeframeTable from "./components/TimeframeTable";
-import ConfluenceScore from "./components/ConfluenceScore";
-import AlertLog from "./components/AlertLog";
-import OverallVerdict from "./components/OverallVerdict";
 import TradingRulesPanel from "./components/TradingRulesPanel";
 import RuleAlertBanner from "./components/RuleAlertBanner";
 import LiveActionItems from "./components/LiveActionItems";
-import LiveRulesSummary from "./components/LiveRulesSummary";
 import RiskRadar from "./components/RiskRadar";
 import GptRuleScreen from "./components/GptRuleScreen";
 import { useRiskRadar } from "./hooks/useRiskRadar";
-import { GoldenFiringBanner } from "./components/GoldenFiringBanner";
+// v4.8.25 (anh Tommy): xoá 5 panel useless khỏi tab RULE
+// - GoldenFiringBanner: artifact scan 2.3Y cũ, redirect sang tab risk legacy
+// - LiveRulesSummary:   redundant với TradingRulesPanel
+// - ConfluenceScore:    redundant với RuleAlertBanner (server-only mode không cần)
+// - OverallVerdict:     legacy "BUY/SELL/HOLD" — frontend không trade nữa
+// - AlertLog:           noise (non-critical alerts spam)
 // PaperTradeJournal removed (trùng với LIVE journal + 5m ALL panel)
 import UnifiedTradesPanel from "./components/UnifiedTradesPanel";
 import ServerTab from "./components/ServerTab";
@@ -63,7 +64,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.8.24";
+const APP_VERSION = "4.8.25";
 const BUILD_DATE = "2026-04-28";
 
 /**
@@ -485,17 +486,6 @@ export default function App() {
           />
         </PanelBoundary>
 
-        {/* GOLDEN FIRING banner — verified rule từ scan 2.3Y đang match ngay bây giờ */}
-        <PanelBoundary name="GoldenFiringBanner">
-          <GoldenFiringBanner
-            goldens={riskState.goldens}
-            onPress={() => {
-              setNavTab("trades");
-              setActiveTab("risk");
-            }}
-          />
-        </PanelBoundary>
-
         {/* Critical Alerts */}
         <PanelBoundary name="AlertBanner">
           <AlertBanner alerts={criticalAlerts} />
@@ -511,16 +501,6 @@ export default function App() {
             support15m={ltfCtx.support15m}
             resistance15m={ltfCtx.resistance15m}
             onGoToLive={() => { setNavTab("live"); setActiveTab("live"); }}
-          />
-        </PanelBoundary>
-
-        {/* v4.3.16 — Live rules aggregate summary (C) */}
-        <PanelBoundary name="LiveRulesSummary">
-          <LiveRulesSummary
-            trackedIds={tracked.trackedIds}
-            ruleStatus={ruleStatus}
-            ruleMatchDetails={ruleMatchDetails}
-            tfData={tfData}
           />
         </PanelBoundary>
 
@@ -569,28 +549,6 @@ export default function App() {
               <BinanceChart rawKlines={rawKlines} selectedTF={selectedTF} onSelectTF={setSelectedTF} />
             </PanelBoundary>
 
-            {/* v4.3.43 — Multi-TF gộp thành 1 confluence score (-100..+100) */}
-            <PanelBoundary name="ConfluenceScore">
-              <ConfluenceScore tfData={tfData} />
-            </PanelBoundary>
-
-            {/* Verdict */}
-            <PanelBoundary name="OverallVerdict">
-              <OverallVerdict
-                verdict={verdict}
-                selectedTF={selectedTF}
-                onSelectTF={setSelectedTF}
-                tfData={tfData}
-                rawKlines={rawKlines}
-                price={priceData?.price ?? 0}
-                change24hPct={priceData?.changePct24h ?? 0}
-              />
-            </PanelBoundary>
-
-            {/* Alert Log */}
-            <PanelBoundary name="AlertLog">
-              <AlertLog alerts={normalAlerts} />
-            </PanelBoundary>
           </>
         )}
 
