@@ -2,7 +2,7 @@
 
 **Date written:** 2026-04-28
 **Frontend:** v4.8.19 (`tommy31383/btc-dashboard`, public, master branch)
-**Server:** v0.2.1 (`tommy31383/btc-trader-server`, private, main branch)
+**Server:** v0.2.2 (`tommy31383/btc-trader-server`, private, main branch)
 **Owner:** Tommy (tuantommy83@gmail.com) — speaks Vietnamese, prefers terse Việt-Anh mix
 
 ---
@@ -581,6 +581,13 @@ Every per-rule backtest MUST emit:
 
 ## 16. Recent decision log (last sprint)
 
+- **v0.2.2:** 3-tier rolling journal (closes mismatch with frontend commit `4b5fa02`)
+  - Tier 1 RAM cap 100 entries (trader.logAction slices newest)
+  - Tier 2 disk JSONL files `/var/lib/btc-trader/journal/journal-YYYY-MM-DD.jsonl`, keep 7 days, auto cleanup 00:05 UTC
+  - Tier 3 client lazy fetch via `/journal/history?date=...` (no cache)
+  - 2 new endpoints: `GET /api/live/journal/days`, `GET /api/live/journal/history?date=YYYY-MM-DD`
+  - WS broadcast `journal_append` (delta ~150B) + `journal_snapshot` on connect (sync after reconnect)
+  - Bandwidth -99.8% per journal write vs full state push
 - **v0.2.1:** Available USDT < marginUsd → BLOCK gate (decideEntry + confirmPending)
 - **v0.2.0:** E-T15-NoTP S50 step trail (15m only, NO TP cap, 10 steps × 50% TP dist)
   - Backtest 3y: NET +1.4M% (vs E0 +937k%, vs E-T15 fixed +890k%)
@@ -609,4 +616,5 @@ Password:       30318384 (single user, both UI gate + bulk-close confirm)
 Production rule set: Mode E (disable 5m:1 baseline) + E-T15-NoTP S50 step trail (15m)
 Production preset:   B (maxStack 50, dist 0%, spacing 0, cap $200k notional)
 Available gate:      avail < marginUsd → BLOCK (v0.2.1+)
+Journal tiers:       RAM 100 / disk 7-day JSONL / client lazy per-day (v0.2.2+)
 ```
