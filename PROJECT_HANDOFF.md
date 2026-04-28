@@ -1,7 +1,7 @@
 # PROJECT HANDOFF — BTC Trading Bot
 
-**Date written:** 2026-04-28
-**Frontend:** v4.8.19 (`tommy31383/btc-dashboard`, public, master branch)
+**Date written:** 2026-04-28 (last sync v4.8.23)
+**Frontend:** v4.8.23 (`tommy31383/btc-dashboard`, public, master branch)
 **Server:** v0.2.2 (`tommy31383/btc-trader-server`, private, main branch)
 **Owner:** Tommy (tuantommy83@gmail.com) — speaks Vietnamese, prefers terse Việt-Anh mix
 
@@ -581,7 +581,13 @@ Every per-rule backtest MUST emit:
 
 ## 16. Recent decision log (last sprint)
 
-- **v0.2.2:** 3-tier rolling journal (closes mismatch with frontend commit `4b5fa02`)
+- **v4.8.23 (frontend):** 5 PRESETS từ stack-sweep 12-combo backtest 3y
+  - EAGLE bỏ luôn (dominated bởi WHALE/TOMI ở mọi stack size)
+  - 5 winner: WHALE_MAX(200) / WHALE_MID(100) / TOMI_MAX(200) / **TOMI_MID(100) ★default** / TOMI_MIN(50)
+  - Migration legacy keys: AGGRESSIVE→WHALE_MID, BALANCED→TOMI_MID, TURTLE/TOMI→TOMI_MIN
+  - TOMI-75 anomaly debunked: DD% 2.0% chỉ là artifact timing (DD peak xảy ra 3 tháng đầu khi capital base $94k)
+  - Tools: `backtest-5mall-stack-sweep-3y.ts` + `diag-tomi-stack-dd.ts`
+- **v0.2.2 (server):** 3-tier rolling journal (closes mismatch with frontend commit `4b5fa02`)
   - Tier 1 RAM cap 100 entries (trader.logAction slices newest)
   - Tier 2 disk JSONL files `/var/lib/btc-trader/journal/journal-YYYY-MM-DD.jsonl`, keep 7 days, auto cleanup 00:05 UTC
   - Tier 3 client lazy fetch via `/journal/history?date=...` (no cache)
@@ -617,4 +623,5 @@ Production rule set: Mode E (disable 5m:1 baseline) + E-T15-NoTP S50 step trail 
 Production preset:   B (maxStack 50, dist 0%, spacing 0, cap $200k notional)
 Available gate:      avail < marginUsd → BLOCK (v0.2.1+)
 Journal tiers:       RAM 100 / disk 7-day JSONL / client lazy per-day (v0.2.2+)
+5m ALL presets:      WHALE_MAX/WHALE_MID/TOMI_MAX/TOMI_MID★/TOMI_MIN (v4.8.23+)
 ```
