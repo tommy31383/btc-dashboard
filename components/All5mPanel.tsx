@@ -5,7 +5,7 @@
  * SHORT K>90), fallback S/R 15m. TP+4%/SL-2%. Cooldown 15m sau entry.
  */
 import React, { useMemo, useState, useCallback, memo, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Polyline, Line, Polygon, Circle } from "react-native-svg";
 import { P } from "../utils/v2Theme";
@@ -384,6 +384,9 @@ const RULE_OPEN_KEY = "@all5m_rule_open";
 export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, support15m, resistance15m, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
   const [ruleOpen, setRuleOpen] = useState(false);
+  const { width: winWidth } = useWindowDimensions();
+  // Chart width: full window width - padding 32 (root 16 mỗi bên), max 760 cho desktop
+  const chartW = Math.min(760, Math.max(280, winWidth - 32));
 
   // Persist ruleOpen state (anh Tommy: "nhớ rule đã chọn")
   useEffect(() => {
@@ -476,11 +479,12 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         </TouchableOpacity>
       </View>
 
-      {/* PRESET SWITCHER — 7 picks từ TPSL_GRID_v1 (composite rank 3.25-5.75) */}
+      {/* PRESET SWITCHER — 7 picks v2 + 3 LEGACY (anh Tommy v4.8.34: add lại 3 legacy) */}
       <View style={styles.presetRow}>
         {([
           "WHALE_MAX_66", "WHALE_MAX_48", "WHALE_MAX_38", "WHALE_MAX_88",
           "TOMI_MAX_55", "WHALE_MID_66", "TOMI_MIN_66",
+          "WHALE_MAX", "WHALE_MID", "TOMI_MAX",
         ] as PresetKey[]).map((k) => {
           const p = getEffectivePreset(k);
           const active = k === presetKey;
@@ -567,14 +571,14 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
       {price5mBars && price5mBars.length >= 2 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📊 PRICE 5m + ENTRIES (last 120 cây ≈ 10h)</Text>
-          <PriceChartWithMarkersSvg bars={price5mBars} positions={account.positions} />
+          <PriceChartWithMarkersSvg bars={price5mBars} positions={account.positions} width={chartW} />
         </View>
       )}
 
       {/* Equity curve */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>📈 EQUITY ({account.equityHistory.length} pts)</Text>
-        <EquityCurveSvg data={account.equityHistory} />
+        <EquityCurveSvg data={account.equityHistory} width={chartW} />
       </View>
 
       {/* OPEN list — split LONG/SHORT, dùng OpenPositionRow memo */}
@@ -624,7 +628,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         {price5mBars && price5mBars.length >= 2 && closed.length > 0 ? (
           <View style={{ marginBottom: 10 }}>
             <Text style={styles.closedChartTitle}>📉 CLOSE MAP (auto zoom theo lệnh đóng)</Text>
-            <PriceChartWithMarkersSvg bars={price5mBars} positions={closed.slice(0, 50)} height={180} maxBars={500} />
+            <PriceChartWithMarkersSvg bars={price5mBars} positions={closed.slice(0, 50)} height={180} maxBars={500} width={chartW} />
           </View>
         ) : null}
         {closed.length === 0
