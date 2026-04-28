@@ -577,7 +577,11 @@ function ServerPriceChart({ bars, tracked, journal, width, tf }: {
   const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
 
   // CLOSE markers từ journal (last 30 closes)
-  const closesJ = journal.filter((j) => j.actionKind === "CLOSE").slice(0, 30);
+  // 2026-04-28 BUG FIX: server v0.2.2+ trả {action:{kind:"CLOSE"}} nested.
+  // Defensive: handle cả 2 schema (verbose nested + legacy flat) tránh chart trống marker.
+  const isClose = (j: any) =>
+    j?.action?.kind === "CLOSE" || j?.actionKind === "CLOSE" || j?.a === "C";
+  const closesJ = journal.filter(isClose).slice(0, 30);
   // Y-axis ticks (5 levels) + current price line
   const currentPrice = closes[closes.length - 1];
   const ticks = [pMax, pMax - (pMax - pMin) * 0.25, (pMax + pMin) / 2, pMin + (pMax - pMin) * 0.25, pMin];
