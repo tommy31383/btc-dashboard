@@ -35,6 +35,7 @@ interface Props {
 }
 
 type Filter = "ALL" | "WIN" | "LOSS";
+const MAX_OPEN_ROWS_PER_SIDE = 30;
 
 function fmtUsd(n: number, sign = false) { return (sign && n > 0 ? "+" : "") + "$" + n.toFixed(2); }
 function fmtPct(n: number, sign = true) { return (sign && n > 0 ? "+" : "") + n.toFixed(2) + "%"; }
@@ -305,6 +306,8 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
   const closed = useMemo(() => filter === "ALL" ? closedAll : closedAll.filter((p) => p.status === filter), [closedAll, filter]);
   const openLong = useMemo(() => open.filter((p) => p.side === "LONG").sort((a, b) => b.entryMs - a.entryMs), [open]);
   const openShort = useMemo(() => open.filter((p) => p.side === "SHORT").sort((a, b) => b.entryMs - a.entryMs), [open]);
+  const openLongVisible = useMemo(() => openLong.slice(0, MAX_OPEN_ROWS_PER_SIDE), [openLong]);
+  const openShortVisible = useMemo(() => openShort.slice(0, MAX_OPEN_ROWS_PER_SIDE), [openShort]);
 
   const handleSwitchPreset = useCallback((key: PresetKey) => {
     if (key === presetKey) return;
@@ -586,7 +589,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         {open.length === 0 ? (
           <Text style={styles.empty}>chưa có lệnh nào đang mở</Text>
         ) : (
-          ([["LONG", openLong], ["SHORT", openShort]] as const).map(([side, list]) => {
+          ([["LONG", openLong, openLongVisible], ["SHORT", openShort, openShortVisible]] as const).map(([side, list, visibleList]) => {
             if (list.length === 0) return null;
             let sideUpnl = 0;
             if (currentPrice !== null) {
@@ -603,7 +606,12 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
                 <Text style={[styles.sectionTitle, { color: sideColor, marginTop: 4 }]}>
                   {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) · uPnL <Text style={{ color: sideUpnl >= 0 ? P.green : P.error }}>{fmtUsd(sideUpnl, true)}</Text>
                 </Text>
-                {list.map((p, i) => (
+                {list.length > visibleList.length ? (
+                  <Text style={styles.openListHint}>
+                    hiện {visibleList.length}/{list.length} lệnh mới nhất để mobile đỡ lag
+                  </Text>
+                ) : null}
+                {visibleList.map((p, i) => (
                   <OpenPositionRow key={p.id} p={p} i={i} currentPrice={currentPrice} onCloseManual={onCloseManual} />
                 ))}
               </View>
@@ -698,6 +706,7 @@ const styles = StyleSheet.create({
   section: { marginBottom: 18 },
   sectionTitle: { color: P.text, fontSize: 13, fontWeight: "700", marginBottom: 8, letterSpacing: 0.4 },
   empty: { color: P.dim, fontStyle: "italic", paddingVertical: 8, fontSize: 12 },
+  openListHint: { color: P.dim, fontSize: 10, marginBottom: 6, fontStyle: "italic" },
   row: { flexDirection: "row", alignItems: "center", paddingVertical: 5, borderBottomColor: P.borderSoft, borderBottomWidth: 1, gap: 10, flexWrap: "wrap" },
   cellW: { flexBasis: 110, flexShrink: 0, fontFamily: "JetBrainsMono_500Medium", fontSize: 11 },
   cellNarrow: { flexBasis: 70, flexShrink: 0, fontFamily: "JetBrainsMono_500Medium", fontSize: 11 },

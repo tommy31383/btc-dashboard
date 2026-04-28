@@ -42,7 +42,6 @@ import { useRiskRadar } from "./hooks/useRiskRadar";
 // - OverallVerdict:     legacy "BUY/SELL/HOLD" — frontend không trade nữa
 // - AlertLog:           noise (non-critical alerts spam)
 // PaperTradeJournal removed (trùng với LIVE journal + 5m ALL panel)
-import UnifiedTradesPanel from "./components/UnifiedTradesPanel";
 import ServerTab from "./components/ServerTab";
 // LiveTradingPanel moved to dedicated LiveTab
 import LiveTab from "./components/LiveTab";
@@ -64,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.8.26";
+const APP_VERSION = "4.8.27";
 const BUILD_DATE = "2026-04-28";
 
 /**
@@ -508,16 +507,6 @@ export default function App() {
 
         {/* UNIFIED TRADES — gộp lệnh OPEN từ LIVE (Binance real) + 5m ALL (paper).
             v4.7.6: thay AutoTraderPanel paper legacy bằng panel read-only đúng nguồn. */}
-        <PanelBoundary name="UnifiedTradesPanel">
-          <UnifiedTradesPanel
-            liveState={live.state}
-            all5mAccount={all5m.account}
-            currentPrice={priceData?.price ?? null}
-            onGoToLive={() => { setNavTab("live"); setActiveTab("live"); }}
-            onGoToAll5m={() => { setNavTab("all5m"); setActiveTab("all5m"); }}
-          />
-        </PanelBoundary>
-
         {/* PAPER TRADE JOURNAL moved into 5m ALL tab footer */}
 
         {/* RULE TRADING — main interaction. User picks which pre-baked rules

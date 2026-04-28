@@ -17,6 +17,7 @@ import { pullFile, scheduleFilePush } from "./gistSync";
 const STORAGE_KEY = "@all5m_data_v1";
 const REMOTE_FILE = "all5m_account.json";
 const PRESET_STORAGE_KEY = "@all5m_preset_v1";
+const LOCAL_SAVE_DEBOUNCE_MS = 750;
 
 // v4.7.20 (anh Tommy): bump $1000 → $5000 cho stack 75 (WHALE) khả thi
 // — 75 LONG × $30 + 75 SHORT × $30 = $4500 max margin, $5000 đủ buffer.
@@ -227,6 +228,8 @@ export const DEFAULT_PRESET_KEY: PresetKey = "WHALE_MAX_66";
 
 // Cache trong RAM để tryEntry5mBar không phải đọc AsyncStorage mỗi lần
 let _activePresetCache: PresetKey | null = null;
+let _accountCache: All5mAccount | null = null;
+let _localSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
 export async function getActivePresetKey(): Promise<PresetKey> {
   if (_activePresetCache) return _activePresetCache;
@@ -334,11 +337,20 @@ export function emptyAccount(): All5mAccount {
 }
 
 export async function loadAccount(): Promise<All5mAccount> {
+  if (_accountCache) return _accountCache;
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!raw) return emptyAccount();
+    if (!raw) {
+      const fresh = emptyAccount();
+      _accountCache = fresh;
+      return fresh;
+    }
     const p = JSON.parse(raw) as All5mAccount;
-    if (p.version !== 1) return emptyAccount();
+    if (p.version !== 1) {
+      const fresh = emptyAccount();
+      _accountCache = fresh;
+      return fresh;
+    }
     if (!p.equityHistory) p.equityHistory = [{ t: p.updatedAt, equity: p.capital }];
     // ── Migration v1→v2 (anh Tommy v4.7.20): bump capital baseline $1k → $5k
     // Top up diff $4000 ONCE để mày không mất lệnh hiện tại.
@@ -350,8 +362,13 @@ export async function loadAccount(): Promise<All5mAccount> {
       // Save migrated state
       try { await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
     }
+    _accountCache = p;
     return p;
-  } catch { return emptyAccount(); }
+  } catch {
+    const fresh = emptyAccount();
+    _accountCache = fresh;
+    return fresh;
+  }
 }
 
 function isAll5mAccount(v: unknown): v is All5mAccount {
@@ -360,9 +377,27 @@ function isAll5mAccount(v: unknown): v is All5mAccount {
   return o.version === 1 && typeof o.capital === "number" && Array.isArray(o.positions);
 }
 
-export async function saveAccount(acc: All5mAccount, opts: { sync?: boolean } = {}): Promise<void> {
+function scheduleLocalSave(acc: All5mAccount, immediate: boolean = false): void {
+  const write = () => {
+    _localSaveTimer = null;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(acc)).catch(() => {});
+  };
+  if (immediate) {
+    if (_localSaveTimer) {
+      clearTimeout(_localSaveTimer);
+      _localSaveTimer = null;
+    }
+    write();
+    return;
+  }
+  if (_localSaveTimer) clearTimeout(_localSaveTimer);
+  _localSaveTimer = setTimeout(write, LOCAL_SAVE_DEBOUNCE_MS);
+}
+
+export async function saveAccount(acc: All5mAccount, opts: { sync?: boolean; immediateLocalSave?: boolean } = {}): Promise<void> {
   acc.updatedAt = Date.now();
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(acc));
+  _accountCache = acc;
+  scheduleLocalSave(acc, opts.immediateLocalSave === true);
   if (opts.sync !== false) {
     // Leader push lên gist — debounce 20s (anh Tommy v4.5.3: 10s → 20s)
     scheduleFilePush(
@@ -379,14 +414,16 @@ export async function pullAccountFromGist(): Promise<All5mAccount | null> {
   const remote = await pullFile<All5mAccount>(REMOTE_FILE, isAll5mAccount);
   if (!remote) return null;
   // Lưu local nhưng KHÔNG sync lại (tránh loop)
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+  _accountCache = remote;
+  scheduleLocalSave(remote, true);
   return remote;
 }
 
 export async function resetAccount(): Promise<All5mAccount> {
   const fresh = emptyAccount();
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
-  await saveAccount(fresh); // sync gist luôn
+  _accountCache = fresh;
+  scheduleLocalSave(fresh, true);
+  await saveAccount(fresh, { immediateLocalSave: true }); // sync gist luôn
   return fresh;
 }
 
