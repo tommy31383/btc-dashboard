@@ -12,12 +12,14 @@
  *   - Local PC + gist mirror (leader/follower pattern)
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 import { pullFile, scheduleFilePush } from "./gistSync";
 
 const STORAGE_KEY = "@all5m_data_v1";
 const REMOTE_FILE = "all5m_account.json";
 const PRESET_STORAGE_KEY = "@all5m_preset_v1";
 const LOCAL_SAVE_DEBOUNCE_MS = 750;
+const MOBILE_STACK_CAP_PER_SIDE = 50;
 
 // v4.7.20 (anh Tommy): bump $1000 → $5000 cho stack 75 (WHALE) khả thi
 // — 75 LONG × $30 + 75 SHORT × $30 = $4500 max margin, $5000 đủ buffer.
@@ -115,6 +117,10 @@ export interface Preset {
   // Backtest expectations (3y)
   expectedNet3y: number;
   expectedMaxDd3y: number;
+}
+
+function isNativeMobileRuntime(): boolean {
+  return Platform.OS === "android" || Platform.OS === "ios";
 }
 
 // ─── Helper: WHALE base config (stoch 10/90, srProx 0.4, srLB 30) ──────
@@ -225,6 +231,16 @@ export const PRESETS: Record<PresetKey, Preset> = {
 // Default = WHALE_MAX_66 ⭐ MAIN (composite 3.75, NET $4.09M, DD 0.87%).
 // Anh muốn safer → switch TOMI_MIN_66 (composite 5.75, MaxDD chỉ $957).
 export const DEFAULT_PRESET_KEY: PresetKey = "WHALE_MAX_66";
+export const MOBILE_DEFAULT_PRESET_KEY: PresetKey = "TOMI_MIN_66";
+
+export function getEffectivePreset(key: PresetKey): Preset {
+  const base = PRESETS[key];
+  if (!isNativeMobileRuntime()) return base;
+  return {
+    ...base,
+    stackMaxPerSide: Math.min(base.stackMaxPerSide, MOBILE_STACK_CAP_PER_SIDE),
+  };
+}
 
 // Cache trong RAM để tryEntry5mBar không phải đọc AsyncStorage mỗi lần
 let _activePresetCache: PresetKey | null = null;
@@ -250,8 +266,8 @@ export async function getActivePresetKey(): Promise<PresetKey> {
       }
     }
   } catch {}
-  _activePresetCache = DEFAULT_PRESET_KEY;
-  return DEFAULT_PRESET_KEY;
+  _activePresetCache = isNativeMobileRuntime() ? MOBILE_DEFAULT_PRESET_KEY : DEFAULT_PRESET_KEY;
+  return _activePresetCache;
 }
 
 export async function setActivePresetKey(key: PresetKey): Promise<void> {
@@ -261,12 +277,13 @@ export async function setActivePresetKey(key: PresetKey): Promise<void> {
 
 export async function getActivePreset(): Promise<Preset> {
   const k = await getActivePresetKey();
-  return PRESETS[k];
+  return getEffectivePreset(k);
 }
 
 /** Sync getter — dùng cho UI display (countdown) khi không await được. Trả về cached hoặc DEFAULT. */
 export function getCachedActivePreset(): Preset {
-  return PRESETS[_activePresetCache ?? DEFAULT_PRESET_KEY];
+  const key = _activePresetCache ?? (isNativeMobileRuntime() ? MOBILE_DEFAULT_PRESET_KEY : DEFAULT_PRESET_KEY);
+  return getEffectivePreset(key);
 }
 
 // Backward-compat: TP_PCT / SL_PCT / STACK_MAX_PER_SIDE / STACK_MIN_ENTRY_DIST_PCT

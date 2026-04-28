@@ -12,7 +12,7 @@ import DebugLabel from "./DebugLabel";
 import {
   All5mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE, FEE_PER_SIDE,
-  PRESETS, PresetKey,
+  PRESETS, PresetKey, getEffectivePreset,
 } from "../utils/all5mAccount";
 
 interface Props {
@@ -287,7 +287,7 @@ const OpenPositionRow = memo(function OpenPositionRow({
 
 export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, support15m, resistance15m, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
-  const preset = PRESETS[presetKey];
+  const preset = getEffectivePreset(presetKey);
   // ALL tunable values từ active preset (anh Tommy v4.7.1)
   const TP_PCT = preset.tpPct;
   const SL_PCT = preset.slPct;
@@ -311,7 +311,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
 
   const handleSwitchPreset = useCallback((key: PresetKey) => {
     if (key === presetKey) return;
-    const target = PRESETS[key];
+    const target = getEffectivePreset(key);
     if (typeof window !== "undefined") {
       const ok = window.confirm(
         `🔄 SWITCH PRESET → ${target.emoji} ${target.label}?\n\n` +
@@ -379,7 +379,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
           "TOMI_MAX_55", "WHALE_MID_66", "TOMI_MIN_66",
           "WHALE_MAX", "WHALE_MID", "TOMI_MAX",
         ] as PresetKey[]).map((k) => {
-          const p = PRESETS[k];
+          const p = getEffectivePreset(k);
           const active = k === presetKey;
           // Color theo prefix: WHALE_MAX = đỏ, WHALE_MID = cam, TOMI_MAX = xanh, TOMI_MIN = trắng
           const accentColor =
