@@ -77,14 +77,13 @@ const PRESETS: PresetDef[] = [
     cooldownMin: 15, stochLongLevel: 10, stochShortLevel: 90,
     srProximityPct: 0.4, srLookback15m: 80,
   },
+  // v4.8.22: grid sweep winner TP4%/SL4%
   {
     key: "TOMI", label: "TOMI", emoji: "🔵",
-    tpPct: 9999, slPct: 2,
+    tpPct: 4, slPct: 4,
     stackMaxPerSide: 50, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
     cooldownMin: 5, stochLongLevel: 5, stochShortLevel: 95,
     srProximityPct: 0.2, srLookback15m: 50,
-    trailingStopEnabled: true,
-    trailStartMilestone: 2,   // tắt trail hòa vốn: trail bắt đầu từ milestone 2
   },
 ];
 

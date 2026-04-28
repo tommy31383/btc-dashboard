@@ -38,14 +38,14 @@ export const SR_LOOKBACK_15M = 50;
 export const STACK_PER_SIDE_SPACING_MS = 10 * 60 * 1000;
 
 // ════════════════════════════════════════════════════════════════════
-// 🎯 PRESETS v2 (anh Tommy v4.7.1 — Phase 2 sweep tuned)
-//   3 chế độ switch trong UI, sweep one-at-a-time tuning per anchor:
+// 🎯 PRESETS v3 (anh Tommy v4.8.22 — TURTLE removed, TOMI added)
+//   3 chế độ switch trong UI:
 //   - AGGRESSIVE 🔴 WHALE  → Highest PnL (3y backtest +$1.52M, MaxDD $5.9k)
-//   - BALANCED   🟡 EAGLE  → Balanced     (3y backtest +$634k, MaxDD $1.98k)
-//   - SAFE       🟢 TURTLE → Lowest MaxDD (3y backtest +$241k, MaxDD $792)
+//   - BALANCED   🟡 EAGLE  → Balanced     (3y backtest +$635k, MaxDD $1.98k)
+//   - TOMI       🔵 TOMI   → Best risk-adjusted (3y backtest +$1.16M, MaxDD $1.1k, PF 3.52)
 // ════════════════════════════════════════════════════════════════════
 
-export type PresetKey = "AGGRESSIVE" | "BALANCED" | "SAFE" | "TOMI";
+export type PresetKey = "AGGRESSIVE" | "BALANCED" | "TOMI";
 
 export interface Preset {
   key: PresetKey;
@@ -119,17 +119,7 @@ export const PRESETS: Record<PresetKey, Preset> = {
     srProximityPct: 0.4, srLookback15m: 50,
     expectedNet3y: 633753, expectedMaxDd3y: 1983,
   },
-  SAFE: {
-    key: "SAFE", label: "TURTLE", emoji: "🟢",
-    description: "Lowest MaxDD · vốn ít",
-    tpPct: 3.5, slPct: 2,
-    stackMaxPerSide: 15, stackMinEntryDistPct: 0.3, stackPerSideSpacingMin: 10,
-    stackBetterEntryMode: "off",
-    cooldownMin: 15,
-    stochLongLevel: 10, stochShortLevel: 90,
-    srProximityPct: 0.4, srLookback15m: 80,
-    expectedNet3y: 240975, expectedMaxDd3y: 792,
-  },
+
 };
 
 export const DEFAULT_PRESET_KEY: PresetKey = "BALANCED";
@@ -141,7 +131,7 @@ export async function getActivePresetKey(): Promise<PresetKey> {
   if (_activePresetCache) return _activePresetCache;
   try {
     const raw = await AsyncStorage.getItem(PRESET_STORAGE_KEY);
-    if (raw && (raw === "AGGRESSIVE" || raw === "BALANCED" || raw === "SAFE" || raw === "TOMI")) {
+    if (raw && (raw === "AGGRESSIVE" || raw === "BALANCED" || raw === "TOMI")) {
       _activePresetCache = raw;
       return raw;
     }

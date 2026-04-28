@@ -370,10 +370,10 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
 
       {/* PRESET SWITCHER (anh Tommy v4.7.0): 4 chế độ — click để swap */}
       <View style={styles.presetRow}>
-        {(["AGGRESSIVE", "BALANCED", "SAFE", "TOMI"] as PresetKey[]).map((k) => {
+        {(["AGGRESSIVE", "BALANCED", "TOMI"] as PresetKey[]).map((k) => {
           const p = PRESETS[k];
           const active = k === presetKey;
-          const accentColor = k === "AGGRESSIVE" ? P.error : k === "BALANCED" ? P.bitcoinOrange : k === "SAFE" ? P.green : "#3b82f6";
+          const accentColor = k === "AGGRESSIVE" ? P.error : k === "BALANCED" ? P.bitcoinOrange : "#3b82f6";
           return (
             <TouchableOpacity
               key={k}
