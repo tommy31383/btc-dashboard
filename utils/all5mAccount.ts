@@ -1,14 +1,15 @@
 /**
  * all5mAccount — paper-trading account cho tab "5m All".
  *
- * Spec (anh Tommy, theo backtest tools/backtest-stoch-5m.ts):
+ * Spec (v4.8.23 — stack-sweep winner picks, xem 5MALL_TRADING_RULES.md):
  *   - 5m closed bar → quyết định ngay (không có PENDING phase như 15mALL)
- *   - StochRSI 5m K<10 → LONG; K>90 → SHORT
- *   - Else fallback S/R 15m: close gần support (≤0.3%) → LONG, gần resistance → SHORT
- *   - TP +4% / SL -2% (raw); cooldown 15 phút (3 cây 5m) sau entry
- *   - Capital $1000, margin $30 × 100x, fee 0.05%/side ($1.5/side)
- *   - Vào song song nhiều lệnh
- *   - Local PC only (AsyncStorage)
+ *   - StochRSI 5m K<stochLongLevel → LONG; K>stochShortLevel → SHORT (per preset)
+ *   - Else fallback S/R 15m: close gần support (≤srProximityPct%) → LONG / resistance → SHORT
+ *   - TP/SL theo active preset (WHALE 5/2.5, TOMI 4/4)
+ *   - Capital $5000 (v4.7.20 bump từ $1000), margin $30 × 100x, fee 0.05%/side ($1.5/side)
+ *   - Hedge mode: LONG + SHORT độc lập, có thể coexist; vào song song nhiều lệnh
+ *   - 5 preset switch: WHALE_MAX/MID + TOMI_MAX/MID/MIN (default TOMI_MID — PF 3.55, DD 0.2%)
+ *   - Local PC + gist mirror (leader/follower pattern)
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { pullFile, scheduleFilePush } from "./gistSync";
@@ -438,6 +439,12 @@ export async function processOpen(currentPrice: number): Promise<number> {
 
     if (p.trailingStopEnabled) {
       // ── Tomi5mALL trailing SL milestone logic ──────────────────────────
+      // ⚠️ DEAD CODE PATH (v4.8.23): TẤT CẢ 5 preset hiện tại đều KHÔNG set
+      // trailingStopEnabled=true → branch này không được run trong production.
+      // Logic giữ lại để Tommy re-enable cho preset cụ thể khi backtest đủ.
+      // Decision log: bỏ trailing để TP4/SL4 fixed consistency với WHALE TP5/SL2.5.
+      // Xem 5MALL_TRADING_RULES.md section "TRAILING STOP" để chi tiết.
+      // ────────────────────────────────────────────────────────────────────
       // leveragedPnlPct = raw price move % × 100x leverage
       const leveragedPnlPct = (p.side === "LONG"
         ? (currentPrice - p.entryPrice) / p.entryPrice

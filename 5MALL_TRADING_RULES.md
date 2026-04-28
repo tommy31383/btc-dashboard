@@ -1,6 +1,6 @@
 # 5m ALL TRADING ENGINE — Rule & Preset
 
-**Version:** v3.0 (last updated 2026-04-28 — anh Tommy v4.8.23)
+**Version:** v3.1 (last updated 2026-04-28 — anh Tommy v4.8.23, doc cleanup pass)
 
 ---
 
@@ -72,85 +72,107 @@ EAGLE/BALANCED + TURTLE bị **bỏ luôn** vì dominated bởi WHALE/TOMI ở m
 
 ---
 
-## 🏆 3 PRESET CHÍNH (3y backtest BTCUSDT, vốn $1000)
+## 🏆 5 PRESET CHÍNH — Stack-sweep winners (3y BTCUSDT, capital $5000)
 
-### 🟢 PRESET SAFE — "TURTLE" (recommend cho vốn ít / risk-averse)
+Chi tiết bảng so sánh đã ghi ở section v3.0 đầu doc. Phần này có **config đầy đủ TypeScript** + lý do chọn từng preset.
 
+### 🔴 WHALE_MAX (stack 200) — Max NET / yolo
+
+```typescript
+{
+  tpPct: 5, slPct: 2.5,
+  stackMaxPerSide: 200, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 30,
+  expectedNet3y: 3_028_056, expectedMaxDd3y: 15_627,  // NET +$3.03M, DD 8.0%
+}
 ```
-TP=5%, SL=2.5%, stackMax=15/side, distance=0.3%, spacing=10m, cooldown=10m
-```
 
-| Metric | Value |
-|---|---|
-| Final equity | **$300,133** (300x) |
-| NET | +$299,133 |
-| ROI | +29,913% |
-| Trades | 11,019 |
-| Win rate | 33.4% |
-| Profit factor | ~1.8 |
-| **MaxDD** | **$993** (~3 lần margin) |
-| **DD/NET ratio** | **0.33%** |
-
-**Lý do chọn:** TP/SL nới rộng → ít trade chéo nhau, MaxDD ≈ baseline nhưng NET cao hơn baseline +24%. Ổn định nhất.
+**Lý do chọn:** Stack tối đa = max NET. DD/Equity 8% là cao nhất 5 preset → chỉ phù hợp vốn ≥ $20k để chịu DD tuyệt đối ~$15k.
 
 ---
 
-### 🟡 PRESET BALANCED — "EAGLE" (recommend cho vốn vừa)
+### 🟠 WHALE_MID (stack 100) — WHALE balanced
 
+```typescript
+{
+  tpPct: 5, slPct: 2.5,
+  stackMaxPerSide: 100, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 30,
+  expectedNet3y: 1_888_767, expectedMaxDd3y: 7_359,  // NET +$1.89M, DD 2.6%
+}
 ```
-TP=4%, SL=2%, stackMax=30/side, distance=0.2%, spacing=10m, cooldown=10m
-```
 
-| Metric | Value |
-|---|---|
-| Final equity | **$393,019** (393x) |
-| NET | +$392,019 |
-| ROI | +39,201% |
-| Trades | 22,007 |
-| Win rate | 33.9% |
-| Profit factor | ~1.78 |
-| **MaxDD** | **$3,069** |
-| **DD/NET ratio** | **0.78%** |
-
-**Lý do chọn:** Stack 30 + distance 0.2% → bắt được nhiều cú stack hơn baseline mà DD vẫn quản lý được. 1.6× NET so với baseline.
+**Lý do chọn:** WHALE-style (TP5/SL2.5, stoch 10/90, srLB 30) nhưng stack giảm xuống 100 → DD chỉ 2.6%. Phù hợp anh thích WHALE volatility nhưng vốn vừa.
 
 ---
 
-### 🔴 PRESET AGGRESSIVE — "WHALE" (recommend cho vốn lớn / chịu được DD cao)
+### 🔵 TOMI_MAX (stack 200) — TOMI scaled max
 
+```typescript
+{
+  tpPct: 4, slPct: 4,
+  stackMaxPerSide: 200, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 5, stochShortLevel: 95,
+  srProximityPct: 0.2, srLookback15m: 50,
+  expectedNet3y: 2_633_499, expectedMaxDd3y: 2_424,  // NET +$2.63M, DD 0.3%
+}
 ```
-TP=4%, SL=2%, stackMax=50/side, distance=0%, spacing=0m, cooldown=10m
-```
 
-**= LIVE PRESET B (cùng config với LIVE engine production)**
-
-| Metric | Value |
-|---|---|
-| Final equity | **$726,319** (726x) |
-| NET | +$725,319 |
-| ROI | +72,531% |
-| Trades | 42,107 |
-| Win rate | 33.5% |
-| Profit factor | ~1.78 |
-| **MaxDD** | **$5,217** |
-| **DD/NET ratio** | **0.72%** |
-
-**Lý do chọn:** Bỏ tất cả gate stack → maximize cú stack khi market trend mạnh. 3× NET so với baseline, DD đổi lại 5.4× — chấp nhận được nếu vốn ≥ $5k để chịu DD.
+**Lý do chọn:** TOMI style (TP4/SL4 symmetric, stoch cực trị 5/95) scaled max stack. NET ~88% WHALE_MAX nhưng DD chỉ 1/6 → ROI/risk vượt trội.
 
 ---
 
-## 📊 BẢNG SO SÁNH 3 PRESET
+### 🟢 TOMI_MID (stack 100) ★ DEFAULT — Best risk-adjusted
 
-| Preset | TP/SL | Stack | Dist | NET | MaxDD | Trades | DD/NET |
-|---|---|---|---|---|---|---|---|
-| 🟢 SAFE | 5/2.5 | 15 | 0.3% | $299k | $993 | 11k | 0.33% ⭐ |
-| 🟡 BALANCED | 4/2 | 30 | 0.2% | $392k | $3,069 | 22k | 0.78% |
-| 🔴 AGGRESSIVE | 4/2 | 50 | 0% | $725k | $5,217 | 42k | 0.72% |
-| (baseline) | 4/2 | 15 | 0.3% | $240k | $972 | 14k | 0.41% |
+```typescript
+{
+  tpPct: 4, slPct: 4,
+  stackMaxPerSide: 100, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 5, stochShortLevel: 95,
+  srProximityPct: 0.2, srLookback15m: 50,
+  expectedNet3y: 1_865_622, expectedMaxDd3y: 2_046,  // NET +$1.87M, DD 0.2%, PF 3.55
+}
+```
 
-**Reference:**
-- 11 variants A+B+C đầy đủ: `assets/sweep_5mall_improve_report.html`
-- JSON raw: `assets/sweep_5mall_improve.json`
+**Lý do chọn:** **PF 3.55** + **DD 0.2%** + **WR 50%** — chỉ tiêu nào cũng top. NET ~$1.87M cùng range với WHALE_MID nhưng DD nhỏ 9× lần. **DEFAULT_PRESET_KEY** trong code.
+
+---
+
+### ⚪ TOMI_MIN (stack 50) — Starter / vốn ít
+
+```typescript
+{
+  tpPct: 4, slPct: 4,
+  stackMaxPerSide: 50, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 5, stochShortLevel: 95,
+  srProximityPct: 0.2, srLookback15m: 50,
+  expectedNet3y: 1_165_062, expectedMaxDd3y: 1_149,  // NET +$1.16M, DD 0.3%
+}
+```
+
+**Lý do chọn:** TOMI style với stack 50 → max margin used = $1.5k → phù hợp account $5k base. Starter preset cho ai mới chạy 5m ALL.
+
+---
+
+**Default preset:** `TOMI_MID` (`DEFAULT_PRESET_KEY = "TOMI_MID"` trong `utils/all5mAccount.ts`).
+**Storage:** active preset key trong AsyncStorage `@all5m_preset_v1` (LOCAL ONLY, KHÔNG sync gist).
+
+**Reference data:**
+- 12-combo stack sweep: `assets/backtest_5mall_stack_sweep_3y.json`
+- TOMI diagnostic: `assets/diag_tomi_stack_dd.json`
+- Phase 2 sweep cũ (3 preset đã thay): `assets/sweep_5mall_v2.json`
 
 ---
 
@@ -176,108 +198,50 @@ TP=4%, SL=2%, stackMax=50/side, distance=0%, spacing=0m, cooldown=10m
 2. Chỉnh `stackMaxPerSide`, `distance`, `tp`, `sl` theo bảng trên
 3. SAVE → engine reload với config mới
 
-### Apply preset programmatically (utils/all5mAccount.ts — Phase 2 v2 values):
+### Apply preset programmatically:
 
+Xem section "🏆 5 PRESET CHÍNH" ở trên — đã có config đầy đủ TypeScript cho từng preset.
+
+**API:**
 ```typescript
-// 🔴 AGGRESSIVE (WHALE) — highest PnL
-{
-  tpPct: 5, slPct: 2.5,
-  stackMaxPerSide: 75, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
-  stackBetterEntryMode: "off",
-  cooldownMin: 5,
-  stochLongLevel: 10, stochShortLevel: 90,
-  srProximityPct: 0.4, srLookback15m: 30,
-  expectedNet3y: 1_516_473, expectedMaxDd3y: 5_874,
-}
+import { setActivePresetKey, getActivePreset } from "./utils/all5mAccount";
 
-// 🟡 BALANCED (EAGLE) — default, balance NET vs DD
-{
-  tpPct: 5, slPct: 2.5,
-  stackMaxPerSide: 30, stackMinEntryDistPct: 0.1, stackPerSideSpacingMin: 10,
-  stackBetterEntryMode: "off",
-  cooldownMin: 5,
-  stochLongLevel: 15, stochShortLevel: 85,
-  srProximityPct: 0.4, srLookback15m: 50,
-  expectedNet3y: 633_753, expectedMaxDd3y: 1_983,
-}
+// Switch preset
+await setActivePresetKey("TOMI_MAX");
 
-// 🟢 SAFE (TURTLE) — lowest MaxDD
-{
-  tpPct: 3.5, slPct: 2,
-  stackMaxPerSide: 15, stackMinEntryDistPct: 0.3, stackPerSideSpacingMin: 10,
-  stackBetterEntryMode: "off",
-  cooldownMin: 15,
-  stochLongLevel: 10, stochShortLevel: 90,
-  srProximityPct: 0.4, srLookback15m: 80,
-  expectedNet3y: 240_975, expectedMaxDd3y: 792,
-}
+// Read current
+const preset = await getActivePreset();
 ```
-
-**Default preset:** `BALANCED` (`DEFAULT_PRESET_KEY = "BALANCED"`).
-**Storage:** active preset key trong AsyncStorage `@all5m_preset_v1` (LOCAL ONLY, KHÔNG sync gist).
 
 ---
 
-## 🧠 LEARNING IMPROVE — Phase 2 Sweep (v2.0)
+## 🧠 LEARNING — Knob sensitivity (từ Phase 2 sweep cũ + stack-sweep v3)
 
-**Sweep tool:** `tools/sweep-5mall-improve-v2.ts` · 81 runs · one-at-a-time tuning per anchor
-**Output:** `assets/sweep_5mall_v2.json` · `assets/sweep_5mall_v2_report.html`
+### Phase 2 sweep tool (legacy reference)
+- `tools/sweep-5mall-improve-v2.ts` · 81 runs · one-at-a-time tuning per anchor
+- Output: `assets/sweep_5mall_v2.json` · grid: cooldown[5,10,15] · stoch[10/90,5/95,15/85] · srProx[0.2,0.3,0.4] · srLB[30,50,80] · stack[15,30,50,75] · tpsl[3.5/2,4/2,4.5/2.25,5/2.5]
 
-### Knob grid tested
+### Stack sweep v3 (current — 12 combo)
+- `tools/backtest-5mall-stack-sweep-3y.ts` · 3 anchors × 4 stack [50/75/100/200]
+- Output: `assets/backtest_5mall_stack_sweep_3y.json`
+- → 5 preset hiện tại (WHALE_MAX/MID, TOMI_MAX/MID/MIN) là winners pick từ 12-combo này.
 
-| Knob | Values |
-|---|---|
-| `cooldownMin` | 5, 10, 15 |
-| `stochThr` (long/short) | 10/90, 5/95, 15/85 |
-| `srProxPct` | 0.2, 0.3, 0.4 |
-| `srLookback15m` | 30, 50, 80 |
-| `distPct` (entry distance) | 0, 0.1, 0.2, 0.3, 0.5 |
-| `stackMax` | 15, 30, 50, 75 |
-| `tpsl` | 3.5/2, 4/2, 4.5/2.25, 5/2.5 |
+### 🔬 KNOB SENSITIVITY (insight đúng tại v4.8.23)
 
-### 🏆 3 PRESET MỚI (đã apply vào engine)
+1. **TOMI symmetric `4/4` >> WHALE `5/2.5` ở mọi stack:** PF 3.5+ vs 2.3, WR 50% vs 34%, DD nhỏ ~6× lần. WHALE chỉ thắng NET tuyệt đối ở stack max 200 (ăn nhiều cú stack).
+2. **Stack scale linear NET, sub-linear DD:** stack 50→100→200 → NET tăng 1.6× / 1.4× nhưng DD chỉ 1.8× / 2.2× → ROI/risk cải thiện theo stack.
+3. **Stoch `5/95` (cực trị)** cho TOMI thắng `10/90` của WHALE — vào ít trade hơn nhưng tỉ lệ thắng cao hơn (50% vs 34%).
+4. **`srProximityPct 0.2`** cho TOMI nhạy hơn `0.4` của WHALE — bắt được trade gần S/R chặt hơn → entry tốt hơn.
+5. **`srLookback15m 50`** cho TOMI cân bằng — ít noise hơn 30 (WHALE), không quá lag như 80 (TURTLE cũ đã bỏ).
+6. **`cooldownMin 5`** thắng all 5 preset — high-freq capture nhiều opportunity, không có downside vs cooldown 10/15.
 
-| Preset | NET v1 | NET v2 | Δ NET | DD v1 | DD v2 | Δ DD |
-|---|---|---|---|---|---|---|
-| 🔴 WHALE | $725k | **$1,516k** | **+109%** ⭐ | $5,217 | $5,874 | +13% |
-| 🟡 EAGLE | $392k | **$634k** | **+62%** ⭐ | $3,069 | **$1,983** | **-35%** ⭐ |
-| 🟢 TURTLE | $299k | $241k | -19% | $993 | **$792** | **-20%** ⭐ |
+### Lý do bỏ EAGLE/BALANCED
+- TOMI cùng stack luôn dominate EAGLE: NET cao hơn + DD thấp hơn + WR cao hơn ở mọi anchor.
+- EAGLE TP5/SL2.5 + stoch relax 15/85 → vào nhiều trade nhưng PF chỉ 1.7x, không vượt được TOMI 3.5x.
 
-**Đánh giá:**
-- 🔴 **WHALE**: +109% NET cho cùng risk envelope (DD chỉ tăng nhẹ 13%) — **win lớn**
-- 🟡 **EAGLE**: +62% NET VÀ giảm DD -35% — **win cả 2 mặt**, preset balance đẹp nhất
-- 🟢 **TURTLE**: theo criterion "lowest MaxDD" — DD giảm 20%, đổi lại NET giảm 19% (proportional)
-
-### 🔬 KNOB SENSITIVITY (insight chính)
-
-1. **`tpsl` 5/2.5 thắng cho cả AGGRESSIVE + BALANCED** — TP rộng cho phép trade đi trọn cú trend, không bị scalp out sớm. Chỉ SAFE chọn 3.5/2 (cắt nhanh)
-2. **`srProxPct` 0.4% thắng all 3 anchor** — proximity cao hơn bắt được nhiều cú reversal hơn (vs 0.3% gốc)
-3. **`stackMax` 75 cho AGGRESSIVE** (vs 50 gốc) — đẩy stack tới ngưỡng vốn cho phép → +50% NET single change
-4. **`stochThr` 15/85 cho BALANCED** (vs 10/90) — relax stoch giúp bắt nhiều entry hơn, NET tăng mà DD vẫn quản được
-5. **`cooldownMin` 5m thắng AGGRESSIVE/BALANCED, 15m thắng SAFE** — high-freq cho aggressive, low-freq cho safe — hợp lý
-6. **`srLookback15m`**: 30 cho AGGRESSIVE (S/R nhạy hơn), 80 cho SAFE (S/R bền hơn)
-
-### 📋 CONFIG ĐẦY ĐỦ 3 PRESET (sau Phase 2)
-
-```typescript
-// AGGRESSIVE 🔴 WHALE
-{ tpPct: 5, slPct: 2.5, stackMaxPerSide: 75, stackMinEntryDistPct: 0,
-  stackPerSideSpacingMin: 0, cooldownMin: 5,
-  stochLongLevel: 10, stochShortLevel: 90,
-  srProximityPct: 0.4, srLookback15m: 30 }
-
-// BALANCED 🟡 EAGLE
-{ tpPct: 5, slPct: 2.5, stackMaxPerSide: 30, stackMinEntryDistPct: 0.1,
-  stackPerSideSpacingMin: 10, cooldownMin: 5,
-  stochLongLevel: 15, stochShortLevel: 85,
-  srProximityPct: 0.4, srLookback15m: 50 }
-
-// SAFE 🟢 TURTLE
-{ tpPct: 3.5, slPct: 2, stackMaxPerSide: 15, stackMinEntryDistPct: 0.3,
-  stackPerSideSpacingMin: 10, cooldownMin: 15,
-  stochLongLevel: 10, stochShortLevel: 90,
-  srProximityPct: 0.4, srLookback15m: 80 }
-```
+### Lý do bỏ TURTLE
+- TURTLE cũ TP3.5/SL2 stack 15 → quá conservative, NET chỉ $241k vs TOMI_MIN $1.16M cùng vốn.
+- Replace bằng TOMI_MIN (stack 50) cho user vốn ít — vẫn TOMI style, NET 4.8× cao hơn TURTLE.
 
 ---
 
@@ -295,14 +259,16 @@ Nếu khác `"off"`, gate này chạy **sau** distance check trong `tryEntry5mBa
 
 **Quy tắc** (trong code): LONG cần `fillPrice < benchmark`, SHORT cần `fillPrice > benchmark`. Không thoả → block.
 
-**Trạng thái production hiện tại:** cả 3 preset (WHALE/EAGLE/TURTLE) đều set `"off"`. Logic có sẵn để Tommy bật khi đã backtest đủ.
+**Trạng thái production hiện tại:** cả 5 preset (WHALE_MAX/MID, TOMI_MAX/MID/MIN) đều set `"off"`. Logic có sẵn để Tommy bật khi đã backtest đủ.
 
 ---
 
 ## 💰 CAPITAL MIGRATION (v4.7.20)
 
-`INITIAL_CAPITAL` bumped **$1000 → $5000** để stack 75 (WHALE) khả thi:
-- 75 LONG × $30 + 75 SHORT × $30 = $4500 max margin → cần buffer ≥ $500 để chịu fee + slippage
+`INITIAL_CAPITAL` bumped **$1000 → $5000** để stack ≥75 khả thi:
+- 200 LONG × $30 + 200 SHORT × $30 = $12k max margin → cần Tommy bump capital cao hơn $5k cho `WHALE_MAX`/`TOMI_MAX` stack 200, OR chạy với bot $5k và chấp nhận free margin block sớm.
+- Stack 100 max margin = $6k → nhỏ hơn $5k buffer là OK (account chỉ stack được tới khi free margin < $30).
+- Stack 50 max margin = $1.5k → thừa buffer rộng.
 
 **Migration tự động** trong `loadAccount()`:
 - Account cũ (`capitalVersion === undefined || < 2`) → top up `+$4000` ONCE
@@ -310,6 +276,28 @@ Nếu khác `"off"`, gate này chạy **sau** distance check trong `tryEntry5mBa
 - Lệnh OPEN hiện tại được giữ nguyên (không bị reset)
 
 **`PREV_INITIAL_CAPITAL = 1000`** vẫn export làm reference cho ROI legacy.
+
+---
+
+## 🧪 TRAILING STOP (DEAD CODE — chờ re-enable)
+
+Code có sẵn trong `processOpen()` (line 439-469) + Position fields `trailingStopEnabled` + `lastTrailMilestone`. Logic đầy đủ:
+
+- Mỗi tick `processOpen(currentPrice)` tính `leveragedPnlPct = priceMove × 100x`
+- Khi `pnl ≥ N×100%` → SL ratchet lên `(N-1)×100%` PnL (lag 1 milestone, raw price = (N-1)/100)
+- Position chỉ exit qua SL (KHÔNG có fixed TP)
+
+**Trạng thái production hiện tại (v4.8.23):** TẤT CẢ 5 preset đều **KHÔNG** set `trailingStopEnabled`, nên branch trailing là **DEAD CODE** chưa active. Lý do (decision log từ doc top):
+> TOMI bỏ trailing: test TP4/SL4 fixed cho consistency với WHALE. Có thể re-enable trailing cho TOMI variants sau.
+
+**Nếu muốn re-enable cho 1 preset cụ thể** (vd `TOMI_MAX`):
+```typescript
+TOMI_MAX: {
+  ...,
+  trailingStopEnabled: true, // re-enable
+}
+```
+→ Position mới sẽ tự copy flag → `processOpen` route qua trailing branch. Position OPEN cũ giữ logic fixed (không retroactive).
 
 ---
 
@@ -330,12 +318,16 @@ Nếu khác `"off"`, gate này chạy **sau** distance check trong `tryEntry5mBa
 
 ## 📝 CHANGELOG
 
-- **v2.1** (2026-04-28): Doc sync với code — cập nhật capital $5000, full Preset interface (gồm stackPerSideSpacingMin/cooldownMin/stoch/srProx/srLookback), thêm section Better Entry Mode + Capital Migration v4.7.20 + Leader/Follower
-- **v2.0** (2026-04-27): Phase 2 sweep — 3 preset re-tuned via 81-run one-at-a-time sweep. WHALE +109% NET, EAGLE +62% NET & -35% DD, TURTLE -20% DD. New knobs exposed in Preset interface (cooldown, stoch, srProx, srLookback)
+- **v3.1** (2026-04-28): Doc cleanup — xóa 2 section cũ tự mâu thuẫn (3 preset TURTLE/EAGLE/WHALE + "Apply preset programmatically" Phase 2 v2). Toàn bộ doc giờ đồng nhất với 5 preset v4.8.23. Thêm section Trailing Stop (dead code — chờ re-enable).
+- **v3.0** (2026-04-28): 5 PRESET mới từ stack-sweep 12-combo backtest. Bỏ EAGLE/BALANCED + TURTLE (dominated). Bumped to WHALE_MAX/MID + TOMI_MAX/MID/MIN với DEFAULT = TOMI_MID (PF 3.55, DD 0.2%).
+- **v2.1** (2026-04-28): Doc sync với code v4.7.27 — full Preset interface (cooldown/stoch/srProx/srLB), Better Entry Mode + Capital Migration v4.7.20 + Leader/Follower
+- **v2.0** (2026-04-27): Phase 2 sweep — 3 preset (WHALE/EAGLE/TURTLE) re-tuned via 81-run sweep
 - **v1.0** (2026-04-27): Initial doc với 3 preset SAFE/BALANCED/AGGRESSIVE từ 11-variant sweep
 
 ### Code-level milestones (cho cross-reference)
-- **v4.7.27**: `stackBetterEntryMode` field thêm vào Preset, logic "vs-last/vs-best/vs-avg" trong `tryEntry5mBar` (currently `"off"` cả 3 preset)
-- **v4.7.20**: `INITIAL_CAPITAL` 1000 → 5000 + auto-migration via `capitalVersion`
-- **v4.7.1**: Phase 2 sweep apply — 3 preset hoàn chỉnh với 9 knob (TP, SL, stack, dist, spacing, cooldown, stoch×2, srProx, srLookback)
+- **v4.8.23**: 5-preset stack-sweep era (WHALE_MAX/MID, TOMI_MAX/MID/MIN). Migration map LEGACY_KEY_MAP cho key cũ → mới. DEFAULT = TOMI_MID.
+- **v4.8.22**: Trailing stop logic added (`trailingStopEnabled` flag + milestone ratchet) — currently DEAD CODE (no preset enables).
+- **v4.7.27**: `stackBetterEntryMode` field thêm vào Preset (`"off"|"vs-last"|"vs-best"|"vs-avg"`) — currently OFF all presets.
+- **v4.7.20**: `INITIAL_CAPITAL` 1000 → 5000 + auto-migration via `capitalVersion`.
+- **v4.7.1**: Phase 2 sweep apply — 3 preset (now legacy) với 9 knob (TP, SL, stack, dist, spacing, cooldown, stoch×2, srProx, srLookback).
 - **v4.5.3**: Follower pull 60s → 120s, leader push debounce 10s → 20s
