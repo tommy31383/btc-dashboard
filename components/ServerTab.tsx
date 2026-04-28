@@ -89,7 +89,7 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
           value={pwInput}
           onChangeText={setPwInput}
           secureTextEntry
-          placeholder="password (30318384)"
+          placeholder="Nhập password..."
           placeholderTextColor={P.dim}
           style={styles.input}
         />
@@ -443,17 +443,23 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
                     const dtStr = `${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")} ${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}`;
                     const diff = markPrice !== null ? (side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) : 0;
                     const upnlUsd = diff * t.qty;
-                    const upnlPct = markPrice !== null ? (diff / t.entryPrice) * 100 : 0;
+                    // anh Tommy v0.2.2: pnl% phải × leverage (giống 5m ALL)
+                    const binPos = side === "LONG" ? binanceLongPos : binanceShortPos;
+                    const lev = binPos ? parseInt(binPos.leverage) : 100;
+                    const upnlPct = markPrice !== null ? (diff / t.entryPrice) * 100 * lev : 0;
                     const upnlColor = upnlUsd >= 0 ? P.green : P.error;
                     const sizeUsd = t.qty * t.entryPrice;
+                    const isTrailing = t.tfKey === "15m" && (t.lastTrailStep ?? 0) > 0;
                     return (
-                      <View key={t.id} style={styles.posRow}>
+                      <View key={t.id} style={[styles.posRow, { flexWrap: "wrap" }]}>
                         <Text style={[styles.dim, { width: 22 }]}>{i + 1}</Text>
                         <Text style={[styles.dim, { width: 90, color: P.tertiary, fontSize: 10 }]}>{dtStr}</Text>
                         <Text style={[styles.dim, { width: 65 }]}>${t.entryPrice.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: P.bitcoinOrange, width: 60, fontWeight: "700" }]}>${sizeUsd.toFixed(0)}</Text>
                         <Text style={[styles.dim, { color: P.green, width: 65 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.error, width: 65 }]}>SL ${t.slPrice.toFixed(0)}</Text>
+                        <Text style={[styles.dim, { color: isTrailing ? P.bitcoinOrange : P.error, width: 65 }]}>
+                          {isTrailing ? `🔄SL $${t.slPrice.toFixed(0)}` : `SL $${t.slPrice.toFixed(0)}`}
+                        </Text>
                         <Text style={[styles.dim, { color: upnlColor, width: 70, fontWeight: "700" }]}>
                           {upnlUsd >= 0 ? "+" : ""}${upnlUsd.toFixed(2)}
                         </Text>
@@ -464,6 +470,11 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
                         <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
                           <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕</Text>
                         </TouchableOpacity>
+                        {isTrailing && (
+                          <Text style={{ width: "100%", color: P.bitcoinOrange, fontSize: 10, marginTop: 2, paddingLeft: 22 }}>
+                            ↳ TRAIL step {t.lastTrailStep} · SL trailed from ${t.origSlPrice?.toFixed(0) ?? "—"} → ${t.slPrice.toFixed(0)}
+                          </Text>
+                        )}
                       </View>
                     );
                   })}

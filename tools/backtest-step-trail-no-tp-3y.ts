@@ -54,6 +54,8 @@ const MIN_LOOKBACK = 50;
 // Step trailing spec (15m only)
 const STEP_TRAIL_STEPS = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]; // E-T15 / NoTP
 const STEP_TRAIL_STEPS_EXTENDED = Array.from({ length: 20 }, (_, i) => 0.5 * (i + 1)); // 0.5..10.0
+// Unlimited: 200 steps (100× tpDist) — đủ lớn để không bao giờ hit cap trong 3y backtest
+const STEP_TRAIL_STEPS_UNLIMITED = Array.from({ length: 200 }, (_, i) => 0.5 * (i + 1));
 const STEP_TRAIL_TFS = new Set<string>(["15m"]); // 15m ONLY
 
 // LIVE PRESET B
@@ -388,7 +390,7 @@ function srAtTime(
 
 // ─── Trade simulation ───────────────────────────────────────────────────────
 type HitType = "TP" | "ORIG_SL" | "STEP_SL" | "TIME";
-type StepMode = "off" | "fixedTp" | "noTp";
+type StepMode = "off" | "fixedTp" | "noTp" | "noTpUnlimited";
 
 interface TradeOutcome {
   source: string;
@@ -470,7 +472,11 @@ function simulateTradeStepTrail(
     const c = ltfCandles[i];
 
     let effectiveSL = origSLPrice;
-    if (stepMode !== "off" && lastStep >= 1) {
+    if (stepMode === "noTpUnlimited") {
+      // Lag fix: SL = 1 step sau trigger → SL không bao giờ = giá hiện tại
+      // lastStep=1 → SL = origSL (breakeven chưa lock), lastStep=N → SL = stepPrices[N-2]
+      if (lastStep >= 2) effectiveSL = stepPrices[lastStep - 2];
+    } else if (stepMode !== "off" && lastStep >= 1) {
       effectiveSL = stepPrices[lastStep - 1];
     }
 
@@ -972,7 +978,9 @@ function runModeSimulation(
       : c.entryPrice * (1 + c.slPct / 100);
 
     // Step trail enabled only on 15m TF; HTF always "off"
-    const useMode: StepMode = (stepMode !== "off" && STEP_TRAIL_TFS.has(c.tfKey)) ? stepMode : "off";
+    const useMode: StepMode = (stepMode !== "off" && stepMode !== "noTpUnlimited" && STEP_TRAIL_TFS.has(c.tfKey)) ? stepMode
+      : (stepMode === "noTpUnlimited" && STEP_TRAIL_TFS.has(c.tfKey)) ? "noTpUnlimited"
+      : "off";
 
     const sim = simulateTradeStepTrail(
       candles5m, c.entryIdx5m, c.side, c.entryPrice,
@@ -1366,10 +1374,11 @@ HTF (1h/4h/1d/1w) keep fixed TP/SL.
 
   // Run 4 modes
   const runDefs: { name: string; desc: string; mode: StepMode; steps: number[] }[] = [
-    { name: "E0",                   desc: "Baseline · no trail, fixed TP/SL all",                                    mode: "off",     steps: STEP_TRAIL_STEPS },
-    { name: "E-T15",                desc: "Step trail 15m + fixed TP cap (original logic)",                          mode: "fixedTp", steps: STEP_TRAIL_STEPS },
-    { name: "E-T15-NoTP",           desc: "Step trail 15m, NO fixed TP (trail keeps running past TP target)",        mode: "noTp",    steps: STEP_TRAIL_STEPS },
-    { name: "E-T15-NoTP-Extended",  desc: `NoTP + extended steps (${STEP_TRAIL_STEPS_EXTENDED.length} levels, 50% → 1000%)`, mode: "noTp", steps: STEP_TRAIL_STEPS_EXTENDED },
+    { name: "E0",                    desc: "Baseline · no trail, fixed TP/SL all",                                                      mode: "off",          steps: STEP_TRAIL_STEPS },
+    { name: "E-T15",                 desc: "Step trail 15m + fixed TP cap (original logic)",                                            mode: "fixedTp",      steps: STEP_TRAIL_STEPS },
+    { name: "E-T15-NoTP",            desc: "Step trail 15m, NO fixed TP (trail keeps running past TP target)",                          mode: "noTp",         steps: STEP_TRAIL_STEPS },
+    { name: "E-T15-NoTP-Extended",   desc: `NoTP + extended steps (${STEP_TRAIL_STEPS_EXTENDED.length} levels, 50% → 1000%)`,           mode: "noTp",         steps: STEP_TRAIL_STEPS_EXTENDED },
+    { name: "E-T15-NoTP-Unlimited",  desc: "NoTP + unlimited steps + lag fix (SL 1 step behind trigger, production v0.2.2 logic)",      mode: "noTpUnlimited", steps: STEP_TRAIL_STEPS_UNLIMITED },
   ];
   const results: ModeResult[] = [];
   for (const def of runDefs) {
