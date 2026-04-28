@@ -4,7 +4,7 @@
  * Strategy: mỗi 5m closed → quyết định LONG/SHORT theo StochRSI K (LONG K<10,
  * SHORT K>90), fallback S/R 15m. TP+4%/SL-2%. Cooldown 15m sau entry.
  */
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback, memo } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import Svg, { Polyline, Line, Polygon, Circle } from "react-native-svg";
 import { P } from "../utils/v2Theme";
@@ -59,7 +59,8 @@ function fmtCountdown(ms: number) {
  *   ● green (3px) = WIN exit  · ● red = LOSS exit
  * Auto-zoom theo time range của bars + markers (last 100 bars ~8h).
  */
-function PriceChartWithMarkersSvg({
+// memo: chỉ re-render khi bars / positions thay đổi thật sự, không re-render theo currentPrice
+const PriceChartWithMarkersSvg = memo(function PriceChartWithMarkersSvg({
   bars, positions, width = 760, height = 220, maxBars = 120,
 }: {
   bars: { time: number; close: number }[];
@@ -77,8 +78,12 @@ function PriceChartWithMarkersSvg({
   const tMax = slice[slice.length - 1].time;
   const range = tMax - tMin || 1;
   const closes = slice.map((b) => b.close);
-  const pMin = Math.min(...closes);
-  const pMax = Math.max(...closes);
+  // dùng loop thay Math.min/max(...array) để tránh stack overflow khi array lớn
+  let pMin = closes[0], pMax = closes[0];
+  for (let i = 1; i < closes.length; i++) {
+    if (closes[i] < pMin) pMin = closes[i];
+    if (closes[i] > pMax) pMax = closes[i];
+  }
   const pRange = pMax - pMin || 1;
   const pad = 8;
   const w = width - pad * 2;
@@ -136,9 +141,10 @@ function PriceChartWithMarkersSvg({
       <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>${pMin.toFixed(0)} · {slice.length} cây 5m</Text>
     </View>
   );
-}
+});
 
-function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number; equity: number }[]; width?: number; height?: number; }) {
+// memo: chỉ re-render khi equityHistory thay đổi
+const EquityCurveSvg = memo(function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number; equity: number }[]; width?: number; height?: number; }) {
   if (!data || data.length < 2) {
     return <View style={[styles.chartBox, { width, height, justifyContent: "center", alignItems: "center" }]}>
       <Text style={styles.chartEmpty}>chưa có data — chờ lệnh đầu tiên đóng</Text>
@@ -218,7 +224,55 @@ function EquityCurveSvg({ data, width = 760, height = 220 }: { data: { t: number
       </View>
     </View>
   );
-}
+});
+
+// ─── Per-position row (memo: chỉ re-render khi currentPrice thay đổi hoặc position data thay đổi) ───
+const OpenPositionRow = memo(function OpenPositionRow({
+  p, i, currentPrice, onCloseManual,
+}: {
+  p: Position; i: number; currentPrice: number | null;
+  onCloseManual?: (id: string) => void;
+}) {
+  const upnlPct = currentPrice !== null
+    ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE
+    : 0;
+  let grossUsd = currentPrice !== null ? MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100 : 0;
+  if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
+  const upnlUsd = grossUsd - FEE_PER_SIDE;
+  const color = upnlUsd >= 0 ? P.green : P.error;
+  const notional = MARGIN_PER_TRADE * LEVERAGE;
+  const distTpPct = currentPrice !== null ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
+  const distSlPct = currentPrice !== null ? Math.abs(p.slPrice - currentPrice) / currentPrice * 100 : 0;
+  const heldMin = Math.floor((Date.now() - p.entryMs) / 60000);
+  const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
+  const handleClose = useCallback(() => {
+    if (!onCloseManual) return;
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(`Close ${p.side} @${p.entryPrice.toFixed(0)} ngay tại $${currentPrice?.toFixed(0)}?`);
+      if (!ok) return;
+    }
+    onCloseManual(p.id);
+  }, [p.id, p.side, p.entryPrice, currentPrice, onCloseManual]);
+  return (
+    <View key={p.id} style={styles.row}>
+      <Text style={[styles.cellNarrow, { color: P.dim, width: 22 }]}>{i + 1}</Text>
+      <Text style={[styles.cellW, { color: P.tertiary }]}>{fmtTime(p.entryMs)}</Text>
+      <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
+      <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
+      <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
+      <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
+      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
+      <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
+      <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
+      <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
+      {onCloseManual && (
+        <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
+          <Text style={styles.closeBtnText}>✕</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+});
 
 export default function All5mPanel({ account, summary, currentPrice, stoch5mK, onReset, onCloseManual, presetKey, onSetPreset, price5mBars, support15m, resistance15m, footer }: Props) {
   const [filter, setFilter] = useState<Filter>("ALL");
@@ -235,7 +289,14 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
   const SR_PROX_PCT = preset.srProximityPct;
   const SR_LOOKBACK = preset.srLookback15m;
 
-  const handleSwitchPreset = (key: PresetKey) => {
+  // ── Memoize lists — tránh re-filter mỗi render ──────────────────────────
+  const open = useMemo(() => account.positions.filter((p) => p.status === "OPEN"), [account.positions]);
+  const closedAll = useMemo(() => account.positions.filter((p) => p.status === "WIN" || p.status === "LOSS"), [account.positions]);
+  const closed = useMemo(() => filter === "ALL" ? closedAll : closedAll.filter((p) => p.status === filter), [closedAll, filter]);
+  const openLong = useMemo(() => open.filter((p) => p.side === "LONG").sort((a, b) => b.entryMs - a.entryMs), [open]);
+  const openShort = useMemo(() => open.filter((p) => p.side === "SHORT").sort((a, b) => b.entryMs - a.entryMs), [open]);
+
+  const handleSwitchPreset = useCallback((key: PresetKey) => {
     if (key === presetKey) return;
     const target = PRESETS[key];
     if (typeof window !== "undefined") {
@@ -249,9 +310,9 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
       if (!ok) return;
     }
     Promise.resolve(onSetPreset(key));
-  };
+  }, [presetKey, onSetPreset]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     if (typeof window !== "undefined") {
       const ok = window.confirm(
         `RESET 5m All account?\n\nXoá tất cả lệnh, capital về $${INITIAL_CAPITAL}.\n\nKhông thể undo.`
@@ -259,11 +320,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
       if (!ok) return;
     }
     Promise.resolve(onReset());
-  };
-
-  const open = account.positions.filter((p) => p.status === "OPEN");
-  const closedAll = account.positions.filter((p) => p.status === "WIN" || p.status === "LOSS");
-  const closed = filter === "ALL" ? closedAll : closedAll.filter((p) => p.status === filter);
+  }, [onReset]);
 
   const unrealized = useMemo(() => {
     if (currentPrice === null) return 0;
@@ -374,16 +431,16 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <Kpi label="OPEN" value={`${summary.openCount}`} color={P.primaryContainer} sub={`free $${summary.freeMargin.toFixed(0)}`} />
       </View>
 
-      {/* Status detail — anh Tommy v4.7.18: cho biết chờ gì + bị gì block */}
-      {(() => {
-        const longCount = open.filter((p) => p.side === "LONG").length;
-        const shortCount = open.filter((p) => p.side === "SHORT").length;
+      {/* Status detail — memoized theo open/stoch/price thay đổi */}
+      {useMemo(() => {
+        const longCount = openLong.length;
+        const shortCount = openShort.length;
         const k = stoch5mK;
         const cd = summary.cooldownRemainMs;
         const freeM = summary.freeMargin;
-        const minMargin = 30; // MARGIN_PER_TRADE — 1 lệnh cần $30
-        const lastLong = open.filter((p) => p.side === "LONG").reduce((a, b) => (a && a.entryMs > b.entryMs ? a : b), null as Position | null);
-        const lastShort = open.filter((p) => p.side === "SHORT").reduce((a, b) => (a && a.entryMs > b.entryMs ? a : b), null as Position | null);
+        const minMargin = 30;
+        const lastLong = openLong[0] ?? null;
+        const lastShort = openShort[0] ?? null;
         const now = Date.now();
 
         // Eval per side
@@ -476,7 +533,7 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
             <Bullet side="SHORT" count={shortCount} max={STACK_MAX_PER_SIDE} ready={shortReady} blocks={shortEval.blocks} trigger={shortEval.trigger} />
           </View>
         );
-      })()}
+      }, [openLong, openShort, stoch5mK, summary.cooldownRemainMs, summary.freeMargin, currentPrice, preset, STACK_MAX_PER_SIDE, STACK_SPACING_MIN, STACK_MIN_ENTRY_DIST_PCT, STOCH_LONG, STOCH_SHORT, SR_PROX_PCT, support15m, resistance15m])}
 
       {/* Price 5m + entry/exit markers (anh Tommy v4.7.12) */}
       {price5mBars && price5mBars.length >= 2 && (
@@ -492,16 +549,14 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <EquityCurveSvg data={account.equityHistory} />
       </View>
 
-      {/* OPEN list — split LONG/SHORT, show all, total per side (anh Tommy v4.8.12) */}
+      {/* OPEN list — split LONG/SHORT, dùng OpenPositionRow memo */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🟢 OPEN ({open.length}) · TỔNG uPnL: <Text style={{ color: unrealized >= 0 ? P.green : P.error }}>{fmtUsd(unrealized, true)}</Text></Text>
         {open.length === 0 ? (
           <Text style={styles.empty}>chưa có lệnh nào đang mở</Text>
         ) : (
-          (["LONG", "SHORT"] as const).map((side) => {
-            const list = open.filter((p) => p.side === side).sort((a, b) => b.entryMs - a.entryMs);
+          ([["LONG", openLong], ["SHORT", openShort]] as const).map(([side, list]) => {
             if (list.length === 0) return null;
-            // Side-total uPnL
             let sideUpnl = 0;
             if (currentPrice !== null) {
               for (const p of list) {
@@ -517,49 +572,9 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
                 <Text style={[styles.sectionTitle, { color: sideColor, marginTop: 4 }]}>
                   {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) · uPnL <Text style={{ color: sideUpnl >= 0 ? P.green : P.error }}>{fmtUsd(sideUpnl, true)}</Text>
                 </Text>
-                {list.map((p, i) => {
-                  const upnlPct = currentPrice !== null
-                    ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE
-                    : 0;
-                  let grossUsd = currentPrice !== null
-                    ? MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100
-                    : 0;
-                  if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
-                  const upnlUsd = grossUsd - FEE_PER_SIDE;
-                  const color = upnlUsd >= 0 ? P.green : P.error;
-                  const notional = MARGIN_PER_TRADE * LEVERAGE;
-                  const distTpPct = currentPrice !== null ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
-                  const distSlPct = currentPrice !== null ? Math.abs(p.slPrice - currentPrice) / currentPrice * 100 : 0;
-                  const heldMin = Math.floor((Date.now() - p.entryMs) / 60000);
-                  const heldStr = heldMin >= 60 ? `${(heldMin / 60).toFixed(1)}h` : `${heldMin}m`;
-                  const handleClose = () => {
-                    if (!onCloseManual) return;
-                    if (typeof window !== "undefined") {
-                      const ok = window.confirm(`Close ${p.side} @${p.entryPrice.toFixed(0)} ngay tại $${currentPrice?.toFixed(0)}?`);
-                      if (!ok) return;
-                    }
-                    Promise.resolve(onCloseManual(p.id));
-                  };
-                  return (
-                    <View key={p.id} style={styles.row}>
-                      <Text style={[styles.cellNarrow, { color: P.dim, width: 22 }]}>{i + 1}</Text>
-                      <Text style={[styles.cellW, { color: P.tertiary }]}>{fmtTime(p.entryMs)}</Text>
-                      <Text style={[styles.cellW, { color: P.tertiary, fontSize: 10, fontWeight: "700" }]}>{p.source.replace("_", " ")}</Text>
-                      <Text style={[styles.cellW, { color: P.bitcoinOrange, fontSize: 10 }]}>size ${notional}</Text>
-                      <Text style={[styles.cellW, { color: P.text }]}>@${p.entryPrice.toFixed(0)}</Text>
-                      <Text style={[styles.cellW, { color: P.green, fontSize: 10 }]}>TP ${p.tpPrice.toFixed(0)} ({distTpPct.toFixed(2)}%)</Text>
-                      <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
-                      <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
-                      <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
-                      <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
-                      {onCloseManual && (
-                        <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
-                          <Text style={styles.closeBtnText}>✕</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  );
-                })}
+                {list.map((p, i) => (
+                  <OpenPositionRow key={p.id} p={p} i={i} currentPrice={currentPrice} onCloseManual={onCloseManual} />
+                ))}
               </View>
             );
           })

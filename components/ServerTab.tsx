@@ -136,6 +136,25 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
           <Text style={styles.dim}>{SERVER_URL} · last update </Text>
           <LiveAgo timestampMs={live.lastUpdateMs} suffix=" ago" />
         </View>
+        {/* Server version + health info */}
+        {live.serverInfo && (
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 6 }}>
+            <Text style={[styles.dim, { color: P.bitcoinOrange, fontWeight: "700" }]}>
+              v{live.serverInfo.version}
+            </Text>
+            {live.serverHealth && (
+              <>
+                <Text style={styles.dim}>
+                  uptime {live.serverHealth.uptime >= 3600
+                    ? `${(live.serverHealth.uptime / 3600).toFixed(1)}h`
+                    : `${(live.serverHealth.uptime / 60).toFixed(0)}m`}
+                </Text>
+                <Text style={styles.dim}>mem {live.serverHealth.memMb}MB</Text>
+                <Text style={styles.dim}>pid {live.serverHealth.pid}</Text>
+              </>
+            )}
+          </View>
+        )}
       </View>
 
       {/* ENGINE START/STOP — clearer for new entries vs Plan B */}

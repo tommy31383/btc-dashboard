@@ -7,7 +7,7 @@
  * - REST fallback for actions.
  */
 import { useEffect, useRef, useState, useCallback } from "react";
-import { api, getToken, setToken, startWs, stopWs, onWsMessage } from "../utils/backendApi";
+import { api, getToken, setToken, startWs, stopWs, onWsMessage, ServerInfo, ServerHealth } from "../utils/backendApi";
 
 // 2026-04-28 (anh Tommy): RAM cap journal client-side. Server-side cũng cap 100,
 // disk rolling 7 ngày, lazy history per-day. KHÔNG cache history vào _cache.
@@ -28,6 +28,8 @@ const _cache = {
   journal: [] as any[],
   lastUpdateMs: 0,
   initialized: false,
+  serverInfo: null as ServerInfo | null,
+  serverHealth: null as ServerHealth | null,
 };
 let _wsStarted = false;
 const _stateSubscribers = new Set<() => void>();
@@ -42,6 +44,8 @@ export interface BackendLiveState {
   alerts: any[];                 // current rule alerts
   journal: any[];                // recent journal entries (CLOSE for chart markers)
   lastUpdateMs: number;
+  serverInfo: ServerInfo | null; // version, name từ GET /
+  serverHealth: ServerHealth | null; // uptime, mem, pid từ GET /api/health
 }
 
 export interface BackendLiveActions {
@@ -69,6 +73,8 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
   const [alerts, setAlerts] = useState<any[]>(_cache.alerts);
   const [journal, setJournal] = useState<any[]>(_cache.journal);
   const [lastUpdateMs, setLastUpdateMs] = useState(_cache.lastUpdateMs);
+  const [serverInfo, setServerInfo] = useState<ServerInfo | null>(_cache.serverInfo);
+  const [serverHealth, setServerHealth] = useState<ServerHealth | null>(_cache.serverHealth);
   const refreshTimerRef = useRef<any>(null);
 
   const refresh = useCallback(async () => {
@@ -104,6 +110,8 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
       setAlerts(_cache.alerts);
       setJournal(_cache.journal);
       setLastUpdateMs(_cache.lastUpdateMs);
+      setServerInfo(_cache.serverInfo);
+      setServerHealth(_cache.serverHealth);
     };
     _stateSubscribers.add(sync);
 
@@ -116,7 +124,7 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
         try {
           await api.me();
           _cache.authed = true; setAuthed(true);
-          await refresh();
+          await Promise.all([refresh(), fetchServerInfo()]);
           if (!_wsStarted) { startWs(); _wsStarted = true; }
         } catch {
           setToken(null);
@@ -172,6 +180,15 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
     return off;
   }, [authed]);
 
+  const fetchServerInfo = useCallback(async () => {
+    try {
+      const [info, health] = await Promise.all([api.root(), api.health()]);
+      _cache.serverInfo = info;
+      _cache.serverHealth = health;
+      _notifyAll();
+    } catch { /* non-critical, bỏ qua */ }
+  }, []);
+
   const login = useCallback(async (password: string): Promise<boolean> => {
     setLoading(true);
     setLastError(null);
@@ -179,7 +196,7 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
       const r = await api.login(password);
       await setToken(r.token);
       _cache.authed = true; setAuthed(true);
-      await refresh();
+      await Promise.all([refresh(), fetchServerInfo()]);
       if (!_wsStarted) { startWs(); _wsStarted = true; }
       _notifyAll();
       return true;
@@ -250,6 +267,7 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
 
   return {
     authed, loading, lastError, state, scheduler, alerts, journal, lastUpdateMs,
+    serverInfo, serverHealth,
     login, logout, refresh, setAuto, setDryRun, setSettings,
     closePosition, editTpSl, bulkClose,
     loadJournalHistory, loadJournalDays,

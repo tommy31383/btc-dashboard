@@ -65,7 +65,11 @@ async function request<T>(path: string, method: "GET" | "POST" = "GET", body?: a
 
 export interface LoginResponse { token: string; ttlDays: number; }
 
+export interface ServerInfo { name: string; version: string; }
+export interface ServerHealth { ok: boolean; uptime: number; pid: number; memMb: number; ts: number; }
+
 export const api = {
+  root: () => request<ServerInfo>("/"),
   login: (password: string) => request<LoginResponse>("/api/auth/login", "POST", { password }),
   logout: () => request<{ ok: boolean }>("/api/auth/logout", "POST"),
   me: () => request<{ jti: string; exp: number }>("/api/auth/me"),

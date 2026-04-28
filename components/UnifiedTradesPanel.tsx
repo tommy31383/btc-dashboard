@@ -36,10 +36,11 @@ function fmtUsd(n: number, sign = false) {
 function UnifiedTradesPanelInner({ liveState, all5mAccount, currentPrice, onGoToLive, onGoToAll5m }: Props) {
   const [collapsed, setCollapsed] = useState(false);
 
+  // anh Tommy v0.2.3: SERVER_OWNS_TRADING=true → frontend không connect Binance
+  // LIVE section chỉ show tracked positions từ server (qua useBackendLive), không cần API key check
   const liveTracked = liveState.trackedPositions;
   const all5mOpen = all5mAccount.positions.filter((p) => p.status === "OPEN");
-  // Detect LIVE disconnected — chưa nhập API key (anh Tommy v4.7.7)
-  const liveDisconnected = !liveState.apiKey || !liveState.apiSecret;
+  const liveDisconnected = false; // ẩn DISCONNECTED banner — server owns trading
 
   // ── LIVE summary ──
   const liveLong = liveTracked.filter((t) => t.side === "LONG");
