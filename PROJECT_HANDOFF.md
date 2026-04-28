@@ -1,7 +1,7 @@
 # PROJECT HANDOFF — BTC Trading Bot
 
-**Date written:** 2026-04-28 (last sync v4.8.23)
-**Frontend:** v4.8.23 (`tommy31383/btc-dashboard`, public, master branch)
+**Date written:** 2026-04-28 (last sync v4.8.25)
+**Frontend:** v4.8.25 (`tommy31383/btc-dashboard`, public, master branch)
 **Server:** v0.2.2 (`tommy31383/btc-trader-server`, private, main branch)
 **Owner:** Tommy (tuantommy83@gmail.com) — speaks Vietnamese, prefers terse Việt-Anh mix
 
@@ -81,12 +81,14 @@ CODEX_REVIEW_NOTES.md      # Code review notes from Codex agent
 components/                # 30+ React Native components
   ServerTab.tsx            # ★ SERVER tab UI — login + control + view bot state
   LiveTab.tsx              # LIVE tab — locked, banner shows SERVER_OWNS
-  All5mPanel.tsx           # 5m ALL paper trader 3-preset switcher
+  All5mPanel.tsx           # 5m ALL paper trader 5-preset switcher (v4.8.23)
   UnifiedTradesPanel.tsx   # Combined trade list (LIVE + 5m ALL)
   LiveActionItems.tsx      # Action snapshot (stack bars + EQ DD + zones)
   TradingRulesPanel.tsx    # 43 rule list with stats sparkline
   BinanceChart.tsx         # Chart with entry/exit markers + S/R overlay
   RuleAlertBanner.tsx      # Top banner showing live FIRED rules
+  # Removed v4.8.25: GoldenFiringBanner, LiveRulesSummary, ConfluenceScore,
+  #                  OverallVerdict, AlertLog (server-only mode → useless)
 
 hooks/
   useBackendLive.ts        # ★ Backend client (REST + WS). Module-level _cache
@@ -581,6 +583,14 @@ Every per-rule backtest MUST emit:
 
 ## 16. Recent decision log (last sprint)
 
+- **v4.8.25 (frontend):** Tab RULE cleanup 13 → 8 panel
+  - Xoá 5 panel useless: GoldenFiringBanner / LiveRulesSummary /
+    ConfluenceScore / OverallVerdict / AlertLog
+  - Lý do: server-only mode, frontend chỉ monitor + control nên không
+    cần verdict / confluence / aggregate
+  - 5 component file deleted khỏi repo (no refs còn lại)
+- **v4.8.24 (frontend):** Server version + uptime auto-refresh mỗi 15s
+  (trước chỉ fetch 1 lần lúc init/login → version stale sau server deploy)
 - **v4.8.23 (frontend):** 5 PRESETS từ stack-sweep 12-combo backtest 3y
   - EAGLE bỏ luôn (dominated bởi WHALE/TOMI ở mọi stack size)
   - 5 winner: WHALE_MAX(200) / WHALE_MID(100) / TOMI_MAX(200) / **TOMI_MID(100) ★default** / TOMI_MIN(50)
