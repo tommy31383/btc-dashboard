@@ -1,37 +1,41 @@
 # 5m ALL TRADING ENGINE — Rule & Preset
 
-**Version:** v1.0 (last updated 2026-04-27)
+**Version:** v2.1 (last updated 2026-04-28)
 **Engine:** `utils/all5mAccount.ts` + `hooks/use5mAllTrader.ts`
-**Backtest:** `tools/backtest-5mall-3y.ts` + `tools/sweep-5mall-improve.ts`
-**Account:** Paper $1000 (local AsyncStorage `@all5m_data_v1`, KHÔNG sync git)
+**Backtest:** `tools/backtest-5mall-3y.ts` + `tools/sweep-5mall-improve.ts` + `tools/sweep-5mall-improve-v2.ts`
+**Account:** Paper $5000 (local AsyncStorage `@all5m_data_v1`; gist mirror leader/follower qua `all5m_account.json`)
 
 ---
 
 ## 🔑 ENGINE CƠ BẢN
 
-### Trigger (mỗi cây 5m close):
+### Trigger (mỗi cây 5m close — actual values per active preset):
 
-1. **Stoch5m K < 10** → LONG (`stoch_long`)
-2. **Stoch5m K > 90** → SHORT (`stoch_short`)
+1. **Stoch5m K < `stochLongLevel`** → LONG (`stoch_long`)
+2. **Stoch5m K > `stochShortLevel`** → SHORT (`stoch_short`)
 3. **Fallback S/R 15m** (nếu stoch không trigger):
-   - `close ≤ support15m × (1 + 0.3%)` → LONG (`sr_long`)
-   - `close ≥ resistance15m × (1 - 0.3%)` → SHORT (`sr_short`)
+   - `close ≤ support15m × (1 + srProximityPct%)` → LONG (`sr_long`)
+   - `close ≥ resistance15m × (1 - srProximityPct%)` → SHORT (`sr_short`)
+   - Support/resistance = min low / max high của `srLookback15m` cây 15m gần nhất (exclude in-progress bar)
 
 ### Hedge mode + Plan B (giống LIVE engine):
 
 - LONG và SHORT là **2 stack độc lập**, có thể coexist
-- Mỗi entry có TP/SL riêng (Plan B monitor mỗi cây 5m → first hit TP/SL → close)
+- Mỗi entry có TP/SL riêng (Plan B: tick `processOpen()` → first hit TP/SL → close)
 - Stack max tunable per side
 - Distance gate giữa các entry cùng side
 - Cooldown all-side sau mỗi trade
-- Margin $30 × leverage 100x = notional $3000, fee 0.05%
+- **Capital $5000**, margin $30 × leverage 100x = notional $3000, fee 0.05%/side ($1.5/side, round-trip $3)
 
-### Block gates (theo thứ tự):
+### Block gates (theo thứ tự — gọi trong `tryEntry5mBar`):
 
-1. **Cooldown** (default 10m all-side sau trade gần nhất)
-2. **Stack full** (≥ stackMax cùng side)
-3. **Spacing** (min phút giữa 2 entry cùng side)
-4. **Distance** (entry mới phải xa entry gần nhất cùng side ≥ N%)
+1. **Dedup** theo `bar5mTime` (1 cây 5m chỉ 1 entry)
+2. **Cooldown** all-side: `now - lastEntryMs < cooldownMin × 60s`
+3. **Free margin** ≥ $30
+4. **Stack full** (≥ `stackMaxPerSide` cùng side)
+5. **Spacing** (`stackPerSideSpacingMin` phút giữa 2 entry cùng side)
+6. **Distance** (entry mới phải xa entry gần nhất cùng side ≥ `stackMinEntryDistPct`%)
+7. **Better entry** (v4.7.27, `stackBetterEntryMode` — hiện DISABLED ở cả 3 preset, xem section dưới)
 
 ---
 
@@ -139,18 +143,45 @@ TP=4%, SL=2%, stackMax=50/side, distance=0%, spacing=0m, cooldown=10m
 2. Chỉnh `stackMaxPerSide`, `distance`, `tp`, `sl` theo bảng trên
 3. SAVE → engine reload với config mới
 
-### Apply preset programmatically (utils/all5mAccount.ts):
+### Apply preset programmatically (utils/all5mAccount.ts — Phase 2 v2 values):
 
 ```typescript
-// SAFE
-{ stackMaxPerSide: 15, stackMinEntryDistPct: 0.3, tpPct: 5, slPct: 2.5 }
+// 🔴 AGGRESSIVE (WHALE) — highest PnL
+{
+  tpPct: 5, slPct: 2.5,
+  stackMaxPerSide: 75, stackMinEntryDistPct: 0, stackPerSideSpacingMin: 0,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 30,
+  expectedNet3y: 1_516_473, expectedMaxDd3y: 5_874,
+}
 
-// BALANCED
-{ stackMaxPerSide: 30, stackMinEntryDistPct: 0.2, tpPct: 4, slPct: 2 }
+// 🟡 BALANCED (EAGLE) — default, balance NET vs DD
+{
+  tpPct: 5, slPct: 2.5,
+  stackMaxPerSide: 30, stackMinEntryDistPct: 0.1, stackPerSideSpacingMin: 10,
+  stackBetterEntryMode: "off",
+  cooldownMin: 5,
+  stochLongLevel: 15, stochShortLevel: 85,
+  srProximityPct: 0.4, srLookback15m: 50,
+  expectedNet3y: 633_753, expectedMaxDd3y: 1_983,
+}
 
-// AGGRESSIVE (= LIVE PRESET B)
-{ stackMaxPerSide: 50, stackMinEntryDistPct: 0, tpPct: 4, slPct: 2 }
+// 🟢 SAFE (TURTLE) — lowest MaxDD
+{
+  tpPct: 3.5, slPct: 2,
+  stackMaxPerSide: 15, stackMinEntryDistPct: 0.3, stackPerSideSpacingMin: 10,
+  stackBetterEntryMode: "off",
+  cooldownMin: 15,
+  stochLongLevel: 10, stochShortLevel: 90,
+  srProximityPct: 0.4, srLookback15m: 80,
+  expectedNet3y: 240_975, expectedMaxDd3y: 792,
+}
 ```
+
+**Default preset:** `BALANCED` (`DEFAULT_PRESET_KEY = "BALANCED"`).
+**Storage:** active preset key trong AsyncStorage `@all5m_preset_v1` (LOCAL ONLY, KHÔNG sync gist).
 
 ---
 
@@ -217,7 +248,61 @@ TP=4%, SL=2%, stackMax=50/side, distance=0%, spacing=0m, cooldown=10m
 
 ---
 
+## 🧪 BETTER ENTRY MODE (v4.7.27 — đang DISABLED trong production)
+
+**Field:** `Preset.stackBetterEntryMode: "off" | "vs-last" | "vs-best" | "vs-avg"`
+
+Nếu khác `"off"`, gate này chạy **sau** distance check trong `tryEntry5mBar`. Entry mới chỉ được phép khi giá tốt hơn benchmark cùng side:
+
+| Mode | Benchmark | Ý nghĩa |
+|---|---|---|
+| `vs-last` | `lastSame.entryPrice` | Mỗi lệnh mới phải có entry tốt hơn lệnh gần nhất cùng side |
+| `vs-best` | LONG: `min(entryPrice)` · SHORT: `max(entryPrice)` | Tốt hơn lệnh có entry tốt nhất từ trước tới giờ |
+| `vs-avg` | trung bình entry của tất cả OPEN cùng side | Tốt hơn average — giảm bớt averaging up/down |
+
+**Quy tắc** (trong code): LONG cần `fillPrice < benchmark`, SHORT cần `fillPrice > benchmark`. Không thoả → block.
+
+**Trạng thái production hiện tại:** cả 3 preset (WHALE/EAGLE/TURTLE) đều set `"off"`. Logic có sẵn để Tommy bật khi đã backtest đủ.
+
+---
+
+## 💰 CAPITAL MIGRATION (v4.7.20)
+
+`INITIAL_CAPITAL` bumped **$1000 → $5000** để stack 75 (WHALE) khả thi:
+- 75 LONG × $30 + 75 SHORT × $30 = $4500 max margin → cần buffer ≥ $500 để chịu fee + slippage
+
+**Migration tự động** trong `loadAccount()`:
+- Account cũ (`capitalVersion === undefined || < 2`) → top up `+$4000` ONCE
+- Sau migration: `capitalVersion = 2`, equityHistory ghi 1 điểm mới
+- Lệnh OPEN hiện tại được giữ nguyên (không bị reset)
+
+**`PREV_INITIAL_CAPITAL = 1000`** vẫn export làm reference cho ROI legacy.
+
+---
+
+## 🔄 LEADER / FOLLOWER (multi-device sync)
+
+**Pattern:** `use5mAllTrader(rawKlines, tfData, currentPrice, enabled, isLeader)`
+
+| Role | Trigger entry | Process TP/SL | Reset/close manual | Pull state |
+|---|---|---|---|---|
+| **Leader** (`isLeader=true`) | ✅ chạy `tryEntry5mBar` mỗi 5m close | ✅ chạy `processOpen` mỗi tick | ✅ | ❌ |
+| **Follower** (`isLeader=false`) | ❌ | ❌ | ❌ | ✅ pull `all5m_account.json` từ gist mỗi **120s** |
+
+- Leader push gist debounce **20s** sau mỗi save (`scheduleFilePush`)
+- Follower pull-only → chỉ mirror state, không tạo trade ghost
+- Reset/manual-close trên follower → no-op (silent skip)
+
+---
+
 ## 📝 CHANGELOG
 
+- **v2.1** (2026-04-28): Doc sync với code — cập nhật capital $5000, full Preset interface (gồm stackPerSideSpacingMin/cooldownMin/stoch/srProx/srLookback), thêm section Better Entry Mode + Capital Migration v4.7.20 + Leader/Follower
 - **v2.0** (2026-04-27): Phase 2 sweep — 3 preset re-tuned via 81-run one-at-a-time sweep. WHALE +109% NET, EAGLE +62% NET & -35% DD, TURTLE -20% DD. New knobs exposed in Preset interface (cooldown, stoch, srProx, srLookback)
 - **v1.0** (2026-04-27): Initial doc với 3 preset SAFE/BALANCED/AGGRESSIVE từ 11-variant sweep
+
+### Code-level milestones (cho cross-reference)
+- **v4.7.27**: `stackBetterEntryMode` field thêm vào Preset, logic "vs-last/vs-best/vs-avg" trong `tryEntry5mBar` (currently `"off"` cả 3 preset)
+- **v4.7.20**: `INITIAL_CAPITAL` 1000 → 5000 + auto-migration via `capitalVersion`
+- **v4.7.1**: Phase 2 sweep apply — 3 preset hoàn chỉnh với 9 knob (TP, SL, stack, dist, spacing, cooldown, stoch×2, srProx, srLookback)
+- **v4.5.3**: Follower pull 60s → 120s, leader push debounce 10s → 20s
