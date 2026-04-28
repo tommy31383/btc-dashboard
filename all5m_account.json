@@ -1,7 +1,43 @@
 {
   "version": 1,
-  "capital": 4997,
+  "capital": 4992.5,
   "positions": [
+    {
+      "id": "bar5m-1777389600000",
+      "bar5mTime": 1777389600000,
+      "status": "OPEN",
+      "side": "SHORT",
+      "source": "stoch_short",
+      "entryPrice": 76063.6,
+      "entryMs": 1777390053909,
+      "tpPrice": 71499.784,
+      "slPrice": 80627.41600000001,
+      "entryFeeUsd": 1.5
+    },
+    {
+      "id": "bar5m-1777388400000",
+      "bar5mTime": 1777388400000,
+      "status": "OPEN",
+      "side": "SHORT",
+      "source": "stoch_short",
+      "entryPrice": 76026.87,
+      "entryMs": 1777388728870,
+      "tpPrice": 71465.25779999999,
+      "slPrice": 80588.4822,
+      "entryFeeUsd": 1.5
+    },
+    {
+      "id": "bar5m-1777387500000",
+      "bar5mTime": 1777387500000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "sr_long",
+      "entryPrice": 75750.01,
+      "entryMs": 1777387873263,
+      "tpPrice": 80295.0106,
+      "slPrice": 71205.0094,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1777387200000",
       "bar5mTime": 1777387200000,
@@ -9,7 +45,7 @@
       "side": "LONG",
       "source": "sr_long",
       "entryPrice": 75862.78,
-      "entryMs": 1777388128119,
+      "entryMs": 1777387521814,
       "tpPrice": 80414.5468,
       "slPrice": 71311.0132,
       "entryFeeUsd": 1.5
@@ -37,8 +73,20 @@
       "equity": 4998.5
     },
     {
-      "t": 1777388128119,
+      "t": 1777387521814,
       "equity": 4997
+    },
+    {
+      "t": 1777387873263,
+      "equity": 4995.5
+    },
+    {
+      "t": 1777388728870,
+      "equity": 4994
+    },
+    {
+      "t": 1777390053909,
+      "equity": 4992.5
     }
   ],
   "stats": {
@@ -46,10 +94,10 @@
     "wins": 0,
     "losses": 0,
     "totalPnlUsd": 0,
-    "totalFeeUsd": 3,
-    "lastEntryMs": 1777388128119,
+    "totalFeeUsd": 7.5,
+    "lastEntryMs": 1777390053909,
     "lastResetMs": 1777387114363
   },
-  "updatedAt": 1777388128119,
+  "updatedAt": 1777390053909,
   "capitalVersion": 2
 }
