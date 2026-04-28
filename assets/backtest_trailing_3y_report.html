@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"/>
+<title>Trailing Stop · 3y Backtest · BTC/USDT</title>
+<style>
+  body { background:#131313; color:#e5e2e1; font-family:'JetBrains Mono','Menlo',monospace; font-size:12px; padding:18px; }
+  h1 { color:#F7931A; font-size:18px; letter-spacing:1px; margin:0 0 6px 0; }
+  h2 { color:#ffdcc0; font-size:14px; letter-spacing:1px; margin:0 0 10px 0; }
+  .info { color:#9f8e80; font-size:11px; margin:6px 0 14px 0; line-height:1.7; }
+  .card { background:#1a1a1a; border:1px solid #2a2a2a; padding:14px 16px; border-radius:6px; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:repeat(8, 1fr); gap:12px; margin-bottom:10px; }
+  .stat { display:flex; flex-direction:column; gap:2px; }
+  .stat span { color:#9f8e80; font-size:10px; text-transform:uppercase; }
+  .stat b { color:#ffdcc0; font-size:14px; }
+  table { border-collapse:collapse; width:100%; font-size:11px; margin-top:8px; }
+  th, td { border:1px solid #2a2a2a; padding:5px 8px; text-align:left; }
+  th { background:#1c1b1b; color:#F7931A; font-size:10px; letter-spacing:1px; text-transform:uppercase; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+</style>
+</head>
+<body>
+<h1>📈 TRAILING STOP · 3-YEAR BACKTEST · BTC/USDT</h1>
+<div class="info"><span><b>5m</b>: 315,360 candles · 2023-04-27 → 2026-04-26</span> · <span><b>15m</b>: 105,120 candles · 2023-04-27 → 2026-04-26</span> · <span><b>1h</b>: 26,280 candles · 2023-04-27 → 2026-04-26</span> · <span><b>4h</b>: 6,570 candles · 2023-04-27 → 2026-04-26</span> · <span><b>1d</b>: 1,095 candles · 2023-04-28 → 2026-04-26</span> · <span><b>1w</b>: 156 candles · 2023-05-01 → 2026-04-20</span><br>
+Generated: 2026-04-28T01:58:55.995Z · Fee/side: 0.05% · Margin $1 × 100x = $100/lệnh<br>
+LIVE PRESET B stack: 50/side · cooldown 10m · DD pause 30%/4h<br>
+HTF rules use Phase 2 LTF confirm (5m Stoch 20/80 OR 15m S/R 0.4%, max wait 60 bars). LTF rules (5m/15m) use PA A2 skip.<br>
+<b>Trailing stop spec:</b> activation at 50% of TP distance, lock 70% of running profit; tighter SL wins.
+</div>
+
+<div class="card">
+  <h2>📊 EQUITY OVERLAY · Mode E0 (no trailing) vs Mode E-T (trailing)</h2>
+  <svg width="900" height="280" style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px">
+    <line x1="0" y1="279.9" x2="900" y2="279.9" stroke="#444" stroke-dasharray="3,3" stroke-width="0.7"/>
+    <polyline points="0.0,280.0 4.5,277.0 9.0,269.6 13.6,271.9 18.1,273.1 22.6,272.8 27.1,274.7 31.7,273.0 36.2,275.2 40.7,274.1 45.2,275.8 49.7,275.1 54.3,276.5 58.8,275.1 63.3,276.1 67.8,267.0 72.4,266.2 76.9,264.6 81.4,260.2 85.9,261.6 90.5,262.0 95.0,264.7 99.5,265.7 104.0,262.3 108.5,259.3 113.1,255.3 117.6,254.5 122.1,256.4 126.6,252.4 131.2,252.5 135.7,253.0 140.2,252.0 144.7,252.3 149.2,250.9 153.8,249.7 158.3,246.8 162.8,240.4 167.3,240.4 171.9,239.1 176.4,238.0 180.9,234.9 185.4,232.2 189.9,226.4 194.5,223.3 199.0,223.4 203.5,223.4 208.0,225.3 212.6,219.4 217.1,215.3 221.6,211.1 226.1,211.3 230.7,208.1 235.2,205.4 239.7,205.9 244.2,206.1 248.7,207.6 253.3,212.0 257.8,212.9 262.3,211.0 266.8,209.8 271.4,207.0 275.9,205.7 280.4,203.4 284.9,196.3 289.4,197.4 294.0,197.5 298.5,189.1 303.0,191.2 307.5,192.5 312.1,198.2 316.6,200.3 321.1,193.3 325.6,186.1 330.2,175.1 334.7,176.4 339.2,175.7 343.7,176.0 348.2,180.9 352.8,177.4 357.3,175.4 361.8,172.2 366.3,170.6 370.9,163.8 375.4,169.7 379.9,170.4 384.4,163.0 388.9,165.9 393.5,162.0 398.0,162.4 402.5,161.8 407.0,161.7 411.6,161.1 416.1,156.0 420.6,160.6 425.1,157.3 429.6,155.5 434.2,149.3 438.7,144.4 443.2,145.8 447.7,144.1 452.3,140.9 456.8,139.6 461.3,137.8 465.8,141.1 470.4,142.7 474.9,133.2 479.4,132.8 483.9,134.5 488.4,133.7 493.0,133.0 497.5,135.2 502.0,125.9 506.5,122.1 511.1,119.1 515.6,122.4 520.1,120.3 524.6,115.0 529.1,112.1 533.7,110.4 538.2,114.8 542.7,116.1 547.2,107.6 551.8,109.6 556.3,109.4 560.8,106.2 565.3,102.0 569.8,105.9 574.4,104.8 578.9,106.3 583.4,108.0 587.9,103.1 592.5,104.5 597.0,103.4 601.5,105.4 606.0,105.2 610.6,100.5 615.1,104.3 619.6,101.2 624.1,105.8 628.6,103.0 633.2,102.2 637.7,100.4 642.2,98.4 646.7,99.1 651.3,94.9 655.8,93.4 660.3,96.9 664.8,97.7 669.3,96.0 673.9,93.4 678.4,92.2 682.9,87.5 687.4,85.0 692.0,79.7 696.5,82.2 701.0,81.3 705.5,80.2 710.1,71.9 714.6,69.0 719.1,69.7 723.6,62.5 728.1,59.9 732.7,57.9 737.2,51.8 741.7,48.1 746.2,49.6 750.8,46.4 755.3,45.5 759.8,48.1 764.3,46.0 768.8,49.6 773.4,53.7 777.9,54.8 782.4,57.4 786.9,55.6 791.5,52.7 796.0,45.8 800.5,44.4 805.0,46.7 809.5,41.0 814.1,35.3 818.6,25.9 823.1,15.4 827.6,20.4 832.2,16.6 836.7,15.7 841.2,18.3 845.7,14.1 850.3,15.2 854.8,10.1 859.3,8.9 863.8,8.4 868.3,7.6 872.9,4.4 877.4,3.2 881.9,3.2 886.4,0.0 891.0,2.2 895.5,1.3 900.0,1.8" fill="none" stroke="#a855f7" stroke-width="1.8"/>
+<polyline points="0.0,280.0 4.5,274.9 9.0,272.7 13.6,273.7 18.1,275.7 22.6,275.8 27.1,273.7 31.7,272.4 36.2,274.0 40.7,276.2 45.2,274.5 49.7,277.0 54.3,275.2 58.8,276.0 63.3,277.2 67.8,276.1 72.4,273.4 76.9,268.4 81.4,265.9 85.9,263.8 90.5,260.7 95.0,259.3 99.5,259.1 104.0,260.4 108.5,259.4 113.1,256.8 117.6,253.9 122.1,252.7 126.6,253.2 131.2,254.1 135.7,253.2 140.2,253.1 144.7,251.2 149.2,252.5 153.8,251.0 158.3,252.9 162.8,249.4 167.3,247.6 171.9,243.6 176.4,237.9 180.9,240.4 185.4,238.5 189.9,237.1 194.5,234.4 199.0,231.2 203.5,228.3 208.0,231.4 212.6,228.0 217.1,226.4 221.6,221.8 226.1,217.4 230.7,219.5 235.2,214.5 239.7,213.3 244.2,211.0 248.7,213.7 253.3,211.1 257.8,212.7 262.3,215.9 266.8,216.3 271.4,216.6 275.9,216.1 280.4,212.6 284.9,211.9 289.4,212.0 294.0,209.0 298.5,208.5 303.0,208.8 307.5,204.6 312.1,203.5 316.6,202.7 321.1,208.5 325.6,209.6 330.2,207.9 334.7,203.4 339.2,197.1 343.7,191.9 348.2,187.3 352.8,183.3 357.3,183.3 361.8,182.5 366.3,181.9 370.9,179.1 375.4,176.9 379.9,173.2 384.4,175.1 388.9,176.4 393.5,172.0 398.0,174.1 402.5,171.8 407.0,172.2 411.6,171.0 416.1,168.6 420.6,169.0 425.1,169.7 429.6,170.6 434.2,168.4 438.7,162.9 443.2,160.1 447.7,160.8 452.3,159.5 456.8,162.2 461.3,157.8 465.8,156.0 470.4,158.2 474.9,156.6 479.4,151.7 483.9,151.2 488.4,153.2 493.0,149.2 497.5,150.0 502.0,150.2 506.5,146.8 511.1,141.3 515.6,138.9 520.1,140.8 524.6,139.5 529.1,134.8 533.7,136.0 538.2,136.7 542.7,138.1 547.2,135.8 551.8,132.2 556.3,135.2 560.8,130.4 565.3,127.4 569.8,124.5 574.4,125.0 578.9,125.9 583.4,124.8 587.9,121.8 592.5,122.9 597.0,122.6 601.5,122.2 606.0,120.9 610.6,118.9 615.1,117.1 619.6,118.5 624.1,117.7 628.6,116.4 633.2,114.2 637.7,112.2 642.2,110.8 646.7,108.8 651.3,107.0 655.8,105.8 660.3,108.0 664.8,104.9 669.3,101.0 673.9,100.9 678.4,98.5 682.9,95.3 687.4,89.0 692.0,89.3 696.5,88.1 701.0,86.4 705.5,80.9 710.1,78.2 714.6,75.5 719.1,77.7 723.6,75.2 728.1,71.5 732.7,68.6 737.2,64.1 741.7,65.9 746.2,65.2 750.8,63.6 755.3,60.0 759.8,59.5 764.3,57.3 768.8,58.8 773.4,57.5 777.9,57.3 782.4,59.0 786.9,57.3 791.5,52.3 796.0,50.9 800.5,51.3 805.0,46.8 809.5,39.1 814.1,35.4 818.6,29.1 823.1,28.3 827.6,28.0 832.2,27.5 836.7,31.2 841.2,28.9 845.7,28.1 850.3,24.0 854.8,22.6 859.3,19.1 863.8,14.7 868.3,15.9 872.9,15.1 877.4,10.3 881.9,9.3 886.4,5.5 891.0,4.9 895.5,4.6 900.0,4.3" fill="none" stroke="#10b981" stroke-width="1.8"/>
+    <rect x="12" y="6" width="14" height="3" fill="#a855f7"/>
+            <text x="32" y="13" fill="#cfc6bc" font-size="11">Mode E0: +937030% lev · DD -46096%</text>
+<rect x="242" y="6" width="14" height="3" fill="#10b981"/>
+            <text x="262" y="13" fill="#cfc6bc" font-size="11">Mode E-T: +928535% lev · DD -32405%</text>
+    <text x="892" y="14" text-anchor="end" fill="#9f8e80" font-size="10">max 943003%</text>
+    <text x="892" y="276" text-anchor="end" fill="#9f8e80" font-size="10">min -210%</text>
+  </svg>
+</div>
+
+<div class="card">
+  <h2>🥊 SIDE-BY-SIDE METRICS</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Mode E0 (baseline)</th><th>Mode E-T (trailing)</th><th>Δ</th></tr></thead>
+    <tbody>
+      <tr><td><b>Trades</b></td><td>34,922</td><td>42,933</td><td style="color:#10b981">+8,011</td></tr>
+      <tr><td><b>Win Rate</b></td><td>38.67%</td><td>61.26%</td><td style="color:#10b981">+22.59%</td></tr>
+      <tr><td><b>NET %lev</b></td><td>+937030%</td><td>+928535%</td><td style="color:#ffb4ab">-8495%</td></tr>
+      <tr><td><b>Max Drawdown</b></td><td>+46096%</td><td>+32405%</td><td style="color:#10b981">-13691%</td></tr>
+      <tr><td><b>Profit Factor</b></td><td>1.54</td><td>1.65</td><td style="color:#10b981">+0.11</td></tr>
+      <tr><td><b>Sharpe-like</b></td><td>4364.36</td><td>5158.13</td><td style="color:#10b981">+793.77</td></tr>
+      <tr><td><b>Avg Hold (5m bars)</b></td><td>234.6</td><td>148.9</td><td style="color:#ffb4ab">-85.7</td></tr>
+    </tbody>
+  </table>
+  <div class="info" style="margin-top:10px">
+    <b>Trailing impact:</b> ΔNET -8495% · ΔMaxDD -13691% · ΔSharpe +793.77 · ΔWR +22.59pp · ΔPF +0.11 · ΔTrades +8011
+  </div>
+</div>
+
+<div class="card">
+  <h2>🎯 HIT-TYPE BREAKDOWN · Mode E-T</h2>
+  <div class="info">Trail activated on <b>25,950</b> trades (60.44% of all trades).</div>
+  
+    <table>
+      <thead><tr><th>Hit Type</th><th>Count</th><th>%</th><th>NET %lev</th></tr></thead>
+      <tbody>
+        <tr><td>TP</td><td>3,316</td><td>7.7%</td><td style="color:#10b981">+786840%</td></tr><tr><td>ORIG_SL</td><td>11,501</td><td>26.8%</td><td style="color:#ffb4ab">-2041810%</td></tr><tr><td>TRAIL_SL</td><td>22,986</td><td>53.5%</td><td style="color:#10b981">+2334683%</td></tr><tr><td>TIME</td><td>5,130</td><td>11.9%</td><td style="color:#ffb4ab">-151178%</td></tr>
+      </tbody>
+    </table>
+</div>
+
+<div class="card">
+  <h2>🔄 PER-SOURCE BREAKDOWN · NET %lev delta</h2>
+  <table>
+    <thead><tr><th>Source bucket</th><th>E0 trades</th><th>E0 NET</th><th>E-T trades</th><th>E-T NET</th><th>Δ NET</th></tr></thead>
+    <tbody><tr>
+      <td>HTF rules (1d)</td>
+      <td>35</td>
+      <td style="color:#10b981">+800%</td>
+      <td>35</td>
+      <td style="color:#ffb4ab">-126%</td>
+      <td style="color:#ffb4ab"><b>-926%</b></td>
+    </tr><tr>
+      <td>HTF rules (1h)</td>
+      <td>9,799</td>
+      <td style="color:#10b981">+344592%</td>
+      <td>11,360</td>
+      <td style="color:#10b981">+313834%</td>
+      <td style="color:#ffb4ab"><b>-30758%</b></td>
+    </tr><tr>
+      <td>HTF rules (4h)</td>
+      <td>438</td>
+      <td style="color:#10b981">+52338%</td>
+      <td>442</td>
+      <td style="color:#10b981">+28948%</td>
+      <td style="color:#ffb4ab"><b>-23390%</b></td>
+    </tr><tr>
+      <td>LTF rules (15m)</td>
+      <td>24,650</td>
+      <td style="color:#10b981">+539300%</td>
+      <td>31,096</td>
+      <td style="color:#10b981">+585879%</td>
+      <td style="color:#10b981"><b>+46579%</b></td>
+    </tr></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>📋 PER-SOURCE FULL · Mode E0 (baseline)</h2>
+  <table>
+      <thead><tr><th>Source bucket</th><th>Trades</th><th>W/L</th><th>PF</th><th>NET %lev</th><th>TP</th><th>OrigSL</th><th>TrailSL</th><th>TIME</th></tr></thead>
+      <tbody><tr>
+        <td>LTF rules (15m)</td><td>24,650</td>
+        <td>9884/7225</td>
+        <td>1.50</td>
+        <td style="color:#10b981">+539300%</td>
+        <td>9884</td>
+        <td>7225</td>
+        <td>0</td>
+        <td>7541</td>
+      </tr><tr>
+        <td>HTF rules (1h)</td><td>9,799</td>
+        <td>3393/5462</td>
+        <td>1.57</td>
+        <td style="color:#10b981">+344592%</td>
+        <td>3393</td>
+        <td>5462</td>
+        <td>0</td>
+        <td>944</td>
+      </tr><tr>
+        <td>HTF rules (4h)</td><td>438</td>
+        <td>214/208</td>
+        <td>2.12</td>
+        <td style="color:#10b981">+52338%</td>
+        <td>214</td>
+        <td>208</td>
+        <td>0</td>
+        <td>16</td>
+      </tr><tr>
+        <td>HTF rules (1d)</td><td>35</td>
+        <td>14/21</td>
+        <td>1.45</td>
+        <td style="color:#10b981">+800%</td>
+        <td>14</td>
+        <td>21</td>
+        <td>0</td>
+        <td>0</td>
+      </tr></tbody>
+    </table>
+</div>
+
+<div class="card">
+  <h2>📋 PER-SOURCE FULL · Mode E-T (trailing)</h2>
+  <table>
+      <thead><tr><th>Source bucket</th><th>Trades</th><th>W/L</th><th>PF</th><th>NET %lev</th><th>TP</th><th>OrigSL</th><th>TrailSL</th><th>TIME</th></tr></thead>
+      <tbody><tr>
+        <td>LTF rules (15m)</td><td>31,096</td>
+        <td>19761/6525</td>
+        <td>1.65</td>
+        <td style="color:#10b981">+585879%</td>
+        <td>2405</td>
+        <td>6525</td>
+        <td>17356</td>
+        <td>4810</td>
+      </tr><tr>
+        <td>HTF rules (1h)</td><td>11,360</td>
+        <td>6239/4802</td>
+        <td>1.62</td>
+        <td style="color:#10b981">+313834%</td>
+        <td>873</td>
+        <td>4802</td>
+        <td>5366</td>
+        <td>319</td>
+      </tr><tr>
+        <td>HTF rules (4h)</td><td>442</td>
+        <td>285/156</td>
+        <td>1.88</td>
+        <td style="color:#10b981">+28948%</td>
+        <td>35</td>
+        <td>156</td>
+        <td>250</td>
+        <td>1</td>
+      </tr><tr>
+        <td>HTF rules (1d)</td><td>35</td>
+        <td>17/18</td>
+        <td>1.10</td>
+        <td style="color:#ffb4ab">-126%</td>
+        <td>3</td>
+        <td>18</td>
+        <td>14</td>
+        <td>0</td>
+      </tr></tbody>
+    </table>
+</div>
+
+</body></html>
