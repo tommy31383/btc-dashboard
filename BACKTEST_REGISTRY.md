@@ -19,14 +19,88 @@ Canonical registry cho mọi dataset backtest. Mỗi entry có **tên (key)** + 
 - **HTML heatmap:** `assets/backtest_5mall_tpsl_grid_3y_report.html`
 - **PnL chart 12 picks:** `assets/pnl_chart_tpsl_grid_3y.html`
 - **PnL chart top WR:** `assets/pnl_chart_top_wr_3y.html`
-- **Setup:** 5 preset × 8 TP `[3,4,5,6,7,8,10,12]` × 7 SL `[2,2.5,3,4,5,6,8]` = **280 combos**
+- **Setup:** 5 preset (WHALE_MAX 200, WHALE_MID 100, TOMI_MAX 200, TOMI_MID 100, TOMI_MIN 50) × 8 TP `[3,4,5,6,7,8,10,12]` × 7 SL `[2,2.5,3,4,5,6,8]` = **280 combos**
 - **Period:** 2023-04-27 → 2026-04-26 (3y)
 - **Capital:** $5000, lev 100x, fee 0.05%/side
 - **Winner NET:** 🔴 WHALE_MAX TP=5/SL=6 → $4.15M, DD 2.0%, WR 54.3%
 - **Winner WR:** 🟠 WHALE_MID TP=3/SL=8 → 72.5%, NET $2.29M
 - **Min DD:** 🔵 TOMI_MAX TP=8/SL=8 → DD 0.1%, NET $3.09M
-- **Insight key:** TP < SL (asymmetric) thắng symmetric. SL=2 với TP cao = blew-up. Stack 200 dominate top NET.
 - **Children:** `SHORTLIST_v1`
+
+#### 📚 LESSONS LEARNED (anh Tommy 2026-04-29 — note để Claude tiếp theo resume)
+
+**🏆 TOP 5 BY NET (WHALE_MAX stack 200 dominate):**
+1. WHALE_MAX 200 TP5/SL6 → $4.15M · DD 1.98% · WR 54.3% · PF 5.30
+2. WHALE_MAX 200 TP5/SL5 → $4.12M · DD 1.18% · WR 49.8% · PF 4.41
+3. WHALE_MAX 200 TP6/SL6 → $4.09M · DD 0.87% · WR 50.1% · PF 5.38 ⭐ MAIN current default
+4. WHALE_MAX 200 TP4/SL6 → $4.08M · DD 2.16% · WR 59.5% · PF 5.22
+5. WHALE_MAX 200 TP3/SL6 → $4.06M · DD 1.61% · WR 66.3% · PF 5.18
+
+**🏆 TOP 5 BY PF (TP cao + SL=8 dominate):**
+1. WHALE_MAX 200 **TP12/SL8** → PF **7.53** · NET $3.16M · DD 6.46%
+2. TOMI_MID 100 **TP12/SL8** → PF 7.52 · NET $1.59M · DD 3.51% (KHÔNG có trong app!)
+3. WHALE_MID 100 **TP10/SL8** → PF 7.42 · NET $1.80M · DD 2.34%
+4. TOMI_MIN 50 **TP12/SL8** → PF 7.42 · NET $845k · DD 3.39%
+5. WHALE_MID 100 **TP12/SL8** → PF 7.39 · NET $1.66M · DD 2.51%
+
+**🏆 TOP 5 MIN DD (NET >$100k filter):**
+1. WHALE_MID 100 TP6/SL6 → DD **0.10%** · NET $2.31M · PF 5.41 ← current `WHALE_MID_66`
+2. TOMI_MAX 200 TP5/SL5 → DD 0.10% · NET $3.05M · PF 4.43 ← current `TOMI_MAX_55`
+3. TOMI_MIN 50 TP8/SL8 → DD 0.12% · NET $986k · PF 7.18
+4. TOMI_MAX 200 TP6/SL6 → DD 0.13% · NET $3.08M · PF 5.22
+5. WHALE_MAX 200 TP8/SL8 → DD 0.14% · NET $3.65M · PF 7.18 ← current `WHALE_MAX_88`
+
+**🚨 DISASTERS — TP cao + SL=2 = BLOW UP (TUYỆT ĐỐI KHÔNG dùng):**
+- WHALE_MAX TP10/SL2 → DD **108.57%** · NET -$6k · WR 7.0%  ← **liquidation!**
+- WHALE_MAX TP12/SL2 → DD 105.27% · NET -$6k · WR 6.3%
+- TOMI_MAX TP8/SL2 → DD 107.10% · NET -$6k · WR 10.6%
+- TOMI_MAX TP10/SL2 → DD 105.70% · NET -$5k · WR 5.6%
+- TOMI_MID TP10/SL2 → DD 105.70% · NET -$5k · WR 5.6%
+- → **Pattern:** SL=2% với leverage 100x = -$6 (=$30 margin × 2% × 100x → 20% margin loss/lệnh) × 75-200 stack → equity blow.
+- → **Rule of thumb:** SL >= TP/2 mới safe, SL < TP/3 = burn.
+
+**🎯 KEY PATTERNS từ 280 runs:**
+
+1. **TP12/SL8 ratio 1.5:1 = best PF universal** — winner across all 5 stacks (WHALE 200/100, TOMI 200/100/50)
+2. **SL=8 thắng SL=6 về PF** (dù NET có thể thấp hơn) — SL rộng = ít stop sớm = PF cao hơn
+3. **TP=3 high-WR (72%), TP=12 low-WR (~50%) but PF cao hơn** — đánh đổi WR vs PF
+4. **Stack 200 dominate top NET** (4/5 top NET là stack 200) — capacity quan trọng hơn quality cho NET tổng
+5. **DD<1% phần lớn là TP=SL hoặc TP<SL** — symmetric/conservative TP/SL
+6. **Spec winner luôn LONG side bias** — backtest period 2023-2026 BTC trend tổng thể UP
+7. **TP=8 sweet spot** — nhiều combo TP=8 có PF 7+ và DD <0.5%
+
+**📋 CURRENT STATE (sau v4.8.34 — Tommy add lại 3 LEGACY):**
+- 10 presets active: 7 picks (composite rank tốt) + 3 LEGACY (TP5/SL2.5 + TP4/SL4)
+- 3 LEGACY có DD cao (8.02%, 2.59%, 0.28%) so với variants cùng stack (0.87%, 0.10%, 1.18%)
+- Migration map đã có: old key auto map sang variant tốt hơn cùng stack
+
+**🔮 FUTURE BACKTEST RECOMMENDATIONS:**
+
+1. **Mở rộng grid TP `[15, 20, 25, 30]`** — vì 5/5 best PF đều pick TP=12 (max grid hiện tại) → có thể TP cao hơn còn ăn nhiều hơn
+2. **Test SL `[1.5, 1.75]` với TP=3** — high-WR sniper mode chưa test
+3. **Test ASYMMETRIC ratio TP:SL = 2:1, 3:1** — đa số top PF là 1.5:1, có thể thử cao hơn
+4. **Test out-of-sample 2020-2022** — backtest hiện tại trend BTC up nhiều, cần verify trên downtrend period
+5. **Test STACK 300, 500** — chưa biết capacity vs quality tradeoff ở stack lớn
+6. **Test STOCH levels khác** — current WHALE 10/90, TOMI 5/95. Thử WHALE 15/85 cho nhiều entry hơn
+7. **Test S/R proximity 0.5%, 0.6%** — current WHALE 0.4, TOMI 0.2
+
+**🚧 PITFALLS cho Claude tiếp theo:**
+
+1. **ĐỪNG dùng SL<3% với leverage 100x** — risk liquidation cao
+2. **ĐỪNG quá tin top NET** — top NET (TP5/SL6 PF 5.30) không bằng top PF (TP12/SL8 PF 7.53). Tommy ưu tiên PF (consistency) hơn NET (max yolo)
+3. **DD% là PEAK-TO-TROUGH** trong period, không phải mỗi lệnh — DD 8% nghĩa là equity sụt 8% từ peak, có thể recover
+4. **WR thấp (50%) + PF cao (7+) = OK** — winners lớn hơn losers nhiều, khác với rule HTF cần WR ≥ 30%
+5. **Stack 200 = max margin lock $6000** ($30 × 200) — đảm bảo capital >= $5000 + 20% buffer
+6. **TPSL_GRID_v1 là TRUTH cho 5m ALL TP/SL** — đừng dùng `STACK_SWEEP_v1` cũ (superseded)
+7. **Check `equityTrend: "UP"`** trước khi recommend rule — nếu DOWN thì rule đã hết edge dù NET dương
+
+**🔄 RESUME COMMAND:**
+```
+"Anh Tommy resume TPSL_GRID_v1 — em xem lại 280 combos cleanup 5m ALL presets (current 10 → propose 7 picks)"
+```
+- Read: `assets/preset_shortlist_v1.json` (full grid backup)
+- Read: `utils/all5mAccount.ts` PRESETS object (current state)
+- Recommend: drop 3 LEGACY (DD cao + PF thấp) hoặc replace bằng best PF picks (TP12/SL8 family)
 
 ### `SHORTLIST_v1`
 - **Parent:** `TPSL_GRID_v1`
