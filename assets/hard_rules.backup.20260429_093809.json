@@ -30,7 +30,7 @@
             "label": "Stoch 5m + S/R 15m fallback",
             "disabled": true,
             "disabledAt": 1777278197804,
-            "disabledReason": "Mode E backtest 3y: NET -332k%, drag down full TF \u2014 disabled v4.7.26"
+            "disabledReason": "Mode E backtest 3y: NET -332k%, drag down full TF — disabled v4.7.26"
           },
           "stats": {
             "winRate": 36.68,
@@ -193,7 +193,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u"
+              "label": "cả 1h + 4h cùng chiều"
             }
           },
           "stats": {
@@ -210,7 +210,7 @@
             "feeCost": 18250,
             "netPnL": 16056,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 2,
@@ -327,7 +327,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1470
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 44% \u00b7 NET +46700%",
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44% · NET +46700%",
           "compositeScore": 46700
         },
         {
@@ -349,7 +349,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "4h c\u00f9ng chi\u1ec1u"
+              "label": "4h cùng chiều"
             }
           },
           "stats": {
@@ -366,7 +366,7 @@
             "feeCost": 25620,
             "netPnL": 11297,
             "side": "SHORT",
-            "htfFilterLabel": "4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "4h cùng chiều",
             "originalTP": 3,
             "originalSL": 1.5,
             "rescuedAt": "2026-04-22T11:15:16.911Z",
@@ -480,7 +480,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1786
           },
-          "label": "[HTF SHORT] MACD + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 41.5% \u00b7 NET +42330%",
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 41.5% · NET +42330%",
           "compositeScore": 42330
         },
         {
@@ -502,11 +502,8 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u"
-            },
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 15m:2 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+              "label": "cả 1h + 4h cùng chiều"
+            }
           },
           "stats": {
             "winRate": 45.1,
@@ -522,7 +519,7 @@
             "feeCost": 18250,
             "netPnL": 10514,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
             "originalTP": 2,
             "originalSL": 1,
             "rescuedAt": "2026-04-22T11:15:16.911Z",
@@ -636,7 +633,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 2336
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u TP+2% SL-1% \u00b7 WR 44.9% \u00b7 NET +39450%",
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+2% SL-1% · WR 44.9% · NET +39450%",
           "compositeScore": 39450
         },
         {
@@ -658,13 +655,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u"
+              "label": "cả 1h + 4h cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 15m:2 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 45.1,
@@ -680,7 +674,7 @@
             "feeCost": 18250,
             "netPnL": 10514,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
             "originalTP": 3,
             "originalSL": 1,
             "rescuedAt": "2026-04-22T11:15:16.911Z",
@@ -796,7 +790,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 2336
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1% \u00b7 WR 34.3% \u00b7 NET +38250%",
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1% · WR 34.3% · NET +38250%",
           "compositeScore": 38250
         },
         {
@@ -818,13 +812,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "4h c\u00f9ng chi\u1ec1u"
+              "label": "4h cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 15m:8 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 44.3,
@@ -840,7 +831,7 @@
             "feeCost": 25620,
             "netPnL": 11297,
             "side": "SHORT",
-            "htfFilterLabel": "4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "4h cùng chiều",
             "originalTP": 2,
             "originalSL": 1,
             "rescuedAt": "2026-04-22T11:15:16.911Z",
@@ -956,7 +947,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1786
           },
-          "label": "[HTF SHORT] MACD + 4h c\u00f9ng chi\u1ec1u TP+2% SL-1% \u00b7 WR 42.3% \u00b7 NET +35880%",
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+2% SL-1% · WR 42.3% · NET +35880%",
           "compositeScore": 35880
         },
         {
@@ -978,13 +969,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u"
+              "label": "cả 1h + 4h cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.600Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 15m:2 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 28.4,
@@ -1000,7 +988,7 @@
             "feeCost": 1457,
             "netPnL": 16056,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 1h + 4h cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 2,
@@ -1119,13 +1107,13 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1470
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 44.1% \u00b7 NET +5068%",
+          "label": "[HTF SHORT] MACD + cả 1h + 4h cùng chiều TP+3% SL-1.5% · WR 44.1% · NET +5068%",
           "compositeScore": 5068
         },
         {
           "rank": 16,
           "source": "flipped-from-15m-rank12",
-          "label": "[FLIPPED] SHORT\u2192LONG [HTF SHORT] MACD + 1h c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 41.4% \u00b7 NET +34160%",
+          "label": "[FLIPPED] SHORT→LONG [HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
           "config": {
             "leverage": 100,
             "targetPct": 1.5,
@@ -1142,11 +1130,11 @@
             "forceSide": "LONG",
             "htfTrendFilter": {
               "mode": "near_match",
-              "label": "1h c\u00f9ng chi\u1ec1u",
+              "label": "1h cùng chiều",
               "invertedFromFlip": true
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%"
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "side": "LONG",
@@ -1167,7 +1155,7 @@
             "tier": "BRONZE",
             "injectedAt": "2026-04-22T12:29:51.040Z",
             "disabledAt": "2026-04-22T12:30:01.040Z",
-            "disabledReason": "post-flip-review: edge \u00e2m ho\u1eb7c overfit",
+            "disabledReason": "post-flip-review: edge âm hoặc overfit",
             "avgHold": 63.5,
             "lastBacktestAt": "2026-04-24T10:23:30.927Z",
             "lastBacktestSource": "backtest_active_3y_6tf",
@@ -1298,7 +1286,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "near_match",
-              "label": "1h c\u00f9ng chi\u1ec1u"
+              "label": "1h cùng chiều"
             }
           },
           "stats": {
@@ -1315,7 +1303,7 @@
             "feeCost": 21040,
             "netPnL": 3855,
             "side": "SHORT",
-            "htfFilterLabel": "1h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1h cùng chiều",
             "originalTP": 2,
             "originalSL": 1,
             "rescuedAt": "2026-04-22T11:15:16.911Z",
@@ -1429,7 +1417,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 3200
           },
-          "label": "[HTF SHORT] MACD + 1h c\u00f9ng chi\u1ec1u TP+2% SL-1% \u00b7 WR 43.2% \u00b7 NET +34460%",
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+2% SL-1% · WR 43.2% · NET +34460%",
           "compositeScore": 34460
         },
         {
@@ -1451,13 +1439,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "near_match",
-              "label": "1h c\u00f9ng chi\u1ec1u"
+              "label": "1h cùng chiều"
             },
             "revivedAt": "2026-04-24T09:21:35.962Z",
-            "revivedNote": "enable-safe-rules: n=1053 WR=41.3% PF=1.18 (source=backtest_3y)",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 15m:22 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "enable-safe-rules: n=1053 WR=41.3% PF=1.18 (source=backtest_3y)"
           },
           "stats": {
             "winRate": 41.3,
@@ -1473,7 +1458,7 @@
             "feeCost": 21040,
             "netPnL": 3855,
             "side": "SHORT",
-            "htfFilterLabel": "1h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1h cùng chiều",
             "originalTP": 3,
             "originalSL": 1.5,
             "rescuedAt": "2026-04-22T11:15:16.911Z",
@@ -1593,7 +1578,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 3200
           },
-          "label": "[HTF SHORT] MACD + 1h c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 41.4% \u00b7 NET +34160%",
+          "label": "[HTF SHORT] MACD + 1h cùng chiều TP+3% SL-1.5% · WR 41.4% · NET +34160%",
           "compositeScore": 34160
         }
       ]
@@ -2025,10 +2010,7 @@
               "rsiExtreme",
               "divergence"
             ],
-            "forceSide": "LONG",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+            "forceSide": "LONG"
           },
           "stats": {
             "winRate": 8.3,
@@ -2065,7 +2047,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 510
           },
-          "label": "[LONG] RSI+Div TP+10% SL-5% \u00b7 WR 50% \u00b7 NET +840%",
+          "label": "[LONG] RSI+Div TP+10% SL-5% · WR 50% · NET +840%",
           "compositeScore": 840
         },
         {
@@ -2085,10 +2067,7 @@
               "rsiExtreme",
               "divergence"
             ],
-            "forceSide": "LONG",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:30 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "forceSide": "LONG"
           },
           "stats": {
             "winRate": 41.7,
@@ -2125,7 +2104,7 @@
             "equityTrend": "FLAT",
             "maxDrawdownPct": 310
           },
-          "label": "[LONG] RSI+Div TP+5% SL-3% \u00b7 WR 41.7% \u00b7 NET +240%",
+          "label": "[LONG] RSI+Div TP+5% SL-3% · WR 41.7% · NET +240%",
           "compositeScore": 240
         },
         {
@@ -2145,10 +2124,7 @@
               "rsiExtreme",
               "divergence"
             ],
-            "forceSide": "LONG",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:30 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "forceSide": "LONG"
           },
           "stats": {
             "winRate": 16.7,
@@ -2185,7 +2161,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 310
           },
-          "label": "[LONG] RSI+Div TP+8% SL-3% \u00b7 WR 30% \u00b7 NET +140%",
+          "label": "[LONG] RSI+Div TP+8% SL-3% · WR 30% · NET +140%",
           "compositeScore": 140
         },
         {
@@ -2207,11 +2183,8 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u"
-            },
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:18 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+              "label": "1d cùng chiều"
+            }
           },
           "stats": {
             "winRate": 26.2,
@@ -2227,7 +2200,7 @@
             "feeCost": 4530,
             "netPnL": 2597,
             "side": "SHORT",
-            "htfFilterLabel": "1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1d cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 5,
@@ -2309,7 +2282,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1459
           },
-          "label": "[HTF SHORT] Div + 1d c\u00f9ng chi\u1ec1u TP+5% SL-3% \u00b7 WR 50.9% \u00b7 NET +30070%",
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-3% · WR 50.9% · NET +30070%",
           "compositeScore": 30070
         },
         {
@@ -2331,10 +2304,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u"
+              "label": "cả 4h + 1d cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%"
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 33.5,
@@ -2350,7 +2323,7 @@
             "feeCost": 18520,
             "netPnL": 11972,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 4,
@@ -2467,7 +2440,7 @@
             "equityTrend": "FLAT",
             "maxDrawdownPct": 1500
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u TP+3% SL-1% \u00b7 WR 30.9% \u00b7 NET +24980%",
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1% · WR 30.9% · NET +24980%",
           "compositeScore": 24980
         },
         {
@@ -2489,13 +2462,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "near_match",
-              "label": "4h c\u00f9ng chi\u1ec1u"
+              "label": "4h cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:4 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 38.9,
@@ -2511,7 +2481,7 @@
             "feeCost": 22470,
             "netPnL": 11277,
             "side": "SHORT",
-            "htfFilterLabel": "4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "4h cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 3,
@@ -2628,7 +2598,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1810
           },
-          "label": "[HTF SHORT] MACD + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 38% \u00b7 NET +24180%",
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1.5% · WR 38% · NET +24180%",
           "compositeScore": 24180
         },
         {
@@ -2650,13 +2620,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u"
+              "label": "cả 4h + 1d cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:7 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 40.5,
@@ -2672,7 +2639,7 @@
             "feeCost": 18520,
             "netPnL": 10184,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 4,
@@ -2789,7 +2756,7 @@
             "equityTrend": "FLAT",
             "maxDrawdownPct": 1810
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 38.4% \u00b7 NET +23930%",
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+3% SL-1.5% · WR 38.4% · NET +23930%",
           "compositeScore": 23930
         },
         {
@@ -2811,7 +2778,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "near_match",
-              "label": "4h c\u00f9ng chi\u1ec1u"
+              "label": "4h cùng chiều"
             }
           },
           "stats": {
@@ -2828,7 +2795,7 @@
             "feeCost": 22470,
             "netPnL": 14417,
             "side": "SHORT",
-            "htfFilterLabel": "4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "4h cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 3,
@@ -2945,7 +2912,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1610
           },
-          "label": "[HTF SHORT] MACD + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1% \u00b7 WR 30% \u00b7 NET +22130%",
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +22130%",
           "compositeScore": 22130
         },
         {
@@ -2967,11 +2934,8 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u"
-            },
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:18 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+              "label": "1d cùng chiều"
+            }
           },
           "stats": {
             "winRate": 24.3,
@@ -2987,7 +2951,7 @@
             "feeCost": 4530,
             "netPnL": 1427,
             "side": "SHORT",
-            "htfFilterLabel": "1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1d cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 5,
@@ -3074,7 +3038,7 @@
             "equityTrend": "FLAT",
             "maxDrawdownPct": 1555
           },
-          "label": "[HTF SHORT] Div + 1d c\u00f9ng chi\u1ec1u TP+5% SL-2% \u00b7 WR 37.5% \u00b7 NET +19970%",
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+5% SL-2% · WR 37.5% · NET +19970%",
           "compositeScore": 19970
         },
         {
@@ -3096,13 +3060,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u"
+              "label": "1d cùng chiều"
             },
             "revivedAt": "2026-04-24T09:21:35.962Z",
-            "revivedNote": "enable-safe-rules: n=481 WR=37% PF=1.23 (source=backtest_3y)",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:17 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "enable-safe-rules: n=481 WR=37% PF=1.23 (source=backtest_3y)"
           },
           "stats": {
             "winRate": 37,
@@ -3118,7 +3079,7 @@
             "feeCost": 29360,
             "netPnL": 5135,
             "side": "SHORT",
-            "htfFilterLabel": "1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1d cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 4,
@@ -3235,7 +3196,7 @@
             "equityTrend": "DOWN",
             "maxDrawdownPct": 2378
           },
-          "label": "[HTF SHORT] MACD + 1d c\u00f9ng chi\u1ec1u TP+3% SL-1.5% \u00b7 WR 36.7% \u00b7 NET +14890%",
+          "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1.5% · WR 36.7% · NET +14890%",
           "compositeScore": 14890
         },
         {
@@ -3258,7 +3219,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u"
+              "label": "1d cùng chiều"
             }
           },
           "stats": {
@@ -3275,7 +3236,7 @@
             "feeCost": 2490,
             "netPnL": 1952,
             "side": "SHORT",
-            "htfFilterLabel": "1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1d cùng chiều",
             "deadAt": "2026-04-22T11:15:16.911Z",
             "bestAttempt": {
               "tp": 4,
@@ -3343,7 +3304,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 998
           },
-          "label": "[HTF SHORT] Div+MACD + 1d c\u00f9ng chi\u1ec1u TP+5% SL-3% \u00b7 WR 49.1% \u00b7 NET +13810%",
+          "label": "[HTF SHORT] Div+MACD + 1d cùng chiều TP+5% SL-3% · WR 49.1% · NET +13810%",
           "compositeScore": 13810
         },
         {
@@ -3365,11 +3326,8 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u"
-            },
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:7 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+              "label": "cả 4h + 1d cùng chiều"
+            }
           },
           "stats": {
             "winRate": 41.5,
@@ -3385,7 +3343,7 @@
             "feeCost": 18520,
             "netPnL": 8684,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 4,
@@ -3502,7 +3460,7 @@
             "equityTrend": "FLAT",
             "maxDrawdownPct": 1860
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u TP+2% SL-1% \u00b7 WR 38.8% \u00b7 NET +11680%",
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +11680%",
           "compositeScore": 11680
         },
         {
@@ -3524,7 +3482,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u"
+              "label": "1d cùng chiều"
             }
           },
           "stats": {
@@ -3541,7 +3499,7 @@
             "feeCost": 4530,
             "netPnL": 6144,
             "side": "SHORT",
-            "htfFilterLabel": "1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1d cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 5,
@@ -3628,7 +3586,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1459
           },
-          "label": "[HTF SHORT] Div + 1d c\u00f9ng chi\u1ec1u TP+8% SL-3% \u00b7 WR 33.1% \u00b7 NET +10470%",
+          "label": "[HTF SHORT] Div + 1d cùng chiều TP+8% SL-3% · WR 33.1% · NET +10470%",
           "compositeScore": 10470
         },
         {
@@ -3650,13 +3608,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "near_match",
-              "label": "4h c\u00f9ng chi\u1ec1u"
+              "label": "4h cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:4 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 32.2,
@@ -3672,7 +3627,7 @@
             "feeCost": 1797,
             "netPnL": 14417,
             "side": "SHORT",
-            "htfFilterLabel": "4h c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "4h cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 3,
@@ -3791,7 +3746,7 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1610
           },
-          "label": "[HTF SHORT] MACD + 4h c\u00f9ng chi\u1ec1u TP+3% SL-1% \u00b7 WR 30% \u00b7 NET +2673%",
+          "label": "[HTF SHORT] MACD + 4h cùng chiều TP+3% SL-1% · WR 30% · NET +2673%",
           "compositeScore": 2673
         },
         {
@@ -3813,13 +3768,10 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "both_match",
-              "label": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u"
+              "label": "cả 4h + 1d cùng chiều"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:7 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 41.5,
@@ -3835,7 +3787,7 @@
             "feeCost": 1481,
             "netPnL": 8684,
             "side": "SHORT",
-            "htfFilterLabel": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "cả 4h + 1d cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 4,
@@ -3954,7 +3906,7 @@
             "equityTrend": "FLAT",
             "maxDrawdownPct": 1860
           },
-          "label": "[HTF SHORT] MACD + c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u TP+2% SL-1% \u00b7 WR 38.8% \u00b7 NET +1549%",
+          "label": "[HTF SHORT] MACD + cả 4h + 1d cùng chiều TP+2% SL-1% · WR 38.8% · NET +1549%",
           "compositeScore": 1549
         },
         {
@@ -3976,7 +3928,7 @@
             "forceSide": "SHORT",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u"
+              "label": "1d cùng chiều"
             }
           },
           "stats": {
@@ -3993,7 +3945,7 @@
             "feeCost": 2348,
             "netPnL": 6510,
             "side": "SHORT",
-            "htfFilterLabel": "1d c\u00f9ng chi\u1ec1u",
+            "htfFilterLabel": "1d cùng chiều",
             "needsReview": true,
             "improvedSuggestion": {
               "tp": 4,
@@ -4116,13 +4068,13 @@
             "equityTrend": "DOWN",
             "maxDrawdownPct": 2500
           },
-          "label": "[HTF SHORT] MACD + 1d c\u00f9ng chi\u1ec1u TP+3% SL-1% \u00b7 WR 28.1% \u00b7 NET +1252%",
+          "label": "[HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
           "compositeScore": 1252
         },
         {
           "rank": 6,
           "source": "flipped-from-1h-rank29",
-          "label": "[FLIPPED] SHORT\u2192LONG [HTF SHORT] MACD + 1d c\u00f9ng chi\u1ec1u TP+3% SL-1% \u00b7 WR 28.1% \u00b7 NET +1252%",
+          "label": "[FLIPPED] SHORT→LONG [HTF SHORT] MACD + 1d cùng chiều TP+3% SL-1% · WR 28.1% · NET +1252%",
           "config": {
             "leverage": 100,
             "targetPct": 3,
@@ -4139,11 +4091,11 @@
             "forceSide": "LONG",
             "htfTrendFilter": {
               "mode": "far_match",
-              "label": "1d c\u00f9ng chi\u1ec1u",
+              "label": "1d cùng chiều",
               "invertedFromFlip": true
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%"
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n≥247 PF≥1.28 NET +8k%~+16k%"
           },
           "stats": {
             "side": "LONG",
@@ -4164,7 +4116,7 @@
             "tier": "BRONZE",
             "injectedAt": "2026-04-22T12:29:51.040Z",
             "disabledAt": "2026-04-22T12:30:01.040Z",
-            "disabledReason": "post-flip-review: edge \u00e2m ho\u1eb7c overfit",
+            "disabledReason": "post-flip-review: edge âm hoặc overfit",
             "avgHold": 60,
             "lastBacktestAt": "2026-04-24T10:23:30.927Z",
             "lastBacktestSource": "backtest_active_3y_6tf",
@@ -4279,7 +4231,7 @@
         {
           "rank": 26,
           "source": "GPT_HIGHWR_1H_v2",
-          "label": "[GPT-V2 1H] EMA0.5-2% & ATR<0.3% & HTF4h UP \u2014 WR 71.7% n=245 NET +329%",
+          "label": "[GPT-V2 1H] EMA0.5-2% & ATR<0.3% & HTF4h UP — WR 71.7% n=245 NET +329%",
           "config": {
             "leverage": 100,
             "targetPct": 3,
@@ -4304,7 +4256,7 @@
               "min": 0.5,
               "max": 2
             },
-            "note": "Verified 3y post-fee 0.05%/side. PF 3.81. Spec-aligned: SL\u2192TP, entry@close, one-position."
+            "note": "Verified 3y post-fee 0.05%/side. PF 3.81. Spec-aligned: SL→TP, entry@close, one-position."
           },
           "stats": {
             "side": "LONG",
@@ -4357,7 +4309,7 @@
         {
           "rank": 25,
           "source": "GPT_HIGHWR_1H_v2",
-          "label": "[GPT-V2 1H] RSI55-70 & EMA0.5-2% & ATR<0.3% & HTF4h UP \u2014 WR 73.4% n=183 NET +264%",
+          "label": "[GPT-V2 1H] RSI55-70 & EMA0.5-2% & ATR<0.3% & HTF4h UP — WR 73.4% n=183 NET +264%",
           "config": {
             "leverage": 100,
             "targetPct": 3,
@@ -4438,7 +4390,7 @@
         {
           "rank": 24,
           "source": "GPT_HIGHWR_1H_v2",
-          "label": "[GPT-V2 1H] RSI55-70 & ATR<0.3% & HTF4h UP \u2014 WR 65.7% n=312 NET +321%",
+          "label": "[GPT-V2 1H] RSI55-70 & ATR<0.3% & HTF4h UP — WR 65.7% n=312 NET +321%",
           "config": {
             "leverage": 100,
             "targetPct": 3,
@@ -4548,10 +4500,7 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "macdCross"
-            ],
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+            ]
           },
           "stats": {
             "winRate": 40.7,
@@ -4612,7 +4561,7 @@
         {
           "rank": 19,
           "source": "GPT_4H_v1",
-          "label": "[GPT 4H v1] MACD>100 + ATR1-2% + Body>2% + HTF1d UP \u2014 WR 60% n=36 NET +6640%",
+          "label": "[GPT 4H v1] MACD>100 + ATR1-2% + Body>2% + HTF1d UP — WR 60% n=36 NET +6640%",
           "config": {
             "leverage": 100,
             "targetPct": 5,
@@ -4730,7 +4679,7 @@
         {
           "rank": 46,
           "source": "GPT_4H_v1",
-          "label": "[GPT 4H v1] RSI45-55 + MACD0-100 + Body0.3-1% + HTF1d UP \u2014 WR 55% n=42 NET +6080%",
+          "label": "[GPT 4H v1] RSI45-55 + MACD0-100 + Body0.3-1% + HTF1d UP — WR 55% n=42 NET +6080%",
           "config": {
             "leverage": 100,
             "targetPct": 5,
@@ -4857,7 +4806,7 @@
         {
           "rank": 20,
           "source": "GPT_4H_v1",
-          "label": "[GPT 4H v1] BB%>100 + Body>2% + CONT + HTF1d UP \u2014 WR 56.3% n=34 NET +5160%",
+          "label": "[GPT 4H v1] BB%>100 + Body>2% + CONT + HTF1d UP — WR 56.3% n=34 NET +5160%",
           "config": {
             "leverage": 100,
             "targetPct": 5,
@@ -4946,7 +4895,7 @@
         {
           "rank": 37,
           "source": "GPT_4H_v1",
-          "label": "[GPT 4H v1] RSI>70 + BB%75-100 + DOWN_REV + HTF1d UP \u2014 WR 57.1% n=31 NET +4690%",
+          "label": "[GPT 4H v1] RSI>70 + BB%75-100 + DOWN_REV + HTF1d UP — WR 57.1% n=31 NET +4690%",
           "config": {
             "leverage": 100,
             "targetPct": 5,
@@ -4974,10 +4923,7 @@
               "kind": "DOWN_REV"
             },
             "gptFeatureRule": "rsi:>70 & bb%:75-100 & rev:DOWN_REV & htf:UP",
-            "note": "Spec-aligned 3y scan. PF 2.67. Mua khi pullback nh\u1eb9 trong xu th\u1ebf t\u0103ng.",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+            "note": "Spec-aligned 3y scan. PF 2.67. Mua khi pullback nhẹ trong xu thế tăng."
           },
           "stats": {
             "side": "LONG",
@@ -5016,7 +4962,7 @@
         {
           "rank": 40,
           "source": "GPT_4H_v1",
-          "label": "[GPT 4H v1] RSI30-45 + MACD-100..0 + Body0.3-1% + HTF1d UP \u2014 WR 55.6% n=30 NET +4200%",
+          "label": "[GPT 4H v1] RSI30-45 + MACD-100..0 + Body0.3-1% + HTF1d UP — WR 55.6% n=30 NET +4200%",
           "config": {
             "leverage": 100,
             "targetPct": 5,
@@ -5047,7 +4993,7 @@
               "max": 1
             },
             "gptFeatureRule": "rsi:30-45 & macd:-100..0 & body:0.3-1% & htf:UP",
-            "note": "Spec-aligned 3y scan. PF 2.50. Mua \u0111\u00e1y trong xu th\u1ebf t\u0103ng (RSI low + macd hist c\u00f2n \u00e2m)."
+            "note": "Spec-aligned 3y scan. PF 2.50. Mua đáy trong xu thế tăng (RSI low + macd hist còn âm)."
           },
           "stats": {
             "side": "LONG",
@@ -5164,10 +5110,7 @@
             "rsiOSLevel": 25,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+            ]
           },
           "stats": {
             "winRate": 66.7,
@@ -5219,10 +5162,7 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+            ]
           },
           "stats": {
             "winRate": 75,
@@ -5282,10 +5222,7 @@
             "rsiOSLevel": 30,
             "requiredConditions": [
               "divergence"
-            ],
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1d:36 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            ]
           },
           "stats": {
             "winRate": 66.7,
@@ -5348,10 +5285,7 @@
             "requiredConditions": [
               "divergence"
             ],
-            "forceSide": "SHORT",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+            "forceSide": "SHORT"
           },
           "stats": {
             "winRate": 85.7,
@@ -5414,10 +5348,7 @@
             "requiredConditions": [
               "divergence"
             ],
-            "forceSide": "SHORT",
-            "disabled": true,
-            "disabledAt": 1777430320365,
-            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1d:34 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+            "forceSide": "SHORT"
           },
           "stats": {
             "winRate": 75,
@@ -5507,51 +5438,5 @@
     "backup": "assets/hard_rules.backup-flipped-live-2026-04-23T10-06-10-455Z.json",
     "updatedAt": "2026-04-23T10:06:10.455Z"
   },
-  "last_baseline_5m_injected_at": "2026-04-24T17:24:26.038Z",
-  "cleanup_2026-04-29": {
-    "type": "safe_remove_only",
-    "applied_at": 1777430320365,
-    "disabled_count": 23,
-    "removed_dup": [
-      "15m:3",
-      "15m:11",
-      "15m:12",
-      "15m:9",
-      "15m:23",
-      "1h:5",
-      "1h:10",
-      "1h:13",
-      "1h:14",
-      "1h:15",
-      "1h:21",
-      "1h:27",
-      "1h:35",
-      "1h:31",
-      "1h:33",
-      "1d:41",
-      "1d:42"
-    ],
-    "removed_rare": [
-      "1d:34",
-      "1d:36",
-      "1d:49",
-      "1h:30",
-      "4h:37",
-      "4h:57"
-    ],
-    "kept_dup_representatives": [
-      "15m:2",
-      "15m:22",
-      "15m:8",
-      "1d:34",
-      "1d:36",
-      "1h:17",
-      "1h:18",
-      "1h:30",
-      "1h:4",
-      "1h:7"
-    ],
-    "tp_sl_unchanged": "100% \u2014 only set disabled flag, no TP/SL modification \u2192 LIVE budget unchanged",
-    "source_backtest": "TPSL_GRID_v1 (assets/backtest_htf_tpsl_grid_3y.json)"
-  }
+  "last_baseline_5m_injected_at": "2026-04-24T17:24:26.038Z"
 }
