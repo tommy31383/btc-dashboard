@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { BINANCE_REST, BINANCE_WS } from "../utils/constants";
+import { onWsMessage } from "../utils/backendApi";
 
 const THROTTLE_MS = 500; // Update UI max 2x per second
 
@@ -92,8 +93,33 @@ export function useBinancePrice(): UseBinancePriceResult {
     if (pollRef.current) return;
     setConnectionStatus("POLLING");
     fetchREST();
-    pollRef.current = setInterval(fetchREST, 3000);
+    // v4.8.35 (anh Tommy Phương án A): 3s → 10s — giảm 70% Binance hit từ client.
+    // WS connection là primary, REST chỉ là fallback khi WS fail/down.
+    // 10s khi server WS markPrice không nuôi price; nếu có push từ server → coi là LIVE.
+    pollRef.current = setInterval(fetchREST, 10000);
   }, [fetchREST]);
+
+  // v4.8.35 (anh Tommy B3): subscribe markPrice từ server WS để bypass Binance WS.
+  // Server đã maintain WS connection tới Binance, push price ~1s → giảm 1 connection per client.
+  useEffect(() => {
+    const off = onWsMessage((msg) => {
+      if (msg?.type === "markPrice" && typeof msg.price === "number") {
+        // Update price field nhanh; high/low/volume giữ giá trị cũ từ REST 24h ticker.
+        if (mountedRef.current) {
+          setConnectionStatus("LIVE");
+          setPriceData((prev) => prev
+            ? { ...prev, price: msg.price }
+            : { price: msg.price, change24h: 0, changePct24h: 0, high24h: 0, low24h: 0, volume24h: 0 });
+          setPriceHistory((prevH) => {
+            const next = [...prevH, msg.price];
+            return next.length > MAX_HISTORY ? next.slice(-MAX_HISTORY) : next;
+          });
+          lastUpdateRef.current = Date.now();
+        }
+      }
+    });
+    return off;
+  }, []);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {

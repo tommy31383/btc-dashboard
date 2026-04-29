@@ -63,7 +63,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.8.34";
+const APP_VERSION = "4.8.35";
 const BUILD_DATE = "2026-04-28";
 
 /**
@@ -190,7 +190,9 @@ export default function App() {
       : null;
     return { stoch5m, support15m, resistance15m, closedBar5m };
   })();
-  const live = useBinanceLive(activeAlerts, priceData?.price ?? null, ltfCtx);
+  // v4.8.35 (B1): gate useBinanceLive — chỉ poll khi user vào LIVE tab.
+  // Server đã own trading nên hook chỉ dùng để render UI tab LIVE.
+  const live = useBinanceLive(activeAlerts, priceData?.price ?? null, ltfCtx, activeTab === "live");
 
   // v4.3.44 — 15m All trader: PC-only, local AsyncStorage, LONG every closed 15m bar
   // 15m All trader disabled — replaced by LIVE tab

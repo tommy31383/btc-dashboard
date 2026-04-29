@@ -77,6 +77,7 @@ export function useBinanceLive(
   activeAlerts: RuleAlert[],
   currentPrice: number | null = null,
   ltfCtx: { stoch5m: number | null; support15m: number | null; resistance15m: number | null; closedBar5m?: { time: number; close: number } | null } = { stoch5m: null, support15m: null, resistance15m: null, closedBar5m: null },
+  enabled: boolean = true,  // v4.8.35 (anh Tommy Phương án B1): gate khi không vào LIVE tab → 0 Binance hit
 ): UseBinanceLiveResult {
   const [state, setState] = useState<LiveTraderState>(() => emptyState());
   const [account, setAccount] = useState<AccountSnapshot | null>(null);
@@ -350,6 +351,7 @@ export function useBinanceLive(
 
   // Poll Binance state every 30s — CHỈ LEADER (follower đọc snapshot từ gist)
   useEffect(() => {
+    if (!enabled) return; // v4.8.35 (B1): gate khi không vào LIVE tab
     if (role !== "LEADER") return;
     if (!state.apiKey || !state.apiSecret) return;
     let alive = true;

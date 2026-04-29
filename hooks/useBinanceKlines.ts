@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BINANCE_REST, TIMEFRAMES, TimeframeKey } from "../utils/constants";
+import { SERVER_URL } from "../utils/backendApi";
 import {
   calcRSI,
   calcStochRSI,
@@ -145,8 +146,22 @@ export function useBinanceKlines(): {
 
   const fetchAllKlines = useCallback(async () => {
     try {
+      // v4.8.35 (anh Tommy B2): try server proxy trước (cùng region SG, server đã cache).
+      // Fallback Binance public API nếu server lỗi/down.
       const results = await Promise.all(
         TIMEFRAMES.map(async (tf) => {
+          try {
+            const r = await fetch(`${SERVER_URL}/api/binance/klines/${tf.interval}?full=1`);
+            if (r.ok) {
+              const j = await r.json();
+              if (Array.isArray(j.bars) && j.bars.length > 0) {
+                // Server bars format: { time, open, high, low, close, volume } → map vào kline tuple
+                const data = j.bars.map((b: any) => [b.time, b.open, b.high, b.low, b.close, b.volume]);
+                return { tf, data };
+              }
+            }
+          } catch {}
+          // Fallback Binance direct
           const url = `${BINANCE_REST}/klines?symbol=BTCUSDT&interval=${tf.interval}&limit=${tf.limit}`;
           const res = await fetch(url);
           if (!res.ok) throw new Error(`HTTP ${res.status} cho ${tf.label}`);
