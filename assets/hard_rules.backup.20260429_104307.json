@@ -180,7 +180,7 @@
           "config": {
             "leverage": 100,
             "targetPct": 3,
-            "stopPct": 2,
+            "stopPct": 1.5,
             "maxHoldBars": 100,
             "minScore": 1,
             "stochOBLevel": 95,
@@ -194,21 +194,7 @@
             "htfTrendFilter": {
               "mode": "both_match",
               "label": "c\u1ea3 1h + 4h c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 1.5
-                },
-                "to": {
-                  "tp": 3,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.48 (was orig PF 1.47)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 28.4,
@@ -349,7 +335,7 @@
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
-            "targetPct": 5,
+            "targetPct": 2,
             "stopPct": 2,
             "maxHoldBars": 100,
             "minScore": 1,
@@ -364,21 +350,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "4h c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 2,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 5,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.48 (was orig PF 1.30)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 44.3,
@@ -1312,7 +1284,7 @@
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
-            "targetPct": 5,
+            "targetPct": 2,
             "stopPct": 2,
             "maxHoldBars": 100,
             "minScore": 1,
@@ -1327,21 +1299,7 @@
             "htfTrendFilter": {
               "mode": "near_match",
               "label": "1h c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 2,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 5,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.38 (was orig PF 1.18)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 41.3,
@@ -1657,7 +1615,7 @@
           "label": "LONG Widened EMA+FLAT",
           "config": {
             "leverage": 100,
-            "targetPct": 8,
+            "targetPct": 5,
             "stopPct": 2,
             "maxHoldBars": 100,
             "minScore": 0,
@@ -1673,21 +1631,7 @@
             },
             "htfTrendFilter": {
               "mode": "far_flat"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 8,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.61 (was orig PF 1.11)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 22.3,
@@ -1826,7 +1770,7 @@
           "label": "Golden ATR+EMA+FLAT",
           "config": {
             "leverage": 100,
-            "targetPct": 10,
+            "targetPct": 5,
             "stopPct": 2,
             "maxHoldBars": 100,
             "minScore": 0,
@@ -1846,21 +1790,7 @@
             },
             "htfTrendFilter": {
               "mode": "far_flat"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 10,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 3.17 (was orig PF 1.49)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 23,
@@ -1962,7 +1892,7 @@
           "label": "Golden ATR+FLAT",
           "config": {
             "leverage": 100,
-            "targetPct": 10,
+            "targetPct": 5,
             "stopPct": 2,
             "maxHoldBars": 100,
             "minScore": 0,
@@ -1977,21 +1907,7 @@
             },
             "htfTrendFilter": {
               "mode": "far_flat"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 10,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 2.94 (was orig PF 1.48)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 22.7,
@@ -2091,6 +2007,186 @@
             "equityTrend": "UP",
             "maxDrawdownPct": 1120
           }
+        },
+        {
+          "rank": 30,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 10,
+            "stopPct": 5,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG",
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+          },
+          "stats": {
+            "winRate": 8.3,
+            "profitFactor": 4.19,
+            "trades": 12,
+            "avgWinPct": 1000,
+            "avgLossPct": -500,
+            "avgHoldBars": 83.5,
+            "wins": 1,
+            "losses": 1,
+            "timeouts": 10,
+            "grossPnL": 2383,
+            "feeCost": 160,
+            "netPnL": 2263,
+            "side": "LONG",
+            "avgHold": 89.1,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              -26,
+              -26,
+              179,
+              381,
+              -129,
+              403,
+              986,
+              1069,
+              838,
+              1828,
+              2282,
+              2263
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 510
+          },
+          "label": "[LONG] RSI+Div TP+10% SL-5% \u00b7 WR 50% \u00b7 NET +840%",
+          "compositeScore": 840
+        },
+        {
+          "rank": 33,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 5,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG",
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:30 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+          },
+          "stats": {
+            "winRate": 41.7,
+            "profitFactor": 3.07,
+            "trades": 12,
+            "avgWinPct": 500,
+            "avgLossPct": -300,
+            "avgHoldBars": 57.1,
+            "wins": 5,
+            "losses": 3,
+            "timeouts": 4,
+            "grossPnL": 1899,
+            "feeCost": 160,
+            "netPnL": 1779,
+            "side": "LONG",
+            "avgHold": 66.8,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              -26,
+              -26,
+              464,
+              665,
+              355,
+              845,
+              1335,
+              1419,
+              1109,
+              1599,
+              2089,
+              1779
+            ],
+            "equityTrend": "FLAT",
+            "maxDrawdownPct": 310
+          },
+          "label": "[LONG] RSI+Div TP+5% SL-3% \u00b7 WR 41.7% \u00b7 NET +240%",
+          "compositeScore": 240
+        },
+        {
+          "rank": 31,
+          "source": "VERIFIED",
+          "config": {
+            "leverage": 100,
+            "targetPct": 8,
+            "stopPct": 3,
+            "maxHoldBars": 100,
+            "minScore": 1,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "rsiExtreme",
+              "divergence"
+            ],
+            "forceSide": "LONG",
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1h:30 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+          },
+          "stats": {
+            "winRate": 16.7,
+            "profitFactor": 3.42,
+            "trades": 12,
+            "avgWinPct": 800,
+            "avgLossPct": -300,
+            "avgHoldBars": 64.4,
+            "wins": 2,
+            "losses": 3,
+            "timeouts": 7,
+            "grossPnL": 2220,
+            "feeCost": 160,
+            "netPnL": 2100,
+            "side": "LONG",
+            "avgHold": 79.2,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              -26,
+              -26,
+              179,
+              381,
+              71,
+              603,
+              1393,
+              1476,
+              1166,
+              1956,
+              2410,
+              2100
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 310
+          },
+          "label": "[LONG] RSI+Div TP+8% SL-3% \u00b7 WR 30% \u00b7 NET +140%",
+          "compositeScore": 140
         },
         {
           "rank": 27,
@@ -2221,8 +2317,8 @@
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
-            "targetPct": 15,
-            "stopPct": 10,
+            "targetPct": 3,
+            "stopPct": 1,
             "maxHoldBars": 100,
             "minScore": 1,
             "stochOBLevel": 95,
@@ -2238,21 +2334,7 @@
               "label": "c\u1ea3 4h + 1d c\u00f9ng chi\u1ec1u"
             },
             "revivedAt": "2026-04-24T08:21:25.601Z",
-            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 1
-                },
-                "to": {
-                  "tp": 15,
-                  "sl": 10
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.64 (was orig PF 1.55)"
-              }
-            ]
+            "revivedNote": "TIER1 revival 2026-04-24: 3y backtest n\u2265247 PF\u22651.28 NET +8k%~+16k%"
           },
           "stats": {
             "winRate": 33.5,
@@ -2715,8 +2797,8 @@
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
-            "targetPct": 15,
-            "stopPct": 8,
+            "targetPct": 3,
+            "stopPct": 1,
             "maxHoldBars": 100,
             "minScore": 1,
             "stochOBLevel": 95,
@@ -2730,21 +2812,7 @@
             "htfTrendFilter": {
               "mode": "near_match",
               "label": "4h c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 1
-                },
-                "to": {
-                  "tp": 15,
-                  "sl": 8
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.56 (was orig PF 1.47)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 32.2,
@@ -3175,7 +3243,7 @@
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
-            "targetPct": 8,
+            "targetPct": 5,
             "stopPct": 3,
             "maxHoldBars": 100,
             "minScore": 1,
@@ -3191,21 +3259,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 3
-                },
-                "to": {
-                  "tp": 8,
-                  "sl": 3
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 2.56 (was orig PF 1.38)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 25.5,
@@ -3457,7 +3511,7 @@
           "config": {
             "leverage": 100,
             "targetPct": 8,
-            "stopPct": 2,
+            "stopPct": 3,
             "maxHoldBars": 100,
             "minScore": 1,
             "stochOBLevel": 95,
@@ -3471,21 +3525,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 8,
-                  "sl": 3
-                },
-                "to": {
-                  "tp": 8,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.86 (was orig PF 1.82)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 20.3,
@@ -3922,8 +3962,8 @@
           "source": "VERIFIED",
           "config": {
             "leverage": 100,
-            "targetPct": 6,
-            "stopPct": 2,
+            "targetPct": 3,
+            "stopPct": 1,
             "maxHoldBars": 100,
             "minScore": 1,
             "stochOBLevel": 95,
@@ -3937,21 +3977,7 @@
             "htfTrendFilter": {
               "mode": "far_match",
               "label": "1d c\u00f9ng chi\u1ec1u"
-            },
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 1
-                },
-                "to": {
-                  "tp": 6,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 1.50 (was orig PF 1.30)"
-              }
-            ]
+            }
           },
           "stats": {
             "winRate": 29.7,
@@ -4256,7 +4282,7 @@
           "label": "[GPT-V2 1H] EMA0.5-2% & ATR<0.3% & HTF4h UP \u2014 WR 71.7% n=245 NET +329%",
           "config": {
             "leverage": 100,
-            "targetPct": 4,
+            "targetPct": 3,
             "stopPct": 2,
             "maxHoldBars": 100,
             "forceSide": "LONG",
@@ -4278,21 +4304,7 @@
               "min": 0.5,
               "max": 2
             },
-            "note": "Verified 3y post-fee 0.05%/side. PF 3.81. Spec-aligned: SL\u2192TP, entry@close, one-position.",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 4,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 4.56 (was orig PF 2.84)"
-              }
-            ]
+            "note": "Verified 3y post-fee 0.05%/side. PF 3.81. Spec-aligned: SL\u2192TP, entry@close, one-position."
           },
           "stats": {
             "side": "LONG",
@@ -4348,7 +4360,7 @@
           "label": "[GPT-V2 1H] RSI55-70 & EMA0.5-2% & ATR<0.3% & HTF4h UP \u2014 WR 73.4% n=183 NET +264%",
           "config": {
             "leverage": 100,
-            "targetPct": 4,
+            "targetPct": 3,
             "stopPct": 2,
             "maxHoldBars": 100,
             "forceSide": "LONG",
@@ -4375,21 +4387,7 @@
               "min": 0.5,
               "max": 2
             },
-            "note": "Verified 3y post-fee 0.05%/side. PF 4.13.",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 4,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 4.34 (was orig PF 3.22)"
-              }
-            ]
+            "note": "Verified 3y post-fee 0.05%/side. PF 4.13."
           },
           "stats": {
             "side": "LONG",
@@ -4444,7 +4442,7 @@
           "config": {
             "leverage": 100,
             "targetPct": 3,
-            "stopPct": 2.5,
+            "stopPct": 2,
             "maxHoldBars": 100,
             "forceSide": "LONG",
             "minScore": 0,
@@ -4465,21 +4463,7 @@
               "op": "<",
               "value": 0.3
             },
-            "note": "Verified 3y post-fee 0.05%/side. PF 2.87.",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 3,
-                  "sl": 2
-                },
-                "to": {
-                  "tp": 3,
-                  "sl": 2.5
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 3.36 (was orig PF 2.49)"
-              }
-            ]
+            "note": "Verified 3y post-fee 0.05%/side. PF 2.87."
           },
           "stats": {
             "side": "LONG",
@@ -4550,13 +4534,89 @@
       },
       "rules": [
         {
+          "rank": 57,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "macdCross"
+            ],
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+          },
+          "stats": {
+            "winRate": 40.7,
+            "profitFactor": 1.15,
+            "trades": 27,
+            "avgWinPct": 250,
+            "avgLossPct": 150,
+            "avgHoldBars": 8.5,
+            "wins": 11,
+            "losses": 16,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 26.3,
+              "net": 51262
+            },
+            "netPnL": 80,
+            "avgHold": 8.3,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              -160,
+              -320,
+              -480,
+              -640,
+              -800,
+              -960,
+              -720,
+              -480,
+              -640,
+              -800,
+              -560,
+              -320,
+              -480,
+              -640,
+              -800,
+              -560,
+              -720,
+              -480,
+              -640,
+              -400,
+              -160,
+              -320,
+              -480,
+              -240,
+              -400,
+              -160,
+              80
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 800,
+            "grossPnL": 350
+          }
+        },
+        {
           "rank": 19,
           "source": "GPT_4H_v1",
           "label": "[GPT 4H v1] MACD>100 + ATR1-2% + Body>2% + HTF1d UP \u2014 WR 60% n=36 NET +6640%",
           "config": {
             "leverage": 100,
-            "targetPct": 20,
-            "stopPct": 2,
+            "targetPct": 5,
+            "stopPct": 2.5,
             "maxHoldBars": 50,
             "forceSide": "LONG",
             "minScore": 0,
@@ -4581,21 +4641,7 @@
               "value": 2
             },
             "gptFeatureRule": "macd:>100 & atr:1-2% & body:>2% & htf:UP",
-            "note": "Spec-aligned 3y scan TP=5% SL=2.5%. PF 3.00.",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2.5
-                },
-                "to": {
-                  "tp": 20,
-                  "sl": 2
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 3.86 (was orig PF 1.78)"
-              }
-            ]
+            "note": "Spec-aligned 3y scan TP=5% SL=2.5%. PF 3.00."
           },
           "stats": {
             "side": "LONG",
@@ -4687,8 +4733,8 @@
           "label": "[GPT 4H v1] RSI45-55 + MACD0-100 + Body0.3-1% + HTF1d UP \u2014 WR 55% n=42 NET +6080%",
           "config": {
             "leverage": 100,
-            "targetPct": 20,
-            "stopPct": 8,
+            "targetPct": 5,
+            "stopPct": 2.5,
             "maxHoldBars": 50,
             "forceSide": "LONG",
             "minScore": 0,
@@ -4715,21 +4761,7 @@
               "max": 1
             },
             "gptFeatureRule": "rsi:45-55 & macd:0..100 & body:0.3-1% & htf:UP",
-            "note": "Spec-aligned 3y scan. PF 2.44.",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2.5
-                },
-                "to": {
-                  "tp": 20,
-                  "sl": 8
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 3.21 (was orig PF 1.13)"
-              }
-            ]
+            "note": "Spec-aligned 3y scan. PF 2.44."
           },
           "stats": {
             "side": "LONG",
@@ -4828,8 +4860,8 @@
           "label": "[GPT 4H v1] BB%>100 + Body>2% + CONT + HTF1d UP \u2014 WR 56.3% n=34 NET +5160%",
           "config": {
             "leverage": 100,
-            "targetPct": 20,
-            "stopPct": 10,
+            "targetPct": 5,
+            "stopPct": 2.5,
             "maxHoldBars": 50,
             "forceSide": "LONG",
             "minScore": 0,
@@ -4852,21 +4884,7 @@
               "kind": "CONT"
             },
             "gptFeatureRule": "bb%:>100 & body:>2% & rev:CONT & htf:UP",
-            "note": "Spec-aligned 3y scan. PF 2.57. BB %B > 1 = price above upper band.",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2.5
-                },
-                "to": {
-                  "tp": 20,
-                  "sl": 10
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 10.76 (was orig PF 2.61)"
-              }
-            ]
+            "note": "Spec-aligned 3y scan. PF 2.57. BB %B > 1 = price above upper band."
           },
           "stats": {
             "side": "LONG",
@@ -5001,8 +5019,8 @@
           "label": "[GPT 4H v1] RSI30-45 + MACD-100..0 + Body0.3-1% + HTF1d UP \u2014 WR 55.6% n=30 NET +4200%",
           "config": {
             "leverage": 100,
-            "targetPct": 10,
-            "stopPct": 10,
+            "targetPct": 5,
+            "stopPct": 2.5,
             "maxHoldBars": 50,
             "forceSide": "LONG",
             "minScore": 0,
@@ -5029,21 +5047,7 @@
               "max": 1
             },
             "gptFeatureRule": "rsi:30-45 & macd:-100..0 & body:0.3-1% & htf:UP",
-            "note": "Spec-aligned 3y scan. PF 2.50. Mua \u0111\u00e1y trong xu th\u1ebf t\u0103ng (RSI low + macd hist c\u00f2n \u00e2m).",
-            "tpslHistory": [
-              {
-                "appliedAt": 1777434231688,
-                "from": {
-                  "tp": 5,
-                  "sl": 2.5
-                },
-                "to": {
-                  "tp": 10,
-                  "sl": 10
-                },
-                "reason": "HTF_TPSL_GRID_v2 best PF: PF 2.98 (was orig PF 1.19)"
-              }
-            ]
+            "note": "Spec-aligned 3y scan. PF 2.50. Mua \u0111\u00e1y trong xu th\u1ebf t\u0103ng (RSI low + macd hist c\u00f2n \u00e2m)."
           },
           "stats": {
             "side": "LONG",
@@ -5144,7 +5148,323 @@
         "first": 38731,
         "last": 73596
       },
-      "rules": []
+      "rules": [
+        {
+          "rank": 49,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 75,
+            "rsiOSLevel": 25,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+          },
+          "stats": {
+            "winRate": 66.7,
+            "profitFactor": 4,
+            "trades": 6,
+            "avgWinPct": 200,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.3,
+            "wins": 4,
+            "losses": 2,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "netPnL": 540,
+            "avgHold": 1.3,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              190,
+              80,
+              270,
+              460,
+              350,
+              540
+            ],
+            "equityTrend": "FLAT",
+            "maxDrawdownPct": 110,
+            "grossPnL": 600
+          }
+        },
+        {
+          "rank": 36,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+          },
+          "stats": {
+            "winRate": 75,
+            "profitFactor": 6,
+            "trades": 8,
+            "avgWinPct": 300,
+            "avgLossPct": 150,
+            "avgHoldBars": 1.9,
+            "wins": 6,
+            "losses": 2,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "flippedTo": {
+              "rank": 12,
+              "side": "SHORT",
+              "at": "2026-04-23T10:06:10.455Z",
+              "reason": "positive_flip_backtest"
+            },
+            "netPnL": 1420,
+            "avgHold": 1.9,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              290,
+              580,
+              420,
+              710,
+              1000,
+              1290,
+              1130,
+              1420
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 160,
+            "grossPnL": 1500
+          }
+        },
+        {
+          "rank": 42,
+          "source": "GRID",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1d:36 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+          },
+          "stats": {
+            "winRate": 66.7,
+            "profitFactor": 5,
+            "trades": 9,
+            "avgWinPct": 250,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.5,
+            "wins": 6,
+            "losses": 3,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "flippedTo": {
+              "rank": 14,
+              "side": "SHORT",
+              "at": "2026-04-23T10:06:10.455Z",
+              "reason": "positive_flip_backtest"
+            },
+            "netPnL": 1110,
+            "avgHold": 1.4,
+            "verified": true,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              240,
+              480,
+              370,
+              610,
+              850,
+              740,
+              980,
+              870,
+              1110
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 110,
+            "grossPnL": 1200
+          }
+        },
+        {
+          "rank": 34,
+          "source": "flipped-selected-live",
+          "label": "[FLIPPED LIVE] LONG rank5 ? SHORT",
+          "config": {
+            "leverage": 100,
+            "targetPct": 3,
+            "stopPct": 1.5,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "RARE signals cleanup 2026-04-29: total signals < 30 trong 3y backtest \u2192 qu\u00e1 hi\u1ebfm \u0111\u1ec3 statistical significant. Contribute ~$1-2k NET only."
+          },
+          "stats": {
+            "winRate": 85.7,
+            "profitFactor": 12,
+            "trades": 7,
+            "avgWinPct": 300,
+            "avgLossPct": 150,
+            "avgHoldBars": 1.7,
+            "wins": 6,
+            "losses": 1,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "side": "SHORT",
+            "netPnL": 1580,
+            "verified": true,
+            "source": "flipped-selected-backtest",
+            "injectedAt": "2026-04-23T10:06:10.455Z",
+            "flippedFrom": {
+              "tfKey": "1d",
+              "rank": 5,
+              "originalSide": "LONG"
+            },
+            "avgHold": 2,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              290,
+              580,
+              420,
+              710,
+              1000,
+              1290,
+              1580
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 160,
+            "grossPnL": 1650
+          }
+        },
+        {
+          "rank": 41,
+          "source": "flipped-selected-live",
+          "label": "[FLIPPED LIVE] LONG rank8 ? SHORT",
+          "config": {
+            "leverage": 100,
+            "targetPct": 2.5,
+            "stopPct": 1,
+            "maxHoldBars": 50,
+            "minScore": 3,
+            "stochOBLevel": 95,
+            "stochOSLevel": 5,
+            "rsiOBLevel": 70,
+            "rsiOSLevel": 30,
+            "requiredConditions": [
+              "divergence"
+            ],
+            "forceSide": "SHORT",
+            "disabled": true,
+            "disabledAt": 1777430320365,
+            "disabledReason": "DUP cleanup 2026-04-29: c\u00f9ng signal logic v\u1edbi 1d:34 (TPSL_GRID_v1 detect duplicate bestNet/trades). B\u1ecf \u0111\u1ec3 gi\u1ea3m noise, kh\u00f4ng m\u1ea5t edge (cooldown \u0111\u00e3 dedup t\u1ea1i runtime)."
+          },
+          "stats": {
+            "winRate": 75,
+            "profitFactor": 7.5,
+            "trades": 8,
+            "avgWinPct": 250,
+            "avgLossPct": 100,
+            "avgHoldBars": 1.4,
+            "wins": 6,
+            "losses": 2,
+            "timeouts": 0,
+            "needsReview": true,
+            "improvedSuggestion": {
+              "tp": 5,
+              "sl": 1.5,
+              "wr": 24.2,
+              "net": -220
+            },
+            "side": "SHORT",
+            "netPnL": 1220,
+            "verified": true,
+            "source": "flipped-selected-backtest",
+            "injectedAt": "2026-04-23T10:06:10.455Z",
+            "flippedFrom": {
+              "tfKey": "1d",
+              "rank": 8,
+              "originalSide": "LONG"
+            },
+            "avgHold": 1.5,
+            "lastBacktestAt": "2026-04-24T10:23:30.927Z",
+            "lastBacktestSource": "backtest_active_3y_6tf",
+            "equityCurve": [
+              240,
+              480,
+              370,
+              610,
+              850,
+              740,
+              980,
+              1220
+            ],
+            "equityTrend": "UP",
+            "maxDrawdownPct": 110,
+            "grossPnL": 1300
+          }
+        }
+      ]
     },
     "1w": {
       "interval": "1w",
@@ -5233,143 +5553,5 @@
     ],
     "tp_sl_unchanged": "100% \u2014 only set disabled flag, no TP/SL modification \u2192 LIVE budget unchanged",
     "source_backtest": "TPSL_GRID_v1 (assets/backtest_htf_tpsl_grid_3y.json)"
-  },
-  "cleanup_2026-04-29_phase2": {
-    "type": "permanent_delete",
-    "applied_at": 1777434187461,
-    "deleted_rules": [
-      "1d:36",
-      "1d:42",
-      "1d:34",
-      "1d:41",
-      "1d:49",
-      "1h:30",
-      "1h:31",
-      "1h:33",
-      "4h:57"
-    ],
-    "reason": "Anh Tommy ch\u1ecdn b\u1ecf h\u1eb3n t\u1eeb 1d:36 tr\u1edf xu\u1ed1ng (NET sort) \u2014 to\u00e0n rules qu\u00e1 rare ho\u1eb7c \u0111\u00e3 disabled tr\u01b0\u1edbc \u0111\u00f3. X\u00f3a h\u1eb3n \u0111\u1ec3 gi\u1ea3m noise file size + clarity.",
-    "rollback": "/Users/lap16116/BTC_PC/btc-dashboard/assets/hard_rules.backup.20260429_104307.json"
-  },
-  "tpsl_tune_2026-04-29": {
-    "applied_at": 1777434231688,
-    "source": "HTF_TPSL_GRID_v2 best PF combo",
-    "strategy": "Conservative \u2014 pick best PF (ch\u1ea5t l\u01b0\u1ee3ng) thay v\u00ec best NET (yolo DD l\u1edbn)",
-    "applied_count": 18,
-    "applied_rules": [
-      {
-        "id": "15m:2",
-        "from": "TP3/SL1.5",
-        "to": "TP3/SL2",
-        "newPF": 1.48
-      },
-      {
-        "id": "15m:8",
-        "from": "TP2/SL2",
-        "to": "TP5/SL2",
-        "newPF": 1.48
-      },
-      {
-        "id": "15m:22",
-        "from": "TP2/SL2",
-        "to": "TP5/SL2",
-        "newPF": 1.38
-      },
-      {
-        "id": "1h:43",
-        "from": "TP5/SL2",
-        "to": "TP8/SL2",
-        "newPF": 1.61
-      },
-      {
-        "id": "1h:29",
-        "from": "TP5/SL2",
-        "to": "TP10/SL2",
-        "newPF": 3.17
-      },
-      {
-        "id": "1h:28",
-        "from": "TP5/SL2",
-        "to": "TP10/SL2",
-        "newPF": 2.94
-      },
-      {
-        "id": "1h:7",
-        "from": "TP3/SL1",
-        "to": "TP15/SL10",
-        "newPF": 1.64
-      },
-      {
-        "id": "1h:4",
-        "from": "TP3/SL1",
-        "to": "TP15/SL8",
-        "newPF": 1.56
-      },
-      {
-        "id": "1h:32",
-        "from": "TP5/SL3",
-        "to": "TP8/SL3",
-        "newPF": 2.56
-      },
-      {
-        "id": "1h:18",
-        "from": "TP8/SL3",
-        "to": "TP8/SL2",
-        "newPF": 1.86
-      },
-      {
-        "id": "1h:17",
-        "from": "TP3/SL1",
-        "to": "TP6/SL2",
-        "newPF": 1.5
-      },
-      {
-        "id": "1h:26",
-        "from": "TP3/SL2",
-        "to": "TP4/SL2",
-        "newPF": 4.56
-      },
-      {
-        "id": "1h:25",
-        "from": "TP3/SL2",
-        "to": "TP4/SL2",
-        "newPF": 4.34
-      },
-      {
-        "id": "1h:24",
-        "from": "TP3/SL2",
-        "to": "TP3/SL2.5",
-        "newPF": 3.36
-      },
-      {
-        "id": "4h:19",
-        "from": "TP5/SL2.5",
-        "to": "TP20/SL2",
-        "newPF": 3.86
-      },
-      {
-        "id": "4h:46",
-        "from": "TP5/SL2.5",
-        "to": "TP20/SL8",
-        "newPF": 3.21
-      },
-      {
-        "id": "4h:20",
-        "from": "TP5/SL2.5",
-        "to": "TP20/SL10",
-        "newPF": 10.76
-      },
-      {
-        "id": "4h:40",
-        "from": "TP5/SL2.5",
-        "to": "TP10/SL10",
-        "newPF": 2.98
-      }
-    ],
-    "skipped_no_grid": [
-      "15m:16",
-      "1h:6"
-    ],
-    "skipped_already_opt": []
   }
 }
