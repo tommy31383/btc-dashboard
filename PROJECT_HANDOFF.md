@@ -766,3 +766,133 @@ Câu hỏi cốt lõi: **API key Binance ở đâu? GitHub vai trò gì? "Worker
 3. **Đừng ghi LIVE trading state vào branch `paper-data`** — sẽ chậm + race condition. SQLite trên server là source of truth.
 4. **Build frontend rồi PHẢI copy `dist/` → `docs/app/`** — không có CI/CD auto, GitHub Pages serve thẳng từ `docs/app/`.
 5. **Server deploy:** SSH `root@159.223.90.60` → `cd /opt/btc-trader-server && git pull && npm run build && pm2 restart btc-trader-server`.
+
+---
+
+## 19. HTF_TPSL_GRID_v2 BACKTEST + CLEANUP (anh Tommy 2026-04-29)
+
+**Status:** ✅ Cleanup phase 1 done · ⏸ TP/SL tuning phase paused — chờ anh Tommy resume.
+
+### A) Tool & data location
+
+| File | Mục đích |
+|------|---------|
+| `tools/backtest-htf-tpsl-grid-3y.ts` | Tool grid sweep TP × SL cho mọi HTF rule |
+| `assets/backtest_htf_tpsl_grid_3y.json` | Raw result 3,280 runs (41 rules × 80 combos) |
+| `assets/backtest_htf_tpsl_grid_3y_report.html` | Per-rule heatmap visual |
+| `assets/hard_rules.backup.20260429_*.json` | Backup trước cleanup (cả 2 repos: dashboard + server) |
+| `BACKTEST_REGISTRY.md` § HTF_TPSL_GRID_v2 | Registry entry chi tiết |
+
+### B) Setup grid
+
+- **TFs:** 15m (8 rules) + 1h (22) + 4h (6) + 1d (5) = **41 rules tested** (5m baseline disabled trước đó)
+- **TP grid:** `[3, 4, 5, 6, 7, 8, 10, 12, 15, 20]`
+- **SL grid:** `[2, 2.5, 3, 4, 5, 6, 8, 10]`
+- **Combos/rule:** 80 → tổng 3,280 runs (chạy ~3.4s với cache 3y có sẵn)
+- **Mode:** Fixed TP/SL, NO trail. Filters HTF/divergence/EMA giữ nguyên.
+
+### C) Cleanup applied — 23 rules disabled (SAFE)
+
+**Phương án anh Tommy chọn:** SAFE remove only — KHÔNG động TP/SL của rule giữ lại → LIVE budget 0 thay đổi.
+
+```
+44 rules total
+├─ 23 disabled in this cleanup:
+│   ├─ 17 DUPLICATES (cùng signal logic, cooldown đã dedup runtime, zero edge loss):
+│   │   15m: 3, 9, 11, 12, 23
+│   │   1h:  5, 10, 13, 14, 15, 21, 27, 31, 33, 35
+│   │   1d:  41, 42
+│   └─ 6 RARE (signals < 30/3y, không statistical significant):
+│       1h:30 · 4h:37 · 4h:57 · 1d:34 · 1d:36 · 1d:49
+└─ 21 enabled (post-cleanup)
+    ├─ 15m: 4 (15m:2, 8, 16, 22)
+    ├─ 1h:  12 (1h:4, 6, 7, 17, 18, 24, 25, 26, 28, 29, 32, 43)
+    ├─ 4h:  4 (4h:19, 20, 40, 46)
+    └─ 1d:  0 (toàn 5 rules quá rare → all disabled)
+```
+
+### D) BEST TP/SL per rule (data sẵn cho phase tuning)
+
+Source: `assets/backtest_htf_tpsl_grid_3y.json` field `bestPF` và `bestNet`.
+
+| RuleId | Side | Orig TP/SL | Orig PF | **Best PF combo** | Best PF | Best NET combo | Best NET% | Trades |
+|--------|------|-----------|--------|-----|---------|----------------|-----------|--------|
+| 4h:20 | LONG | TP5/SL2.5 | 2.61 | **TP20/SL10** | 10.76 | TP20/SL10 | 27,403% | 43 |
+| 1h:26 | LONG | TP3/SL2 | 2.84 | **TP4/SL2** | 4.56 | TP4/SL2 | 7,427% | 42 |
+| 1h:25 | LONG | TP3/SL2 | 3.22 | **TP4/SL2** | 4.34 | TP4/SL10 | 7,306% | 40 |
+| 4h:19 | LONG | TP5/SL2.5 | 1.78 | **TP20/SL2** | 3.86 | TP20/SL2 | 25,530% | 87 |
+| 1h:24 | LONG | TP3/SL2 | 2.49 | **TP3/SL2.5** | 3.36 | TP15/SL3 | 8,070% | 61 |
+| 4h:46 | LONG | TP5/SL2.5 | 1.13 | **TP20/SL8** | 3.21 | TP20/SL8 | 49,197% | 162 |
+| 1h:29 | LONG | TP5/SL2 | 1.49 | **TP10/SL2** | 3.17 | TP8/SL2.5 | 29,548% | 177 |
+| 4h:40 | LONG | TP5/SL2.5 | 1.19 | **TP10/SL10** | 2.98 | TP20/SL8 | 26,260% | 96 |
+| 1h:28 | LONG | TP5/SL2 | 1.48 | **TP10/SL2** | 2.94 | TP8/SL2 | 28,447% | 184 |
+| 1h:32 | SHORT | TP5/SL3 | 1.38 | **TP8/SL3** | 2.56 | TP8/SL3 | 14,334% | 95 |
+| 1h:18 | SHORT | TP8/SL3 | 1.82 | **TP8/SL2** | 1.86 | TP8/SL2 | 7,301% | 81 |
+| 1h:7 | SHORT | TP3/SL1 | 1.55 | **TP15/SL10** | 1.64 | TP10/SL10 | 55,780% | 578 |
+| 1h:43 | LONG | TP5/SL2 | 1.11 | **TP8/SL2** | 1.61 | TP20/SL8 | 105,133% | 1551 |
+| 1h:4 | SHORT | TP3/SL1 | 1.47 | **TP15/SL8** | 1.56 | TP4/SL8 | 60,209% | 735 |
+| 1h:17 | SHORT | TP3/SL1 | 1.30 | **TP6/SL2** | 1.50 | TP7/SL10 | 74,293% | 1271 |
+| 15m:2 | SHORT | TP3/SL1.5 | 1.47 | **TP3/SL2** | 1.48 | TP6/SL2.5 | 101,268% | 4182 |
+| 15m:8 | SHORT | TP2/SL2 | 1.30 | **TP5/SL2** | 1.48 | TP6/SL2 | 137,621% | 5977 |
+| 15m:22 | SHORT | TP2/SL2 | 1.18 | **TP5/SL2** | 1.38 | TP6/SL2 | 92,487% | 5162 |
+
+**3 rules enabled không có trong grid (chưa test):** `1h:6`, `15m:16` — cần re-run grid khi resume.
+
+### E) Pattern insight from grid
+
+- **23 SHORT vs 14 LONG vs 4 any** (trong 41 rules tested) → bias SHORT mạnh, có thể overfit BTC downtrend 3y → **CẦN out-of-sample test**
+- **Best TP picks:** TP=20 (9 rules), TP=8 (8), TP=6 (8) → TP cao thắng, **gợi ý mở rộng grid lên TP [25, 30]** trong v3
+- **Best SL bipolar:** SL=10 (11), SL=8 (11), SL=2 (10) → 2 trường phái: yolo wide vs sniper tight
+- **100% rules có thể tune** — không rule nào hiện dùng best TP/SL → potential improvement lớn nhưng RISK budget LIVE chưa eval được
+
+### F) Pending decisions (chờ anh Tommy resume)
+
+**Anh Tommy nói:** "B xong anh với em sẽ review về SL TP" → khi resume sẽ làm:
+
+1. **Phase 2A — Conservative TP/SL tune (per-rule, từng cái một):**
+   - Apply best PF TP/SL cho từng rule một (KHÔNG batch)
+   - Monitor LIVE 1-2 ngày sau mỗi rule update
+   - Strategy: PF (chất lượng) > NET (max yolo) để không phá budget
+   - **CẢNH BÁO:** Best NET combo nhiều rule có DD > 20,000% → SHELVE strategy này cho production
+
+2. **Phase 2B — Out-of-sample verify (must trước Phase 2A):**
+   - Backtest grid với train 2y / test 1y split
+   - Hoặc test BTC 2020-2022 data (không có trong cache hiện tại)
+   - Verify bias SHORT không phải overfit downtrend
+
+3. **Phase 2C — Optional:**
+   - Mở rộng grid TP `[25, 30, 40]` (vì 9 rules đã pick TP=20 max)
+   - Test 15m fixed TP/SL vs current step-trail E-T15-NoTP S50 (Phương án 3)
+   - Có thể bỏ luôn 15m khỏi LIVE engine (PF max chỉ 1.48)
+
+4. **Re-run grid khi resume:**
+   - 1h:6 và 15m:16 chưa có data → cần chạy lại grid include
+   - Command: `npx tsx tools/backtest-htf-tpsl-grid-3y.ts`
+
+### G) Rollback nếu cần
+
+```bash
+# Frontend rollback
+cd /Users/lap16116/BTC_PC/btc-dashboard
+cp assets/hard_rules.backup.20260429_093809.json assets/hard_rules.json
+git add assets/hard_rules.json && git commit -m "rollback hard_rules" && git push
+
+# Server rollback
+cd /Users/lap16116/BTC_PC/btc-trader-server
+cp assets/hard_rules.backup.20260429_093924.json assets/hard_rules.json
+git add assets/hard_rules.json && git commit -m "rollback hard_rules" && git push
+
+# SSH server pull
+ssh root@159.223.90.60 "cd /opt/btc-trader-server && git pull"
+# Engine tự reload trong 60s, không cần PM2 restart
+```
+
+### H) Resume command cho Claude tiếp theo
+
+```
+"Anh Tommy, em resume HTF_TPSL_GRID_v2 phase 2 (TP/SL tuning).
+Current state: 21 enabled rules, TP/SL chưa thay đổi từ orig.
+Em đề xuất start Phase 2B (out-of-sample verify) trước Phase 2A.
+Em check anh Tommy chọn rule nào tune đầu tiên."
+```
+

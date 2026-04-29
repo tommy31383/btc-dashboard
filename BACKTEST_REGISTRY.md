@@ -101,3 +101,47 @@ TPSL_GRID_v1     → 280 TP/SL combos · current canonical TP/SL truth
 STEP_TRAIL_v1    → LIVE engine step-trail (E-T15-NoTP cap 10 winner, applied v0.2.4)
 STACK_SWEEP_v1   → superseded, basis cho 5 preset v4.8.23
 ```
+
+---
+
+## 🆕 `HTF_TPSL_GRID_v2` (2026-04-29 — anh Tommy yêu cầu mở rộng grid)
+
+- **Tool:** `tools/backtest-htf-tpsl-grid-3y.ts`
+- **Data JSON:** `assets/backtest_htf_tpsl_grid_3y.json`
+- **Report HTML:** `assets/backtest_htf_tpsl_grid_3y_report.html` (per-rule heatmap)
+- **Setup:** Sweep TP × SL grid lớn cho từng HTF rule trong `hard_rules.json`.
+  - **TFs:** 15m + 1h + 4h + 1d (41 rules tested, 5m baseline disabled)
+  - **TP grid:** `[3, 4, 5, 6, 7, 8, 10, 12, 15, 20]` (10 values)
+  - **SL grid:** `[2, 2.5, 3, 4, 5, 6, 8, 10]` (8 values)
+  - **Combos:** 80/rule × 41 rules = **3,280 runs total**
+  - **Mode:** Fixed TP/SL, NO trail (test pure rule edge)
+  - **Dataset:** `.cache/binance-{tf}-3y.json` (3 năm BTC/USDT)
+  - **Engine:** Reuse `simulateTradeStepTrail` với `stepMode: "off"` + `steps: []`
+  - **Filters preserved:** htfTrendFilter, htfRsiFilter, htfFilters, divergence, EMA dist, force side, maxHoldBars
+  - **Cooldown:** 10m per rule (LIVE PRESET B)
+- **Status:** `current` — applied cleanup 2026-04-29
+- **Use case:**
+  1. Identify duplicates (cùng signal logic, khác config)
+  2. Identify weak rules (low PF, rare signals)
+  3. Find best TP/SL per rule (chưa apply, chờ anh Tommy review)
+- **Result snapshot:**
+  - 41 tested → 24 unique signals (17 dup detected)
+  - Best PF cao nhất: **4h:20 LONG TP20/SL10 PF 10.76**
+  - Best PF (≥50 trades): **4h:19 LONG TP20/SL2 PF 3.86**, 1h:24 LONG TP3/SL2.5 PF 3.36 WR 57%
+  - 100% rules KHÔNG dùng best TP/SL hiện tại → có room tune
+- **CLI:**
+  ```bash
+  npx tsx tools/backtest-htf-tpsl-grid-3y.ts                    # full 4 TFs
+  npx tsx tools/backtest-htf-tpsl-grid-3y.ts --tfs=1h,4h,1d     # subset
+  npx tsx tools/backtest-htf-tpsl-grid-3y.ts --tfs=15m          # 15m only
+  npx tsx tools/backtest-htf-tpsl-grid-3y.ts --rules=3          # top 3 per TF (smoke test)
+  ```
+
+### Cleanup applied 2026-04-29 (SAFE — no TP/SL change)
+- **Disabled 23 rules** (44 → 21 enabled HTF):
+  - 17 duplicates: keeping rep với orig PF cao nhất
+  - 6 rare (signals <30/3y)
+- **Backup:** `assets/hard_rules.backup.20260429_*.json`
+- **Servers:** synced `/Users/lap16116/BTC_PC/btc-trader-server/assets/hard_rules.json`
+- **TP/SL UNCHANGED** cho 21 rules giữ lại → LIVE budget 0 thay đổi
+
