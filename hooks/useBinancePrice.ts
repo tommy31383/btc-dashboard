@@ -36,6 +36,12 @@ export function useBinancePrice(): UseBinancePriceResult {
   const lastUpdateRef = useRef(0);
   const pendingDataRef = useRef<PriceData | null>(null);
   const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // v4.8.36 (anh Tommy Phương án 2 — Smart Switch):
+  // Track lastServerWsTs để watchdog detect server WS health.
+  const lastServerWsTsRef = useRef(0);
+  const watchdogRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // STALE_THRESHOLD: nếu server WS không push trong 5s → coi là stale → fallback Binance WS
+  const SERVER_WS_STALE_MS = 5000;
 
   const flushPrice = useCallback((data: PriceData) => {
     if (!mountedRef.current) return;
@@ -99,13 +105,13 @@ export function useBinancePrice(): UseBinancePriceResult {
     pollRef.current = setInterval(fetchREST, 10000);
   }, [fetchREST]);
 
-  // v4.8.35 (anh Tommy B3): subscribe markPrice từ server WS để bypass Binance WS.
-  // Server đã maintain WS connection tới Binance, push price ~1s → giảm 1 connection per client.
+  // v4.8.36 (anh Tommy Phương án 2): subscribe markPrice từ server WS — primary source.
+  // Watchdog (dưới) sẽ disconnect Binance WS direct khi server WS healthy.
   useEffect(() => {
     const off = onWsMessage((msg) => {
       if (msg?.type === "markPrice" && typeof msg.price === "number") {
-        // Update price field nhanh; high/low/volume giữ giá trị cũ từ REST 24h ticker.
         if (mountedRef.current) {
+          lastServerWsTsRef.current = Date.now(); // mark health timestamp
           setConnectionStatus("LIVE");
           setPriceData((prev) => prev
             ? { ...prev, price: msg.price }
@@ -186,10 +192,48 @@ export function useBinancePrice(): UseBinancePriceResult {
 
   useEffect(() => {
     mountedRef.current = true;
+    // v4.8.36 (anh Tommy Phương án 2 — Smart Switch):
+    // ZERO-DOWNTIME guarantee → connect Binance WS direct ngay từ mount.
+    // Sau 5s nếu server WS push msg đầu tiên → watchdog disconnect Binance WS để save bandwidth.
+    // Nếu server WS stale > 5s → watchdog re-connect Binance WS làm fallback.
     connectWS();
+
+    // Watchdog check mỗi 2s
+    watchdogRef.current = setInterval(() => {
+      if (!mountedRef.current) return;
+      const now = Date.now();
+      const lastServerTs = lastServerWsTsRef.current;
+      const serverWsHealthy = lastServerTs > 0 && (now - lastServerTs) < SERVER_WS_STALE_MS;
+
+      if (serverWsHealthy && wsRef.current) {
+        // Server WS healthy → disconnect Binance WS direct (save 1 connection per tab)
+        try {
+          wsRef.current.onclose = null;
+          wsRef.current.close();
+          wsRef.current = null;
+        } catch {}
+        // Stop reconnect timer + REST polling — server WS sẽ nuôi price
+        if (reconnectRef.current) {
+          clearTimeout(reconnectRef.current);
+          reconnectRef.current = null;
+        }
+        stopPolling();
+        // eslint-disable-next-line no-console
+        console.log('[useBinancePrice] Server WS healthy → disconnected Binance WS direct');
+      } else if (!serverWsHealthy && !wsRef.current && !reconnectRef.current) {
+        // Server WS stale + no Binance WS active → reconnect Binance WS as fallback
+        // eslint-disable-next-line no-console
+        console.log('[useBinancePrice] Server WS stale → reconnecting Binance WS fallback');
+        connectWS();
+      }
+    }, 2000);
 
     return () => {
       mountedRef.current = false;
+      if (watchdogRef.current) {
+        clearInterval(watchdogRef.current);
+        watchdogRef.current = null;
+      }
       if (wsRef.current) {
         wsRef.current.onclose = null;
         wsRef.current.close();
