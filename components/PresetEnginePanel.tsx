@@ -12,11 +12,13 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 
 import { P } from "../utils/v2Theme";
 import { api } from "../utils/backendApi";
 
-type ToggleView = "real" | "paper";
+export type ToggleView = "real" | "paper";
 
 interface Props {
   state: any;
   onRefresh: () => Promise<void>;
+  view: ToggleView;
+  onViewChange: (v: ToggleView) => void;
 }
 
 const PRESET_KEYS = [
@@ -38,8 +40,8 @@ const PRESET_LABELS: Record<string, { emoji: string; label: string; tp: number; 
   TOMI_MAX: { emoji: "🔵", label: "TOMI 200 LEGACY", tp: 4, sl: 4, stack: 200 },
 };
 
-export default function PresetEnginePanel({ state, onRefresh }: Props) {
-  const [view, setView] = useState<ToggleView>("real");
+export default function PresetEnginePanel({ state, onRefresh, view, onViewChange }: Props) {
+  const setView = onViewChange;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const settings = state?.settings || {};

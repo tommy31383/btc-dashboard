@@ -11,7 +11,7 @@ import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
 import { SERVER_URL } from "../utils/backendApi";
-import PresetEnginePanel from "./PresetEnginePanel";
+import PresetEnginePanel, { ToggleView } from "./PresetEnginePanel";
 
 const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
 
@@ -24,6 +24,8 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
   const [pwInput, setPwInput] = useState("");
   const [chartTf, setChartTf] = useState<"5m" | "15m" | "1h" | "4h">("15m");
   const [containerW, setContainerW] = useState<number>(0);
+  // v0.3.0 (anh Tommy): toggle view real/paper, ảnh hưởng cả PresetEnginePanel + OPEN list bên dưới
+  const [presetView, setPresetView] = useState<ToggleView>("real");
 
   // ALL hooks MUST be at top — Rules of Hooks (anh Tommy v4.8.7 fix crash)
   const s = live.state;
@@ -159,7 +161,10 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       </View>
 
       {/* v0.3.0 PRESET ENGINE PANEL (anh Tommy: Real + Paper song song) */}
-      <PresetEnginePanel state={s} onRefresh={live.refresh} />
+      <PresetEnginePanel state={s} onRefresh={live.refresh} view={presetView} onViewChange={setPresetView} />
+
+      {/* OPEN POSITIONS LIST — render theo view (real or paper) */}
+      <PresetOpenList view={presetView} state={s} markPrice={markPriceAll} />
 
       {/* ENGINE START/STOP — clearer for new entries vs Plan B */}
       <View style={styles.card}>
