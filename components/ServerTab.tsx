@@ -13,6 +13,7 @@ import { useBackendLive } from "../hooks/useBackendLive";
 import { SERVER_URL } from "../utils/backendApi";
 import PresetEnginePanel, { ToggleView } from "./PresetEnginePanel";
 import PresetOpenList from "./PresetOpenList";
+import PaperSection from "./PaperSection";
 
 const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
 
@@ -253,6 +254,8 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         )}
       </View>
 
+      {/* === REAL-only panels: hide khi paper view === */}
+      {presetView === "real" && (<>
       {/* BINANCE POSITIONS — net hedge state lấy từ /fapi/v2/positionRisk thật (anh Tommy v4.8.13) */}
       <View style={styles.card}>
         <Text style={styles.h2}>🏦 BINANCE POSITIONS (live · {symbol})</Text>
@@ -363,8 +366,9 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         </Text>
       </View>
       )}
+      </>)}{/* === END BINANCE POSITIONS + SYNC CHECK (REAL-only) === */}
 
-      {/* Chart entry/exit markers */}
+      {/* Chart entry/exit markers — render cho cả 2 view (real/paper) */}
       <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Text style={styles.h2}>
@@ -422,7 +426,8 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         })()}
       </View>
 
-      {/* Tracked positions */}
+      {/* === REAL-only: TRACKED positions detail === */}
+      {presetView === "real" && (
       <View style={styles.card}>
         <Text style={styles.h2}>📈 TRACKED ({tracked.length})</Text>
 
@@ -543,6 +548,12 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
           </>
         )}
       </View>
+      )}{/* === END TRACKED (REAL-only) === */}
+
+      {/* === PAPER-only section: hide khi real view === */}
+      {presetView === "paper" && (
+        <PaperSection state={s} width={containerW || 600} />
+      )}
 
       {live.lastError && (
         <View style={[styles.card, { borderColor: P.error, borderWidth: 1 }]}>
