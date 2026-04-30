@@ -367,7 +367,12 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       {/* Chart entry/exit markers */}
       <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <Text style={styles.h2}>📊 PRICE {chartTf} + ENTRIES</Text>
+          <Text style={styles.h2}>
+            📊 PRICE {chartTf} + ENTRIES{" "}
+            <Text style={{ color: presetView === "paper" ? "#3b82f6" : P.error, fontSize: 10 }}>
+              ({presetView === "paper" ? "📋 PAPER" : "🔴 REAL"})
+            </Text>
+          </Text>
           <View style={{ flexDirection: "row", gap: 4 }}>
             {(["5m", "15m", "1h", "4h"] as const).map((tf) => (
               <TouchableOpacity key={tf} onPress={() => setChartTf(tf)}
@@ -381,15 +386,40 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
             ))}
           </View>
         </View>
-        {containerW > 0 && (
-          <ServerPriceChart
-            bars={klinesByTf?.[chartTf] ?? []}
-            tracked={tracked}
-            journal={live.journal}
-            width={containerW}
-            tf={chartTf}
-          />
-        )}
+        {containerW > 0 && (() => {
+          // v0.3.1 (anh Tommy): chart switch theo presetView
+          // PAPER → tracked = open paper positions, journal = closed paper as fake CLOSE entries
+          if (presetView === "paper") {
+            const paperPos = s?.paperEngine?.positions ?? [];
+            const paperOpen = paperPos.filter((p: any) => p.status === "OPEN").map((p: any) => ({
+              id: p.id, side: p.side, entryPrice: p.entryPrice, entryMs: p.entryMs,
+              tpPrice: p.tpPrice, slPrice: p.slPrice,
+            }));
+            const paperJournal = paperPos.filter((p: any) => p.status !== "OPEN").map((p: any) => ({
+              ts: p.exitMs ?? p.entryMs,
+              action: { kind: "CLOSE", side: p.side, closePrice: p.exitPrice, trigger: p.status === "WIN" ? "TP" : "SL" },
+            }));
+            return (
+              <ServerPriceChart
+                bars={klinesByTf?.[chartTf] ?? []}
+                tracked={paperOpen}
+                journal={paperJournal}
+                width={containerW}
+                tf={chartTf}
+              />
+            );
+          }
+          // REAL view (default)
+          return (
+            <ServerPriceChart
+              bars={klinesByTf?.[chartTf] ?? []}
+              tracked={tracked}
+              journal={live.journal}
+              width={containerW}
+              tf={chartTf}
+            />
+          );
+        })()}
       </View>
 
       {/* Tracked positions */}
