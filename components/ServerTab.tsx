@@ -11,6 +11,7 @@ import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
 import { SERVER_URL } from "../utils/backendApi";
+import PresetEnginePanel from "./PresetEnginePanel";
 
 const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
 
@@ -156,6 +157,9 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
           </View>
         )}
       </View>
+
+      {/* v0.3.0 PRESET ENGINE PANEL (anh Tommy: Real + Paper song song) */}
+      <PresetEnginePanel state={s} onRefresh={live.refresh} />
 
       {/* ENGINE START/STOP — clearer for new entries vs Plan B */}
       <View style={styles.card}>

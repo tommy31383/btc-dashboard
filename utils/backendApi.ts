@@ -101,6 +101,13 @@ export const api = {
   binanceAccount: () => request<any>("/api/binance/account"),
   binancePositions: () => request<any>("/api/binance/positions"),
   binanceHedge: () => request<any>("/api/binance/hedge-mode"),
+
+  // v0.3.0 PRESET ENGINE (anh Tommy: server replica của 5m ALL)
+  presets: () => request<any>("/api/live/presets"),
+  setPresetConfig: (config: any) => request<any>("/api/live/preset-config", "POST", { config }),
+  paperReset: (password: string) => request<any>("/api/live/paper/reset", "POST", { confirmPassword: password }),
+  paperClear: (password: string) => request<any>("/api/live/paper/clear", "POST", { confirmPassword: password }),
+  realClear: (password: string) => request<any>("/api/live/real/clear", "POST", { confirmPassword: password }),
 };
 
 export type WsHandler = (msg: any) => void;
