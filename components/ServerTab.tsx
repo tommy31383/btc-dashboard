@@ -14,6 +14,7 @@ import { SERVER_URL } from "../utils/backendApi";
 import PresetEnginePanel, { ToggleView } from "./PresetEnginePanel";
 import PresetOpenList from "./PresetOpenList";
 import PaperSection from "./PaperSection";
+import ServerEngineStatus from "./ServerEngineStatus";
 
 const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
 
@@ -164,6 +165,9 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
 
       {/* v0.3.0 PRESET ENGINE PANEL (anh Tommy: Real + Paper song song) */}
       <PresetEnginePanel state={s} onRefresh={live.refresh} view={presetView} onViewChange={setPresetView} />
+
+      {/* v0.3.3 ENGINE STATUS — show stoch K + S/R + per-side READY/BLOCKED */}
+      <ServerEngineStatus view={presetView} state={s} markPrice={markPriceAll} />
 
       {/* OPEN POSITIONS LIST — render theo view (real or paper) */}
       <PresetOpenList view={presetView} state={s} markPrice={markPriceAll} />
