@@ -195,50 +195,84 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       {/* === REAL-only global controls/stats (apply cho real engine) === */}
       {presetView === "real" && (<>
 
-      {/* ENGINE START/STOP — REAL only (paper không cần auto toggle) */}
+      {/* v4.9.11 (anh Tommy): Unified 3-mode (STOPPED / DRY / LIVE REAL) — kèm chú thích từng mode */}
       <View style={styles.card}>
         <Text style={styles.h2}>⚙️ ENGINE — NEW ENTRIES (real)</Text>
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={[styles.chip, {
-              borderColor: s?.autoEnabled ? P.green : P.error,
-              backgroundColor: (s?.autoEnabled ? P.green : P.error) + "22",
-              paddingHorizontal: 18, paddingVertical: 10,
-            }]}
-            onPress={() => {
-              if (!s?.autoEnabled) {
-                if (typeof window !== "undefined" && !window.confirm("▶️ START? Server sẽ tự vào lệnh mới khi rule fire. Plan B vẫn monitor positions hiện có.")) return;
-                live.setAuto(true);
-              } else {
-                if (typeof window !== "undefined" && !window.confirm("⏸ STOP new entries? Plan B vẫn close positions hiện có khi hit TP/SL.")) return;
-                live.setAuto(false);
-              }
-            }}
-          >
-            <Text style={{ color: s?.autoEnabled ? P.green : P.error, fontFamily: "monospace", fontWeight: "900", fontSize: 13, letterSpacing: 1 }}>
-              {s?.autoEnabled ? "▶️ RUNNING (STOP)" : "⏸ STOPPED (START)"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.chip, { borderColor: s?.dryRun ? P.bitcoinOrange : P.error, backgroundColor: (s?.dryRun ? P.bitcoinOrange : P.error) + "22" }]}
-            onPress={() => {
-              if (s?.dryRun) {
-                const pw = askPw();
-                if (pw) live.setDryRun(false, pw);
-              } else {
-                live.setDryRun(true);
-              }
-            }}
-          >
-            <Text style={{ color: s?.dryRun ? P.bitcoinOrange : P.error, fontFamily: "monospace", fontWeight: "800" }}>
-              {s?.dryRun ? "DRY RUN" : "REAL ‼️"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={[styles.dim, { marginTop: 6 }]}>
-          💡 STOP/START chỉ block lệnh MỚI. Plan B vẫn monitor TP/SL của lệnh hiện có 24/7.
-          {"\n"}💡 DRY = log only · REAL = MARKET thật trên Binance (cần password switch).
-        </Text>
+        {(() => {
+          // Compute current mode
+          const isStopped = !s?.autoEnabled;
+          const isDry = s?.autoEnabled && s?.dryRun;
+          const isLive = s?.autoEnabled && !s?.dryRun;
+          const currentMode: "STOPPED" | "DRY" | "LIVE" = isStopped ? "STOPPED" : isDry ? "DRY" : "LIVE";
+
+          const switchTo = (mode: "STOPPED" | "DRY" | "LIVE") => {
+            if (mode === currentMode) return;
+            if (mode === "STOPPED") {
+              if (typeof window !== "undefined" && !window.confirm("⏸ STOPPED?\nKHÔNG fire entry mới. Plan B vẫn monitor TP/SL của lệnh đang OPEN.")) return;
+              live.setAuto(false);
+            } else if (mode === "DRY") {
+              if (typeof window !== "undefined" && !window.confirm("📋 DRY RUN?\nFire signal nhưng CHỈ LOG, không gửi MARKET Binance.\nKhông tốn tiền thật.")) return;
+              if (!s?.autoEnabled) live.setAuto(true);
+              if (!s?.dryRun) live.setDryRun(true);
+            } else {
+              if (typeof window !== "undefined" && !window.confirm("🚨 LIVE REAL?\nServer SẼ trade tiền thật trên Binance!\n\nCần nhập password để xác nhận.")) return;
+              const pw = askPw();
+              if (!pw) return;
+              if (!s?.autoEnabled) live.setAuto(true);
+              if (s?.dryRun) live.setDryRun(false, pw);
+            }
+          };
+
+          const modes: { id: "STOPPED" | "DRY" | "LIVE"; label: string; emoji: string; color: string; desc: string }[] = [
+            { id: "STOPPED", label: "STOPPED", emoji: "⏸", color: P.error, desc: "KHÔNG fire entry mới · Plan B vẫn monitor TP/SL lệnh đang OPEN" },
+            { id: "DRY", label: "DRY RUN", emoji: "📋", color: P.bitcoinOrange, desc: "Fire signal CHỈ LOG · không gửi MARKET Binance · không tốn tiền" },
+            { id: "LIVE", label: "LIVE REAL", emoji: "🔴", color: P.green, desc: "Fire + MARKET THẬT trên Binance · tiền thật ‼️ (cần password)" },
+          ];
+
+          return (
+            <View>
+              {/* Pill segment 3 modes */}
+              <View style={{ flexDirection: "row", gap: 6, marginVertical: 8, flexWrap: "wrap" }}>
+                {modes.map((m) => {
+                  const active = currentMode === m.id;
+                  return (
+                    <TouchableOpacity
+                      key={m.id}
+                      onPress={() => switchTo(m.id)}
+                      style={{
+                        flex: 1, minWidth: 110,
+                        paddingVertical: 12, paddingHorizontal: 12,
+                        borderRadius: 6, borderWidth: 2,
+                        borderColor: active ? m.color : P.borderSoft,
+                        backgroundColor: active ? m.color + "33" : P.surface,
+                      }}
+                    >
+                      <Text style={{
+                        color: active ? m.color : P.dim,
+                        fontFamily: "monospace", fontWeight: "900",
+                        fontSize: 13, textAlign: "center",
+                      }}>
+                        {active ? "● " : ""}{m.emoji} {m.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Chú thích từng mode (collapsed under buttons) */}
+              <View style={{ paddingVertical: 6, gap: 3 }}>
+                {modes.map((m) => (
+                  <Text key={m.id} style={{
+                    color: currentMode === m.id ? m.color : P.dim,
+                    fontFamily: "monospace", fontSize: 10, lineHeight: 14,
+                  }}>
+                    {currentMode === m.id ? "▶ " : "  "}{m.emoji} <Text style={{ fontWeight: "700" }}>{m.label}:</Text> {m.desc}
+                  </Text>
+                ))}
+              </View>
+            </View>
+          );
+        })()}
       </View>
 
       {/* KPIs */}
