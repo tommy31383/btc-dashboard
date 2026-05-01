@@ -235,7 +235,7 @@ export default function PresetEnginePanel({ state, onRefresh, view, onViewChange
             </TouchableOpacity>
           </View>
 
-          {/* PAPER STATS */}
+          {/* PAPER STATS — v0.3.2 add total fee paid */}
           <View style={styles.statsBox}>
             <Text style={styles.dim}>
               Capital: <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>${paper?.capital?.toFixed(2) ?? "—"}</Text>
@@ -244,7 +244,10 @@ export default function PresetEnginePanel({ state, onRefresh, view, onViewChange
             <Text style={styles.dim}>
               Open: {paperOpen} · Closed: {paperClosed} · Wins: {paperWins} · Losses: {paperLosses} · WR: {paperWr}%
             </Text>
-            <Text style={styles.dim}>Total NET: <Text style={{ color: (paper?.totalPnlUsd ?? 0) >= 0 ? P.green : P.error }}>${paper?.totalPnlUsd?.toFixed(2) ?? "0"}</Text></Text>
+            <Text style={styles.dim}>
+              Total NET: <Text style={{ color: (paper?.totalPnlUsd ?? 0) >= 0 ? P.green : P.error }}>${paper?.totalPnlUsd?.toFixed(2) ?? "0"}</Text>
+              {" · "}Total fee paid: <Text style={{ color: "#fbbf24" }}>${(paper?.totalFeeUsd ?? 0).toFixed(2)}</Text>
+            </Text>
           </View>
 
           {/* PAPER PRESET DROPDOWN */}

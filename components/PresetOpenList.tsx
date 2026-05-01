@@ -77,29 +77,32 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
 
   const { positions, isPaper, marginUsd, leverage } = data;
 
-  // v0.3.1 (anh Tommy): tính fee Binance taker 0.05%/side = 0.10% round-trip.
-  // uPnL hiển thị = gross - feeRoundTrip (tránh hiểu nhầm là lời thực tế).
+  // v0.3.2 (anh Tommy): Binance MARKET = TAKER 0.05%/side, trừ NGAY khi fill.
+  // Entry fee đã trừ vào capital lúc fill → uPnL realtime CHỈ trừ exit fee (sẽ trừ khi close).
+  // pnlUsd net của position = gross - entryFee (đã trừ rồi) - exitFee (estimate lúc display).
   const FEE_PER_SIDE_PCT = 0.05;
 
-  // Compute uPnL per position if markPrice available
   const enriched = useMemo(() => {
     return positions.map((p) => {
       let upnlPct: number | null = null;
       let upnlUsd: number | null = null;
-      let upnlPctOnMargin: number | null = null; // % so với margin
-      let feeRoundTrip: number | null = null;
+      let upnlPctOnMargin: number | null = null;
+      let exitFeeEst: number | null = null;
       if (markPrice && markPrice > 0) {
         const rawPct = p.side === "LONG" ? (markPrice - p.entryPrice) / p.entryPrice * 100 : (p.entryPrice - markPrice) / p.entryPrice * 100;
         upnlPct = rawPct;
         let gross = p.notional * rawPct / 100;
-        if (gross < -marginUsd) gross = -marginUsd; // liquidation cap
-        feeRoundTrip = p.notional * (FEE_PER_SIDE_PCT / 100) * 2;
-        let net = gross - feeRoundTrip;
+        if (gross < -marginUsd) gross = -marginUsd;
+        // Estimate exit fee tại markPrice (qty × markPrice × 0.05%)
+        const qty = p.notional / p.entryPrice;
+        exitFeeEst = qty * markPrice * (FEE_PER_SIDE_PCT / 100);
+        // uPnL net (chưa realize) = gross - exitFee. Entry fee đã trừ trước.
+        let net = gross - exitFeeEst;
         if (net < -marginUsd) net = -marginUsd;
         upnlUsd = net;
         if (marginUsd > 0) upnlPctOnMargin = net / marginUsd * 100;
       }
-      return { ...p, upnlPct, upnlUsd, upnlPctOnMargin, feeRoundTrip };
+      return { ...p, upnlPct, upnlUsd, upnlPctOnMargin, feeRoundTrip: exitFeeEst };
     });
   }, [positions, markPrice, marginUsd]);
 
@@ -134,12 +137,12 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
       {isPaper && equity !== null && (
         <Text style={{ color: P.dim, fontSize: 11, marginTop: 2 }}>
           EQUITY = capital ${paperCap?.toFixed(2)} + uPnL = <Text style={{ color: equity >= (state?.paperEngine?.initialCapital ?? 5000) ? P.green : P.error, fontWeight: "700" }}>${equity.toFixed(2)}</Text>
-          {" · "}fee đang lock <Text style={{ color: P.bitcoinOrange }}>${totalOpenFee.toFixed(3)}</Text>
+          {" · "}exit fee estimate <Text style={{ color: "#fbbf24" }}>${totalOpenFee.toFixed(3)}</Text>
         </Text>
       )}
       {!isPaper && totalOpenFee > 0 && (
         <Text style={{ color: P.dim, fontSize: 11, marginTop: 2 }}>
-          fee round-trip estimate: <Text style={{ color: P.bitcoinOrange }}>${totalOpenFee.toFixed(3)}</Text>
+          exit fee estimate: <Text style={{ color: "#fbbf24" }}>${totalOpenFee.toFixed(3)}</Text>
         </Text>
       )}
 
