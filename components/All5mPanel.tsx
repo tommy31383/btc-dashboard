@@ -249,12 +249,17 @@ const OpenPositionRow = memo(function OpenPositionRow({
   p: Position; i: number; currentPrice: number | null;
   onCloseManual?: (id: string) => void;
 }) {
-  const upnlPct = currentPrice !== null
-    ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE
+  // v4.9.12 (anh Tommy fix display): leveraged % không cap → confusing.
+  // Đổi sang PnL% theo MARGIN (đã cap tại -100% + fee) → consistent với USD column.
+  const rawPctMove = currentPrice !== null
+    ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100
     : 0;
-  let grossUsd = currentPrice !== null ? MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100 : 0;
+  let grossUsd = currentPrice !== null ? MARGIN_PER_TRADE * rawPctMove * LEVERAGE / 100 : 0;
+  const isLiquidated = grossUsd <= -MARGIN_PER_TRADE; // hit liquidation cap
   if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
   const upnlUsd = grossUsd - FEE_PER_SIDE;
+  // PnL% on margin = upnlUsd / margin × 100 (naturally cap at -100% - feeImpact ~-105%)
+  const upnlPct = (upnlUsd / MARGIN_PER_TRADE) * 100;
   const color = upnlUsd >= 0 ? P.green : P.error;
   const notional = MARGIN_PER_TRADE * LEVERAGE;
   const distTpPct = currentPrice !== null ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
@@ -280,7 +285,9 @@ const OpenPositionRow = memo(function OpenPositionRow({
       <Text style={[styles.cellW, { color: P.error, fontSize: 10 }]}>SL ${p.slPrice.toFixed(0)} ({distSlPct.toFixed(2)}%)</Text>
       <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
-      <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>{fmtPct(upnlPct)}</Text>
+      <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>
+        {fmtPct(upnlPct)}{isLiquidated ? " 💀" : ""}
+      </Text>
       {onCloseManual && (
         <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
           <Text style={styles.closeBtnText}>✕</Text>
@@ -592,8 +599,9 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
             let sideUpnl = 0;
             if (currentPrice !== null) {
               for (const p of list) {
-                const upnlPct = (side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100 * LEVERAGE;
-                let grossUsd = MARGIN_PER_TRADE * upnlPct / LEVERAGE * LEVERAGE / 100;
+                // v4.9.12 fix: tính raw price move, gross USD, cap tại liquidation
+                const rawPctMove = (side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100;
+                let grossUsd = MARGIN_PER_TRADE * rawPctMove * LEVERAGE / 100;
                 if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
                 sideUpnl += grossUsd - FEE_PER_SIDE;
               }

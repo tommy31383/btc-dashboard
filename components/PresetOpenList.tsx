@@ -82,27 +82,27 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
   // pnlUsd net của position = gross - entryFee (đã trừ rồi) - exitFee (estimate lúc display).
   const FEE_PER_SIDE_PCT = 0.05;
 
+  // v4.9.12 (anh Tommy fix): add isLiquidated flag để UI show 💀 LIQ badge
   const enriched = useMemo(() => {
     return positions.map((p) => {
       let upnlPct: number | null = null;
       let upnlUsd: number | null = null;
       let upnlPctOnMargin: number | null = null;
       let exitFeeEst: number | null = null;
+      let isLiquidated = false;
       if (markPrice && markPrice > 0) {
         const rawPct = p.side === "LONG" ? (markPrice - p.entryPrice) / p.entryPrice * 100 : (p.entryPrice - markPrice) / p.entryPrice * 100;
         upnlPct = rawPct;
         let gross = p.notional * rawPct / 100;
-        if (gross < -marginUsd) gross = -marginUsd;
-        // Estimate exit fee tại markPrice (qty × markPrice × 0.05%)
+        if (gross <= -marginUsd) { gross = -marginUsd; isLiquidated = true; }
         const qty = p.notional / p.entryPrice;
         exitFeeEst = qty * markPrice * (FEE_PER_SIDE_PCT / 100);
-        // uPnL net (chưa realize) = gross - exitFee. Entry fee đã trừ trước.
         let net = gross - exitFeeEst;
         if (net < -marginUsd) net = -marginUsd;
         upnlUsd = net;
         if (marginUsd > 0) upnlPctOnMargin = net / marginUsd * 100;
       }
-      return { ...p, upnlPct, upnlUsd, upnlPctOnMargin, feeRoundTrip: exitFeeEst };
+      return { ...p, upnlPct, upnlUsd, upnlPctOnMargin, feeRoundTrip: exitFeeEst, isLiquidated };
     });
   }, [positions, markPrice, marginUsd]);
 
@@ -174,7 +174,7 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
                         {p.upnlUsd !== null ? fmtUsd(p.upnlUsd, true) : "—"}
                       </Text>
                       <Text style={[styles.cell, styles.cellPct, { color: upnlColor, textAlign: "right" }]}>
-                        {p.upnlPctOnMargin !== null ? `${p.upnlPctOnMargin >= 0 ? "+" : ""}${p.upnlPctOnMargin.toFixed(2)}%` : "—"}
+                        {p.upnlPctOnMargin !== null ? `${p.upnlPctOnMargin >= 0 ? "+" : ""}${p.upnlPctOnMargin.toFixed(2)}%${p.isLiquidated ? " 💀" : ""}` : "—"}
                       </Text>
                     </View>
                   );
