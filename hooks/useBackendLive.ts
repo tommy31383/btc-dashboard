@@ -137,8 +137,14 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
       })();
       // Single global refresh interval — không multi-instance
       // v4.8.35: 15s → 30s — WS đã push state realtime, REST chỉ là safety fallback
+      // v4.9.9 (anh Tommy audit D3): SKIP REST refresh nếu WS healthy (lastWsTs < 10s).
+      // WS đã push state realtime → REST chỉ là safety fallback khi WS chết.
+      // Trước: 30s × 3 reqs = 6 reqs/min lãng phí ~600KB/min. Giờ chỉ refresh nếu WS stale.
       refreshTimerRef.current = setInterval(() => {
-        if (_cache.authed) refresh().catch(() => {});
+        if (!_cache.authed) return;
+        const wsAge = Date.now() - (_cache.lastUpdateMs || 0);
+        if (wsAge < 60_000) return; // WS healthy → skip REST
+        refresh().catch(() => {});
       }, 30000);
     } else {
       setLoading(false);
