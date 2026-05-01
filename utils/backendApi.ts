@@ -119,9 +119,12 @@ async function connectWs(): Promise<void> {
   const token = await getToken();
   if (!token) return;
   const url = await getServerUrl();
-  const wsUrl = url.replace(/^http/, "ws") + `/ws?token=${encodeURIComponent(token)}`;
+  // v4.9.10 (audit SEC1): JWT qua Sec-WebSocket-Protocol header thay vì URL query
+  // (URL query leak vào Caddy/nginx logs, Referer headers, browser history).
+  // Server v0.3.7+ accept subprotocol "bearer" + token. Backward compat fallback ?token=.
+  const wsUrl = url.replace(/^http/, "ws") + "/ws";
   try {
-    _ws = new WebSocket(wsUrl);
+    _ws = new WebSocket(wsUrl, ["bearer", token]);
     _ws.onopen = () => console.log("[backend ws] connected");
     _ws.onmessage = (e) => {
       try {
