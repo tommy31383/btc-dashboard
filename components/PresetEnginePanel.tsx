@@ -110,23 +110,11 @@ export default function PresetEnginePanel({ state, onRefresh, view, onViewChange
 
   return (
     <View style={styles.card}>
-      {/* HEADER + TOGGLE */}
+      {/* v4.9.8: HEADER (toggle moved to ServerTab header — sticky luôn visible) */}
       <View style={styles.headerRow}>
-        <Text style={styles.h1}>⚡ PRESET ENGINE</Text>
-        <View style={styles.toggleRow}>
-          <TouchableOpacity
-            style={[styles.toggleBtn, view === "real" && styles.toggleActive]}
-            onPress={() => setView("real")}
-          >
-            <Text style={[styles.toggleText, view === "real" && styles.toggleTextActive]}>🔴 REAL</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggleBtn, view === "paper" && styles.toggleActiveBlue]}
-            onPress={() => setView("paper")}
-          >
-            <Text style={[styles.toggleText, view === "paper" && styles.toggleTextActive]}>📋 PAPER</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.h1}>
+          ⚡ PRESET ENGINE — {view === "paper" ? "📋 PAPER MODE" : "🔴 REAL MODE"}
+        </Text>
       </View>
 
       {error && <Text style={styles.error}>⚠️ {error}</Text>}

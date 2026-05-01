@@ -133,10 +133,30 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       <DebugLabel name="ServerTab" />
       <View style={styles.card}>
         <View style={styles.headerRow}>
-          <Text style={styles.h1}>☁️ BTC TRADER SERVER · 24/7</Text>
-          <TouchableOpacity onPress={live.logout} style={styles.btnGhost}>
-            <Text style={styles.btnGhostText}>LOGOUT</Text>
-          </TouchableOpacity>
+          <Text style={styles.h1}>
+            ☁️ BTC TRADER SERVER · 24/7{" "}
+            <Text style={{ color: presetView === "paper" ? "#3b82f6" : P.error, fontSize: 12 }}>
+              · {presetView === "paper" ? "📋 PAPER" : "🔴 REAL"}
+            </Text>
+          </Text>
+          <View style={{ flexDirection: "row", gap: 6 }}>
+            {/* v4.9.8: lift view toggle lên header - sticky, luôn visible */}
+            <TouchableOpacity
+              onPress={() => setPresetView("real")}
+              style={[styles.btnGhost, presetView === "real" && { borderColor: P.error, backgroundColor: P.error + "22" }]}
+            >
+              <Text style={[styles.btnGhostText, presetView === "real" && { color: P.error }]}>🔴 REAL</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setPresetView("paper")}
+              style={[styles.btnGhost, presetView === "paper" && { borderColor: "#3b82f6", backgroundColor: "#3b82f622" }]}
+            >
+              <Text style={[styles.btnGhostText, presetView === "paper" && { color: "#3b82f6" }]}>📋 PAPER</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={live.logout} style={styles.btnGhost}>
+              <Text style={styles.btnGhostText}>LOGOUT</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
           <Text style={styles.dim}>{SERVER_URL} · last update </Text>
@@ -172,9 +192,12 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       {/* OPEN POSITIONS LIST — render theo view (real or paper) */}
       <PresetOpenList view={presetView} state={s} markPrice={markPriceAll} />
 
-      {/* ENGINE START/STOP — clearer for new entries vs Plan B */}
+      {/* === REAL-only global controls/stats (apply cho real engine) === */}
+      {presetView === "real" && (<>
+
+      {/* ENGINE START/STOP — REAL only (paper không cần auto toggle) */}
       <View style={styles.card}>
-        <Text style={styles.h2}>⚙️ ENGINE — NEW ENTRIES</Text>
+        <Text style={styles.h2}>⚙️ ENGINE — NEW ENTRIES (real)</Text>
         <View style={styles.row}>
           <TouchableOpacity
             style={[styles.chip, {
@@ -258,8 +281,6 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         )}
       </View>
 
-      {/* === REAL-only panels: hide khi paper view === */}
-      {presetView === "real" && (<>
       {/* BINANCE POSITIONS — net hedge state lấy từ /fapi/v2/positionRisk thật (anh Tommy v4.8.13) */}
       <View style={styles.card}>
         <Text style={styles.h2}>🏦 BINANCE POSITIONS (live · {symbol})</Text>
@@ -309,10 +330,10 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         </Text>
       </View>
 
-      {/* SYNC CHECK moved inside TRACKED card (anh Tommy v4.8.17) */}
+      {/* SYNC CHECK moved inside TRACKED card (anh Tommy v4.8.17) — DEAD CODE removed v4.9.8 */}
       {false && (
       <View style={styles.card}>
-        <Text style={styles.h2}>🔄 SYNC CHECK · App tracked vs Binance</Text>
+        <Text style={styles.h2}>🔄 SYNC CHECK · App tracked vs Binance (DEAD)</Text>
         <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
           {(["LONG", "SHORT"] as const).map((side) => {
             const sideColor = side === "LONG" ? P.green : P.error;
@@ -370,7 +391,7 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
         </Text>
       </View>
       )}
-      </>)}{/* === END BINANCE POSITIONS + SYNC CHECK (REAL-only) === */}
+      </>)}{/* === END REAL-only block (KPIs, Active Firing, Engine, Binance Positions, Sync) === */}
 
       {/* Chart entry/exit markers — render cho cả 2 view (real/paper) */}
       <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
