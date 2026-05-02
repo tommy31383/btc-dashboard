@@ -79,21 +79,31 @@ function consolidate(positions: RawPosition[], side: "LONG" | "SHORT", markPrice
   return { count: filtered.length, totalQty, avgEntry, notional, marginUsed, upnlUsd, upnlPct, liqPrice: null };
 }
 
-/** Compute account-level liquidation price (cross margin, simplified 1-side).
- *  LONG:  liq = avg_entry × (1 - (wallet - maint_margin) / notional)
- *  SHORT: liq = avg_entry × (1 + (wallet - maint_margin) / notional)
- *  Note: chỉ chính xác nếu CHỈ side này có position. Khi cả 2 side có position →
- *  formula phức tạp hơn (cross share collateral). Em show estimate (per-side standalone).
+/** v4.9.18 (anh Tommy): Binance HEDGE cross liq — 2 sides SHARE wallet, hedge nhau.
+ *  Formula (per Binance Futures docs):
+ *    buffer = wallet + uPnL_OTHER_side - maint_margin_TOTAL
+ *    LIQ_LONG  = avg_entry_LONG  × (1 - buffer / notional_LONG)
+ *    LIQ_SHORT = avg_entry_SHORT × (1 + buffer / notional_SHORT)
+ *    maint_margin_TOTAL = (notional_LONG + notional_SHORT) × MMR
+ *
+ *  Khi qty_LONG ≈ qty_SHORT (perfectly hedged) → buffer rất lớn → LIQ practically infinite (đúng logic Binance).
+ *  Note: uPnL_other tại current markPrice là estimate; thực tế LIQ thay đổi khi price move.
  */
-function computeLiqPrice(side: "LONG" | "SHORT", net: NetSide, wallet: number): number | null {
-  if (net.count === 0 || net.notional === 0) return null;
-  const maintMargin = net.notional * MAINT_MARGIN_RATE;
-  const buffer = wallet - maintMargin; // available to absorb loss before liq
-  if (buffer <= 0) return net.avgEntry; // already past liq
-  const lossRatio = buffer / net.notional; // ratio price can move adversely
+function computeLiqPriceHedge(
+  side: "LONG" | "SHORT",
+  netThis: NetSide,
+  netOther: NetSide,
+  wallet: number,
+): number | null {
+  if (netThis.count === 0 || netThis.notional === 0) return null;
+  const maintMarginTotal = (netThis.notional + netOther.notional) * MAINT_MARGIN_RATE;
+  // uPnL của side bên kia HỖ TRỢ collateral khi side này thua (hedge benefit)
+  const buffer = wallet + netOther.upnlUsd - maintMarginTotal;
+  if (buffer <= 0) return netThis.avgEntry; // already past liq
+  const lossRatio = buffer / netThis.notional;
   return side === "LONG"
-    ? net.avgEntry * (1 - lossRatio)
-    : net.avgEntry * (1 + lossRatio);
+    ? netThis.avgEntry * (1 - lossRatio)
+    : netThis.avgEntry * (1 + lossRatio);
 }
 
 export default function ConsolidatedPositions({ positions, markPrice, walletUsd, marginUsd, leverage, title, note }: Props) {
@@ -101,8 +111,9 @@ export default function ConsolidatedPositions({ positions, markPrice, walletUsd,
   const shortNet = consolidate(positions, "SHORT", markPrice, marginUsd, leverage);
 
   if (walletUsd !== null) {
-    longNet.liqPrice = computeLiqPrice("LONG", longNet, walletUsd);
-    shortNet.liqPrice = computeLiqPrice("SHORT", shortNet, walletUsd);
+    // v4.9.18: hedge cross — pass other side cho mỗi liq computation
+    longNet.liqPrice = computeLiqPriceHedge("LONG", longNet, shortNet, walletUsd);
+    shortNet.liqPrice = computeLiqPriceHedge("SHORT", shortNet, longNet, walletUsd);
   }
 
   const totalUpnl = longNet.upnlUsd + shortNet.upnlUsd;
@@ -167,8 +178,13 @@ export default function ConsolidatedPositions({ positions, markPrice, walletUsd,
               <View style={[styles.kvRow, { marginTop: 4, paddingTop: 4, borderTopWidth: 1, borderTopColor: P.border + "33" }]}>
                 <Text style={styles.k}>💀 LIQ price:</Text>
                 <Text style={[styles.v, { color: liqDanger ? P.error : P.bitcoinOrange, fontWeight: "700" }]}>
-                  {net.liqPrice !== null ? `$${net.liqPrice.toFixed(0)}` : "—"}
-                  {liqDistPct !== null && (
+                  {/* v4.9.18: nếu liq < 0 hoặc > 10x markPrice = perfectly hedged → ∞ */}
+                  {net.liqPrice === null
+                    ? "—"
+                    : (net.liqPrice <= 0 || (markPrice && net.liqPrice > markPrice * 10))
+                      ? "∞ hedged"
+                      : `$${net.liqPrice.toFixed(0)}`}
+                  {liqDistPct !== null && net.liqPrice !== null && net.liqPrice > 0 && markPrice && net.liqPrice <= markPrice * 10 && (
                     <Text style={{ color: liqDanger ? P.error : P.dim, fontSize: 10 }}>
                       {" "}({liqDistPct.toFixed(2)}% away{liqDanger ? " ⚠️" : ""})
                     </Text>
@@ -182,7 +198,7 @@ export default function ConsolidatedPositions({ positions, markPrice, walletUsd,
 
       {note && <Text style={styles.note}>{note}</Text>}
       <Text style={styles.note}>
-        💡 LIQ ước tính theo CROSS margin — formula: side × avg_entry × (1 ∓ (wallet - notional × MMR) / notional). MMR=0.4% (Binance tier 0 BTCUSDT).
+        💡 LIQ ước tính theo BINANCE HEDGE CROSS — buffer = wallet + uPnL_other − maint_total. Khi 2 side hedge nhau → LIQ ∞ (an toàn). MMR=0.4% tier 0 BTCUSDT.
       </Text>
     </View>
   );
