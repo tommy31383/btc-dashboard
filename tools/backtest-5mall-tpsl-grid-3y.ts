@@ -233,8 +233,10 @@ function runBacktest(
       const rawPct = p.side === "LONG"
         ? ((exitPrice - p.entryPrice) / p.entryPrice) * 100
         : ((p.entryPrice - exitPrice) / p.entryPrice) * 100;
-      let grossPnl = MARGIN_PER_TRADE * rawPct * LEVERAGE / 100;
-      if (grossPnl < -MARGIN_PER_TRADE) grossPnl = -MARGIN_PER_TRADE;
+      // v2 (anh Tommy 2026-05-02 fix CROSS): KHÔNG cap loss tại -margin.
+      // Anh dùng cross margin → loss = full leveraged. Vd SL=6% × 100x = -6 × margin.
+      // Bug cũ cap tại -margin → understate loss 6x → backtest result SAI.
+      const grossPnl = MARGIN_PER_TRADE * rawPct * LEVERAGE / 100;
       const netPnl = grossPnl - 2 * FEE_PER_SIDE;
       capital += netPnl;
       trades.push({

@@ -219,3 +219,62 @@ STACK_SWEEP_v1   → superseded, basis cho 5 preset v4.8.23
 - **Servers:** synced `/Users/lap16116/BTC_PC/btc-trader-server/assets/hard_rules.json`
 - **TP/SL UNCHANGED** cho 21 rules giữ lại → LIVE budget 0 thay đổi
 
+
+---
+
+## 🚨 LESSON LEARNED 2026-05-02 — CROSS MARGIN vs ISOLATED (anh Tommy critical fix)
+
+### Bug em gây ra trong nhiều version cũ:
+Code paper engine + UI hiển thị + tools backtest TẤT CẢ đều có dòng:
+```ts
+if (grossPnl < -margin) grossPnl = -margin; // SAI cho cross margin
+```
+
+→ Cap loss tại -margin ($30) per position = **assumption ISOLATED mode**.
+
+### Anh Tommy dùng CROSS margin:
+- Tất cả positions share TOTAL WALLET làm collateral
+- **Per-position uPnL có thể âm > 100% margin** (wallet còn cover)
+- Position close khi hit user-set TP/SL — KHÔNG có per-position liq cap
+- LIQ chỉ trigger ở ACCOUNT level: `totalEquity ≤ totalMaintMargin`
+
+### Hậu quả của bug:
+1. **Backtest cũ SAI**: position lỗ -260% bị cap thành -100% margin → understate loss
+2. **WR giả**: position SHOULD have hit SL ở -300% với loss thực $90 (nếu raw price -3%) nhưng cap giả tạo thành -$30 → record LOSS bình thường nhưng amount sai
+3. **NET PnL backtest INFLATED** vì max loss giới hạn → looks safer than reality
+
+### Hedge mode liquidation đúng (Binance docs):
+```
+net_qty   = qty_LONG - qty_SHORT (signed)
+net_entry = (qty_L × entry_L - qty_S × entry_S) / net_qty (break-even)
+buffer    = wallet - mm_total
+
+Net long  → LIQ = net_entry × (1 - buffer/net_notional)  (giá ↓)
+Net short → LIQ = net_entry × (1 + buffer/net_notional)  (giá ↑)
+Hedged    → NO LIQ (wallet tăng cùng chiều price move)
+```
+
+→ KHÔNG có per-side liq trong hedge cross. **CHỈ 1 LIQ duy nhất theo NET direction.**
+
+### Fix applied (server v0.3.9 + dashboard v4.9.14+):
+- ✅ Bỏ `if (gross < liqLoss) gross = liqLoss` trong presetEngine.ts
+- ✅ Bỏ liqPrice per-position
+- ✅ UI: bỏ cap upnlUsd ≥ -margin, show full leveraged loss
+- ✅ Add ConsolidatedPositions với Account NET LIQ (1 price duy nhất)
+
+### TODO tools/backtest-*.ts:
+**TẤT CẢ tools backtest 5m ALL có cap loss đều SAI.** Cần re-run sau fix:
+- `tools/backtest-5mall-tpsl-grid-3y.ts` (TPSL_GRID_v1 — 280 combos)
+- `tools/backtest-5mall-stack-sweep-3y.ts`
+- `tools/backtest-5mall-3y.ts`
+- `tools/backtest-htf-tpsl-grid-3y.ts` (HTF_TPSL_GRID_v2)
+- `tools/backtest-step-trail-sizes-3y.ts` (STEP_TRAIL_v1)
+
+→ Sau khi fix, **TẤT CẢ kết quả backtest CŨ trong registry này có thể KHÔNG còn chính xác**. Re-run + cập nhật picks.
+
+### Pitfalls cho Claude tiếp theo:
+1. **Anh Tommy LUÔN dùng CROSS margin** trên Binance Futures → KHÔNG cap loss per position
+2. Khi viết backtest mới: max loss = full leveraged loss, KHÔNG cap tại margin
+3. Hiển thị uPnL: show -260% raw nếu position chưa close, KHÔNG cap tại -100%
+4. LIQ price: chỉ tính theo NET direction, KHÔNG tính per-side (sai logic)
+5. Kiểm tra Binance liq formula: `buffer = wallet - mm_total + uPnL_other_side` (cho net_position)
