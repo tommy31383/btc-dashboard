@@ -56,6 +56,7 @@ export interface BackendLiveActions {
   setDryRun: (value: boolean, password?: string) => Promise<void>;
   setSettings: (partial: any) => Promise<void>;
   closePosition: (id: string, password: string) => Promise<void>;
+  paperClose: (id: string) => Promise<void>;
   editTpSl: (id: string, newTp?: number, newSl?: number, password?: string) => Promise<void>;
   bulkClose: (filter: "ALL" | "PROFIT" | "LOSS" | "OLD_HOURS", password: string) => Promise<void>;
   // 2026-04-28: lazy history loader — KHÔNG cache vào state, caller tự manage memory.
@@ -253,6 +254,11 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
     try { await api.bulkClose(filter, password); await refresh(); } catch (e: any) { setLastError(e?.message); }
   }, [refresh]);
 
+  // v4.9.15 (anh Tommy): close 1 paper position MANUAL (không cần password — paper money)
+  const paperClose = useCallback(async (id: string) => {
+    try { await api.paperClose(id); await refresh(); } catch (e: any) { setLastError(e?.message); }
+  }, [refresh]);
+
   // 2026-04-28: lazy loaders — KHÔNG cache vào _cache, caller tự dispose để giữ RAM thấp.
   const loadJournalHistory = useCallback(async (date: string): Promise<any[]> => {
     try {
@@ -278,7 +284,7 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
     authed, loading, lastError, state, scheduler, alerts, journal, lastUpdateMs,
     serverInfo, serverHealth,
     login, logout, refresh, setAuto, setDryRun, setSettings,
-    closePosition, editTpSl, bulkClose,
+    closePosition, editTpSl, bulkClose, paperClose,
     loadJournalHistory, loadJournalDays,
   };
 }

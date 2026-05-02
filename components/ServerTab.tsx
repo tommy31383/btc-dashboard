@@ -190,7 +190,7 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       <ServerEngineStatus view={presetView} state={s} markPrice={markPriceAll} />
 
       {/* OPEN POSITIONS LIST — render theo view (real or paper) */}
-      <PresetOpenList view={presetView} state={s} markPrice={markPriceAll} />
+      <PresetOpenList view={presetView} state={s} markPrice={markPriceAll} onPaperClose={live.paperClose} />
 
       {/* === REAL-only global controls/stats (apply cho real engine) === */}
       {presetView === "real" && (<>

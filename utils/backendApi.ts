@@ -107,6 +107,7 @@ export const api = {
   setPresetConfig: (config: any) => request<any>("/api/live/preset-config", "POST", { config }),
   paperReset: (password: string) => request<any>("/api/live/paper/reset", "POST", { confirmPassword: password }),
   paperClear: (password: string) => request<any>("/api/live/paper/clear", "POST", { confirmPassword: password }),
+  paperClose: (id: string) => request<any>("/api/live/paper/close", "POST", { id }),
   realClear: (password: string) => request<any>("/api/live/real/clear", "POST", { confirmPassword: password }),
 };
 

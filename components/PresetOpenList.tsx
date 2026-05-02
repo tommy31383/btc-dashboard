@@ -14,6 +14,7 @@ interface Props {
   view: ToggleView;
   state: any;
   markPrice: number | null;
+  onPaperClose?: (id: string) => Promise<void>;
 }
 
 interface NormalizedPos {
@@ -45,7 +46,7 @@ function fmtHeld(entryMs: number): string {
   return `${(h / 24).toFixed(1)}d`;
 }
 
-export default function PresetOpenList({ view, state, markPrice }: Props) {
+export default function PresetOpenList({ view, state, markPrice, onPaperClose }: Props) {
   const cfg = state?.settings || {};
 
   const data = useMemo<{ positions: NormalizedPos[]; isPaper: boolean; marginUsd: number; leverage: number }>(() => {
@@ -178,6 +179,20 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
                       <Text style={[styles.cell, styles.cellPct, { color: upnlColor, textAlign: "right" }]}>
                         {p.upnlPctOnMargin !== null ? `${p.upnlPctOnMargin >= 0 ? "+" : ""}${p.upnlPctOnMargin.toFixed(2)}%${p.isOverMargin ? " ⚠️" : ""}` : "—"}
                       </Text>
+                      {/* v4.9.15 (anh Tommy): nút ✕ close manual paper position */}
+                      {isPaper && onPaperClose && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (typeof window !== "undefined") {
+                              if (!window.confirm(`Close ${p.side} paper @${p.entryPrice.toFixed(0)}?\nuPnL: ${p.upnlUsd !== null ? fmtUsd(p.upnlUsd, true) : "—"}`)) return;
+                            }
+                            onPaperClose(p.id);
+                          }}
+                          style={styles.closeBtn}
+                        >
+                          <Text style={styles.closeBtnText}>✕</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   );
                 })}
@@ -207,4 +222,6 @@ const styles = StyleSheet.create({
   cellHeld: { width: 80 },
   cellPnl: { width: 80, fontWeight: "700" },
   cellPct: { width: 80, fontWeight: "700" },
+  closeBtn: { paddingHorizontal: 8, paddingVertical: 4, marginLeft: 6, borderRadius: 3, borderWidth: 1, borderColor: P.error + "55", backgroundColor: P.error + "15" },
+  closeBtnText: { color: P.error, fontSize: 11, fontWeight: "900" },
 });
