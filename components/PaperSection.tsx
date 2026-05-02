@@ -81,13 +81,16 @@ export default function PaperSection({ state, width }: Props) {
             <View>
               {closed.slice(0, 50).map((p: any) => {
                 const win = p.status === "WIN";
+                const isLiq = p.status === "LIQ";
                 const sideColor = p.side === "LONG" ? P.green : P.error;
-                const outcomeColor = win ? P.green : P.error;
+                const outcomeColor = win ? P.green : (isLiq ? "#fb923c" : P.error);
                 const notional = (cfg.paperMarginUsd ?? 1) * (cfg.paperLeverage ?? 125);
                 return (
                   <View key={p.id} style={styles.row}>
                     <Text style={[styles.cell, styles.cellTime]}>{fmtTime(p.exitMs)}</Text>
-                    <Text style={[styles.cell, styles.cellOutcome, { color: outcomeColor, fontWeight: "700" }]}>{p.status}</Text>
+                    <Text style={[styles.cell, styles.cellOutcome, { color: outcomeColor, fontWeight: "700" }]}>
+                      {isLiq ? "💀 LIQ" : p.status}
+                    </Text>
                     <Text style={[styles.cell, styles.cellSide, { color: sideColor, fontWeight: "700" }]}>{p.side}</Text>
                     <Text style={[styles.cell, styles.cellSrc, { color: P.dim }]}>{(p.source || "?").replace(/_/g, " ")}</Text>
                     <Text style={[styles.cell, styles.cellSize, { color: P.bitcoinOrange }]}>${notional.toFixed(0)}</Text>
