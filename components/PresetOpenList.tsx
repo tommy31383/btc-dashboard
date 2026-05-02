@@ -9,6 +9,7 @@ import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { P } from "../utils/v2Theme";
 import { ToggleView } from "./PresetEnginePanel";
+import ConsolidatedPositions from "./ConsolidatedPositions";
 
 interface Props {
   view: ToggleView;
@@ -116,10 +117,22 @@ export default function PresetOpenList({ view, state, markPrice, onPaperClose }:
   const shortUpnl = shorts.reduce((s, p) => s + (p.upnlUsd ?? 0), 0);
 
   if (positions.length === 0) {
+    // v4.9.16: vẫn show ConsolidatedPositions với "trống" cả 2 sides (giống Binance UI)
+    const wallet = isPaper ? (state?.paperEngine?.capital ?? null) : (() => {
+      const wb = parseFloat(state?.binanceSnapshot?.account?.totalWalletBalance ?? "");
+      return Number.isFinite(wb) ? wb : null;
+    })();
     return (
-      <View style={styles.card}>
-        <Text style={styles.h2}>{isPaper ? "📋 PAPER OPEN" : "🔴 REAL OPEN"} (0)</Text>
-        <Text style={styles.empty}>Chưa có lệnh nào đang mở</Text>
+      <View>
+        <ConsolidatedPositions
+          positions={[]} markPrice={markPrice} walletUsd={wallet}
+          marginUsd={marginUsd} leverage={leverage}
+          title={isPaper ? "🏦 PAPER NET POSITIONS (gộp như Binance hedge)" : "🏦 REAL NET POSITIONS (gộp như Binance hedge)"}
+        />
+        <View style={styles.card}>
+          <Text style={styles.h2}>{isPaper ? "📋 PAPER OPEN (chi tiết)" : "🔴 REAL OPEN (chi tiết)"} (0)</Text>
+          <Text style={styles.empty}>Chưa có lệnh nào đang mở</Text>
+        </View>
       </View>
     );
   }
@@ -130,10 +143,27 @@ export default function PresetOpenList({ view, state, markPrice, onPaperClose }:
   const paperCap = state?.paperEngine?.capital;
   const equity = isPaper && typeof paperCap === "number" ? paperCap + totalUpnl : null;
 
+  // v4.9.16 (anh Tommy): wallet để compute LIQ price account-level
+  const walletUsd = isPaper ? (state?.paperEngine?.capital ?? null) : (() => {
+    const wb = parseFloat(state?.binanceSnapshot?.account?.totalWalletBalance ?? "");
+    return Number.isFinite(wb) ? wb : null;
+  })();
+
   return (
+    <View>
+      {/* Consolidated 2 NET positions (Binance hedge gộp) — show liq price + total uPnL */}
+      <ConsolidatedPositions
+        positions={positions}
+        markPrice={markPrice}
+        walletUsd={walletUsd}
+        marginUsd={marginUsd}
+        leverage={leverage}
+        title={isPaper ? "🏦 PAPER NET POSITIONS (gộp như Binance hedge)" : "🏦 REAL NET POSITIONS (gộp như Binance hedge)"}
+      />
+
     <View style={styles.card}>
       <Text style={styles.h2}>
-        {isPaper ? "📋 PAPER OPEN" : "🔴 REAL OPEN"} ({positions.length}) · TỔNG uPnL{" "}
+        {isPaper ? "📋 PAPER OPEN (chi tiết từng entry)" : "🔴 REAL OPEN (chi tiết từng entry)"} ({positions.length}) · TỔNG uPnL{" "}
         <Text style={{ color: totalUpnl >= 0 ? P.green : P.error }}>{fmtUsd(totalUpnl, true)}</Text>
         {" "}<Text style={{ color: P.dim, fontSize: 11 }}>(net of fee)</Text>
       </Text>
@@ -201,6 +231,7 @@ export default function PresetOpenList({ view, state, markPrice, onPaperClose }:
           </View>
         );
       })}
+    </View>
     </View>
   );
 }

@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Polyline, Line, Polygon, Circle } from "react-native-svg";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
+import ConsolidatedPositions from "./ConsolidatedPositions";
 import {
   All5mAccount, AccountSummary, Position,
   INITIAL_CAPITAL, MARGIN_PER_TRADE, LEVERAGE, FEE_PER_SIDE,
@@ -588,9 +589,19 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
         <EquityCurveSvg data={account.equityHistory} width={chartW} />
       </View>
 
+      {/* v4.9.16 (anh Tommy): NET POSITIONS gộp như Binance hedge mode */}
+      <ConsolidatedPositions
+        positions={open}
+        markPrice={currentPrice}
+        walletUsd={account.capital}
+        marginUsd={MARGIN_PER_TRADE}
+        leverage={LEVERAGE}
+        title="🏦 5m ALL NET POSITIONS (gộp như Binance hedge)"
+      />
+
       {/* OPEN list — split LONG/SHORT, dùng OpenPositionRow memo */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🟢 OPEN ({open.length}) · TỔNG uPnL: <Text style={{ color: unrealized >= 0 ? P.green : P.error }}>{fmtUsd(unrealized, true)}</Text></Text>
+        <Text style={styles.sectionTitle}>🟢 OPEN chi tiết ({open.length}) · TỔNG uPnL: <Text style={{ color: unrealized >= 0 ? P.green : P.error }}>{fmtUsd(unrealized, true)}</Text></Text>
         {open.length === 0 ? (
           <Text style={styles.empty}>chưa có lệnh nào đang mở</Text>
         ) : (
