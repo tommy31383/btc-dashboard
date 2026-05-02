@@ -249,17 +249,17 @@ const OpenPositionRow = memo(function OpenPositionRow({
   p: Position; i: number; currentPrice: number | null;
   onCloseManual?: (id: string) => void;
 }) {
-  // v4.9.12 (anh Tommy fix display): leveraged % không cap → confusing.
-  // Đổi sang PnL% theo MARGIN (đã cap tại -100% + fee) → consistent với USD column.
+  // v4.9.14 (anh Tommy fix CROSS MARGIN):
+  // Anh dùng cross → uPnL có thể âm > 100% margin (wallet còn cover).
+  // KHÔNG cap loss per position. Position chỉ close khi hit TP/SL user-set.
+  // Display: full leveraged loss (vd -260% margin = -$78 thực).
   const rawPctMove = currentPrice !== null
     ? (p.side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100
     : 0;
-  let grossUsd = currentPrice !== null ? MARGIN_PER_TRADE * rawPctMove * LEVERAGE / 100 : 0;
-  const isLiquidated = grossUsd <= -MARGIN_PER_TRADE; // hit liquidation cap
-  if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
+  const grossUsd = currentPrice !== null ? MARGIN_PER_TRADE * rawPctMove * LEVERAGE / 100 : 0;
   const upnlUsd = grossUsd - FEE_PER_SIDE;
-  // PnL% on margin = upnlUsd / margin × 100 (naturally cap at -100% - feeImpact ~-105%)
-  const upnlPct = (upnlUsd / MARGIN_PER_TRADE) * 100;
+  const upnlPct = (upnlUsd / MARGIN_PER_TRADE) * 100; // có thể âm > 100% với cross margin
+  const isOverMargin = upnlUsd <= -MARGIN_PER_TRADE; // âm hơn 100% margin → warning
   const color = upnlUsd >= 0 ? P.green : P.error;
   const notional = MARGIN_PER_TRADE * LEVERAGE;
   const distTpPct = currentPrice !== null ? Math.abs(p.tpPrice - currentPrice) / currentPrice * 100 : 0;
@@ -286,7 +286,7 @@ const OpenPositionRow = memo(function OpenPositionRow({
       <Text style={[styles.cellW, { color: P.dim, fontSize: 10 }]}>held {heldStr}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right" }]}>{fmtUsd(upnlUsd, true)}</Text>
       <Text style={[styles.cellNarrow, { color, textAlign: "right", fontSize: 10 }]}>
-        {fmtPct(upnlPct)}{isLiquidated ? " 💀" : ""}
+        {fmtPct(upnlPct)}{isOverMargin ? " ⚠️" : ""}
       </Text>
       {onCloseManual && (
         <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
@@ -599,10 +599,9 @@ export default function All5mPanel({ account, summary, currentPrice, stoch5mK, o
             let sideUpnl = 0;
             if (currentPrice !== null) {
               for (const p of list) {
-                // v4.9.12 fix: tính raw price move, gross USD, cap tại liquidation
+                // v4.9.14 fix CROSS: KHÔNG cap loss per position (anh dùng cross margin)
                 const rawPctMove = (side === "LONG" ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice)) / p.entryPrice * 100;
-                let grossUsd = MARGIN_PER_TRADE * rawPctMove * LEVERAGE / 100;
-                if (grossUsd < -MARGIN_PER_TRADE) grossUsd = -MARGIN_PER_TRADE;
+                const grossUsd = MARGIN_PER_TRADE * rawPctMove * LEVERAGE / 100;
                 sideUpnl += grossUsd - FEE_PER_SIDE;
               }
             }

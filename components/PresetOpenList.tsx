@@ -82,27 +82,29 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
   // pnlUsd net của position = gross - entryFee (đã trừ rồi) - exitFee (estimate lúc display).
   const FEE_PER_SIDE_PCT = 0.05;
 
-  // v4.9.12 (anh Tommy fix): add isLiquidated flag để UI show 💀 LIQ badge
+  // v4.9.14 (anh Tommy fix CROSS MARGIN): KHÔNG cap loss per position.
+  // Cross mode: uPnL có thể âm > 100% margin (wallet share collateral).
+  // Position close khi hit user-set TP/SL, KHÔNG có per-position liq cap.
+  // Display warning ⚠️ khi loss > margin để user biết "đang over-leverage".
   const enriched = useMemo(() => {
     return positions.map((p) => {
       let upnlPct: number | null = null;
       let upnlUsd: number | null = null;
       let upnlPctOnMargin: number | null = null;
       let exitFeeEst: number | null = null;
-      let isLiquidated = false;
+      let isOverMargin = false;
       if (markPrice && markPrice > 0) {
         const rawPct = p.side === "LONG" ? (markPrice - p.entryPrice) / p.entryPrice * 100 : (p.entryPrice - markPrice) / p.entryPrice * 100;
         upnlPct = rawPct;
-        let gross = p.notional * rawPct / 100;
-        if (gross <= -marginUsd) { gross = -marginUsd; isLiquidated = true; }
+        const gross = p.notional * rawPct / 100; // KHÔNG cap
         const qty = p.notional / p.entryPrice;
         exitFeeEst = qty * markPrice * (FEE_PER_SIDE_PCT / 100);
-        let net = gross - exitFeeEst;
-        if (net < -marginUsd) net = -marginUsd;
+        const net = gross - exitFeeEst; // KHÔNG cap
         upnlUsd = net;
         if (marginUsd > 0) upnlPctOnMargin = net / marginUsd * 100;
+        if (net <= -marginUsd) isOverMargin = true; // âm hơn 100% margin → cảnh báo
       }
-      return { ...p, upnlPct, upnlUsd, upnlPctOnMargin, feeRoundTrip: exitFeeEst, isLiquidated };
+      return { ...p, upnlPct, upnlUsd, upnlPctOnMargin, feeRoundTrip: exitFeeEst, isOverMargin };
     });
   }, [positions, markPrice, marginUsd]);
 
@@ -174,7 +176,7 @@ export default function PresetOpenList({ view, state, markPrice }: Props) {
                         {p.upnlUsd !== null ? fmtUsd(p.upnlUsd, true) : "—"}
                       </Text>
                       <Text style={[styles.cell, styles.cellPct, { color: upnlColor, textAlign: "right" }]}>
-                        {p.upnlPctOnMargin !== null ? `${p.upnlPctOnMargin >= 0 ? "+" : ""}${p.upnlPctOnMargin.toFixed(2)}%${p.isLiquidated ? " 💀" : ""}` : "—"}
+                        {p.upnlPctOnMargin !== null ? `${p.upnlPctOnMargin >= 0 ? "+" : ""}${p.upnlPctOnMargin.toFixed(2)}%${p.isOverMargin ? " ⚠️" : ""}` : "—"}
                       </Text>
                     </View>
                   );
