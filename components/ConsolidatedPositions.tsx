@@ -143,8 +143,8 @@ export default function ConsolidatedPositions({ positions, markPrice, walletUsd,
                 {side === "LONG" ? "🟢" : "🔴"} {side} NET · {net.count} entries
               </Text>
               <View style={styles.kvRow}>
-                <Text style={styles.k}>qty:</Text>
-                <Text style={styles.v}>{net.totalQty.toFixed(4)} BTC</Text>
+                <Text style={styles.k}>size:</Text>
+                <Text style={styles.v}>${net.notional.toFixed(0)} USDT <Text style={{ color: P.dim, fontSize: 9 }}>({net.totalQty.toFixed(4)} BTC)</Text></Text>
               </View>
               <View style={styles.kvRow}>
                 <Text style={styles.k}>avg entry:</Text>
@@ -155,12 +155,8 @@ export default function ConsolidatedPositions({ positions, markPrice, walletUsd,
                 <Text style={styles.v}>${markPrice ? markPrice.toFixed(0) : "—"}</Text>
               </View>
               <View style={styles.kvRow}>
-                <Text style={styles.k}>notional:</Text>
-                <Text style={styles.v}>${net.notional.toFixed(0)}</Text>
-              </View>
-              <View style={styles.kvRow}>
                 <Text style={styles.k}>margin used:</Text>
-                <Text style={styles.v}>${net.marginUsed.toFixed(2)}</Text>
+                <Text style={styles.v}>${net.marginUsed.toFixed(2)} USDT</Text>
               </View>
               <View style={styles.kvRow}>
                 <Text style={styles.k}>uPnL:</Text>
