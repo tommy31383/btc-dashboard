@@ -1,82 +1,34 @@
 /**
- * ServerTab — connect to btc-trader-server (cloud 24/7).
+ * ServerTab v0.4.2 (anh Tommy kill preset legacy) — TomiHedge ONLY.
  *
- * If not authed → login form.
- * If authed → state + scheduler + alerts + control buttons.
+ * Layout:
+ *   - Login form (if not authed)
+ *   - Header (server status + version + logout)
+ *   - TomiHedgePanel (paper) — Hedge01 rule
+ *   - KPIs (Binance wallet/avail/daily)
+ *   - Actions (reset paper)
  */
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import Svg, { Polyline, Polygon, Circle, Line as SvgLine } from "react-native-svg";
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
-import { SERVER_URL } from "../utils/backendApi";
-import PresetEnginePanel, { ToggleView } from "./PresetEnginePanel";
-import PresetOpenList from "./PresetOpenList";
+import { SERVER_URL, api } from "../utils/backendApi";
 import TomiHedgePanel from "./TomiHedgePanel";
-import PaperSection from "./PaperSection";
-import ServerEngineStatus from "./ServerEngineStatus";
-
-const PASSWORD_PROMPT = "Mã 30318384 cho destructive action:";
 
 interface ServerTabProps {
   klinesByTf?: Record<string, { time: number; close: number }[]>;
 }
 
-export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
+export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = {}) {
   const live = useBackendLive();
   const [pwInput, setPwInput] = useState("");
-  const [chartTf, setChartTf] = useState<"5m" | "15m" | "1h" | "4h">("15m");
-  const [containerW, setContainerW] = useState<number>(0);
-  // v0.3.0 (anh Tommy): toggle view real/paper, ảnh hưởng cả PresetEnginePanel + OPEN list bên dưới
-  const [presetView, setPresetView] = useState<ToggleView>("real");
 
-  // ALL hooks MUST be at top — Rules of Hooks (anh Tommy v4.8.7 fix crash)
   const s = live.state;
-  const trackedAll = s?.trackedPositions ?? [];
   const allPos = s?.binanceSnapshot?.positions ?? [];
   const symbol = s?.settings?.symbol ?? "BTCUSDT";
-  const symPosAll = allPos.find((p: any) => p.symbol === symbol);
-  const markPriceAll = symPosAll ? parseFloat(symPosAll.markPrice) : null;
-  // Binance hedge mode: 2 records per symbol (LONG + SHORT)
-  const binanceLongPos = allPos.find((p: any) => p.symbol === symbol && p.positionSide === "LONG");
-  const binanceShortPos = allPos.find((p: any) => p.symbol === symbol && p.positionSide === "SHORT");
-  const memoLists = useMemo(() => {
-    const long: any[] = [];
-    const short: any[] = [];
-    let lUpnl = 0, sUpnl = 0, lSize = 0, sSize = 0;
-    let lQty = 0, sQty = 0, lQtyEntry = 0, sQtyEntry = 0;
-    for (const t of trackedAll) {
-      if (t.side === "LONG") long.push(t);
-      else if (t.side === "SHORT") short.push(t);
-    }
-    long.sort((a, b) => b.entryMs - a.entryMs);
-    short.sort((a, b) => b.entryMs - a.entryMs);
-    for (const t of long) {
-      lSize += t.qty * t.entryPrice;
-      lQty += t.qty;
-      lQtyEntry += t.qty * t.entryPrice;
-    }
-    for (const t of short) {
-      sSize += t.qty * t.entryPrice;
-      sQty += t.qty;
-      sQtyEntry += t.qty * t.entryPrice;
-    }
-    if (markPriceAll !== null) {
-      for (const t of long) lUpnl += (markPriceAll - t.entryPrice) * t.qty;
-      for (const t of short) sUpnl += (t.entryPrice - markPriceAll) * t.qty;
-    }
-    const lAvgEntry = lQty > 0 ? lQtyEntry / lQty : 0;
-    const sAvgEntry = sQty > 0 ? sQtyEntry / sQty : 0;
-    return {
-      longList: long, shortList: short,
-      longCount: long.length, shortCount: short.length,
-      longUpnl: lUpnl, shortUpnl: sUpnl,
-      longSize: lSize, shortSize: sSize,
-      longQty: lQty, shortQty: sQty,
-      longAvgEntry: lAvgEntry, shortAvgEntry: sAvgEntry,
-    };
-  }, [trackedAll, markPriceAll]);
+  const symPos = allPos.find((p: any) => p.symbol === symbol);
+  const markPrice = symPos ? parseFloat(symPos.markPrice) : null;
 
   if (live.loading) {
     return (
@@ -111,514 +63,85 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
     );
   }
 
-  // Authed view — reuse hooks computed above
-  const sched = live.scheduler;
-  const tracked = trackedAll;
-  const markPrice = markPriceAll;
-  const { longList, shortList, longCount, shortCount, longUpnl, shortUpnl, longSize, shortSize, longQty, shortQty, longAvgEntry, shortAvgEntry } = memoLists;
+  // Server stats
   const wallet = s?.binanceSnapshot?.account?.totalWalletBalance ?? "—";
-  const upnl = s?.binanceSnapshot?.account?.totalUnrealizedProfit ?? "—";
   const avail = s?.binanceSnapshot?.account?.availableBalance ?? "—";
   const dailyPnl = s?.binanceSnapshot?.dailyPnl ?? 0;
-  const lastPollMs = sched?.lastPollOkMs ?? 0;
-  const lastEvalMs = sched?.lastRuleEvalMs ?? 0;
+  const sched = live.scheduler;
+  const lastEvalMs = sched?.lastRuleEvalAt ?? 0;
+  const lastEvalAge = lastEvalMs > 0 ? Math.floor((Date.now() - lastEvalMs) / 1000) : -1;
+  const ruleKey = s?.settings?.activeRuleKey ?? "hedge01";
+  const mode = s?.settings?.serverEngineMode ?? "tomihedge";
 
-  const askPw = (): string | null => {
-    if (typeof window === "undefined") return null;
-    const v = window.prompt(PASSWORD_PROMPT);
-    return v && v.trim();
+  const handleReset = async () => {
+    if (typeof window === "undefined") return;
+    const cap = window.prompt("Reset paper với capital USDT (default 1000):", "1000");
+    if (!cap) return;
+    const capNum = parseFloat(cap);
+    if (!Number.isFinite(capNum) || capNum < 100) {
+      window.alert("Capital phải >= 100");
+      return;
+    }
+    const pw = window.prompt("Mã 30318384 để confirm:");
+    if (!pw) return;
+    try {
+      await api.tomihedgePaperReset(pw, capNum);
+      await live.refresh();
+      window.alert("✅ Reset paper xong, capital = $" + capNum);
+    } catch (e: any) {
+      window.alert("❌ " + (e?.message ?? String(e)));
+    }
   };
 
   return (
-    <ScrollView style={styles.scroll}>
+    <ScrollView style={styles.scroll} contentContainerStyle={{ padding: 8 }}>
       <DebugLabel name="ServerTab" />
+
+      {/* HEADER */}
       <View style={styles.card}>
         <View style={styles.headerRow}>
-          <Text style={styles.h1}>
-            ☁️ BTC TRADER SERVER · 24/7{" "}
-            <Text style={{ color: presetView === "paper" ? "#3b82f6" : P.error, fontSize: 12 }}>
-              · {presetView === "paper" ? "📋 PAPER" : "🔴 REAL"}
+          <View>
+            <Text style={styles.h1}>
+              ☁️ BTC TRADER SERVER · 🌊 <Text style={{ color: P.bitcoinOrange }}>{ruleKey.toUpperCase()}</Text>
             </Text>
-          </Text>
-          <View style={{ flexDirection: "row", gap: 6 }}>
-            {/* v4.9.8: lift view toggle lên header - sticky, luôn visible */}
-            <TouchableOpacity
-              onPress={() => setPresetView("real")}
-              style={[styles.btnGhost, presetView === "real" && { borderColor: P.error, backgroundColor: P.error + "22" }]}
-            >
-              <Text style={[styles.btnGhostText, presetView === "real" && { color: P.error }]}>🔴 REAL</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setPresetView("paper")}
-              style={[styles.btnGhost, presetView === "paper" && { borderColor: "#3b82f6", backgroundColor: "#3b82f622" }]}
-            >
-              <Text style={[styles.btnGhostText, presetView === "paper" && { color: "#3b82f6" }]}>📋 PAPER</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={live.logout} style={styles.btnGhost}>
-              <Text style={styles.btnGhostText}>LOGOUT</Text>
-            </TouchableOpacity>
+            <Text style={styles.dim}>
+              {SERVER_URL} · v{live.serverInfo?.version ?? "?"} · mode: {mode}
+              {lastEvalAge >= 0 ? ` · last eval: ${lastEvalAge}s ago` : ""}
+            </Text>
           </View>
+          <TouchableOpacity onPress={live.logout} style={styles.btnGhost}>
+            <Text style={styles.btnGhostText}>LOGOUT</Text>
+          </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <Text style={styles.dim}>{SERVER_URL} · last update </Text>
-          <LiveAgo timestampMs={live.lastUpdateMs} suffix=" ago" />
-        </View>
-        {/* Server version + health info */}
-        {live.serverInfo && (
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 6 }}>
-            <Text style={[styles.dim, { color: P.bitcoinOrange, fontWeight: "700" }]}>
-              v{live.serverInfo.version}
-            </Text>
-            {live.serverHealth && (
-              <>
-                <Text style={styles.dim}>
-                  uptime {live.serverHealth.uptime >= 3600
-                    ? `${(live.serverHealth.uptime / 3600).toFixed(1)}h`
-                    : `${(live.serverHealth.uptime / 60).toFixed(0)}m`}
-                </Text>
-                <Text style={styles.dim}>mem {live.serverHealth.memMb}MB</Text>
-                <Text style={styles.dim}>pid {live.serverHealth.pid}</Text>
-              </>
-            )}
-          </View>
-        )}
       </View>
 
-      {/* v0.3.0 PRESET ENGINE PANEL (anh Tommy: Real + Paper song song) */}
-      {/* v0.4.1 (anh Tommy): TomiHedge mode → render TomiHedgePanel ở TRÊN; preset legacy ở dưới */}
-      {s?.settings?.serverEngineMode === "tomihedge" && (
-        <TomiHedgePanel state={s} markPrice={markPriceAll} />
-      )}
-
-      <PresetEnginePanel state={s} onRefresh={live.refresh} view={presetView} onViewChange={setPresetView} />
-
-      {/* v0.3.3 ENGINE STATUS — show stoch K + S/R + per-side READY/BLOCKED */}
-      <ServerEngineStatus view={presetView} state={s} markPrice={markPriceAll} />
-
-      {/* OPEN POSITIONS LIST — render theo view (real or paper) */}
-      <PresetOpenList view={presetView} state={s} markPrice={markPriceAll} onPaperClose={live.paperClose} />
-
-      {/* === REAL-only global controls/stats (apply cho real engine) === */}
-      {presetView === "real" && (<>
-
-      {/* v4.9.11 (anh Tommy): Unified 3-mode (STOPPED / DRY / LIVE REAL) — kèm chú thích từng mode */}
+      {/* BINANCE ACCOUNT KPIs */}
       <View style={styles.card}>
-        <Text style={styles.h2}>⚙️ ENGINE — NEW ENTRIES (real)</Text>
-        {(() => {
-          // Compute current mode
-          const isStopped = !s?.autoEnabled;
-          const isDry = s?.autoEnabled && s?.dryRun;
-          const isLive = s?.autoEnabled && !s?.dryRun;
-          const currentMode: "STOPPED" | "DRY" | "LIVE" = isStopped ? "STOPPED" : isDry ? "DRY" : "LIVE";
-
-          const switchTo = (mode: "STOPPED" | "DRY" | "LIVE") => {
-            if (mode === currentMode) return;
-            if (mode === "STOPPED") {
-              if (typeof window !== "undefined" && !window.confirm("⏸ STOPPED?\nKHÔNG fire entry mới. Plan B vẫn monitor TP/SL của lệnh đang OPEN.")) return;
-              live.setAuto(false);
-            } else if (mode === "DRY") {
-              if (typeof window !== "undefined" && !window.confirm("📋 DRY RUN?\nFire signal nhưng CHỈ LOG, không gửi MARKET Binance.\nKhông tốn tiền thật.")) return;
-              if (!s?.autoEnabled) live.setAuto(true);
-              if (!s?.dryRun) live.setDryRun(true);
-            } else {
-              if (typeof window !== "undefined" && !window.confirm("🚨 LIVE REAL?\nServer SẼ trade tiền thật trên Binance!\n\nCần nhập password để xác nhận.")) return;
-              const pw = askPw();
-              if (!pw) return;
-              if (!s?.autoEnabled) live.setAuto(true);
-              if (s?.dryRun) live.setDryRun(false, pw);
-            }
-          };
-
-          const modes: { id: "STOPPED" | "DRY" | "LIVE"; label: string; emoji: string; color: string; desc: string }[] = [
-            { id: "STOPPED", label: "STOPPED", emoji: "⏸", color: P.error, desc: "KHÔNG fire entry mới · Plan B vẫn monitor TP/SL lệnh đang OPEN" },
-            { id: "DRY", label: "DRY RUN", emoji: "📋", color: P.bitcoinOrange, desc: "Fire signal CHỈ LOG · không gửi MARKET Binance · không tốn tiền" },
-            { id: "LIVE", label: "LIVE REAL", emoji: "🔴", color: P.green, desc: "Fire + MARKET THẬT trên Binance · tiền thật ‼️ (cần password)" },
-          ];
-
-          return (
-            <View>
-              {/* Pill segment 3 modes */}
-              <View style={{ flexDirection: "row", gap: 6, marginVertical: 8, flexWrap: "wrap" }}>
-                {modes.map((m) => {
-                  const active = currentMode === m.id;
-                  return (
-                    <TouchableOpacity
-                      key={m.id}
-                      onPress={() => switchTo(m.id)}
-                      style={{
-                        flex: 1, minWidth: 110,
-                        paddingVertical: 12, paddingHorizontal: 12,
-                        borderRadius: 6, borderWidth: 2,
-                        borderColor: active ? m.color : P.borderSoft,
-                        backgroundColor: active ? m.color + "33" : P.surface,
-                      }}
-                    >
-                      <Text style={{
-                        color: active ? m.color : P.dim,
-                        fontFamily: "monospace", fontWeight: "900",
-                        fontSize: 13, textAlign: "center",
-                      }}>
-                        {active ? "● " : ""}{m.emoji} {m.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-
-              {/* Chú thích từng mode (collapsed under buttons) */}
-              <View style={{ paddingVertical: 6, gap: 3 }}>
-                {modes.map((m) => (
-                  <Text key={m.id} style={{
-                    color: currentMode === m.id ? m.color : P.dim,
-                    fontFamily: "monospace", fontSize: 10, lineHeight: 14,
-                  }}>
-                    {currentMode === m.id ? "▶ " : "  "}{m.emoji} <Text style={{ fontWeight: "700" }}>{m.label}:</Text> {m.desc}
-                  </Text>
-                ))}
-              </View>
-            </View>
-          );
-        })()}
+        <Text style={styles.h2}>🏦 BINANCE ACCOUNT</Text>
+        <View style={styles.kpiRow}>
+          <Kpi label="WALLET" value={`$${parseFloat(String(wallet)).toFixed(2)}`} color={P.bitcoinOrange} />
+          <Kpi label="AVAILABLE" value={`$${parseFloat(String(avail)).toFixed(2)}`} color={P.text} />
+          <Kpi label="DAILY PNL" value={`${dailyPnl >= 0 ? "+" : ""}$${parseFloat(String(dailyPnl)).toFixed(2)}`} color={dailyPnl >= 0 ? P.green : P.error} />
+          <Kpi label="MARK PRICE" value={markPrice ? `$${markPrice.toFixed(0)}` : "—"} color={P.text} />
+        </View>
       </View>
 
-      {/* KPIs */}
-      <View style={styles.card}>
-        <Text style={styles.h2}>📊 STATUS</Text>
-        <View style={styles.kpiGrid}>
-          <Kpi label="WALLET" value={`$${parseFloat(wallet).toFixed(2)}`} />
-          <Kpi label="AVAIL" value={`$${parseFloat(avail).toFixed(2)}`} color={P.bitcoinOrange} />
-          <Kpi label="uPnL" value={`$${parseFloat(upnl).toFixed(2)}`} color={parseFloat(upnl) >= 0 ? P.green : P.error} />
-        </View>
-        <View style={styles.kpiGrid}>
-          <Kpi label="DAILY" value={`$${dailyPnl.toFixed(2)}`} color={dailyPnl >= 0 ? P.green : P.error} />
-          <Kpi label="LONG" value={`${longCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.green} />
-          <Kpi label="SHORT" value={`${shortCount}/${s?.settings?.stackMaxPerSide ?? "?"}`} color={P.error} />
-        </View>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-          <Text style={styles.dim}>poll </Text><LiveAgo timestampMs={lastPollMs} suffix=" ago" />
-          <Text style={styles.dim}> · ruleEval </Text><LiveAgo timestampMs={lastEvalMs} suffix=" ago" />
-          <Text style={styles.dim}> · alerts {sched?.lastRuleAlerts ?? 0}</Text>
-        </View>
-        {s?.pauseReason && (
-          <Text style={[styles.error, { marginTop: 6 }]}>
-            🛑 PAUSED ({s.pauseReason}) — until {new Date(s.pausedUntilMs).toLocaleTimeString()}
-          </Text>
-        )}
-      </View>
+      {/* TomiHedge PAPER PANEL */}
+      <TomiHedgePanel state={s} markPrice={markPrice} />
 
-      {/* Active firing rules */}
+      {/* ACTIONS */}
       <View style={styles.card}>
-        <Text style={styles.h2}>🔔 ACTIVE FIRING ({live.alerts.length})</Text>
-        {live.alerts.length === 0 ? (
-          <Text style={styles.dim}>không có rule nào fire</Text>
-        ) : (
-          live.alerts.slice(0, 10).map((a: any, i: number) => (
-            <Text key={i} style={[styles.dim, { marginBottom: 2 }]}>
-              <Text style={{ color: a.side === "LONG" ? P.green : P.error, fontWeight: "700" }}>{a.tfKey}#{a.id.split(":").pop()} {a.side}</Text>
-              {"  "}@ ${a.entryPrice.toFixed(0)} TP ${a.tpPrice.toFixed(0)} SL ${a.slPrice.toFixed(0)}
-            </Text>
-          ))
-        )}
-      </View>
-
-      {/* BINANCE POSITIONS — net hedge state lấy từ /fapi/v2/positionRisk thật (anh Tommy v4.8.13) */}
-      <View style={styles.card}>
-        <Text style={styles.h2}>🏦 BINANCE POSITIONS (live · {symbol})</Text>
-        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-          {(["LONG", "SHORT"] as const).map((side) => {
-            const p = side === "LONG" ? binanceLongPos : binanceShortPos;
-            const sideColor = side === "LONG" ? P.green : P.error;
-            const amt = p ? parseFloat(p.positionAmt) : 0;
-            const hasPos = Math.abs(amt) > 0;
-            const entry = p ? parseFloat(p.entryPrice) : 0;
-            const mark = p ? parseFloat(p.markPrice) : 0;
-            const upnl = p ? parseFloat(p.unRealizedProfit) : 0;
-            const liq = p ? parseFloat(p.liquidationPrice) : 0;
-            const lev = p ? parseInt(p.leverage) : 0;
-            const notional = Math.abs(amt) * mark;
-            const upnlPct = entry > 0 ? ((side === "LONG" ? mark - entry : entry - mark) / entry) * 100 : 0;
-            return (
-              <View key={side} style={{ flex: 1, minWidth: 280, padding: 8, backgroundColor: P.surface, borderRadius: 4, borderWidth: 1, borderColor: hasPos ? sideColor : P.borderSoft }}>
-                <Text style={{ color: sideColor, fontFamily: "monospace", fontWeight: "800", fontSize: 12, marginBottom: 4 }}>
-                  {side === "LONG" ? "🟢" : "🔴"} {side} {hasPos ? `· $${notional.toFixed(0)} USDT` : "· trống"}
-                </Text>
-                {hasPos ? (
-                  <>
-                    <Text style={{ color: P.text, fontFamily: "monospace", fontSize: 11 }}>
-                      qty <Text style={{ color: P.dim }}>{Math.abs(amt).toFixed(4)} BTC</Text>
-                      {"  "}· avg entry <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>${entry.toFixed(2)}</Text>
-                    </Text>
-                    <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 11 }}>
-                      mark <Text style={{ color: P.text }}>${mark.toFixed(2)}</Text>
-                      {"  "}· lev <Text style={{ color: P.text }}>{lev}x</Text>
-                      {"  "}· liq <Text style={{ color: P.error }}>${liq.toFixed(0)}</Text>
-                    </Text>
-                    <Text style={{ fontFamily: "monospace", fontSize: 12, fontWeight: "800", color: upnl >= 0 ? P.green : P.error, marginTop: 2 }}>
-                      uPnL {upnl >= 0 ? "+" : ""}${upnl.toFixed(2)} ({upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%)
-                    </Text>
-                  </>
-                ) : (
-                  <Text style={[styles.dim, { fontStyle: "italic" }]}>không có position</Text>
-                )}
-              </View>
-            );
-          })}
+        <Text style={styles.h2}>⚙️ ACTIONS</Text>
+        <View style={styles.actionRow}>
+          <TouchableOpacity style={[styles.btnGhost, { borderColor: P.bitcoinOrange }]} onPress={handleReset}>
+            <Text style={[styles.btnGhostText, { color: P.bitcoinOrange }]}>🔄 RESET PAPER</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={[styles.dim, { marginTop: 6, fontStyle: "italic" }]}>
-          💡 Lấy từ /fapi/v2/positionRisk · refresh poll {sched?.pollMs ? `${Math.round(sched.pollMs / 1000)}s` : "30s"}.
-          App tracked card bên dưới = N entries logical với TP/SL riêng (Plan B).
+        <Text style={styles.dim}>
+          💡 RESET sẽ đóng paper state hiện tại (LONG + SHORT) và start fresh với capital mới.
+          Real engine vẫn chạy độc lập (chưa migrate sang TomiHedge).
         </Text>
       </View>
-
-      {/* SYNC CHECK moved inside TRACKED card (anh Tommy v4.8.17) — DEAD CODE removed v4.9.8 */}
-      {false && (
-      <View style={styles.card}>
-        <Text style={styles.h2}>🔄 SYNC CHECK · App tracked vs Binance (DEAD)</Text>
-        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-          {(["LONG", "SHORT"] as const).map((side) => {
-            const sideColor = side === "LONG" ? P.green : P.error;
-            const appQty = side === "LONG" ? longQty : shortQty;
-            const appAvg = side === "LONG" ? longAvgEntry : shortAvgEntry;
-            const appSize = side === "LONG" ? longSize : shortSize;
-            const appUpnl = side === "LONG" ? longUpnl : shortUpnl;
-            const appCount = side === "LONG" ? longCount : shortCount;
-            const binPos = side === "LONG" ? binanceLongPos : binanceShortPos;
-            const binQty = binPos ? Math.abs(parseFloat(binPos.positionAmt)) : 0;
-            const binEntry = binPos ? parseFloat(binPos.entryPrice) : 0;
-            const binMark = binPos ? parseFloat(binPos.markPrice) : 0;
-            const binSize = binQty * binMark;
-            const binUpnl = binPos ? parseFloat(binPos.unRealizedProfit) : 0;
-            // Diff
-            const qtyDiff = appQty - binQty;
-            const entryDiff = appAvg - binEntry;
-            const TOL_QTY = 0.0005; // 0.0005 BTC
-            const TOL_ENTRY = 50;   // $50
-            const qtyOk = Math.abs(qtyDiff) <= TOL_QTY;
-            const entryOk = appAvg === 0 || binEntry === 0 || Math.abs(entryDiff) <= TOL_ENTRY;
-            const allOk = qtyOk && entryOk;
-            return (
-              <View key={side} style={{
-                flex: 1, minWidth: 280, padding: 8, borderRadius: 4, borderWidth: 1,
-                borderColor: allOk ? sideColor + "55" : P.error,
-                backgroundColor: allOk ? P.surface : P.error + "12",
-              }}>
-                <Text style={{ color: allOk ? sideColor : P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 12, marginBottom: 4 }}>
-                  {allOk ? "✅" : "⚠️"} {side} {allOk ? "SYNC" : "MISMATCH"}
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
-                  qty: app <Text style={{ color: P.text }}>{appQty.toFixed(4)}</Text> vs bin <Text style={{ color: P.text }}>{binQty.toFixed(4)}</Text>
-                  {!qtyOk && <Text style={{ color: P.error }}> · diff {qtyDiff >= 0 ? "+" : ""}{qtyDiff.toFixed(4)}</Text>}
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
-                  avg entry: app <Text style={{ color: P.text }}>${appAvg.toFixed(0)}</Text> vs bin <Text style={{ color: P.text }}>${binEntry.toFixed(0)}</Text>
-                  {!entryOk && <Text style={{ color: P.error }}> · diff ${entryDiff >= 0 ? "+" : ""}{entryDiff.toFixed(0)}</Text>}
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
-                  size: app <Text style={{ color: P.bitcoinOrange }}>${appSize.toFixed(0)}</Text> vs bin <Text style={{ color: P.bitcoinOrange }}>${binSize.toFixed(0)}</Text>
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 10 }}>
-                  uPnL: app <Text style={{ color: appUpnl >= 0 ? P.green : P.error }}>${appUpnl.toFixed(2)}</Text> vs bin <Text style={{ color: binUpnl >= 0 ? P.green : P.error }}>${binUpnl.toFixed(2)}</Text>
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 9, fontStyle: "italic", marginTop: 2 }}>
-                  app {appCount} entries · bin 1 net
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-        <Text style={[styles.dim, { marginTop: 6, fontStyle: "italic" }]}>
-          💡 Tolerance: qty ±0.0005 BTC · entry ±$50. MISMATCH → reconcile sẽ tự fix tại cycle poll kế (max 30s).
-        </Text>
-      </View>
-      )}
-      </>)}{/* === END REAL-only block (KPIs, Active Firing, Engine, Binance Positions, Sync) === */}
-
-      {/* Chart entry/exit markers — render cho cả 2 view (real/paper) */}
-      <View style={styles.card} onLayout={(e) => setContainerW(e.nativeEvent.layout.width - 24)}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <Text style={styles.h2}>
-            📊 PRICE {chartTf} + ENTRIES{" "}
-            <Text style={{ color: presetView === "paper" ? "#3b82f6" : P.error, fontSize: 10 }}>
-              ({presetView === "paper" ? "📋 PAPER" : "🔴 REAL"})
-            </Text>
-          </Text>
-          <View style={{ flexDirection: "row", gap: 4 }}>
-            {(["5m", "15m", "1h", "4h"] as const).map((tf) => (
-              <TouchableOpacity key={tf} onPress={() => setChartTf(tf)}
-                style={{
-                  paddingHorizontal: 8, paddingVertical: 3, borderRadius: 3, borderWidth: 1,
-                  borderColor: chartTf === tf ? P.bitcoinOrange : P.borderSoft,
-                  backgroundColor: chartTf === tf ? P.bitcoinOrange + "22" : P.surface,
-                }}>
-                <Text style={{ color: chartTf === tf ? P.bitcoinOrange : P.dim, fontSize: 10, fontFamily: "monospace", fontWeight: "700" }}>{tf}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-        {containerW > 0 && (() => {
-          // v0.3.1 (anh Tommy): chart switch theo presetView
-          // PAPER → tracked = open paper positions, journal = closed paper as fake CLOSE entries
-          if (presetView === "paper") {
-            const paperPos = s?.paperEngine?.positions ?? [];
-            const paperOpen = paperPos.filter((p: any) => p.status === "OPEN").map((p: any) => ({
-              id: p.id, side: p.side, entryPrice: p.entryPrice, entryMs: p.entryMs,
-              tpPrice: p.tpPrice, slPrice: p.slPrice,
-            }));
-            const paperJournal = paperPos.filter((p: any) => p.status !== "OPEN").map((p: any) => ({
-              ts: p.exitMs ?? p.entryMs,
-              action: { kind: "CLOSE", side: p.side, closePrice: p.exitPrice, trigger: p.status === "WIN" ? "TP" : "SL" },
-            }));
-            return (
-              <ServerPriceChart
-                bars={klinesByTf?.[chartTf] ?? []}
-                tracked={paperOpen}
-                journal={paperJournal}
-                width={containerW}
-                tf={chartTf}
-              />
-            );
-          }
-          // REAL view (default)
-          return (
-            <ServerPriceChart
-              bars={klinesByTf?.[chartTf] ?? []}
-              tracked={tracked}
-              journal={live.journal}
-              width={containerW}
-              tf={chartTf}
-            />
-          );
-        })()}
-      </View>
-
-      {/* === REAL-only: TRACKED positions detail === */}
-      {presetView === "real" && (
-      <View style={styles.card}>
-        <Text style={styles.h2}>📈 TRACKED ({tracked.length})</Text>
-
-        {/* SYNC CHECK inline (anh Tommy v4.8.17) — compare app vs Binance */}
-        <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-          {(["LONG", "SHORT"] as const).map((side) => {
-            const sideColor = side === "LONG" ? P.green : P.error;
-            const appQty = side === "LONG" ? longQty : shortQty;
-            const appAvg = side === "LONG" ? longAvgEntry : shortAvgEntry;
-            const appCount = side === "LONG" ? longCount : shortCount;
-            const binPos = side === "LONG" ? binanceLongPos : binanceShortPos;
-            const binQty = binPos ? Math.abs(parseFloat(binPos.positionAmt)) : 0;
-            const binEntry = binPos ? parseFloat(binPos.entryPrice) : 0;
-            const qtyDiff = appQty - binQty;
-            const entryDiff = appAvg - binEntry;
-            const TOL_QTY = 0.0005, TOL_ENTRY = 50;
-            const qtyOk = Math.abs(qtyDiff) <= TOL_QTY;
-            const entryOk = appAvg === 0 || binEntry === 0 || Math.abs(entryDiff) <= TOL_ENTRY;
-            const ok = qtyOk && entryOk;
-            return (
-              <View key={side} style={{
-                flex: 1, minWidth: 200, padding: 6, borderRadius: 3, borderWidth: 1,
-                borderColor: ok ? sideColor + "55" : P.error,
-                backgroundColor: ok ? P.surface : P.error + "12",
-              }}>
-                <Text style={{ color: ok ? sideColor : P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 11 }}>
-                  {ok ? "✅" : "⚠️"} {side} {ok ? "SYNC" : "MISMATCH"} · {appCount} app vs 1 bin
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 9 }}>
-                  qty: <Text style={{ color: P.text }}>{appQty.toFixed(4)}</Text> vs <Text style={{ color: P.text }}>{binQty.toFixed(4)}</Text>
-                  {!qtyOk && <Text style={{ color: P.error }}> ({qtyDiff >= 0 ? "+" : ""}{qtyDiff.toFixed(4)})</Text>}
-                </Text>
-                <Text style={{ color: P.dim, fontFamily: "monospace", fontSize: 9 }}>
-                  entry: <Text style={{ color: P.text }}>${appAvg.toFixed(0)}</Text> vs <Text style={{ color: P.text }}>${binEntry.toFixed(0)}</Text>
-                  {!entryOk && <Text style={{ color: P.error }}> (${entryDiff >= 0 ? "+" : ""}{entryDiff.toFixed(0)})</Text>}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-
-        {tracked.length === 0 ? (
-          <Text style={styles.dim}>chưa có position nào</Text>
-        ) : (
-          <>
-            <View style={styles.row}>
-              <TouchableOpacity style={[styles.chip, { borderColor: P.green }]}
-                onPress={() => { const pw = askPw(); if (pw) live.bulkClose("PROFIT", pw); }}>
-                <Text style={{ color: P.green, fontFamily: "monospace", fontWeight: "700", fontSize: 10 }}>✓ CLOSE PROFIT</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.chip, { borderColor: P.error }]}
-                onPress={() => { const pw = askPw(); if (pw) live.bulkClose("LOSS", pw); }}>
-                <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "700", fontSize: 10 }}>✗ CLOSE LOSS</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.chip, { borderColor: P.error, backgroundColor: P.error + "22" }]}
-                onPress={() => { const pw = askPw(); if (pw) live.bulkClose("ALL", pw); }}>
-                <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 10 }}>🔥 CLOSE ALL</Text>
-              </TouchableOpacity>
-            </View>
-            {(["LONG", "SHORT"] as const).map((side) => {
-              const list = side === "LONG" ? longList : shortList;
-              if (list.length === 0) return null;
-              const sideColor = side === "LONG" ? P.green : P.error;
-              const sideUpnlUsd = side === "LONG" ? longUpnl : shortUpnl;
-              const sideSizeUsd = side === "LONG" ? longSize : shortSize;
-              return (
-                <View key={side} style={{ marginTop: 8 }}>
-                  <Text style={[styles.h2, { color: sideColor, marginTop: 4 }]}>
-                    {side === "LONG" ? "🟢" : "🔴"} {side} ({list.length}) ·
-                    <Text style={{ color: P.bitcoinOrange }}> size ${sideSizeUsd.toFixed(0)}</Text> ·
-                    <Text style={{ color: sideUpnlUsd >= 0 ? P.green : P.error }}> uPnL {sideUpnlUsd >= 0 ? "+" : ""}${sideUpnlUsd.toFixed(2)}</Text>
-                  </Text>
-                  {list.map((t: any, i: number) => {
-                    const heldMin = (Date.now() - t.entryMs) / 60000;
-                    const heldStr = heldMin < 60 ? `${heldMin.toFixed(0)}m` : `${(heldMin / 60).toFixed(1)}h`;
-                    const dt = new Date(t.entryMs);
-                    const dtStr = `${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")} ${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}`;
-                    const diff = markPrice !== null ? (side === "LONG" ? (markPrice - t.entryPrice) : (t.entryPrice - markPrice)) : 0;
-                    const upnlUsd = diff * t.qty;
-                    // anh Tommy v0.2.2: pnl% phải × leverage (giống 5m ALL)
-                    const binPos = side === "LONG" ? binanceLongPos : binanceShortPos;
-                    const lev = binPos ? parseInt(binPos.leverage) : 100;
-                    const upnlPct = markPrice !== null ? (diff / t.entryPrice) * 100 * lev : 0;
-                    const upnlColor = upnlUsd >= 0 ? P.green : P.error;
-                    const sizeUsd = t.qty * t.entryPrice;
-                    const isTrailing = t.tfKey === "15m" && (t.lastTrailStep ?? 0) > 0;
-                    return (
-                      <View key={t.id} style={[styles.posRow, { flexWrap: "wrap" }]}>
-                        <Text style={[styles.dim, { width: 22 }]}>{i + 1}</Text>
-                        <Text style={[styles.dim, { width: 90, color: P.tertiary, fontSize: 10 }]}>{dtStr}</Text>
-                        <Text style={[styles.dim, { width: 65 }]}>${t.entryPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.bitcoinOrange, width: 60, fontWeight: "700" }]}>${sizeUsd.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: P.green, width: 65 }]}>TP ${t.tpPrice.toFixed(0)}</Text>
-                        <Text style={[styles.dim, { color: isTrailing ? P.bitcoinOrange : P.error, width: 65 }]}>
-                          {isTrailing ? `🔄SL $${t.slPrice.toFixed(0)}` : `SL $${t.slPrice.toFixed(0)}`}
-                        </Text>
-                        <Text style={[styles.dim, { color: upnlColor, width: 70, fontWeight: "700" }]}>
-                          {upnlUsd >= 0 ? "+" : ""}${upnlUsd.toFixed(2)}
-                        </Text>
-                        <Text style={[styles.dim, { color: upnlColor, width: 55, fontWeight: "700" }]}>
-                          {upnlPct >= 0 ? "+" : ""}{upnlPct.toFixed(2)}%
-                        </Text>
-                        <Text style={[styles.dim, { width: 40 }]}>{heldStr}</Text>
-                        <TouchableOpacity onPress={() => { const pw = askPw(); if (pw) live.closePosition(t.id, pw); }}>
-                          <Text style={{ color: P.error, fontWeight: "800", fontSize: 11 }}>✕</Text>
-                        </TouchableOpacity>
-                        {isTrailing && (
-                          <Text style={{ width: "100%", color: P.bitcoinOrange, fontSize: 10, marginTop: 2, paddingLeft: 22 }}>
-                            ↳ TRAIL step {t.lastTrailStep} · SL trailed from ${t.origSlPrice?.toFixed(0) ?? "—"} → ${t.slPrice.toFixed(0)}
-                          </Text>
-                        )}
-                      </View>
-                    );
-                  })}
-                </View>
-              );
-            })}
-          </>
-        )}
-      </View>
-      )}{/* === END TRACKED (REAL-only) === */}
-
-      {/* === PAPER-only section: hide khi real view === */}
-      {presetView === "paper" && (
-        <PaperSection state={s} width={containerW || 600} />
-      )}
 
       {live.lastError && (
         <View style={[styles.card, { borderColor: P.error, borderWidth: 1 }]}>
@@ -629,144 +152,11 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
   );
 }
 
-/**
- * LiveAgo — tự tick mỗi 1s, chỉ re-render component nhỏ này (anh Tommy v4.8.9 perf).
- * Parent ServerTab + 64 tracked rows KHÔNG re-render → tiết kiệm CPU/battery.
- */
-function LiveAgo({ timestampMs, prefix = "", suffix = "" }: { timestampMs: number; prefix?: string; suffix?: string }) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  if (!timestampMs) return <Text style={styles.dim}>—</Text>;
-  const sec = Math.max(0, Math.round((now - timestampMs) / 1000));
-  const txt = sec < 60 ? `${sec}s` : sec < 3600 ? `${Math.round(sec / 60)}m` : `${(sec / 3600).toFixed(1)}h`;
-  return <Text style={styles.dim}>{prefix}{txt}{suffix}</Text>;
-}
-
-function ServerPriceChart({ bars, tracked, journal, width, tf }: {
-  bars: { time: number; close: number }[];
-  tracked: any[]; journal: any[]; width: number; tf: string;
-}) {
-  const height = 240;
-  if (bars.length < 2) {
-    return <Text style={{ color: P.dim, fontSize: 11, fontFamily: "monospace", padding: 12 }}>chưa có data {tf}</Text>;
-  }
-  const maxBars = 120;
-  let slice = bars.slice(-maxBars);
-  if (tracked.length > 0) {
-    const oldestOpen = Math.min(...tracked.map((t) => t.entryMs));
-    if (oldestOpen < slice[0].time) {
-      const startIdx = Math.max(0, bars.findIndex((b) => b.time >= oldestOpen) - 1);
-      if (startIdx >= 0 && startIdx < bars.length) slice = bars.slice(startIdx);
-    }
-  }
-  const tMin = slice[0].time;
-  const tMax = Math.max(slice[slice.length - 1].time, ...tracked.map((t) => t.entryMs), Date.now());
-  const range = tMax - tMin || 1;
-  const closes = slice.map((b) => b.close);
-  // SMART RANGE (anh Tommy v4.8.13): chỉ dùng closes + tracked entryPrice (NOT tp/sl —
-  // tránh outlier SL/TP xa kéo lệch chart). Markers ngoài range sẽ clamp tới edge.
-  const pricePoints: number[] = [...closes];
-  for (const t of tracked) pricePoints.push(t.entryPrice);
-  let pMin = Math.min(...pricePoints);
-  let pMax = Math.max(...pricePoints);
-  // Padding 5% trên dưới để có không gian thở
-  const pad5 = (pMax - pMin) * 0.05;
-  pMin -= pad5;
-  pMax += pad5;
-  const pRange = pMax - pMin || 1;
-  const pad = 8;
-  const w = width - pad * 2;
-  const h = height - pad * 2;
-  const xOf = (t: number) => {
-    if (t < tMin) return pad;
-    if (t > tMax) return width - pad;
-    return pad + ((t - tMin) / range) * w;
-  };
-  const yOf = (p: number) => {
-    // Clamp price ra ngoài range vào edge (anh Tommy v4.8.13)
-    const clamped = Math.max(pMin, Math.min(pMax, p));
-    return pad + h - ((clamped - pMin) / pRange) * h;
-  };
-  const pricePts = slice.map((b) => `${xOf(b.time).toFixed(1)},${yOf(b.close).toFixed(1)}`).join(" ");
-
-  // CLOSE markers từ journal (last 30 closes)
-  // 2026-04-28 BUG FIX: server v0.2.2+ trả {action:{kind:"CLOSE"}} nested.
-  // Defensive: handle cả 2 schema (verbose nested + legacy flat) tránh chart trống marker.
-  const isClose = (j: any) =>
-    j?.action?.kind === "CLOSE" || j?.actionKind === "CLOSE" || j?.a === "C";
-  const closesJ = journal.filter(isClose).slice(0, 30);
-  // Y-axis ticks (5 levels) + current price line
-  const currentPrice = closes[closes.length - 1];
-  const ticks = [pMax, pMax - (pMax - pMin) * 0.25, (pMax + pMin) / 2, pMin + (pMax - pMin) * 0.25, pMin];
-  return (
-    <View style={{ width, height, backgroundColor: P.surface, borderRadius: 2, borderWidth: 1, borderColor: P.borderSoft, marginTop: 8 }}>
-      <Svg width={width} height={height}>
-        {/* Y-axis grid lines + current price horizontal line */}
-        {ticks.map((p, i) => (
-          <SvgLine key={`tick-${i}`} x1={pad} y1={yOf(p)} x2={width - 50} y2={yOf(p)} stroke={P.borderSoft} strokeWidth={0.3} strokeDasharray="2,4" opacity={0.4} />
-        ))}
-        <SvgLine x1={pad} y1={yOf(currentPrice)} x2={width - 50} y2={yOf(currentPrice)} stroke={P.bitcoinOrange} strokeWidth={0.6} strokeDasharray="3,2" opacity={0.6} />
-        <Polyline points={pricePts} fill="none" stroke={P.bitcoinOrange} strokeWidth={1.4} opacity={0.85} />
-        {tracked.map((p) => {
-          const eX = xOf(p.entryMs);
-          const eY = yOf(p.entryPrice);
-          const longSide = p.side === "LONG";
-          const color = longSide ? P.green : P.error;
-          const tri = longSide
-            ? `${eX},${eY - 7} ${eX - 6},${eY + 4} ${eX + 6},${eY + 4}`
-            : `${eX},${eY + 7} ${eX - 6},${eY - 4} ${eX + 6},${eY - 4}`;
-          return (
-            <React.Fragment key={`open-${p.id}`}>
-              <SvgLine x1={eX} y1={eY} x2={eX} y2={height - pad} stroke={color} strokeWidth={0.4} strokeDasharray="2,3" opacity={0.3} />
-              <Polygon points={tri} fill={color} opacity={1} stroke={P.surface} strokeWidth={0.7} />
-            </React.Fragment>
-          );
-        })}
-        {closesJ.map((j: any, i: number) => {
-          const a = j.action;
-          if (!a?.closePrice || !a?.side) return null;
-          const cX = xOf(j.ts);
-          const cY = yOf(a.closePrice);
-          const win = a.trigger === "TP";
-          const dotColor = win ? P.green : P.error;
-          return <Circle key={`close-${i}`} cx={cX} cy={cY} r={4} fill={dotColor} opacity={1} stroke={P.surface} strokeWidth={0.5} />;
-        })}
-      </Svg>
-      {/* Y-axis tick value labels (right edge) */}
-      {ticks.map((p, i) => {
-        const y = yOf(p);
-        if (y < 12 || y > height - 4) return null;
-        return (
-          <Text key={`lbl-${i}`} style={{
-            position: "absolute", right: 4, top: y - 7,
-            color: P.dim, fontSize: 9, fontFamily: "monospace",
-          }}>${p.toFixed(0)}</Text>
-        );
-      })}
-      {/* Current price label (highlight cam) */}
-      <Text style={{
-        position: "absolute", right: 4, top: yOf(currentPrice) - 7,
-        color: P.bitcoinOrange, fontSize: 10, fontFamily: "monospace", fontWeight: "800",
-      }}>${currentPrice.toFixed(0)}</Text>
-      <View style={{ position: "absolute", top: 4, left: 8, flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
-        <Text style={{ color: P.green, fontSize: 9, fontFamily: "monospace" }}>▲ LONG ● TP</Text>
-        <Text style={{ color: P.error, fontSize: 9, fontFamily: "monospace" }}>▼ SHORT ● SL</Text>
-      </View>
-      <Text style={{ position: "absolute", bottom: 2, left: 8, color: P.dim, fontSize: 9, fontFamily: "monospace" }}>
-        range ${(pMax - pMin).toFixed(0)} · {tracked.length} open · {closesJ.length} closed · {((tMax - tMin) / 3600000).toFixed(1)}h
-      </Text>
-    </View>
-  );
-}
-
-function Kpi({ label, value, color }: { label: string; value: string; color?: string }) {
+function Kpi({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <View style={styles.kpi}>
       <Text style={styles.kpiLabel}>{label}</Text>
-      <Text style={[styles.kpiValue, color ? { color } : null]}>{value}</Text>
+      <Text style={[styles.kpiValue, { color }]}>{value}</Text>
     </View>
   );
 }
@@ -783,13 +173,11 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: P.borderSoft, color: P.text, padding: 10, marginVertical: 10, width: 240, fontFamily: "monospace", fontSize: 14 },
   btnPrimary: { backgroundColor: P.bitcoinOrange, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 4 },
   btnPrimaryText: { color: P.bg, fontWeight: "800", letterSpacing: 1 },
-  btnGhost: { borderWidth: 1, borderColor: P.borderSoft, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 3 },
-  btnGhostText: { color: P.dim, fontSize: 10, fontFamily: "monospace", fontWeight: "700" },
-  row: { flexDirection: "row", gap: 6, flexWrap: "wrap", marginBottom: 8 },
-  chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 3, borderWidth: 1 },
-  kpiGrid: { flexDirection: "row", gap: 6, marginBottom: 6 },
-  kpi: { flex: 1, padding: 8, backgroundColor: P.surface, borderRadius: 3, borderWidth: 1, borderColor: P.borderSoft },
-  kpiLabel: { color: P.dim, fontSize: 9, letterSpacing: 1, fontWeight: "700" },
-  kpiValue: { color: P.text, fontSize: 14, fontWeight: "800", fontFamily: "JetBrainsMono_700Bold", marginTop: 2 },
-  posRow: { flexDirection: "row", alignItems: "center", paddingVertical: 4, gap: 4, borderBottomWidth: 1, borderBottomColor: P.surface },
+  btnGhost: { borderWidth: 1, borderColor: P.borderSoft, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 4 },
+  btnGhostText: { color: P.dim, fontWeight: "700", letterSpacing: 1, fontSize: 12 },
+  kpiRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  kpi: { minWidth: 110 },
+  kpiLabel: { color: P.dim, fontSize: 9, fontFamily: "monospace" },
+  kpiValue: { fontSize: 16, fontWeight: "700", fontFamily: "monospace" },
+  actionRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 6 },
 });

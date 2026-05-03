@@ -108,6 +108,9 @@ export const api = {
   paperReset: (password: string) => request<any>("/api/live/paper/reset", "POST", { confirmPassword: password }),
   paperClear: (password: string) => request<any>("/api/live/paper/clear", "POST", { confirmPassword: password }),
   paperClose: (id: string) => request<any>("/api/live/paper/close", "POST", { id }),
+  // v0.4.2 TomiHedge
+  tomihedgePaperReset: (password: string, capital: number) =>
+    request<any>("/api/live/tomihedge/paper/reset", "POST", { confirmPassword: password, capital }),
   realClear: (password: string) => request<any>("/api/live/real/clear", "POST", { confirmPassword: password }),
 };
 
