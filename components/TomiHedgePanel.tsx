@@ -10,23 +10,56 @@
  */
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+// Toggle types exported above
 import { P } from "../utils/v2Theme";
 import ConsolidatedPositions from "./ConsolidatedPositions";
+
+export type TomiHedgeView = "paper" | "real";
 
 interface Props {
   state: any;
   markPrice: number | null;
+  view: TomiHedgeView;
+  onViewChange: (v: TomiHedgeView) => void;
 }
 
-export default function TomiHedgePanel({ state, markPrice }: Props) {
-  const th = state?.tomiHedgePaper;
+export default function TomiHedgePanel({ state, markPrice, view, onViewChange }: Props) {
   const cfg = state?.settings || {};
+  const isPaper = view === "paper";
+  const th = isPaper ? state?.tomiHedgePaper : state?.tomiHedgeReal;
+
+  // Toggle bar
+  const toggle = (
+    <View style={styles.toggleRow}>
+      <TouchableOpacity
+        style={[styles.toggleBtn, view === "real" && { borderColor: P.error, backgroundColor: P.error + "22" }]}
+        onPress={() => onViewChange("real")}
+      >
+        <Text style={[styles.toggleText, view === "real" && { color: P.error }]}>🔴 REAL</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.toggleBtn, view === "paper" && { borderColor: "#3b82f6", backgroundColor: "#3b82f622" }]}
+        onPress={() => onViewChange("paper")}
+      >
+        <Text style={[styles.toggleText, view === "paper" && { color: "#3b82f6" }]}>📋 PAPER</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   if (!th) {
     return (
       <View style={styles.card}>
-        <Text style={styles.h2}>🌊 TomiHedge — Hedge01 (PAPER)</Text>
-        <Text style={styles.empty}>State chưa init. Cần POST /api/live/tomihedge/paper/reset</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.h2}>🌊 TomiHedge — Hedge01 ({isPaper ? "PAPER" : "REAL"})</Text>
+          {toggle}
+        </View>
+        {isPaper ? (
+          <Text style={styles.empty}>State chưa init. Cần POST /api/live/tomihedge/paper/reset</Text>
+        ) : (
+          <Text style={styles.empty}>
+            🔴 REAL engine chưa activate. Em đang defer chờ paper test OK rồi anh confirm mới deploy real (tránh risk tiền thật).
+          </Text>
+        )}
       </View>
     );
   }
@@ -55,9 +88,15 @@ export default function TomiHedgePanel({ state, markPrice }: Props) {
     <View>
       {/* HEADER */}
       <View style={styles.card}>
-        <Text style={styles.h2}>
-          🌊 TomiHedge — <Text style={{ color: P.bitcoinOrange }}>{th.activeRuleKey?.toUpperCase() || "?"}</Text> (PAPER)
-        </Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.h2}>
+            🌊 TomiHedge — <Text style={{ color: P.bitcoinOrange }}>{th.activeRuleKey?.toUpperCase() || "?"}</Text>{" "}
+            <Text style={{ color: isPaper ? "#3b82f6" : P.error, fontSize: 12 }}>
+              · {isPaper ? "📋 PAPER" : "🔴 REAL"}
+            </Text>
+          </Text>
+          {toggle}
+        </View>
         <View style={styles.row}>
           <View style={styles.kpi}>
             <Text style={styles.kpiLabel}>WALLET</Text>
@@ -95,7 +134,7 @@ export default function TomiHedgePanel({ state, markPrice }: Props) {
         walletUsd={wallet}
         marginUsd={cfg.paperMarginUsd ?? 1}
         leverage={cfg.paperLeverage ?? 125}
-        title="🌊 TomiHedge NET POSITIONS (Hedge01)"
+        title={isPaper ? "🌊 TomiHedge PAPER NET POSITIONS" : "🌊 TomiHedge REAL NET POSITIONS"}
       />
     </View>
   );
@@ -110,4 +149,8 @@ const styles = StyleSheet.create({
   kpiVal: { fontSize: 16, fontWeight: "700", fontFamily: "monospace" },
   dim: { color: P.dim, fontSize: 11, fontFamily: "monospace", marginTop: 4 },
   empty: { color: P.dim, fontSize: 11, fontStyle: "italic", padding: 8 },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+  toggleRow: { flexDirection: "row", gap: 6 },
+  toggleBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 4, borderWidth: 1, borderColor: P.borderSoft },
+  toggleText: { color: P.dim, fontSize: 11, fontWeight: "700", fontFamily: "monospace" },
 });

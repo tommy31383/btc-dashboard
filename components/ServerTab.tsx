@@ -14,7 +14,7 @@ import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
 import { SERVER_URL, api } from "../utils/backendApi";
-import TomiHedgePanel from "./TomiHedgePanel";
+import TomiHedgePanel, { TomiHedgeView } from "./TomiHedgePanel";
 
 interface ServerTabProps {
   klinesByTf?: Record<string, { time: number; close: number }[]>;
@@ -23,6 +23,7 @@ interface ServerTabProps {
 export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = {}) {
   const live = useBackendLive();
   const [pwInput, setPwInput] = useState("");
+  const [tomiView, setTomiView] = useState<TomiHedgeView>("paper");
 
   const s = live.state;
   const allPos = s?.binanceSnapshot?.positions ?? [];
@@ -126,8 +127,8 @@ export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = 
         </View>
       </View>
 
-      {/* TomiHedge PAPER PANEL */}
-      <TomiHedgePanel state={s} markPrice={markPrice} />
+      {/* TomiHedge PANEL — toggle Real/Paper */}
+      <TomiHedgePanel state={s} markPrice={markPrice} view={tomiView} onViewChange={setTomiView} />
 
       {/* ACTIONS */}
       <View style={styles.card}>
