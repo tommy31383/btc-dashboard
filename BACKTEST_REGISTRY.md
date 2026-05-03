@@ -278,3 +278,116 @@ Hedged    → NO LIQ (wallet tăng cùng chiều price move)
 3. Hiển thị uPnL: show -260% raw nếu position chưa close, KHÔNG cap tại -100%
 4. LIQ price: chỉ tính theo NET direction, KHÔNG tính per-side (sai logic)
 5. Kiểm tra Binance liq formula: `buffer = wallet - mm_total + uPnL_other_side` (cho net_position)
+
+---
+
+## 📘 TOMIHEDGE RULE — Binance Hedge Cross Mechanics (anh Tommy verify 2026-05-03)
+
+> Note này lưu lại CƠ CHẾ chính xác Binance hedge mode + cross margin để Claude tương lai không hiểu sai.
+
+### 1. **Hedge Mode** — 2 net positions song song
+- 1 symbol có **2 net positions độc lập**: 1 LONG net + 1 SHORT net
+- Mỗi side là **1 NET DUY NHẤT** với `qty + avg_entry` (KHÔNG có nhiều entries riêng)
+- Trên UI Binance: 2 dòng `BTC LONG` + `BTC SHORT` cho cùng symbol
+
+### 2. **Cross Margin** — wallet share collateral
+- Toàn bộ wallet làm collateral cho mọi positions
+- **uPnL CÓ THỂ âm > 100% margin** (wallet còn cover) — KHÔNG cap per position
+- Liquidation = ACCOUNT level: `totalEquity ≤ totalMaintMargin`
+
+### 3. **GỘP same-side khi nhồi** — weighted average entry
+
+```
+Trước:    LONG NET = 0.001 BTC @ avg $76,000
+Add:      0.002 BTC @ $77,000
+
+→ MERGE:
+  qty_new = 0.001 + 0.002 = 0.003 BTC
+  avg_new = (0.001 × 76,000 + 0.002 × 77,000) / 0.003 = $76,666.67
+
+Sau:      LONG NET = 0.003 BTC @ avg $76,666.67  (1 net duy nhất)
+```
+
+### 4. **PnL theo CHÊNH avg vs price** (KHÔNG per-entry)
+
+#### Unrealized:
+```
+LONG:  uPnL = qty × (current_price - avg_entry)
+SHORT: uPnL = qty × (avg_entry - current_price)
+```
+
+#### Realized (close ALL):
+```
+LONG close all:  PnL = qty × (exit_price - avg_entry)
+SHORT close all: PnL = qty × (avg_entry - exit_price)
+```
+
+### 5. **PARTIAL CLOSE — avg_entry GIỮ NGUYÊN** ⭐ CRITICAL
+
+```
+Setup: LONG NET 0.0125 BTC @ avg $76,000, current $80,000
+       size USDT = 0.0125 × 80,000 = $1,000
+
+Action: Close 100 USDT (10% notional)
+       close_qty = 100 / 80,000 = 0.00125 BTC
+
+Sau:
+  qty_remaining = 0.0125 - 0.00125 = 0.01125 BTC
+  avg_entry     = $76,000  ← GIỮ NGUYÊN, KHÔNG đổi
+  size USDT mới = 0.01125 × 80,000 = $900
+
+PnL realized = 0.00125 × (80,000 - 76,000) = +$5.00 (gross)
+exit_fee     = 100 × 0.05% = $0.05
+Net wallet   = +$5.00 - $0.05 = +$4.95
+```
+
+⭐ **KEY:** Close partial KHÔNG thay đổi avg_entry. Phần còn lại tiếp tục với avg cũ.
+
+### 6. **Liquidation hedge cross — 1 LIQ duy nhất theo NET direction**
+
+```
+net_qty   = qty_LONG - qty_SHORT  (signed)
+net_entry = (qty_L × entry_L − qty_S × entry_S) / net_qty   (break-even)
+buffer    = wallet - mm_total
+mm_total  = (notional_L + notional_S) × MMR (0.4% tier 0)
+
+Net long  → LIQ = net_entry × (1 - buffer / |net_notional|)  (giá ↓)
+Net short → LIQ = net_entry × (1 + buffer / |net_notional|)  (giá ↑)
+Hedged    → NO LIQ (wallet không thay đổi với price)
+```
+
+#### Insight:
+- Net long → giá UP = lời (LONG > SHORT) → KHÔNG liq theo hướng UP
+- CHỈ liq khi giá DOWN
+- Hedge perfectly (qty_L = qty_S) → ∞ LIQ (không bao giờ liq)
+
+### 7. **Margin used (cross share)**
+```
+margin_LONG  = notional_LONG  / leverage
+margin_SHORT = notional_SHORT / leverage
+margin_TOTAL = margin_L + margin_S  ← cross share wallet này
+```
+
+### 8. **Fee Binance Futures USDT-M**
+- Maker: 0.02%/side
+- Taker: 0.05%/side ← MARKET orders
+- Round-trip: 0.10% (entry + exit)
+
+### 9. **Maintenance Margin Rate (MMR) BTCUSDT**
+- Tier 0 (notional < $50k): MMR = 0.4%
+- Tier 1 ($50k-250k): MMR = 0.5%
+
+### 🚧 PITFALLS cho Claude tiếp theo:
+1. **KHÔNG simulate per-entry positions** — gộp vào NET với weighted avg ngay
+2. **PARTIAL close giữ avg_entry** — đừng recalc avg sau partial
+3. **PnL = chênh avg vs price**, KHÔNG phải sum của per-entry pnl
+4. **LIQ chỉ 1 cái** theo net direction, KHÔNG per-side
+5. **uPnL cross KHÔNG cap** — có thể âm > 100% margin
+6. **Hedge perfectly = ∞ LIQ** — không phải bug
+7. Anh Tommy test backtest TomiHedge với rule này → lesson learned: accumulate vô hạn không close → margin used khổng lồ ($17k cho N=5 stack 12k adds), wallet $5k chịu không nổi.
+
+### 🔄 Resume backtest TomiHedge:
+- Tool: `tools/backtest-tomihedge-15m.ts`
+- HTML: `assets/backtest_tomihedge_15m.html`
+- Đã test 3 N levels (5, 10, 20) — strategy gần break-even, hedge nhau triệt tiêu PnL
+- Anh Tommy quyết: cần CAP stack + close logic (TP/SL ROI hoặc time-based) để giảm risk
