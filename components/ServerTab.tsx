@@ -13,6 +13,7 @@ import { useBackendLive } from "../hooks/useBackendLive";
 import { SERVER_URL } from "../utils/backendApi";
 import PresetEnginePanel, { ToggleView } from "./PresetEnginePanel";
 import PresetOpenList from "./PresetOpenList";
+import TomiHedgePanel from "./TomiHedgePanel";
 import PaperSection from "./PaperSection";
 import ServerEngineStatus from "./ServerEngineStatus";
 
@@ -184,6 +185,11 @@ export default function ServerTab({ klinesByTf }: ServerTabProps = {}) {
       </View>
 
       {/* v0.3.0 PRESET ENGINE PANEL (anh Tommy: Real + Paper song song) */}
+      {/* v0.4.1 (anh Tommy): TomiHedge mode → render TomiHedgePanel ở TRÊN; preset legacy ở dưới */}
+      {s?.settings?.serverEngineMode === "tomihedge" && (
+        <TomiHedgePanel state={s} markPrice={markPriceAll} />
+      )}
+
       <PresetEnginePanel state={s} onRefresh={live.refresh} view={presetView} onViewChange={setPresetView} />
 
       {/* v0.3.3 ENGINE STATUS — show stoch K + S/R + per-side READY/BLOCKED */}
