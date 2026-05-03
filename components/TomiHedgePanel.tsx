@@ -48,6 +48,17 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
     return all.filter((p: any) => p.symbol === symbol && Math.abs(parseFloat(p.positionAmt)) > 0);
   }, [state?.binanceSnapshot?.positions, symbol]);
 
+  // v0.4.4 fix #300: ALL hooks PHẢI gọi trước conditional return.
+  // Build positions cho ConsolidatedPositions (an toàn cả khi th null)
+  const longNet0 = th?.longNet || { qty: 0, avgEntry: 0, totalAdds: 0 };
+  const shortNet0 = th?.shortNet || { qty: 0, avgEntry: 0, totalAdds: 0 };
+  const consolidatedPositions = useMemo(() => {
+    const out: any[] = [];
+    if (longNet0.qty > 0) out.push({ side: "LONG", entryPrice: longNet0.avgEntry, qty: longNet0.qty });
+    if (shortNet0.qty > 0) out.push({ side: "SHORT", entryPrice: shortNet0.avgEntry, qty: shortNet0.qty });
+    return out;
+  }, [longNet0.qty, longNet0.avgEntry, shortNet0.qty, shortNet0.avgEntry]);
+
   // Toggle bar + START/STOP
   const toggle = (
     <View style={styles.toggleRow}>
@@ -111,14 +122,6 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
   const totalUpnl = uPnLLong + uPnLShort;
   const equity = wallet + totalUpnl;
   const roi = ((equity - initialCap) / initialCap) * 100;
-
-  // Build positions for ConsolidatedPositions component (which expects array)
-  const consolidatedPositions = useMemo(() => {
-    const out: any[] = [];
-    if (longNet.qty > 0) out.push({ side: "LONG", entryPrice: longNet.avgEntry, qty: longNet.qty });
-    if (shortNet.qty > 0) out.push({ side: "SHORT", entryPrice: shortNet.avgEntry, qty: shortNet.qty });
-    return out;
-  }, [longNet.qty, longNet.avgEntry, shortNet.qty, shortNet.avgEntry]);
 
   return (
     <View>
