@@ -15,6 +15,7 @@ import { P } from "../utils/v2Theme";
 import { api } from "../utils/backendApi";
 import ConsolidatedPositions from "./ConsolidatedPositions";
 import TomiHedgeChart from "./TomiHedgeChart";
+import TomiHedgeLogPanel from "./TomiHedgeLogPanel";
 
 export type TomiHedgeView = "paper" | "real";
 
@@ -186,6 +187,12 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
         eventLog={th.eventLog}
         weeklyTrend={th.lastWeeklyTrend}
         title={isPaper ? "TomiHedge PAPER — Entry/Close Markers" : "TomiHedge REAL — Entry/Close Markers"}
+      />
+
+      {/* v0.4.5: LOG ADD/CLOSE — 20 entries mới nhất */}
+      <TomiHedgeLogPanel
+        eventLog={th.eventLog}
+        title={isPaper ? "TomiHedge PAPER Log" : "TomiHedge REAL Log"}
       />
     </View>
   );
