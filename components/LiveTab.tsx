@@ -22,8 +22,8 @@ import { MaterialIcon } from "./v2/MaterialIcon";
 import { UseBinanceLiveResult } from "../hooks/useBinanceLive";
 import { LiveSettings } from "../utils/liveTraderEngine";
 
-/** Hard-roll password để force claim leader (anh Tommy đặt). */
-const CLAIM_LEADER_PASSWORD = "30318384";
+/** Hard-roll password để force claim leader — v4.9.27 (anh Tommy): rotate "3031". */
+const CLAIM_LEADER_PASSWORD = "3031";
 
 interface Props {
   live: UseBinanceLiveResult;
@@ -828,19 +828,13 @@ function NumField({
 
 // ── TRACKED (Plan B virtual lệnh, mỗi lệnh TP/SL riêng) ──────────────────────
 
-// Password chung cho mọi destructive action (close, edit TP/SL, bulk close) — anh Tommy v4.7.5
-const DESTRUCTIVE_PASSWORD = "30318384";
+// v4.9.27 (anh Tommy): KHÔNG prompt password user nữa — chỉ confirm yes/no.
+import { DESTRUCTIVE_PWD as DESTRUCTIVE_PASSWORD } from "../utils/serverSecrets";
 
-/** Hỏi password trước khi cho phép destructive action. Trả về true nếu OK. */
+/** Confirm yes/no trước destructive action. Password gửi tự động trong API. */
 function requireDestructivePassword(actionLabel: string): boolean {
   if (typeof window === "undefined") return true;
-  const input = window.prompt(`🔒 Mã xác nhận để ${actionLabel}:`);
-  if (input === null) return false; // user cancel
-  if (input.trim() !== DESTRUCTIVE_PASSWORD) {
-    window.alert("❌ Sai mã xác nhận. Hành động đã hủy.");
-    return false;
-  }
-  return true;
+  return window.confirm(`Anh có chắc muốn ${actionLabel}?`);
 }
 
 /** Compute weighted summary cho stack 1 side */

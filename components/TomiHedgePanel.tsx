@@ -34,6 +34,20 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
     ? (cfg.tomiHedgePaperEnabled !== false)
     : (cfg.tomiHedgeRealEnabled === true);
   const [busy, setBusy] = React.useState(false);
+  const [rules, setRules] = React.useState<{ key: string; name: string; description: string }[]>([]);
+  const activeRuleKey: string = cfg.activeRuleKey || "hedge01";
+
+  React.useEffect(() => {
+    api.tomihedgeRules().then((r) => setRules(r.rules || [])).catch(() => {});
+  }, []);
+
+  const handleSetRule = async (key: string) => {
+    if (key === activeRuleKey) return;
+    setBusy(true);
+    try { await api.tomihedgeSetRule(key); }
+    catch (e: any) { if (typeof window !== "undefined") window.alert("❌ " + (e?.message ?? String(e))); }
+    finally { setBusy(false); }
+  };
 
   const handleToggle = async () => {
     setBusy(true);
@@ -60,7 +74,27 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
     return out;
   }, [longNet0.qty, longNet0.avgEntry, shortNet0.qty, shortNet0.avgEntry]);
 
-  // Toggle bar + START/STOP
+  // Rule selector + toggle + START/STOP
+  const ruleSelector = (
+    <View style={styles.ruleRow}>
+      <Text style={styles.ruleLabel}>RULE:</Text>
+      {rules.length === 0 ? (
+        <Text style={styles.ruleLabel}>{activeRuleKey}</Text>
+      ) : rules.map((r) => (
+        <TouchableOpacity
+          key={r.key}
+          style={[styles.ruleBtn, activeRuleKey === r.key && styles.ruleBtnActive]}
+          onPress={() => handleSetRule(r.key)}
+          disabled={busy}
+        >
+          <Text style={[styles.ruleText, activeRuleKey === r.key && styles.ruleTextActive]}>
+            {r.key.toUpperCase()}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+
   const toggle = (
     <View style={styles.toggleRow}>
       <TouchableOpacity
@@ -96,9 +130,10 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
       <View>
         <View style={styles.card}>
           <View style={styles.headerRow}>
-            <Text style={styles.h2}>🌊 TomiHedge — Hedge01 ({isPaper ? "PAPER" : "REAL"})</Text>
+            <Text style={styles.h2}>🌊 TomiHedge ({isPaper ? "PAPER" : "REAL"})</Text>
             {toggle}
           </View>
+          {ruleSelector}
           {isPaper ? (
             <Text style={styles.empty}>State chưa init. Cần POST /api/live/tomihedge/paper/reset</Text>
           ) : (
@@ -137,6 +172,7 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
           </Text>
           {toggle}
         </View>
+        {ruleSelector}
         <View style={styles.row}>
           <View style={styles.kpi}>
             <Text style={styles.kpiLabel}>WALLET</Text>
@@ -259,6 +295,12 @@ const styles = StyleSheet.create({
   toggleRow: { flexDirection: "row", gap: 6 },
   toggleBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 4, borderWidth: 1, borderColor: P.borderSoft },
   toggleText: { color: P.dim, fontSize: 11, fontWeight: "700", fontFamily: "monospace" },
+  ruleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginBottom: 8 },
+  ruleLabel: { color: P.dim, fontSize: 10, fontFamily: "monospace", letterSpacing: 0.8 },
+  ruleBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: P.borderSoft },
+  ruleBtnActive: { borderColor: P.bitcoinOrange, backgroundColor: P.bitcoinOrange + "22" },
+  ruleText: { color: P.dim, fontSize: 10, fontWeight: "700", fontFamily: "monospace" },
+  ruleTextActive: { color: P.bitcoinOrange },
   binRow: { flexDirection: "row", paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: P.borderSoft },
   binHeader: { borderBottomColor: P.border, borderBottomWidth: 2 },
   binCell: { fontSize: 11, fontFamily: "monospace", color: P.dim },

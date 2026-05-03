@@ -117,6 +117,11 @@ export const api = {
   // v0.4.4: START/STOP riêng paper + real
   tomihedgeToggle: (view: "paper" | "real", enabled: boolean) =>
     request<any>("/api/live/tomihedge/toggle", "POST", { view, enabled }),
+  // v0.4.5: rule registry — list + switch active
+  tomihedgeRules: () =>
+    request<{ ok: boolean; rules: { key: string; name: string; description: string }[]; activeRuleKey: string }>("/api/live/tomihedge/rules"),
+  tomihedgeSetRule: (ruleKey: string) =>
+    request<{ ok: boolean; activeRuleKey: string }>("/api/live/tomihedge/rule", "POST", { ruleKey }),
   realClear: (password: string) => request<any>("/api/live/real/clear", "POST", { confirmPassword: password }),
 };
 

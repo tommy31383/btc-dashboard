@@ -14,6 +14,7 @@ import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
 import { SERVER_URL, api } from "../utils/backendApi";
+import { DESTRUCTIVE_PWD } from "../utils/serverSecrets";
 import TomiHedgePanel, { TomiHedgeView } from "./TomiHedgePanel";
 
 interface ServerTabProps {
@@ -83,10 +84,9 @@ export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = 
       window.alert("Capital phải >= 100");
       return;
     }
-    const pw = window.prompt("Mã 30318384 để confirm:");
-    if (!pw) return;
+    if (!window.confirm(`Anh có chắc reset paper với capital $${capNum}?`)) return;
     try {
-      await api.tomihedgePaperReset(pw, capNum);
+      await api.tomihedgePaperReset(DESTRUCTIVE_PWD, capNum);
       await live.refresh();
       window.alert("✅ Reset paper xong, capital = $" + capNum);
     } catch (e: any) {
