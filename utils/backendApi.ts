@@ -101,6 +101,9 @@ export const api = {
   binanceAccount: () => request<any>("/api/binance/account"),
   binancePositions: () => request<any>("/api/binance/positions"),
   binanceHedge: () => request<any>("/api/binance/hedge-mode"),
+  // v0.4.3: klines for chart (full bars). Public endpoint, không cần auth.
+  klines: (tf: "5m" | "15m" | "1h" | "4h" | "1d" | "1w") =>
+    request<{ tf: string; count: number; bars: { time: number; open: number; high: number; low: number; close: number; volume: number }[] }>(`/api/binance/klines/${tf}?full=1`),
 
   // v0.3.0 PRESET ENGINE (anh Tommy: server replica của 5m ALL)
   presets: () => request<any>("/api/live/presets"),
@@ -111,6 +114,9 @@ export const api = {
   // v0.4.2 TomiHedge
   tomihedgePaperReset: (password: string, capital: number) =>
     request<any>("/api/live/tomihedge/paper/reset", "POST", { confirmPassword: password, capital }),
+  // v0.4.4: START/STOP riêng paper + real
+  tomihedgeToggle: (view: "paper" | "real", enabled: boolean) =>
+    request<any>("/api/live/tomihedge/toggle", "POST", { view, enabled }),
   realClear: (password: string) => request<any>("/api/live/real/clear", "POST", { confirmPassword: password }),
 };
 
