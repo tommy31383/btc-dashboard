@@ -36,6 +36,9 @@ export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = 
     return (
       <View style={styles.center}>
         <Text style={styles.dim}>⏳ Connecting to {SERVER_URL}...</Text>
+        <Text style={[styles.dim, { fontSize: 10, marginTop: 8, fontStyle: "italic" }]}>
+          Tự timeout sau 10s nếu server không phản hồi
+        </Text>
       </View>
     );
   }

@@ -46,16 +46,31 @@ export async function setToken(token: string | null): Promise<void> {
   else await AsyncStorage.removeItem(TOKEN_KEY);
 }
 
+// 2026-05-03 (anh Tommy): timeout 10s — nếu server down thì throw nhanh thay vì
+// fetch hang vô hạn (web client kẹt mãi ở "Connecting to ..." loading screen).
+const REQUEST_TIMEOUT_MS = 10_000;
+
 async function request<T>(path: string, method: "GET" | "POST" = "GET", body?: any): Promise<T> {
   const token = await getToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const url = await getServerUrl();
-  const res = await fetch(`${url}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), REQUEST_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(`${url}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: ac.signal,
+    });
+  } catch (e: any) {
+    if (e?.name === "AbortError") throw new Error(`Server không phản hồi sau ${REQUEST_TIMEOUT_MS / 1000}s — VPS có thể down`);
+    throw new Error(`Network error: ${e?.message ?? "fetch failed"}`);
+  } finally {
+    clearTimeout(timer);
+  }
   const text = await res.text();
   let data: any = {};
   try { data = JSON.parse(text); } catch {}
