@@ -35,7 +35,9 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
     : (cfg.tomiHedgeRealEnabled === true);
   const [busy, setBusy] = React.useState(false);
   const [rules, setRules] = React.useState<{ key: string; name: string; description: string }[]>([]);
+  const [showRuleDetail, setShowRuleDetail] = React.useState(false);
   const activeRuleKey: string = cfg.activeRuleKey || "hedge01";
+  const activeRule = rules.find((r) => r.key === activeRuleKey);
 
   React.useEffect(() => {
     api.tomihedgeRules().then((r) => setRules(r.rules || [])).catch(() => {});
@@ -74,24 +76,42 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
     return out;
   }, [longNet0.qty, longNet0.avgEntry, shortNet0.qty, shortNet0.avgEntry]);
 
-  // Rule selector + toggle + START/STOP
+  // Rule selector + toggle + START/STOP + show/hide rule detail
   const ruleSelector = (
-    <View style={styles.ruleRow}>
-      <Text style={styles.ruleLabel}>RULE:</Text>
-      {rules.length === 0 ? (
-        <Text style={styles.ruleLabel}>{activeRuleKey}</Text>
-      ) : rules.map((r) => (
-        <TouchableOpacity
-          key={r.key}
-          style={[styles.ruleBtn, activeRuleKey === r.key && styles.ruleBtnActive]}
-          onPress={() => handleSetRule(r.key)}
-          disabled={busy}
-        >
-          <Text style={[styles.ruleText, activeRuleKey === r.key && styles.ruleTextActive]}>
-            {r.key.toUpperCase()}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View>
+      <View style={styles.ruleRow}>
+        <Text style={styles.ruleLabel}>RULE:</Text>
+        {rules.length === 0 ? (
+          <Text style={styles.ruleLabel}>{activeRuleKey}</Text>
+        ) : rules.map((r) => (
+          <TouchableOpacity
+            key={r.key}
+            style={[styles.ruleBtn, activeRuleKey === r.key && styles.ruleBtnActive]}
+            onPress={() => handleSetRule(r.key)}
+            disabled={busy}
+          >
+            <Text style={[styles.ruleText, activeRuleKey === r.key && styles.ruleTextActive]}>
+              {r.key.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
+        ))}
+        {activeRule && (
+          <TouchableOpacity
+            style={[styles.ruleBtn, { borderColor: P.dim }]}
+            onPress={() => setShowRuleDetail(!showRuleDetail)}
+          >
+            <Text style={[styles.ruleText, { color: P.dim }]}>
+              {showRuleDetail ? "▼ HIDE" : "▶ SHOW"} INFO
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {showRuleDetail && activeRule && (
+        <View style={styles.ruleDetail}>
+          <Text style={styles.ruleDetailName}>{activeRule.name}</Text>
+          <Text style={styles.ruleDetailDesc}>{activeRule.description}</Text>
+        </View>
+      )}
     </View>
   );
 
@@ -296,6 +316,9 @@ const styles = StyleSheet.create({
   toggleBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 4, borderWidth: 1, borderColor: P.borderSoft },
   toggleText: { color: P.dim, fontSize: 11, fontWeight: "700", fontFamily: "monospace" },
   ruleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginBottom: 8 },
+  ruleDetail: { backgroundColor: P.bg, padding: 10, borderRadius: 4, marginBottom: 8, borderLeftWidth: 3, borderLeftColor: P.bitcoinOrange },
+  ruleDetailName: { color: P.bitcoinOrange, fontSize: 12, fontWeight: "700", marginBottom: 6, fontFamily: "monospace" },
+  ruleDetailDesc: { color: P.text2, fontSize: 11, fontFamily: "monospace", lineHeight: 16 },
   ruleLabel: { color: P.dim, fontSize: 10, fontFamily: "monospace", letterSpacing: 0.8 },
   ruleBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: P.borderSoft },
   ruleBtnActive: { borderColor: P.bitcoinOrange, backgroundColor: P.bitcoinOrange + "22" },
