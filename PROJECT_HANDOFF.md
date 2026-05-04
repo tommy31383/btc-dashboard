@@ -1,12 +1,21 @@
 # PROJECT HANDOFF — BTC Trading Bot
 
-**Date written:** 2026-04-28 (last sync v4.8.30 + v0.4.5)
-**Frontend:** v4.8.30 (`tommy31383/btc-dashboard`, public, master branch)
+**Date written:** 2026-04-28 (last sync v4.9.27 + v0.4.5)
+**Frontend:** v4.9.27 (`tommy31383/btc-dashboard`, public, master branch)
 **Server:** v0.4.5 (`tommy31383/btc-trader-server`, private, main branch)
 **Owner:** Tommy (tuantommy83@gmail.com) — speaks Vietnamese, prefers terse Việt-Anh mix
 
 > **🆕 What's new since v4.8.25 / v0.2.2:**
-> - **Frontend:** v4.8.26 (10 PRESETS từ SHORTLIST_v1) → v4.8.27 (5m ALL mobile perf) → v4.8.29 (closed chart + web build excludes) → v4.8.30 (Windows web deploy script)
+> - **Frontend v4.8.x line:**
+>   - v4.8.26 (10 PRESETS từ SHORTLIST_v1) → v4.8.27 (5m ALL mobile perf)
+>   - v4.8.29 (closed chart + web build excludes) → v4.8.30 (Windows deploy script)
+> - **Frontend v4.9.x line — TomiHedge UI + Server tab refactor:**
+>   - v4.9.2-v4.9.6: fee model + EQUITY paper + ServerEngineStatus panel + hide LIVE tab
+>   - v4.9.7-v4.9.11: SERVER tab UI/UX rewrite theo view Real/Paper + 3-mode ENGINE NEW ENTRIES pill + LIQ display + 💀 badge
+>   - v4.9.12-v4.9.16: ConsolidatedPositions (2 NET LONG+SHORT gộp Binance-style) + manual close paper + UI CROSS margin match
+>   - v4.9.17-v4.9.19: ConsolidatedPositions size USDT chính + LIQ hedge cross + LIQ ACCOUNT-LEVEL theo NET direction
+>   - v4.9.20-v4.9.22: TomiHedgePanel hiển thị Hedge01 paper state + kill preset legacy UI + toggle Real/Paper
+>   - v4.9.24-v4.9.27: TomiHedge START/STOP + Binance live positions + log panel 20 entries + rule registry/selector + password 3031 (no prompt)
 > - **Server v0.3.0:** preset engine (server replica của 5m ALL paper)
 > - **Server v0.3.5 audit:** CORS restrict, rate limit (5/min login, 30/min destructive), gzip compression, WS perMessageDeflate ~80% bandwidth, WAL checkpoint mỗi 10p, JWT subprotocol auth (SEC1), password từ env (SEC3)
 > - **Server v0.4.0:** TomiHedge engine (server-side rules registry, paper + real engine)
