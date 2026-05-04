@@ -1,9 +1,18 @@
 # PROJECT HANDOFF — BTC Trading Bot
 
-**Date written:** 2026-04-28 (last sync v4.8.25)
-**Frontend:** v4.8.25 (`tommy31383/btc-dashboard`, public, master branch)
-**Server:** v0.2.2 (`tommy31383/btc-trader-server`, private, main branch)
+**Date written:** 2026-04-28 (last sync v4.8.30 + v0.4.5)
+**Frontend:** v4.8.30 (`tommy31383/btc-dashboard`, public, master branch)
+**Server:** v0.4.5 (`tommy31383/btc-trader-server`, private, main branch)
 **Owner:** Tommy (tuantommy83@gmail.com) — speaks Vietnamese, prefers terse Việt-Anh mix
+
+> **🆕 What's new since v4.8.25 / v0.2.2:**
+> - **Frontend:** v4.8.26 (10 PRESETS từ SHORTLIST_v1) → v4.8.27 (5m ALL mobile perf) → v4.8.29 (closed chart + web build excludes) → v4.8.30 (Windows web deploy script)
+> - **Server v0.3.0:** preset engine (server replica của 5m ALL paper)
+> - **Server v0.3.5 audit:** CORS restrict, rate limit (5/min login, 30/min destructive), gzip compression, WS perMessageDeflate ~80% bandwidth, WAL checkpoint mỗi 10p, JWT subprotocol auth (SEC1), password từ env (SEC3)
+> - **Server v0.4.0:** TomiHedge engine (server-side rules registry, paper + real engine)
+> - **Server v0.4.4:** START/STOP riêng cho paper + real
+> - **Server v0.4.5:** Rule registry (hedge02/hedge03 skeletons), password default = `3031` (4-digit, anh Tommy convenience)
+> - **Backtest:** TPSL_GRID_v1 (280 combos) + SHORTLIST_v1 (10 picks curated) — xem `BACKTEST_REGISTRY.md`
 
 ---
 
