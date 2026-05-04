@@ -18,8 +18,8 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 
-const PIVOT_N = 10;
-const TOUCH_PCT = 0.4;
+const MA_PERIOD_1H = 20;
+const MA_DEVIATION_PCT = 2.0;
 const RSI_PERIOD = 14;
 const STOCH_PERIOD = 14;
 const STOCH_K_OS = 10;
@@ -31,7 +31,7 @@ const COOLDOWN_MS = 60 * 60_000; // 1h
 const MIN_QTY_BTC = 0.001;
 const FEE_PER_SIDE_PCT = 0.05;
 const MAINT_MARGIN_RATE = 0.004;
-const INITIAL_CAPITAL = 1000;
+const INITIAL_CAPITAL = 100000;
 
 interface Candle { time: number; open: number; high: number; low: number; close: number; }
 
@@ -74,27 +74,17 @@ function calcStochK(candles: Candle[], period: number): (number | null)[] {
   return out;
 }
 
-function detectSwingLevels(candles: Candle[], n: number): { lows: number[]; highs: number[] } {
-  const lows: number[] = [], highs: number[] = [];
-  for (let i = n; i < candles.length - n; i++) {
-    let isLow = true, isHigh = true;
-    for (let j = i - n; j <= i + n; j++) {
-      if (j === i) continue;
-      if (candles[j].low <= candles[i].low) isLow = false;
-      if (candles[j].high >= candles[i].high) isHigh = false;
-    }
-    if (isLow) lows.push(candles[i].low);
-    if (isHigh) highs.push(candles[i].high);
+function calcSMA(closes: number[], period: number): (number | null)[] {
+  const out: (number | null)[] = new Array(closes.length).fill(null);
+  if (closes.length < period) return out;
+  let sum = 0;
+  for (let i = 0; i < period; i++) sum += closes[i];
+  out[period - 1] = sum / period;
+  for (let i = period; i < closes.length; i++) {
+    sum += closes[i] - closes[i - period];
+    out[i] = sum / period;
   }
-  return { lows: lows.sort((a, b) => a - b), highs: highs.sort((a, b) => a - b) };
-}
-
-function nearLevel(price: number, levels: number[]): boolean {
-  const tol = price * (TOUCH_PCT / 100);
-  for (const lv of levels) {
-    if (Math.abs(lv - price) <= tol) return true;
-  }
-  return false;
+  return out;
 }
 
 function findIndexAtOrBefore(arr: { time: number }[], t: number): number {
@@ -135,10 +125,9 @@ function main() {
   const rsi5 = calcRSI(closes5, RSI_PERIOD);
   const stochK5 = calcStochK(c5, STOCH_PERIOD);
 
-  // S/R precompute với rolling window — quá tốn nếu compute mỗi bar trên full c1h.
-  // Thay vào đó dùng SR static trên FULL history c1h+c4h, lọc level <= current price.
-  const sr1h = detectSwingLevels(c1h, PIVOT_N);
-  const sr4h = detectSwingLevels(c4h, PIVOT_N);
+  // Fix 1: bỏ S/R, thêm MA20(1H) filter
+  const closes1h = c1h.map((b) => b.close);
+  const ma1h = calcSMA(closes1h, MA_PERIOD_1H);
 
   // State
   let longNet: Net = { qty: 0, avg: 0 };
@@ -168,19 +157,20 @@ function main() {
     const trend = getWeeklyTrend(c1w, bar.time);
     if (!trend) continue;
 
-    // S/R levels — lọc cho gần price
-    const supports = [...sr1h.lows, ...sr4h.lows];
-    const resistances = [...sr1h.highs, ...sr4h.highs];
+    // MA20(1H) at current bar.time
+    const idx1h = findIndexAtOrBefore(c1h, bar.time);
+    const maNow = idx1h >= 0 ? ma1h[idx1h] : null;
+    if (maNow === null) continue;
 
     const longCool = bar.time - lastAddLongMs >= COOLDOWN_MS;
     const shortCool = bar.time - lastAddShortMs >= COOLDOWN_MS;
 
     if (trend === "UP" && longCool) {
-      // 4 conditions OR
-      const c1 = k < STOCH_K_OS;
-      const c2 = r < RSI_OS;
-      const c3 = nearLevel(price, supports);
-      const c4 = longNet.qty > 0 && price < longNet.avg * (1 - DCA_PCT / 100);
+      // 4 conditions OR (Fix 1: bỏ S/R, thêm MA filter)
+      const c1 = k < STOCH_K_OS;                                      // oversold Stoch
+      const c2 = r < RSI_OS;                                           // oversold RSI
+      const c3 = price < maNow * (1 - MA_DEVIATION_PCT / 100);         // price below MA1H by >2%
+      const c4 = longNet.qty > 0 && price < longNet.avg * (1 - DCA_PCT / 100);  // DCA
       if (c1 || c2 || c3 || c4) {
         const qty = MIN_QTY_BTC;
         const fee = qty * price * (FEE_PER_SIDE_PCT / 100);
@@ -189,13 +179,13 @@ function main() {
         totalFees += fee;
         totalAddsLong++;
         lastAddLongMs = bar.time;
-        const reason = c1 ? "K<10" : c2 ? "RSI<20" : c3 ? "support" : "DCA";
+        const reason = c1 ? "K<10" : c2 ? "RSI<20" : c3 ? "MA<-2%" : "DCA";
         events.push({ ts: bar.time, side: "LONG", price, reason, avgAfter: longNet.avg });
       }
     } else if (trend === "DOWN" && shortCool) {
       const c1 = k > STOCH_K_OB;
       const c2 = r > RSI_OB;
-      const c3 = nearLevel(price, resistances);
+      const c3 = price > maNow * (1 + MA_DEVIATION_PCT / 100);         // price above MA1H by >2%
       const c4 = shortNet.qty > 0 && price > shortNet.avg * (1 + DCA_PCT / 100);
       if (c1 || c2 || c3 || c4) {
         const qty = MIN_QTY_BTC;
@@ -205,7 +195,7 @@ function main() {
         totalFees += fee;
         totalAddsShort++;
         lastAddShortMs = bar.time;
-        const reason = c1 ? "K>90" : c2 ? "RSI>80" : c3 ? "resistance" : "DCA";
+        const reason = c1 ? "K>90" : c2 ? "RSI>80" : c3 ? "MA>+2%" : "DCA";
         events.push({ ts: bar.time, side: "SHORT", price, reason, avgAfter: shortNet.avg });
       }
     }

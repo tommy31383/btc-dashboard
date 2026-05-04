@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Wave Methods Comparison</title>
+<style>
+  body { background:#0a0a0a; color:#e5e5e5; font-family:'JetBrains Mono', monospace; margin:0; padding:16px; }
+  h1 { color:#f7931a; font-size:18px; }
+  h2 { font-size:14px; margin:18px 0 6px; }
+  table { border-collapse:collapse; margin-bottom:16px; }
+  th, td { padding:6px 12px; border:1px solid #333; font-size:12px; text-align:right; }
+  th { background:#1a1a1a; color:#888; font-size:10px; letter-spacing:1px; }
+  td.name { text-align:left; color:#f7931a; }
+  .green { color:#10b981; } .red { color:#ef4444; }
+  .switcher { display:flex; gap:8px; margin-bottom:8px; }
+  .swbtn { padding:6px 14px; border:1px solid #444; background:#1a1a1a; color:#888; cursor:pointer; font-size:12px; font-family:monospace; }
+  .swbtn.active { border-color:#f7931a; color:#f7931a; background:#2a1a05; }
+  #chart { background:#111; border:1px solid #333; }
+  .legend { display:flex; gap:14px; font-size:11px; margin:6px 0; color:#888; }
+  .tooltip { position:absolute; background:#000; border:1px solid #555; padding:6px 10px; font-size:11px; pointer-events:none; opacity:0; transition:opacity 0.1s; white-space:nowrap; z-index:10; }
+</style>
+</head>
+<body>
+  <h1>WAVE METHODS COMPARISON (3y, $100k cap, $1000 notional/ADD)</h1>
+  <h2>SUMMARY</h2>
+  <table id="summary"></table>
+  <h2>DETAIL CHART</h2>
+  <div class="switcher" id="switcher"></div>
+  <div class="legend">
+    <span>Price BTC (orange line)</span>
+    <span class="green">▲ ADD LONG</span>
+    <span class="red">▼ ADD SHORT</span>
+    <span class="green">✕ CLOSE LONG (win green / lose red text)</span>
+    <span class="red">✕ CLOSE SHORT</span>
+    <span style="color:#666">(hover marker → tooltip)</span>
+  </div>
+  <canvas id="chart" width="1600" height="650"></canvas>
+  <div class="tooltip" id="tip"></div>
+<script>
+function el(t,c,x){const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e;}
+fetch('backtest_wave_methods_3y.json').then(r=>r.json()).then(d=>{
+  const tbl = document.getElementById('summary');
+  const headRow = el('tr');
+  ['METHOD','ROI %','MAX DD $','LIQ','ADD L','ADD S','CLOSES','WIN/TOTAL','WR %','REALIZED PnL','FINAL EQUITY','FEES'].forEach(h=>{
+    const th = el('th',null,h); headRow.appendChild(th);
+  });
+  tbl.appendChild(headRow);
+  d.methods.forEach((m,idx)=>{
+    const tr = el('tr');
+    tr.appendChild(el('td','name',m.name));
+    const roi = el('td', m.roi>=0?'green':'red', (m.roi>=0?'+':'') + m.roi.toFixed(2));
+    tr.appendChild(roi);
+    tr.appendChild(el('td','red','$'+m.maxDD.toFixed(0)));
+    tr.appendChild(el('td', m.liquidated?'red':'green', m.liquidated?'YES':'NO'));
+    tr.appendChild(el('td','green',m.totalAddsLong));
+    tr.appendChild(el('td','red',m.totalAddsShort));
+    tr.appendChild(el('td',null,m.totalCloses));
+    const wr = m.winCount+m.lossCount;
+    tr.appendChild(el('td',null, wr>0 ? `${m.winCount}/${wr}` : '—'));
+    tr.appendChild(el('td', wr>0 && m.winCount/wr>=0.5 ? 'green' : (wr>0 ? 'red' : ''), wr>0 ? `${(m.winCount/wr*100).toFixed(0)}%` : '—'));
+    tr.appendChild(el('td', m.totalRealizedPnl>=0?'green':'red', (m.totalRealizedPnl>=0?'+':'')+'$'+m.totalRealizedPnl.toFixed(0)));
+    tr.appendChild(el('td', m.finalEq>=d.initialCapital?'green':'red', '$'+m.finalEq.toFixed(0)));
+    tr.appendChild(el('td',null,'$'+m.totalFees.toFixed(0)));
+    tbl.appendChild(tr);
+  });
+
+  const sw = document.getElementById('switcher');
+  let activeIdx = 0;
+  d.methods.forEach((m,i)=>{
+    const b = el('button','swbtn',m.name);
+    b.onclick = ()=>{ activeIdx = i; render(); document.querySelectorAll('.swbtn').forEach((x,j)=>x.classList.toggle('active', j===i)); };
+    sw.appendChild(b);
+  });
+  sw.firstChild.classList.add('active');
+
+  const cv = document.getElementById('chart');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const PAD_L=70, PAD_R=20, PAD_T=20, PAD_B=40;
+  const innerW=W-PAD_L-PAD_R, innerH=H-PAD_T-PAD_B;
+  let markers = [];
+
+  function render(){
+    const m = d.methods[activeIdx];
+    ctx.clearRect(0,0,W,H);
+    const pl = d.priceLine;
+    const t0 = pl[0].ts, t1 = pl[pl.length-1].ts;
+    let pMin=Infinity, pMax=-Infinity;
+    for (const p of pl) { if (p.price<pMin) pMin=p.price; if (p.price>pMax) pMax=p.price; }
+    const xOf=t=>PAD_L+((t-t0)/(t1-t0))*innerW;
+    const yOf=p=>PAD_T+(1-(p-pMin)/(pMax-pMin))*innerH;
+    ctx.font='10px monospace';
+    for (let i=0;i<=5;i++){
+      const y=PAD_T+(i/5)*innerH; const p=pMax-(i/5)*(pMax-pMin);
+      ctx.strokeStyle='#222'; ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
+      ctx.fillStyle='#666'; ctx.fillText('$'+p.toFixed(0), 8, y+4);
+    }
+    for (let i=0;i<=10;i++){
+      const x=PAD_L+(i/10)*innerW; const t=t0+(i/10)*(t1-t0);
+      const dt=new Date(t); const lbl=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      ctx.strokeStyle='#1a1a1a'; ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke();
+      ctx.fillStyle='#666'; ctx.fillText(lbl, x-22, H-PAD_B+18);
+    }
+    ctx.strokeStyle='#f7931a'; ctx.lineWidth=1.2; ctx.beginPath();
+    for (let i=0;i<pl.length;i++){const x=xOf(pl[i].ts), y=yOf(pl[i].price); if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    if (m.liquidated){
+      const x = xOf(m.liqAtMs);
+      ctx.strokeStyle='#ef4444'; ctx.lineWidth=2; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#ef4444'; ctx.font='bold 12px monospace'; ctx.fillText('X LIQ', x+4, PAD_T+14);
+    }
+    markers = [];
+    for (const e of m.events){
+      const x=xOf(e.ts), y=yOf(e.price);
+      const isLong = e.side==='LONG';
+      const baseColor = isLong ? '#10b981' : '#ef4444';
+      ctx.fillStyle = baseColor; ctx.strokeStyle = baseColor; ctx.lineWidth=1.5; ctx.globalAlpha=0.85;
+      if (e.kind==='ADD'){
+        ctx.beginPath();
+        if (isLong){ ctx.moveTo(x,y-6); ctx.lineTo(x-5,y+3); ctx.lineTo(x+5,y+3); ctx.closePath(); }
+        else { ctx.moveTo(x,y+6); ctx.lineTo(x-5,y-3); ctx.lineTo(x+5,y-3); ctx.closePath(); }
+        ctx.fill();
+      } else {
+        const winColor = (e.realizedPnl||0)>=0 ? '#10b981' : '#ef4444';
+        ctx.strokeStyle = winColor;
+        ctx.beginPath(); ctx.moveTo(x-6,y-6); ctx.lineTo(x+6,y+6); ctx.moveTo(x-6,y+6); ctx.lineTo(x+6,y-6); ctx.stroke();
+      }
+      markers.push({x,y,e});
+    }
+    ctx.globalAlpha=1;
+  }
+  render();
+
+  const tip = document.getElementById('tip');
+  cv.addEventListener('mousemove', (ev)=>{
+    const r = cv.getBoundingClientRect();
+    const mx = (ev.clientX-r.left)*(cv.width/r.width);
+    const my = (ev.clientY-r.top)*(cv.height/r.height);
+    let near=null, nd=20;
+    for (const m of markers){const dx=m.x-mx, dy=m.y-my, dist=Math.sqrt(dx*dx+dy*dy); if (dist<nd){nd=dist; near=m;}}
+    if (near){
+      const e=near.e;
+      tip.replaceChildren();
+      tip.appendChild(el('b',null,e.kind+' '+e.side));
+      tip.appendChild(document.createTextNode(' @ $'+e.price.toFixed(0))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode(new Date(e.ts).toISOString().slice(0,16))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('qty: '+e.qty.toFixed(4)+' BTC')); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('avg after: $'+e.avgAfter.toFixed(0)));
+      if (e.realizedPnl !== undefined){tip.appendChild(el('br')); tip.appendChild(el('span', e.realizedPnl>=0?'green':'red', 'PnL: '+(e.realizedPnl>=0?'+':'')+'$'+e.realizedPnl.toFixed(2)));}
+      tip.style.left = (ev.clientX+12)+'px'; tip.style.top = (ev.clientY+12)+'px'; tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  });
+  cv.addEventListener('mouseleave', ()=>tip.style.opacity=0);
+});
+</script>
+</body>
+</html>

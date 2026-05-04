@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>BB Multi-TF Hedge No-Close</title>
+<style>
+  body { background:#0a0a0a; color:#e5e5e5; font-family:'JetBrains Mono', monospace; margin:0; padding:16px; }
+  h1 { color:#f7931a; font-size:18px; }
+  h2 { font-size:13px; margin:12px 0 6px; color:#aaa; }
+  .stats { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:12px; }
+  .stat { background:#1a1a1a; padding:8px 12px; border-radius:4px; border:1px solid #333; }
+  .stat .label { color:#888; font-size:9px; letter-spacing:1px; }
+  .stat .value { font-size:14px; font-weight:700; }
+  .green { color:#10b981; } .red { color:#ef4444; } .orange { color:#f7931a; }
+  .legend { display:flex; gap:14px; font-size:11px; margin-bottom:8px; color:#888; flex-wrap:wrap; }
+  #chart { background:#111; border:1px solid #333; }
+  .tooltip { position:absolute; background:#000; border:1px solid #555; padding:6px 10px; font-size:11px; pointer-events:none; opacity:0; transition:opacity 0.1s; white-space:nowrap; z-index:10; }
+  .tfRow { display:flex; gap:6px; margin-bottom:8px; }
+  .tfBtn { padding:8px 18px; border:1px solid #333; background:#1a1a1a; color:#888; cursor:pointer; font-family:monospace; font-size:13px; font-weight:700; }
+  .tfBtn.active { border-color:#f7931a; color:#f7931a; background:#2a1a05; }
+  table { border-collapse:collapse; font-size:11px; margin-bottom:12px; }
+  th,td { padding:5px 10px; border:1px solid #333; text-align:right; }
+  th { background:#1a1a1a; color:#888; font-size:10px; }
+  td.tf { text-align:left; color:#f7931a; font-weight:700; }
+  tr.active { background:#2a1a05; }
+</style>
+</head>
+<body>
+  <h1>BB(20,2) MULTI-TF HEDGE NO-CLOSE — LONG cross dưới / SHORT cross trên</h1>
+  <h2>SUMMARY (click row to switch chart)</h2>
+  <table id="summary"></table>
+  <h2>CHART — chọn TF</h2>
+  <div class="tfRow" id="tfRow"></div>
+  <div class="stats" id="stats"></div>
+  <div class="legend">
+    <span class="orange">Price BTC (orange)</span>
+    <span style="color:#3b82f6">BB upper/lower của TF đã chọn (blue)</span>
+    <span style="color:#888">BB middle (dotted gray)</span>
+    <span class="green">▲ ADD LONG (cross dưới lower)</span>
+    <span class="red">▼ ADD SHORT (cross trên upper)</span>
+    <span style="color:#666">(hover marker để xem detail · CUỘN CHUỘT để zoom · DRAG để pan · DOUBLE-CLICK reset)</span>
+  </div>
+  <canvas id="chart" width="1600" height="700"></canvas>
+  <div class="tooltip" id="tip"></div>
+<script>
+function el(t,c,x){const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e;}
+function statBox(label,value,cls){const w=el('div','stat'); w.appendChild(el('div','label',label)); w.appendChild(el('div','value '+(cls||''),value)); return w;}
+const fmt=v=>(v>=0?'+':'')+'$'+v.toFixed(2);
+const fmtPct=v=>(v>=0?'+':'')+v.toFixed(2)+'%';
+
+fetch('backtest_boll_multi_tf_3y.json').then(r=>r.json()).then(d=>{
+  // Summary table
+  const tbl=document.getElementById('summary');
+  const head=el('tr');
+  ['TF','LIQ','ADD LONG','ADD SHORT','FINAL LONG (BTC@avg)','FINAL SHORT','uPnL LONG','uPnL SHORT','TOTAL uPnL','ROI %','MAX DD','EQUITY'].forEach(h=>head.appendChild(el('th',null,h)));
+  tbl.appendChild(head);
+  d.results.forEach((r,i)=>{
+    const tr=el('tr'); tr.dataset.idx=i;
+    tr.appendChild(el('td','tf',r.tf));
+    tr.appendChild(el('td', r.liquidated?'red':'green', r.liquidated?'YES':'NO'));
+    tr.appendChild(el('td','green',r.totalAddsLong));
+    tr.appendChild(el('td','red',r.totalAddsShort));
+    tr.appendChild(el('td','green',`${r.finalLong.qty.toFixed(3)} @ $${r.finalLong.avg.toFixed(0)}`));
+    tr.appendChild(el('td','red',`${r.finalShort.qty.toFixed(3)} @ $${r.finalShort.avg.toFixed(0)}`));
+    tr.appendChild(el('td', r.finalUpnlLong>=0?'green':'red', fmt(r.finalUpnlLong)));
+    tr.appendChild(el('td', r.finalUpnlShort>=0?'green':'red', fmt(r.finalUpnlShort)));
+    tr.appendChild(el('td', r.finalUpnl>=0?'green':'red', fmt(r.finalUpnl)));
+    tr.appendChild(el('td', r.roi>=0?'green':'red', fmtPct(r.roi)));
+    tr.appendChild(el('td','red','$'+r.maxDD.toFixed(0)));
+    tr.appendChild(el('td', r.finalEq>=100000?'green':'red', '$'+r.finalEq.toFixed(0)));
+    tr.onclick=()=>{ activeIdx=i; render(); updateActive(); };
+    tbl.appendChild(tr);
+  });
+
+  const tfRow=document.getElementById('tfRow');
+  d.results.forEach((r,i)=>{
+    const b=el('button','tfBtn',r.tf);
+    b.onclick=()=>{ activeIdx=i; render(); updateActive(); };
+    tfRow.appendChild(b);
+  });
+
+  let activeIdx=2; // default 4h
+  // Zoom state
+  const fullT0=d.priceLine[0].ts, fullT1=d.priceLine[d.priceLine.length-1].ts;
+  let viewT0=fullT0, viewT1=fullT1;
+  let isDragging=false, dragStartX=0, dragStartT0=0, dragStartT1=0;
+
+  function updateActive(){
+    document.querySelectorAll('.tfBtn').forEach((b,i)=>b.classList.toggle('active', i===activeIdx));
+    document.querySelectorAll('#summary tr[data-idx]').forEach((tr,i)=>tr.classList.toggle('active', i===activeIdx));
+    const r=d.results[activeIdx];
+    const s=document.getElementById('stats');
+    s.replaceChildren();
+    s.appendChild(statBox('TF', r.tf, 'orange'));
+    s.appendChild(statBox('LIQ', r.liquidated?'YES':'NO', r.liquidated?'red':'green'));
+    s.appendChild(statBox('ADDs LONG', String(r.totalAddsLong), 'green'));
+    s.appendChild(statBox('ADDs SHORT', String(r.totalAddsShort), 'red'));
+    s.appendChild(statBox('FINAL LONG', `${r.finalLong.qty.toFixed(3)} @ $${r.finalLong.avg.toFixed(0)}`, 'green'));
+    s.appendChild(statBox('FINAL SHORT', `${r.finalShort.qty.toFixed(3)} @ $${r.finalShort.avg.toFixed(0)}`, 'red'));
+    s.appendChild(statBox('LAST PRICE', '$'+r.lastPrice.toFixed(0)));
+    s.appendChild(statBox('uPnL LONG', fmt(r.finalUpnlLong), r.finalUpnlLong>=0?'green':'red'));
+    s.appendChild(statBox('uPnL SHORT', fmt(r.finalUpnlShort), r.finalUpnlShort>=0?'green':'red'));
+    s.appendChild(statBox('TOTAL uPnL', fmt(r.finalUpnl), r.finalUpnl>=0?'green':'red'));
+    s.appendChild(statBox('FINAL EQUITY', '$'+r.finalEq.toFixed(2), r.finalEq>=100000?'green':'red'));
+    s.appendChild(statBox('ROI', fmtPct(r.roi), r.roi>=0?'green':'red'));
+    s.appendChild(statBox('MAX DD', '$'+r.maxDD.toFixed(2), 'red'));
+    s.appendChild(statBox('FEES', '$'+r.totalFees.toFixed(0)));
+  }
+
+  const cv=document.getElementById('chart'); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height; const PAD_L=70, PAD_R=20, PAD_T=20, PAD_B=40;
+  const innerW=W-PAD_L-PAD_R, innerH=H-PAD_T-PAD_B;
+  let markers=[];
+
+  function render(){
+    const r=d.results[activeIdx];
+    ctx.clearRect(0,0,W,H);
+    const pl=d.priceLine; const t0=viewT0, t1=viewT1;
+    let pMin=Infinity, pMax=-Infinity;
+    for (const p of pl){if (p.ts<t0||p.ts>t1) continue; if (p.price<pMin) pMin=p.price; if (p.price>pMax) pMax=p.price;}
+    for (const b of r.bandLine){if (b.ts<t0||b.ts>t1) continue; if (b.lower<pMin) pMin=b.lower; if (b.upper>pMax) pMax=b.upper;}
+    if (pMin===Infinity){pMin=0; pMax=1;}
+    const xOf=t=>PAD_L+((t-t0)/(t1-t0))*innerW;
+    const yOf=p=>PAD_T+(1-(p-pMin)/(pMax-pMin))*innerH;
+    ctx.font='10px monospace';
+    for (let i=0;i<=5;i++){const y=PAD_T+(i/5)*innerH; const p=pMax-(i/5)*(pMax-pMin); ctx.strokeStyle='#222'; ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText('$'+p.toFixed(0),8,y+4);}
+    for (let i=0;i<=10;i++){const x=PAD_L+(i/10)*innerW; const t=t0+(i/10)*(t1-t0); const dt=new Date(t); const lbl=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0'); ctx.strokeStyle='#1a1a1a'; ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(lbl,x-22,H-PAD_B+18);}
+    // BB bands
+    ctx.lineWidth=1.2;
+    ctx.strokeStyle='rgba(59,130,246,0.7)'; ctx.beginPath();
+    for (let i=0;i<r.bandLine.length;i++){const b=r.bandLine[i]; const x=xOf(b.ts), y=yOf(b.upper); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    ctx.beginPath();
+    for (let i=0;i<r.bandLine.length;i++){const b=r.bandLine[i]; const x=xOf(b.ts), y=yOf(b.lower); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    ctx.strokeStyle='rgba(150,150,150,0.4)'; ctx.setLineDash([2,4]); ctx.beginPath();
+    for (let i=0;i<r.bandLine.length;i++){const b=r.bandLine[i]; const x=xOf(b.ts), y=yOf(b.mid); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke(); ctx.setLineDash([]);
+    // Price
+    ctx.strokeStyle='#f7931a'; ctx.lineWidth=1.2; ctx.beginPath();
+    for (let i=0;i<pl.length;i++){const p=pl[i]; const x=xOf(p.ts), y=yOf(p.price); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    // LIQ
+    if (r.liquidated){
+      const x=xOf(r.liqAtMs);
+      ctx.strokeStyle='#ef4444'; ctx.lineWidth=2; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#ef4444'; ctx.font='bold 12px monospace'; ctx.fillText('X LIQ', x+4, PAD_T+14);
+    }
+    // Markers
+    markers=[];
+    for (const e of r.events){
+      const x=xOf(e.ts), y=yOf(e.price);
+      const isLong=e.side==='LONG';
+      const c=isLong?'#10b981':'#ef4444';
+      ctx.fillStyle=c; ctx.globalAlpha=0.8;
+      ctx.beginPath();
+      if (isLong){ctx.moveTo(x,y-5); ctx.lineTo(x-4,y+3); ctx.lineTo(x+4,y+3); ctx.closePath();}
+      else {ctx.moveTo(x,y+5); ctx.lineTo(x-4,y-3); ctx.lineTo(x+4,y-3); ctx.closePath();}
+      ctx.fill();
+      markers.push({x,y,e});
+    }
+    ctx.globalAlpha=1;
+  }
+  updateActive(); render();
+
+  const tip=document.getElementById('tip');
+  cv.addEventListener('mousemove',(ev)=>{
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const my=(ev.clientY-r.top)*(cv.height/r.height);
+    let near=null, nd=15;
+    for (const m of markers){const dx=m.x-mx, dy=m.y-my, dist=Math.sqrt(dx*dx+dy*dy); if (dist<nd){nd=dist; near=m;}}
+    if (near){
+      const e=near.e;
+      tip.replaceChildren();
+      tip.appendChild(el('b',null,'ADD '+e.side));
+      tip.appendChild(document.createTextNode(' @ $'+e.price.toFixed(0))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode(new Date(e.ts).toISOString().slice(0,16))); tip.appendChild(el('br'));
+      if (e.qty) {tip.appendChild(document.createTextNode('qty: '+e.qty.toFixed(4))); tip.appendChild(el('br'));}
+      if (e.avgAfter) {tip.appendChild(document.createTextNode('avg after: $'+e.avgAfter.toFixed(0))); tip.appendChild(el('br'));}
+      tip.appendChild(document.createTextNode('BB: $'+e.bbLower.toFixed(0)+' / $'+e.bbMid.toFixed(0)+' / $'+e.bbUpper.toFixed(0)));
+      tip.style.left=(ev.clientX+12)+'px'; tip.style.top=(ev.clientY+12)+'px'; tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  });
+  cv.addEventListener('mouseleave',()=>{tip.style.opacity=0; isDragging=false;});
+
+  // Wheel zoom (centered on mouse)
+  cv.addEventListener('wheel',(ev)=>{
+    ev.preventDefault();
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const PAD_L=70, PAD_R=20;
+    const innerW=cv.width-PAD_L-PAD_R;
+    const frac=Math.max(0,Math.min(1,(mx-PAD_L)/innerW));
+    const tCursor = viewT0 + frac*(viewT1-viewT0);
+    const factor = ev.deltaY < 0 ? 0.8 : 1.25; // zoom in / out
+    const newSpan = (viewT1-viewT0)*factor;
+    const minSpan = 24*60*60*1000; // 1 day min
+    const maxSpan = fullT1 - fullT0;
+    const span = Math.max(minSpan, Math.min(maxSpan, newSpan));
+    let nT0 = tCursor - frac*span;
+    let nT1 = nT0 + span;
+    if (nT0 < fullT0){ nT0 = fullT0; nT1 = nT0+span; }
+    if (nT1 > fullT1){ nT1 = fullT1; nT0 = nT1-span; }
+    viewT0=nT0; viewT1=nT1;
+    render();
+  }, { passive: false });
+
+  // Drag pan
+  cv.addEventListener('mousedown',(ev)=>{
+    isDragging=true; dragStartX=ev.clientX;
+    dragStartT0=viewT0; dragStartT1=viewT1;
+  });
+  window.addEventListener('mouseup',()=>{ isDragging=false; });
+  cv.addEventListener('mousemove',(ev)=>{
+    if (isDragging){
+      const r=cv.getBoundingClientRect();
+      const PAD_L=70, PAD_R=20;
+      const innerW=cv.width-PAD_L-PAD_R;
+      const dxPx = (ev.clientX - dragStartX) * (cv.width/r.width);
+      const span = dragStartT1 - dragStartT0;
+      const dt = -(dxPx / innerW) * span;
+      let nT0 = dragStartT0 + dt;
+      let nT1 = dragStartT1 + dt;
+      if (nT0 < fullT0){ nT0 = fullT0; nT1 = nT0+span; }
+      if (nT1 > fullT1){ nT1 = fullT1; nT0 = nT1-span; }
+      viewT0=nT0; viewT1=nT1;
+      render();
+    }
+  });
+  cv.addEventListener('dblclick',()=>{ viewT0=fullT0; viewT1=fullT1; render(); });
+});
+</script>
+</body>
+</html>

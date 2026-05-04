@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>BB Pure 1H HEDGE no-close Backtest</title>
+<style>
+  body { background:#0a0a0a; color:#e5e5e5; font-family:'JetBrains Mono', monospace; margin:0; padding:16px; }
+  h1 { color:#f7931a; font-size:18px; }
+  .stats { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:12px; }
+  .stat { background:#1a1a1a; padding:8px 12px; border-radius:4px; border:1px solid #333; }
+  .stat .label { color:#888; font-size:9px; letter-spacing:1px; }
+  .stat .value { font-size:14px; font-weight:700; }
+  .green { color:#10b981; } .red { color:#ef4444; } .orange { color:#f7931a; }
+  .legend { display:flex; gap:14px; font-size:11px; margin-bottom:8px; color:#888; flex-wrap:wrap; }
+  #chart { background:#111; border:1px solid #333; }
+  .tooltip { position:absolute; background:#000; border:1px solid #555; padding:6px 10px; font-size:11px; pointer-events:none; opacity:0; transition:opacity 0.1s; white-space:nowrap; z-index:10; }
+</style>
+</head>
+<body>
+  <h1>BB PURE 1H HEDGE — bb=20 std=2 — LONG cross down lower / SHORT cross up upper / NO CLOSE</h1>
+  <div class="stats" id="stats"></div>
+  <div class="legend">
+    <span class="orange">Price (orange)</span>
+    <span style="color:#3b82f6">BB upper/lower (blue)</span>
+    <span style="color:#888">BB middle (dotted)</span>
+    <span class="green">▲ ADD LONG (cham đáy)</span>
+    <span class="red">▼ ADD SHORT (cham đỉnh)</span>
+    <span style="color:#666">(hover marker)</span>
+  </div>
+  <canvas id="chart" width="1600" height="700"></canvas>
+  <div class="tooltip" id="tip"></div>
+<script>
+function el(t,c,x){const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e;}
+function statBox(label,value,cls){const w=el('div','stat'); w.appendChild(el('div','label',label)); w.appendChild(el('div','value '+(cls||''),value)); return w;}
+fetch('backtest_boll_1h_hedge_3y.json').then(r=>r.json()).then(d=>{
+  const fmt=v=>(v>=0?'+':'')+'$'+v.toFixed(2);
+  const fmtPct=v=>(v>=0?'+':'')+v.toFixed(2)+'%';
+  const s=document.getElementById('stats');
+  s.appendChild(statBox('TF/PARAMS', `${d.config.tf} bb=${d.config.period} std=${d.config.std}`, 'orange'));
+  s.appendChild(statBox('PERIOD', new Date(d.period.start).toISOString().slice(0,10)+' → '+new Date(d.period.end).toISOString().slice(0,10)));
+  s.appendChild(statBox('LIQ', d.liquidated?'YES':'NO', d.liquidated?'red':'green'));
+  s.appendChild(statBox('ADDs LONG', String(d.totalAddsLong), 'green'));
+  s.appendChild(statBox('ADDs SHORT', String(d.totalAddsShort), 'red'));
+  s.appendChild(statBox('FINAL LONG', d.finalLong.qty.toFixed(4)+' @ $'+d.finalLong.avg.toFixed(0), 'green'));
+  s.appendChild(statBox('FINAL SHORT', d.finalShort.qty.toFixed(4)+' @ $'+d.finalShort.avg.toFixed(0), 'red'));
+  s.appendChild(statBox('LAST PRICE', '$'+d.lastPrice.toFixed(0)));
+  s.appendChild(statBox('uPnL LONG', fmt(d.finalUpnlLong), d.finalUpnlLong>=0?'green':'red'));
+  s.appendChild(statBox('uPnL SHORT', fmt(d.finalUpnlShort), d.finalUpnlShort>=0?'green':'red'));
+  s.appendChild(statBox('TOTAL uPnL', fmt(d.finalUpnl), d.finalUpnl>=0?'green':'red'));
+  s.appendChild(statBox('FINAL EQUITY', '$'+d.finalEq.toFixed(2), d.finalEq>=100000?'green':'red'));
+  s.appendChild(statBox('ROI', fmtPct(d.roi), d.roi>=0?'green':'red'));
+  s.appendChild(statBox('MAX DD', '$'+d.maxDD.toFixed(2), 'red'));
+  s.appendChild(statBox('FEES', '$'+d.totalFees.toFixed(0)));
+
+  const cv=document.getElementById('chart'); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height; const PAD_L=70, PAD_R=20, PAD_T=20, PAD_B=40;
+  const innerW=W-PAD_L-PAD_R, innerH=H-PAD_T-PAD_B;
+  const pl=d.priceLine; const t0=pl[0].ts, t1=pl[pl.length-1].ts;
+  let pMin=Infinity, pMax=-Infinity;
+  for (const p of pl){if (p.price<pMin) pMin=p.price; if (p.price>pMax) pMax=p.price;}
+  for (const b of d.bandLine){if (b.lower<pMin) pMin=b.lower; if (b.upper>pMax) pMax=b.upper;}
+  const xOf=t=>PAD_L+((t-t0)/(t1-t0))*innerW;
+  const yOf=p=>PAD_T+(1-(p-pMin)/(pMax-pMin))*innerH;
+  ctx.font='10px monospace';
+  for (let i=0;i<=5;i++){const y=PAD_T+(i/5)*innerH; const p=pMax-(i/5)*(pMax-pMin); ctx.strokeStyle='#222'; ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText('$'+p.toFixed(0), 8, y+4);}
+  for (let i=0;i<=10;i++){const x=PAD_L+(i/10)*innerW; const t=t0+(i/10)*(t1-t0); const dt=new Date(t); const lbl=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0'); ctx.strokeStyle='#1a1a1a'; ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(lbl, x-22, H-PAD_B+18);}
+  ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(59,130,246,0.7)'; ctx.beginPath();
+  for (let i=0;i<d.bandLine.length;i++){const b=d.bandLine[i]; const x=xOf(b.ts), y=yOf(b.upper); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+  ctx.stroke();
+  ctx.beginPath();
+  for (let i=0;i<d.bandLine.length;i++){const b=d.bandLine[i]; const x=xOf(b.ts), y=yOf(b.lower); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+  ctx.stroke();
+  ctx.strokeStyle='rgba(150,150,150,0.4)'; ctx.setLineDash([2,4]); ctx.beginPath();
+  for (let i=0;i<d.bandLine.length;i++){const b=d.bandLine[i]; const x=xOf(b.ts), y=yOf(b.mid); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+  ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle='#f7931a'; ctx.lineWidth=1.2; ctx.beginPath();
+  for (let i=0;i<pl.length;i++){const p=pl[i]; const x=xOf(p.ts), y=yOf(p.price); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+  ctx.stroke();
+  const markers=[];
+  for (const e of d.events){
+    const x=xOf(e.ts), y=yOf(e.price);
+    const isLong=e.side==='LONG';
+    const c=isLong?'#10b981':'#ef4444';
+    ctx.fillStyle=c; ctx.globalAlpha=0.8;
+    ctx.beginPath();
+    if (isLong){ctx.moveTo(x,y-5); ctx.lineTo(x-4,y+3); ctx.lineTo(x+4,y+3); ctx.closePath();}
+    else {ctx.moveTo(x,y+5); ctx.lineTo(x-4,y-3); ctx.lineTo(x+4,y-3); ctx.closePath();}
+    ctx.fill();
+    markers.push({x,y,e});
+  }
+  ctx.globalAlpha=1;
+
+  const tip=document.getElementById('tip');
+  cv.addEventListener('mousemove',(ev)=>{
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const my=(ev.clientY-r.top)*(cv.height/r.height);
+    let near=null, nd=15;
+    for (const m of markers){const dx=m.x-mx, dy=m.y-my, dist=Math.sqrt(dx*dx+dy*dy); if (dist<nd){nd=dist; near=m;}}
+    if (near){
+      const e=near.e;
+      tip.replaceChildren();
+      tip.appendChild(el('b',null,'ADD '+e.side));
+      tip.appendChild(document.createTextNode(' @ $'+e.price.toFixed(0))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode(new Date(e.ts).toISOString().slice(0,16))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('qty: '+e.qty.toFixed(4))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('avg after: $'+e.avgAfter.toFixed(0))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('BB: $'+e.bbLower.toFixed(0)+' / $'+e.bbMid.toFixed(0)+' / $'+e.bbUpper.toFixed(0)));
+      tip.style.left=(ev.clientX+12)+'px'; tip.style.top=(ev.clientY+12)+'px'; tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  });
+  cv.addEventListener('mouseleave',()=>tip.style.opacity=0);
+});
+</script>
+</body>
+</html>
