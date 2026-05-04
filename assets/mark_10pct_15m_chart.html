@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mark 10% candles 15m</title>
+<style>
+  body { background:#0a0a0a; color:#e5e5e5; font-family:'JetBrains Mono', monospace; margin:0; padding:16px; }
+  h1 { color:#10b981; font-size:18px; }
+  .stats { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:12px; }
+  .stat { background:#1a1a1a; padding:8px 12px; border-radius:4px; border:1px solid #333; }
+  .stat .label { color:#888; font-size:9px; letter-spacing:1px; }
+  .stat .value { font-size:14px; font-weight:700; }
+  .green { color:#10b981; } .orange { color:#f7931a; } .red { color:#ef4444; }
+  #chart { background:#111; border:1px solid #333; }
+  .legend { display:flex; gap:14px; font-size:11px; margin-bottom:8px; color:#888; }
+  .tooltip { position:absolute; background:#000; border:1px solid #555; padding:6px 10px; font-size:11px; pointer-events:none; opacity:0; transition:opacity 0.1s; white-space:nowrap; z-index:10; }
+</style>
+</head>
+<body>
+  <h1>15m CANDLES — sau đó tăng ≥10% trong 7 ngày</h1>
+  <div class="stats" id="stats"></div>
+  <div class="legend">
+    <span class="orange">Price BTC (orange)</span>
+    <span class="green">▲ entry low candle (sau đó +10%)</span>
+    <span style="color:#666">SCROLL zoom · DRAG pan · DBLCLICK reset · HOVER marker</span>
+  </div>
+  <canvas id="chart" width="1600" height="700"></canvas>
+  <div class="tooltip" id="tip"></div>
+<script>
+function el(t,c,x){const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e;}
+function statBox(label,value,cls){const w=el('div','stat'); w.appendChild(el('div','label',label)); w.appendChild(el('div','value '+(cls||''),value)); return w;}
+fetch('mark_10pct_15m.json').then(r=>r.json()).then(d=>{
+  const s = document.getElementById('stats');
+  s.appendChild(statBox('PERIOD', new Date(d.period.start).toISOString().slice(0,10)+' → '+new Date(d.period.end).toISOString().slice(0,10)));
+  s.appendChild(statBox('TF', d.config.tf, 'orange'));
+  s.appendChild(statBox('TARGET', '+'+d.config.targetPct+'%', 'green'));
+  s.appendChild(statBox('LOOKFORWARD', d.config.lookforwardDays+' ngày'));
+  s.appendChild(statBox('TOTAL BARS', d.totalBars.toLocaleString()));
+  s.appendChild(statBox('WINNER BARS', d.winnerCount.toLocaleString(), 'green'));
+  s.appendChild(statBox('WINNER %', d.winnerPct.toFixed(1)+'%', 'green'));
+
+  const cv=document.getElementById('chart'); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height; const PAD_L=70, PAD_R=20, PAD_T=20, PAD_B=40;
+  const innerW=W-PAD_L-PAD_R, innerH=H-PAD_T-PAD_B;
+  const fullT0=d.priceLine[0].ts, fullT1=d.priceLine[d.priceLine.length-1].ts;
+  let viewT0=fullT0, viewT1=fullT1;
+  let isDrag=false, dragX=0, dT0=0, dT1=0;
+  let markers=[];
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    const pl=d.priceLine;
+    let pMin=Infinity, pMax=-Infinity;
+    for (const p of pl){if (p.ts<viewT0||p.ts>viewT1) continue; if (p.price<pMin) pMin=p.price; if (p.price>pMax) pMax=p.price;}
+    if (pMin===Infinity){pMin=0; pMax=1;}
+    const xOf=t=>PAD_L+((t-viewT0)/(viewT1-viewT0))*innerW;
+    const yOf=p=>PAD_T+(1-(p-pMin)/(pMax-pMin))*innerH;
+    ctx.font='10px monospace';
+    for (let i=0;i<=5;i++){const y=PAD_T+(i/5)*innerH; const p=pMax-(i/5)*(pMax-pMin); ctx.strokeStyle='#222'; ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText('$'+p.toFixed(0),8,y+4);}
+    for (let i=0;i<=10;i++){const x=PAD_L+(i/10)*innerW; const t=viewT0+(i/10)*(viewT1-viewT0); const dt=new Date(t); const lbl=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0'); ctx.strokeStyle='#1a1a1a'; ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(lbl,x-22,H-PAD_B+18);}
+    ctx.strokeStyle='#f7931a'; ctx.lineWidth=1.2; ctx.beginPath();
+    for (let i=0;i<pl.length;i++){const p=pl[i]; const x=xOf(p.ts), y=yOf(p.price); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    markers=[];
+    // Draw winners — many markers (14k+) → use small dots when zoomed out
+    const span = viewT1-viewT0;
+    const pointSize = span > 365*24*60*60_000 ? 1 : (span > 30*24*60*60_000 ? 2 : 3);
+    ctx.fillStyle='rgba(16,185,129,0.6)';
+    for (const w of d.winners){
+      if (w.ts<viewT0||w.ts>viewT1) continue;
+      const x=xOf(w.ts), y=yOf(w.entryLow);
+      if (pointSize<=1){ctx.fillRect(x-0.5, y-0.5, 1, 1);}
+      else if (pointSize<=2){ctx.fillRect(x-1, y-1, 2, 2);}
+      else {ctx.beginPath(); ctx.moveTo(x,y-3); ctx.lineTo(x-3,y+2); ctx.lineTo(x+3,y+2); ctx.closePath(); ctx.fill();}
+      markers.push({x,y,w});
+    }
+  }
+  render();
+
+  const tip=document.getElementById('tip');
+  cv.addEventListener('mousemove',(ev)=>{
+    if (isDrag){
+      const r=cv.getBoundingClientRect();
+      const dxPx=(ev.clientX-dragX)*(cv.width/r.width);
+      const span=dT1-dT0; const dt=-(dxPx/innerW)*span;
+      let nT0=dT0+dt, nT1=dT1+dt;
+      if (nT0<fullT0){nT0=fullT0; nT1=nT0+span;}
+      if (nT1>fullT1){nT1=fullT1; nT0=nT1-span;}
+      viewT0=nT0; viewT1=nT1; render(); return;
+    }
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const my=(ev.clientY-r.top)*(cv.height/r.height);
+    let near=null, nd=12;
+    for (const m of markers){const dx=m.x-mx, dy=m.y-my, dist=Math.sqrt(dx*dx+dy*dy); if (dist<nd){nd=dist; near=m;}}
+    if (near){
+      const w=near.w;
+      tip.replaceChildren();
+      tip.appendChild(el('b',null,'WINNER +10%'));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode(new Date(w.ts).toISOString().slice(0,16)));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('Entry low: $'+w.entryLow.toFixed(0)));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('Target +10%: $'+w.targetPrice.toFixed(0)));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('Hit sau '+w.hitBars+' bars 15m = '+(w.hitBars*0.25).toFixed(1)+'h'));
+      tip.appendChild(el('br'));
+      tip.appendChild(el('span','green','Max gain 7d: +'+w.maxGainPct.toFixed(1)+'%'));
+      tip.style.left=(ev.clientX+12)+'px'; tip.style.top=(ev.clientY+12)+'px'; tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  });
+  cv.addEventListener('mouseleave',()=>{tip.style.opacity=0; isDrag=false;});
+  cv.addEventListener('wheel',(ev)=>{
+    ev.preventDefault();
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const frac=Math.max(0,Math.min(1,(mx-PAD_L)/innerW));
+    const tCursor=viewT0+frac*(viewT1-viewT0);
+    const factor=ev.deltaY<0?0.7:1.4;
+    const newSpan=(viewT1-viewT0)*factor;
+    const minSpan=4*60*60_000, maxSpan=fullT1-fullT0;
+    const span=Math.max(minSpan, Math.min(maxSpan, newSpan));
+    let nT0=tCursor-frac*span, nT1=nT0+span;
+    if (nT0<fullT0){nT0=fullT0; nT1=nT0+span;}
+    if (nT1>fullT1){nT1=fullT1; nT0=nT1-span;}
+    viewT0=nT0; viewT1=nT1; render();
+  }, { passive: false });
+  cv.addEventListener('mousedown',(ev)=>{isDrag=true; dragX=ev.clientX; dT0=viewT0; dT1=viewT1;});
+  window.addEventListener('mouseup',()=>{isDrag=false;});
+  cv.addEventListener('dblclick',()=>{viewT0=fullT0; viewT1=fullT1; render();});
+});
+</script>
+</body>
+</html>

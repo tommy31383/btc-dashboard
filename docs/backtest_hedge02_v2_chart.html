@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hedge01/02/03 Backtest Comparison</title>
+<style>
+  body { background:#0a0a0a; color:#e5e5e5; font-family:'JetBrains Mono', monospace; margin:0; padding:16px; }
+  h1 { color:#f7931a; font-size:18px; }
+  h2 { font-size:13px; margin:12px 0 6px; color:#aaa; }
+  table { border-collapse:collapse; font-size:11px; margin-bottom:12px; }
+  th,td { padding:6px 12px; border:1px solid #333; text-align:right; }
+  th { background:#1a1a1a; color:#888; font-size:10px; letter-spacing:1px; }
+  td.name { text-align:left; color:#f7931a; font-weight:700; }
+  .green { color:#10b981; } .red { color:#ef4444; } .orange { color:#f7931a; }
+  .legend { display:flex; gap:14px; font-size:11px; margin:6px 0; color:#888; flex-wrap:wrap; }
+  #chart { background:#111; border:1px solid #333; }
+  .switcher { display:flex; gap:6px; margin:8px 0; }
+  .swbtn { padding:8px 18px; border:1px solid #333; background:#1a1a1a; color:#888; cursor:pointer; font-family:monospace; font-size:13px; font-weight:700; }
+  .swbtn.active { border-color:#f7931a; color:#f7931a; background:#2a1a05; }
+  .tooltip { position:absolute; background:#000; border:1px solid #555; padding:6px 10px; font-size:11px; pointer-events:none; opacity:0; transition:opacity 0.1s; white-space:nowrap; z-index:10; }
+</style>
+</head>
+<body>
+  <h1>HEDGE02 v0.4.7 PRODUCTION (Score≥4 + TP10%) — 0.001 BTC &times; $100k cap — same setup ($100k, 0.001 BTC/ADD, lev 125x cross)</h1>
+  <h2>SUMMARY</h2>
+  <table id="summary"></table>
+  <h2>CHART — chọn rule</h2>
+  <div class="switcher" id="switcher"></div>
+  <div class="legend">
+    <span class="orange">Price BTC</span>
+    <span class="green">▲ ADD LONG</span>
+    <span class="red">▼ ADD SHORT</span>
+    <span class="green">✕ CLOSE WIN</span>
+    <span class="red">✕ CLOSE LOSS</span>
+    <span style="color:#666">(scroll zoom · drag pan · dblclick reset)</span>
+  </div>
+  <canvas id="chart" width="1600" height="650"></canvas>
+  <div class="tooltip" id="tip"></div>
+<script>
+function el(t,c,x){const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e;}
+const fmt=v=>(v>=0?'+':'')+'$'+v.toFixed(2);
+const fmtPct=v=>(v>=0?'+':'')+v.toFixed(2)+'%';
+fetch('backtest_hedge02_v2_3y.json').then(r=>r.json()).then(d=>{
+  const tbl=document.getElementById('summary');
+  const head=el('tr');
+  ['RULE','LIQ','ADD L','ADD S','CLOSES','WIN/LOSS','REALIZED','FINAL LONG','FINAL SHORT','uPnL','EQUITY','ROI %','MAX DD','FEES'].forEach(h=>head.appendChild(el('th',null,h)));
+  tbl.appendChild(head);
+  d.results.forEach((r,i)=>{
+    const tr=el('tr'); tr.dataset.idx=i;
+    tr.appendChild(el('td','name',r.name));
+    tr.appendChild(el('td', r.liquidated?'red':'green', r.liquidated?'YES':'NO'));
+    tr.appendChild(el('td','green',r.totalAddsLong));
+    tr.appendChild(el('td','red',r.totalAddsShort));
+    tr.appendChild(el('td',null,r.totalCloses));
+    tr.appendChild(el('td',null, r.totalCloses ? `${r.winCount}/${r.lossCount}` : '—'));
+    tr.appendChild(el('td', r.totalRealizedPnl>=0?'green':'red', fmt(r.totalRealizedPnl)));
+    tr.appendChild(el('td','green', `${r.finalLong.qty.toFixed(3)} @ $${r.finalLong.avg.toFixed(0)}`));
+    tr.appendChild(el('td','red', `${r.finalShort.qty.toFixed(3)} @ $${r.finalShort.avg.toFixed(0)}`));
+    tr.appendChild(el('td', r.finalUpnl>=0?'green':'red', fmt(r.finalUpnl)));
+    tr.appendChild(el('td', r.finalEq>=100000?'green':'red', '$'+r.finalEq.toFixed(0)));
+    tr.appendChild(el('td', r.roi>=0?'green':'red', fmtPct(r.roi)));
+    tr.appendChild(el('td','red','$'+r.maxDD.toFixed(0)));
+    tr.appendChild(el('td',null,'$'+r.totalFees.toFixed(0)));
+    tr.style.cursor='pointer';
+    tr.onclick=()=>{ activeIdx=i; render(); updActive(); };
+    tbl.appendChild(tr);
+  });
+
+  const sw=document.getElementById('switcher');
+  d.results.forEach((r,i)=>{ const b=el('button','swbtn', r.name.split(":")[0]); b.onclick=()=>{activeIdx=i; render(); updActive();}; sw.appendChild(b); });
+  let activeIdx=0;
+  function updActive(){
+    document.querySelectorAll('.swbtn').forEach((b,i)=>b.classList.toggle('active', i===activeIdx));
+    document.querySelectorAll('#summary tr[data-idx]').forEach((tr,i)=>tr.style.background = i===activeIdx ? '#2a1a05' : '');
+  }
+
+  const cv=document.getElementById('chart'); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height; const PAD_L=70, PAD_R=20, PAD_T=20, PAD_B=40;
+  const innerW=W-PAD_L-PAD_R, innerH=H-PAD_T-PAD_B;
+  const fullT0=d.priceLine[0].ts, fullT1=d.priceLine[d.priceLine.length-1].ts;
+  let viewT0=fullT0, viewT1=fullT1;
+  let isDrag=false, dragX=0, dT0=0, dT1=0;
+  let markers=[];
+
+  function render(){
+    const r=d.results[activeIdx];
+    ctx.clearRect(0,0,W,H);
+    const pl=d.priceLine;
+    let pMin=Infinity, pMax=-Infinity;
+    for (const p of pl){if (p.ts<viewT0||p.ts>viewT1) continue; if (p.price<pMin) pMin=p.price; if (p.price>pMax) pMax=p.price;}
+    if (pMin===Infinity){pMin=0; pMax=1;}
+    const xOf=t=>PAD_L+((t-viewT0)/(viewT1-viewT0))*innerW;
+    const yOf=p=>PAD_T+(1-(p-pMin)/(pMax-pMin))*innerH;
+    ctx.font='10px monospace';
+    for (let i=0;i<=5;i++){const y=PAD_T+(i/5)*innerH; const p=pMax-(i/5)*(pMax-pMin); ctx.strokeStyle='#222'; ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText('$'+p.toFixed(0),8,y+4);}
+    for (let i=0;i<=10;i++){const x=PAD_L+(i/10)*innerW; const t=viewT0+(i/10)*(viewT1-viewT0); const dt=new Date(t); const lbl=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0'); ctx.strokeStyle='#1a1a1a'; ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(lbl,x-22,H-PAD_B+18);}
+    ctx.strokeStyle='#f7931a'; ctx.lineWidth=1.2; ctx.beginPath();
+    for (let i=0;i<pl.length;i++){const p=pl[i]; const x=xOf(p.ts), y=yOf(p.price); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    if (r.liquidated){
+      const x=xOf(r.liqAtMs);
+      ctx.strokeStyle='#ef4444'; ctx.lineWidth=2; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#ef4444'; ctx.font='bold 12px monospace'; ctx.fillText('X LIQ', x+4, PAD_T+14);
+    }
+    markers=[];
+    for (const e of r.events){
+      if (e.ts<viewT0||e.ts>viewT1) continue;
+      const x=xOf(e.ts), y=yOf(e.price);
+      const isLong=e.side==='LONG'; const c=isLong?'#10b981':'#ef4444';
+      if (e.kind==='ADD'){
+        ctx.fillStyle=c; ctx.globalAlpha=0.8; ctx.beginPath();
+        if (isLong){ctx.moveTo(x,y-5); ctx.lineTo(x-4,y+3); ctx.lineTo(x+4,y+3); ctx.closePath();}
+        else {ctx.moveTo(x,y+5); ctx.lineTo(x-4,y-3); ctx.lineTo(x+4,y-3); ctx.closePath();}
+        ctx.fill();
+      } else {
+        const wc = (e.realizedPnl||0)>=0 ? '#10b981' : '#ef4444';
+        ctx.strokeStyle=wc; ctx.lineWidth=1.5; ctx.globalAlpha=0.9;
+        ctx.beginPath(); ctx.moveTo(x-6,y-6); ctx.lineTo(x+6,y+6); ctx.moveTo(x-6,y+6); ctx.lineTo(x+6,y-6); ctx.stroke();
+      }
+      markers.push({x,y,e});
+    }
+    ctx.globalAlpha=1;
+  }
+  updActive(); render();
+
+  const tip=document.getElementById('tip');
+  cv.addEventListener('mousemove',(ev)=>{
+    if (isDrag){
+      const r=cv.getBoundingClientRect();
+      const innerW=cv.width-PAD_L-PAD_R;
+      const dxPx=(ev.clientX-dragX)*(cv.width/r.width);
+      const span=dT1-dT0; const dt=-(dxPx/innerW)*span;
+      let nT0=dT0+dt, nT1=dT1+dt;
+      if (nT0<fullT0){nT0=fullT0; nT1=nT0+span;}
+      if (nT1>fullT1){nT1=fullT1; nT0=nT1-span;}
+      viewT0=nT0; viewT1=nT1; render(); return;
+    }
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const my=(ev.clientY-r.top)*(cv.height/r.height);
+    let near=null, nd=15;
+    for (const m of markers){const dx=m.x-mx, dy=m.y-my, dist=Math.sqrt(dx*dx+dy*dy); if (dist<nd){nd=dist; near=m;}}
+    if (near){
+      const e=near.e;
+      tip.replaceChildren();
+      tip.appendChild(el('b',null,e.kind+' '+e.side));
+      tip.appendChild(document.createTextNode(' @ $'+e.price.toFixed(0))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode(new Date(e.ts).toISOString().slice(0,16))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('qty: '+e.qty.toFixed(4))); tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('avg after: $'+e.avgAfter.toFixed(0)));
+      if (e.reason){tip.appendChild(el('br')); tip.appendChild(document.createTextNode('reason: '+e.reason));}
+      if (e.realizedPnl!==undefined){tip.appendChild(el('br')); tip.appendChild(el('span', e.realizedPnl>=0?'green':'red', 'PnL: '+(e.realizedPnl>=0?'+':'')+'$'+e.realizedPnl.toFixed(2)));}
+      tip.style.left=(ev.clientX+12)+'px'; tip.style.top=(ev.clientY+12)+'px'; tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  });
+  cv.addEventListener('mouseleave',()=>{tip.style.opacity=0; isDrag=false;});
+  cv.addEventListener('wheel',(ev)=>{
+    ev.preventDefault();
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const innerW=cv.width-PAD_L-PAD_R;
+    const frac=Math.max(0,Math.min(1,(mx-PAD_L)/innerW));
+    const tCursor=viewT0+frac*(viewT1-viewT0);
+    const factor=ev.deltaY<0?0.8:1.25;
+    const newSpan=(viewT1-viewT0)*factor;
+    const minSpan=24*60*60*1000, maxSpan=fullT1-fullT0;
+    const span=Math.max(minSpan, Math.min(maxSpan, newSpan));
+    let nT0=tCursor-frac*span, nT1=nT0+span;
+    if (nT0<fullT0){nT0=fullT0; nT1=nT0+span;}
+    if (nT1>fullT1){nT1=fullT1; nT0=nT1-span;}
+    viewT0=nT0; viewT1=nT1; render();
+  }, { passive: false });
+  cv.addEventListener('mousedown',(ev)=>{isDrag=true; dragX=ev.clientX; dT0=viewT0; dT1=viewT1;});
+  window.addEventListener('mouseup',()=>{isDrag=false;});
+  cv.addEventListener('dblclick',()=>{viewT0=fullT0; viewT1=fullT1; render();});
+});
+</script>
+</body>
+</html>
