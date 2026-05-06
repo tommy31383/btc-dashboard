@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hedge01 v0.4.12 — Production Backtest</title>
+<style>
+  body { background:#0a0a0a; color:#e5e5e5; font-family:'JetBrains Mono', monospace; margin:0; padding:16px; }
+  h1 { color:#f7931a; font-size:18px; }
+  .stats { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; font-size:12px; }
+  .stat { background:#1a1a1a; padding:8px 12px; border-radius:4px; border:1px solid #333; }
+  .stat .label { color:#888; font-size:9px; letter-spacing:1px; }
+  .stat .value { font-size:14px; font-weight:700; }
+  .green { color:#10b981; } .red { color:#ef4444; } .orange { color:#f7931a; }
+  .legend { display:flex; gap:14px; font-size:11px; margin-bottom:8px; color:#888; flex-wrap:wrap; }
+  #chart { background:#111; border:1px solid #333; }
+  .tooltip { position:absolute; background:#000; border:1px solid #555; padding:6px 10px; font-size:11px; pointer-events:none; opacity:0; transition:opacity 0.1s; white-space:nowrap; z-index:10; }
+</style>
+</head>
+<body>
+  <h1>HEDGE01 v0.4.12 — Score Profile GOM 8 setups (production backtest 3y)</h1>
+  <div class="stats" id="stats"></div>
+  <div class="legend">
+    <span class="orange">Price BTC</span>
+    <span class="green">▲ ADD LONG</span>
+    <span class="red">▼ ADD SHORT</span>
+    <span class="green">✕ CLOSE LONG (TP+10%)</span>
+    <span class="red">✕ CLOSE SHORT</span>
+    <span style="color:#666">SCROLL zoom · DRAG pan · DBLCLICK reset · HOVER detail</span>
+  </div>
+  <canvas id="chart" width="1600" height="700"></canvas>
+  <div class="tooltip" id="tip"></div>
+<script>
+function el(t,c,x){const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e;}
+function statBox(label,value,cls){const w=el('div','stat'); w.appendChild(el('div','label',label)); w.appendChild(el('div','value '+(cls||''),value)); return w;}
+fetch('backtest_hedge01_current_3y.json').then(r=>r.json()).then(d=>{
+  const fmt=v=>(v>=0?'+':'')+'$'+Math.round(v);
+  const fmtPct=v=>(v>=0?'+':'')+v.toFixed(2)+'%';
+  const s = document.getElementById('stats');
+  s.appendChild(statBox('PERIOD', new Date(d.period.start).toISOString().slice(0,10)+' → '+new Date(d.period.end).toISOString().slice(0,10)));
+  s.appendChild(statBox('ROI', fmtPct(d.roi), d.roi>=0?'green':'red'));
+  s.appendChild(statBox('EQUITY', '$'+Math.round(d.finalEq), d.finalEq>=100000?'green':'red'));
+  s.appendChild(statBox('REALIZED', fmt(d.totalRealized), d.totalRealized>=0?'green':'red'));
+  s.appendChild(statBox('MAX DD', '$'+Math.round(d.maxDD), 'red'));
+  s.appendChild(statBox('LIQ', d.liquidated?'YES':'NO', d.liquidated?'red':'green'));
+  s.appendChild(statBox('ADDS LONG', String(d.totalAddsLong), 'green'));
+  s.appendChild(statBox('ADDS SHORT', String(d.totalAddsShort), 'red'));
+  s.appendChild(statBox('CLOSES', String(d.totalCloses)));
+  s.appendChild(statBox('WIN/LOSS', d.winCount+'/'+d.lossCount));
+  s.appendChild(statBox('FEES', '$'+Math.round(d.totalFees)));
+  s.appendChild(statBox('LONG OPEN', d.finalLong.qty.toFixed(3)+' BTC @ $'+Math.round(d.finalLong.avg), 'green'));
+  s.appendChild(statBox('SHORT OPEN', d.finalShort.qty.toFixed(3)+' BTC @ $'+Math.round(d.finalShort.avg), 'red'));
+
+  const cv=document.getElementById('chart'); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height; const PAD_L=70, PAD_R=20, PAD_T=20, PAD_B=40;
+  const innerW=W-PAD_L-PAD_R, innerH=H-PAD_T-PAD_B;
+  const fullT0=d.priceLine[0].ts, fullT1=d.priceLine[d.priceLine.length-1].ts;
+  let viewT0=fullT0, viewT1=fullT1;
+  let isDrag=false, dragX=0, dT0=0, dT1=0;
+  let markers=[];
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    const pl=d.priceLine;
+    let pMin=Infinity, pMax=-Infinity;
+    for (const p of pl){if (p.ts<viewT0||p.ts>viewT1) continue; if (p.price<pMin) pMin=p.price; if (p.price>pMax) pMax=p.price;}
+    if (pMin===Infinity){pMin=0; pMax=1;}
+    const xOf=t=>PAD_L+((t-viewT0)/(viewT1-viewT0))*innerW;
+    const yOf=p=>PAD_T+(1-(p-pMin)/(pMax-pMin))*innerH;
+    ctx.font='10px monospace';
+    for (let i=0;i<=5;i++){const y=PAD_T+(i/5)*innerH; const p=pMax-(i/5)*(pMax-pMin); ctx.strokeStyle='#222'; ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText('$'+p.toFixed(0),8,y+4);}
+    for (let i=0;i<=10;i++){const x=PAD_L+(i/10)*innerW; const t=viewT0+(i/10)*(viewT1-viewT0); const dt=new Date(t); const lbl=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0'); ctx.strokeStyle='#1a1a1a'; ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,H-PAD_B); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(lbl,x-22,H-PAD_B+18);}
+    ctx.strokeStyle='#f7931a'; ctx.lineWidth=1.2; ctx.beginPath();
+    for (let i=0;i<pl.length;i++){const p=pl[i]; const x=xOf(p.ts), y=yOf(p.price); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}
+    ctx.stroke();
+    markers=[];
+    for (const e of d.events){
+      if (e.ts<viewT0||e.ts>viewT1) continue;
+      const x=xOf(e.ts), y=yOf(e.price);
+      const isLong = e.side==='LONG';
+      if (e.kind==='ADD'){
+        ctx.fillStyle = isLong ? '#10b981' : '#ef4444';
+        ctx.globalAlpha=0.85;
+        ctx.beginPath();
+        if (isLong){ ctx.moveTo(x,y-5); ctx.lineTo(x-4,y+3); ctx.lineTo(x+4,y+3); ctx.closePath(); }
+        else { ctx.moveTo(x,y+5); ctx.lineTo(x-4,y-3); ctx.lineTo(x+4,y-3); ctx.closePath(); }
+        ctx.fill();
+      } else {
+        const wc = (e.realizedPnl||0)>=0 ? '#10b981' : '#ef4444';
+        ctx.strokeStyle = wc; ctx.lineWidth=2; ctx.globalAlpha=0.95;
+        ctx.beginPath(); ctx.moveTo(x-7,y-7); ctx.lineTo(x+7,y+7); ctx.moveTo(x-7,y+7); ctx.lineTo(x+7,y-7); ctx.stroke();
+      }
+      markers.push({x,y,e});
+    }
+    ctx.globalAlpha=1;
+  }
+  render();
+
+  const tip=document.getElementById('tip');
+  cv.addEventListener('mousemove',(ev)=>{
+    if (isDrag){
+      const r=cv.getBoundingClientRect();
+      const dxPx=(ev.clientX-dragX)*(cv.width/r.width);
+      const span=dT1-dT0; const dt=-(dxPx/innerW)*span;
+      let nT0=dT0+dt, nT1=dT1+dt;
+      if (nT0<fullT0){nT0=fullT0; nT1=nT0+span;}
+      if (nT1>fullT1){nT1=fullT1; nT0=nT1-span;}
+      viewT0=nT0; viewT1=nT1; render(); return;
+    }
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const my=(ev.clientY-r.top)*(cv.height/r.height);
+    let near=null, nd=12;
+    for (const m of markers){const dx=m.x-mx, dy=m.y-my, dist=Math.sqrt(dx*dx+dy*dy); if (dist<nd){nd=dist; near=m;}}
+    if (near){
+      const e=near.e;
+      tip.replaceChildren();
+      tip.appendChild(el('b',null, e.kind+' '+e.side));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode(new Date(e.ts).toISOString().slice(0,16)));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('Price: $'+Math.round(e.price)));
+      if (e.score) {tip.appendChild(el('br')); tip.appendChild(document.createTextNode('Score: '+e.score+'/11'));}
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('Qty: '+e.qty.toFixed(4)+' BTC'));
+      tip.appendChild(el('br'));
+      tip.appendChild(document.createTextNode('Avg after: $'+Math.round(e.avgAfter)));
+      if (e.realizedPnl !== undefined){tip.appendChild(el('br')); tip.appendChild(el('span', e.realizedPnl>=0?'green':'red', 'PnL: '+(e.realizedPnl>=0?'+':'')+'$'+e.realizedPnl.toFixed(2)));}
+      tip.style.left=(ev.clientX+12)+'px'; tip.style.top=(ev.clientY+12)+'px'; tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  });
+  cv.addEventListener('mouseleave',()=>{tip.style.opacity=0; isDrag=false;});
+  cv.addEventListener('wheel',(ev)=>{
+    ev.preventDefault();
+    const r=cv.getBoundingClientRect();
+    const mx=(ev.clientX-r.left)*(cv.width/r.width);
+    const frac=Math.max(0,Math.min(1,(mx-PAD_L)/innerW));
+    const tCursor=viewT0+frac*(viewT1-viewT0);
+    const factor=ev.deltaY<0?0.7:1.4;
+    const newSpan=(viewT1-viewT0)*factor;
+    const minSpan=4*60*60_000, maxSpan=fullT1-fullT0;
+    const span=Math.max(minSpan, Math.min(maxSpan, newSpan));
+    let nT0=tCursor-frac*span, nT1=nT0+span;
+    if (nT0<fullT0){nT0=fullT0; nT1=nT0+span;}
+    if (nT1>fullT1){nT1=fullT1; nT0=nT1-span;}
+    viewT0=nT0; viewT1=nT1; render();
+  }, { passive: false });
+  cv.addEventListener('mousedown',(ev)=>{isDrag=true; dragX=ev.clientX; dT0=viewT0; dT1=viewT1;});
+  window.addEventListener('mouseup',()=>{isDrag=false;});
+  cv.addEventListener('dblclick',()=>{viewT0=fullT0; viewT1=fullT1; render();});
+});
+</script>
+</body>
+</html>
