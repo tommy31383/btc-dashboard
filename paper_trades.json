@@ -1,26 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1777858976251,
+  "updatedAt": 1778127477362,
   "trades": [
-    {
-      "id": "dn980tia9vj",
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "side": "LONG",
-      "status": "TIMEOUT",
-      "entryPrice": 77679.4,
-      "slPrice": 69911.45999999999,
-      "tpPrice": 78844.59099999999,
-      "leverage": 100,
-      "targetPct": 1.5,
-      "stopPct": 10,
-      "maxHoldBars": 100,
-      "openedMs": 1777275904390,
-      "deadlineMs": 1777365900000,
-      "exitPrice": 76625.57,
-      "leveragedPnlPct": -135.66,
-      "closedMs": 1777369574015
-    },
     {
       "id": "xlbvijr751t",
       "ruleId": "5m:1",
@@ -3801,6 +3782,22 @@
       "exitPrice": 78831.05,
       "leveragedPnlPct": 123.48,
       "closedMs": 1777858956199
+    },
+    {
+      "id": "8877ub9asev",
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 80744,
+      "slPrice": 82358.88,
+      "tpPrice": 76706.8,
+      "leverage": 100,
+      "targetPct": 5,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1778126912104,
+      "deadlineMs": 1778216400000
     }
   ]
 }
