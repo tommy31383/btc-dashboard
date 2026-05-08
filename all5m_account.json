@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 4949,
+  "capital": 4947.5,
   "positions": [
+    {
+      "id": "bar5m-1778229000000",
+      "bar5mTime": 1778229000000,
+      "status": "OPEN",
+      "side": "SHORT",
+      "source": "stoch_short",
+      "entryPrice": 79712.8,
+      "entryMs": 1778229550107,
+      "tpPrice": 74930.03199999999,
+      "slPrice": 84495.56800000001,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1778138700000",
       "bar5mTime": 1778138700000,
@@ -551,6 +563,10 @@
     {
       "t": 1778139128748,
       "equity": 4949
+    },
+    {
+      "t": 1778229550107,
+      "equity": 4947.5
     }
   ],
   "stats": {
@@ -558,10 +574,10 @@
     "wins": 0,
     "losses": 0,
     "totalPnlUsd": 0,
-    "totalFeeUsd": 51,
-    "lastEntryMs": 1778139128748,
+    "totalFeeUsd": 52.5,
+    "lastEntryMs": 1778229550107,
     "lastResetMs": 1777864620241
   },
-  "updatedAt": 1778139128748,
+  "updatedAt": 1778229550107,
   "capitalVersion": 2
 }
