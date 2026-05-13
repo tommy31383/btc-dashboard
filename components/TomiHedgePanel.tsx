@@ -170,6 +170,9 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
   const longNet = th.longNet || { qty: 0, avgEntry: 0, totalAdds: 0 };
   const shortNet = th.shortNet || { qty: 0, avgEntry: 0, totalAdds: 0 };
   const wallet: number = th.wallet ?? 0;
+  // v0.4.22+ server: engineWallet = initial + Σpnl − Σfees (ROI thuần từ trade, loại funding fee + manual deposit).
+  // Fallback `wallet` cho state cũ (chưa có field). REAL engine có field này, PAPER share = wallet.
+  const engineWallet: number = (th as any).engineWallet ?? wallet;
   const initialCap: number = th.initialCapital ?? 1000;
 
   // Compute uPnL realtime
@@ -178,6 +181,11 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
   const totalUpnl = uPnLLong + uPnLShort;
   const equity = wallet + totalUpnl;
   const roi = ((equity - initialCap) / initialCap) * 100;
+  // ROI Engine = (engineWallet + uPnL - initial) / initial — ROI thuần từ trade engine, không bao gồm funding fee/manual deposit.
+  const engineEquity = engineWallet + totalUpnl;
+  const roiEngine = ((engineEquity - initialCap) / initialCap) * 100;
+  // Diff giữa wallet (binance live) vs engineWallet (tracking) — nếu khác $0.01 thì có funding fee/manual deposit.
+  const walletDiff = wallet - engineWallet;
 
   return (
     <View>
@@ -199,14 +207,12 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
             <Text style={[styles.kpiVal, { color: P.bitcoinOrange }]}>${wallet.toFixed(2)}</Text>
           </View>
           <View style={styles.kpi}>
-            <Text style={styles.kpiLabel}>EQUITY</Text>
-            <Text style={[styles.kpiVal, { color: equity >= initialCap ? P.green : P.error }]}>${equity.toFixed(2)}</Text>
+            <Text style={styles.kpiLabel}>ENGINE</Text>
+            <Text style={[styles.kpiVal, { color: P.bitcoinOrange, opacity: 0.85 }]}>${engineWallet.toFixed(2)}</Text>
           </View>
           <View style={styles.kpi}>
-            <Text style={styles.kpiLabel}>ROI</Text>
-            <Text style={[styles.kpiVal, { color: roi >= 0 ? P.green : P.error }]}>
-              {roi >= 0 ? "+" : ""}{roi.toFixed(2)}%
-            </Text>
+            <Text style={styles.kpiLabel}>EQUITY</Text>
+            <Text style={[styles.kpiVal, { color: equity >= initialCap ? P.green : P.error }]}>${equity.toFixed(2)}</Text>
           </View>
           <View style={styles.kpi}>
             <Text style={styles.kpiLabel}>uPnL</Text>
@@ -215,8 +221,23 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
             </Text>
           </View>
         </View>
+        <View style={styles.row}>
+          <View style={styles.kpi}>
+            <Text style={styles.kpiLabel}>ROI LIVE</Text>
+            <Text style={[styles.kpiVal, { color: roi >= 0 ? P.green : P.error, fontSize: 16 }]}>
+              {roi >= 0 ? "+" : ""}{roi.toFixed(2)}%
+            </Text>
+          </View>
+          <View style={styles.kpi}>
+            <Text style={styles.kpiLabel}>ROI ENGINE</Text>
+            <Text style={[styles.kpiVal, { color: roiEngine >= 0 ? P.green : P.error, fontSize: 16 }]}>
+              {roiEngine >= 0 ? "+" : ""}{roiEngine.toFixed(2)}%
+            </Text>
+          </View>
+        </View>
         <Text style={styles.dim}>
           Initial: ${initialCap} · Realized: ${th.totalRealizedPnl?.toFixed(2) ?? "0.00"} · Fees: ${th.totalFeesPaid?.toFixed(2) ?? "0.00"}
+          {Math.abs(walletDiff) > 0.01 ? ` · Δ wallet vs engine: ${walletDiff >= 0 ? "+" : ""}$${walletDiff.toFixed(2)} (funding/deposit)` : ""}
         </Text>
         <Text style={styles.dim}>
           Total ADDs: LONG {th.totalAddsLong ?? 0} · SHORT {th.totalAddsShort ?? 0} · Closes: {th.totalCloses ?? 0}

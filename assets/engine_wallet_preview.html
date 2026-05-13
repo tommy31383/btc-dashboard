@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>TomiHedge Panel — engineWallet preview (v0.4.23)</title>
+<style>
+  body { background: #0a0e1a; color: #e4e7ed; font-family: -apple-system, "Segoe UI", sans-serif; padding: 24px; margin: 0; }
+  h1 { color: #f7931a; font-size: 18px; margin: 0 0 16px; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1200px; margin: 0 auto; }
+  .col h2 { color: #94a3b8; font-size: 14px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .col.before h2 { color: #64748b; }
+  .col.after h2 { color: #10b981; }
+  .card { background: #131826; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; }
+  .h2 { font-size: 16px; font-weight: 600; margin: 0 0 12px; }
+  .row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .kpi { flex: 1; min-width: 70px; background: #0f1422; border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .kpiLabel { font-size: 9px; color: #64748b; letter-spacing: 1px; font-weight: 600; margin-bottom: 4px; }
+  .kpiVal { font-size: 14px; font-weight: 700; }
+  .orange { color: #f7931a; }
+  .orange-dim { color: #f7931a; opacity: 0.85; }
+  .green { color: #10b981; }
+  .red { color: #ef4444; }
+  .dim { color: #64748b; font-size: 11px; margin-top: 8px; }
+  .note { background: #1e293b; border-left: 3px solid #f7931a; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; color: #94a3b8; }
+  .legend { background: #131826; padding: 16px; border-radius: 8px; max-width: 1200px; margin: 24px auto; font-size: 12px; line-height: 1.7; color: #94a3b8; }
+  .legend strong { color: #e4e7ed; }
+  .legend .green { font-weight: 600; }
+</style>
+</head>
+<body>
+  <h1>🌊 TomiHedge Panel — engineWallet display preview (dashboard v0.5.x ↔ server v0.4.23)</h1>
+
+  <div class="note">
+    <strong>Context:</strong> Server v0.4.22+ thêm field <code>engineWallet</code> = initialCapital + Σ(realizedPnl) − Σ(fees) — ROI thuần từ trade.
+    Phân biệt với <code>wallet</code> (= Binance live balance, có thể include funding fee / manual deposit).
+    Data giả lập từ DB hiện tại: wallet $206.11, engineWallet $206.11 (vừa init), 0.002 BTC LONG @ $80,131, BTC mark $78,799 → uPnL −$2.66.
+  </div>
+
+  <div class="compare">
+    <div class="col before">
+      <h2>📦 BEFORE (v0.4.21 dashboard hiện tại — 4 KPI)</h2>
+      <div class="card">
+        <div class="h2">🌊 TomiHedge — <span class="orange">HEDGE01</span> · <span class="red">🔴 REAL</span></div>
+        <div class="row">
+          <div class="kpi"><div class="kpiLabel">WALLET</div><div class="kpiVal orange">$206.11</div></div>
+          <div class="kpi"><div class="kpiLabel">EQUITY</div><div class="kpiVal red">$203.45</div></div>
+          <div class="kpi"><div class="kpiLabel">ROI</div><div class="kpiVal red">-1.27%</div></div>
+          <div class="kpi"><div class="kpiLabel">uPnL</div><div class="kpiVal red">-$2.66</div></div>
+        </div>
+        <div class="dim">Initial: $206 · Realized: $0.00 · Fees: $0.16</div>
+        <div class="dim">Total ADDs: LONG 2 · SHORT 0 · Closes: 0</div>
+      </div>
+    </div>
+
+    <div class="col after">
+      <h2>✨ AFTER (v0.4.23 — combo A+B: ENGINE KPI + ROI LIVE/ENGINE)</h2>
+      <div class="card">
+        <div class="h2">🌊 TomiHedge — <span class="orange">HEDGE01</span> · <span class="red">🔴 REAL</span></div>
+        <div class="row">
+          <div class="kpi"><div class="kpiLabel">WALLET</div><div class="kpiVal orange">$206.11</div></div>
+          <div class="kpi"><div class="kpiLabel">ENGINE</div><div class="kpiVal orange-dim">$206.11</div></div>
+          <div class="kpi"><div class="kpiLabel">EQUITY</div><div class="kpiVal red">$203.45</div></div>
+          <div class="kpi"><div class="kpiLabel">uPnL</div><div class="kpiVal red">-$2.66</div></div>
+        </div>
+        <div class="row">
+          <div class="kpi"><div class="kpiLabel">ROI LIVE</div><div class="kpiVal red" style="font-size: 16px;">-1.27%</div></div>
+          <div class="kpi"><div class="kpiLabel">ROI ENGINE</div><div class="kpiVal red" style="font-size: 16px;">-1.27%</div></div>
+        </div>
+        <div class="dim">Initial: $206 · Realized: $0.00 · Fees: $0.16</div>
+        <div class="dim">Total ADDs: LONG 2 · SHORT 0 · Closes: 0</div>
+      </div>
+
+      <h2 style="margin-top: 24px; color: #f59e0b;">📊 Scenario: sau 30 ngày, có funding fee tích lũy −$3.50</h2>
+      <div class="card">
+        <div class="h2">🌊 TomiHedge — <span class="orange">HEDGE01</span> · <span class="red">🔴 REAL</span></div>
+        <div class="row">
+          <div class="kpi"><div class="kpiLabel">WALLET</div><div class="kpiVal orange">$202.61</div></div>
+          <div class="kpi"><div class="kpiLabel">ENGINE</div><div class="kpiVal orange-dim">$206.11</div></div>
+          <div class="kpi"><div class="kpiLabel">EQUITY</div><div class="kpiVal red">$199.95</div></div>
+          <div class="kpi"><div class="kpiLabel">uPnL</div><div class="kpiVal red">-$2.66</div></div>
+        </div>
+        <div class="row">
+          <div class="kpi"><div class="kpiLabel">ROI LIVE</div><div class="kpiVal red" style="font-size: 16px;">-2.94%</div></div>
+          <div class="kpi"><div class="kpiLabel">ROI ENGINE</div><div class="kpiVal red" style="font-size: 16px;">-1.27%</div></div>
+        </div>
+        <div class="dim">Initial: $206 · Realized: $0.00 · Fees: $0.16 · <span style="color:#f59e0b;">Δ wallet vs engine: -$3.50 (funding/deposit)</span></div>
+        <div class="dim">Total ADDs: LONG 2 · SHORT 0 · Closes: 0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <strong>🎯 Mục đích:</strong>
+    <ul style="margin: 8px 0; padding-left: 20px;">
+      <li><strong class="green">ENGINE wallet</strong> giúp anh phân biệt giữa <em>tiền thực tế còn trên Binance</em> (WALLET) và <em>engine tự tracking</em> (ENGINE). Khi 2 số bằng nhau = engine OK, không có ngoại tệ.</li>
+      <li><strong class="green">ROI ENGINE</strong> = ROI thuần từ trade rule (excluded funding fee + manual deposit). Đây là KPI đo lường <em>chất lượng rule</em>.</li>
+      <li><strong class="green">ROI LIVE</strong> = ROI thật của tài khoản (bao gồm tất cả). Đây là KPI <em>tiền vào ra</em> thực tế.</li>
+      <li><strong class="green">Δ wallet vs engine</strong> chỉ hiện khi |diff| ≥ $0.01 — không spam khi 2 số bằng nhau.</li>
+    </ul>
+    <strong>Layout:</strong> 4 KPI row 1 + 2 KPI ROI row 2 (compact). Total 6 KPI nhưng visual không quá đông.
+  </div>
+</body>
+</html>
