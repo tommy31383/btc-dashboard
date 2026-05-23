@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 18785.000000000004,
+  "capital": 25220.000000000004,
   "positions": [
+    {
+      "id": "bar5m-1779519600000",
+      "bar5mTime": 1779519600000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "stoch_long",
+      "entryPrice": 75329.8,
+      "entryMs": 1779522152658,
+      "tpPrice": 79849.588,
+      "slPrice": 70810.012,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1779519300000",
       "bar5mTime": 1779519300000,
@@ -3252,38 +3264,53 @@
     {
       "id": "bar5m-1778768700000",
       "bar5mTime": 1778768700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 80114.3,
       "entryMs": 1778769127853,
       "tpPrice": 75307.442,
       "slPrice": 84921.15800000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75307.442,
+      "exitMs": 1779521092579,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000026,
+      "pnlNetUsd": 177.00000000000026
     },
     {
       "id": "bar5m-1778767500000",
       "bar5mTime": 1778767500000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79733.1,
       "entryMs": 1778767927848,
       "tpPrice": 74949.114,
       "slPrice": 84517.08600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74949.114,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000017,
+      "pnlNetUsd": 177.00000000000017
     },
     {
       "id": "bar5m-1778767200000",
       "bar5mTime": 1778767200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79764.9,
       "entryMs": 1778767627830,
       "tpPrice": 74979.006,
       "slPrice": 84550.794,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74979.006,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000003,
+      "pnlNetUsd": 177.00000000000003
     },
     {
       "id": "bar5m-1778765700000",
@@ -3312,86 +3339,121 @@
     {
       "id": "bar5m-1778762100000",
       "bar5mTime": 1778762100000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79563.9,
       "entryMs": 1778762584576,
       "tpPrice": 74790.06599999999,
       "slPrice": 84337.734,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74790.06599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000001,
+      "pnlNetUsd": 177.0000000000001
     },
     {
       "id": "bar5m-1778754300000",
       "bar5mTime": 1778754300000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79655.8,
       "entryMs": 1778754756893,
       "tpPrice": 74876.452,
       "slPrice": 84435.148,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74876.452,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 179.99999999999991,
+      "pnlNetUsd": 176.99999999999991
     },
     {
       "id": "bar5m-1778753700000",
       "bar5mTime": 1778753700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79709.5,
       "entryMs": 1778754096902,
       "tpPrice": 74926.93,
       "slPrice": 84492.07,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74926.93,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000026,
+      "pnlNetUsd": 177.00000000000026
     },
     {
       "id": "bar5m-1778752200000",
       "bar5mTime": 1778752200000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79545,
       "entryMs": 1778752656881,
       "tpPrice": 84317.7,
       "slPrice": 74772.3,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74772.3,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778751300000",
       "bar5mTime": 1778751300000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79575.6,
       "entryMs": 1778751756884,
       "tpPrice": 84350.13600000001,
       "slPrice": 74801.064,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74801.064,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778750700000",
       "bar5mTime": 1778750700000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79694,
       "entryMs": 1778751156884,
       "tpPrice": 84475.64,
       "slPrice": 74912.36,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74912.36,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778750400000",
       "bar5mTime": 1778750400000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79730.5,
       "entryMs": 1778750856868,
       "tpPrice": 84514.33,
       "slPrice": 74946.67,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74946.67,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778750100000",
@@ -3480,14 +3542,19 @@
     {
       "id": "bar5m-1778747100000",
       "bar5mTime": 1778747100000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79740.5,
       "entryMs": 1778747423088,
       "tpPrice": 74956.06999999999,
       "slPrice": 84524.93000000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74956.06999999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1778746500000",
@@ -3516,26 +3583,36 @@
     {
       "id": "bar5m-1778745600000",
       "bar5mTime": 1778745600000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79625.6,
       "entryMs": 1778745983149,
       "tpPrice": 84403.13600000001,
       "slPrice": 74848.064,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74848.064,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778745300000",
       "bar5mTime": 1778745300000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79699.9,
       "entryMs": 1778745683031,
       "tpPrice": 74917.90599999999,
       "slPrice": 84481.894,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74917.90599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000023,
+      "pnlNetUsd": 177.00000000000023
     },
     {
       "id": "bar5m-1778745000000",
@@ -3576,50 +3653,70 @@
     {
       "id": "bar5m-1778743500000",
       "bar5mTime": 1778743500000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79753.5,
       "entryMs": 1778743883276,
       "tpPrice": 74968.29,
       "slPrice": 84538.71,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74968.29,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000023,
+      "pnlNetUsd": 177.00000000000023
     },
     {
       "id": "bar5m-1778743200000",
       "bar5mTime": 1778743200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79721.8,
       "entryMs": 1778743583057,
       "tpPrice": 74938.492,
       "slPrice": 84505.10800000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74938.492,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000017,
+      "pnlNetUsd": 177.00000000000017
     },
     {
       "id": "bar5m-1778742600000",
       "bar5mTime": 1778742600000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79711.3,
       "entryMs": 1778742984587,
       "tpPrice": 84493.978,
       "slPrice": 74928.622,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74928.622,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778742000000",
       "bar5mTime": 1778742000000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79710,
       "entryMs": 1778742383021,
       "tpPrice": 84492.6,
       "slPrice": 74927.4,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74927.4,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778741400000",
@@ -3648,14 +3745,19 @@
     {
       "id": "bar5m-1778740200000",
       "bar5mTime": 1778740200000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79729.3,
       "entryMs": 1778740602262,
       "tpPrice": 84513.058,
       "slPrice": 74945.542,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74945.542,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778739900000",
@@ -3708,14 +3810,19 @@
     {
       "id": "bar5m-1778738100000",
       "bar5mTime": 1778738100000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79771.5,
       "entryMs": 1778738556875,
       "tpPrice": 74985.20999999999,
       "slPrice": 84557.79000000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74985.20999999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1778737800000",
@@ -3732,50 +3839,70 @@
     {
       "id": "bar5m-1778737200000",
       "bar5mTime": 1778737200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79663.9,
       "entryMs": 1778737656848,
       "tpPrice": 74884.06599999999,
       "slPrice": 84443.734,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74884.06599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000001,
+      "pnlNetUsd": 177.0000000000001
     },
     {
       "id": "bar5m-1778736900000",
       "bar5mTime": 1778736900000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79660.1,
       "entryMs": 1778737356838,
       "tpPrice": 74880.494,
       "slPrice": 84439.706,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74880.494,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 179.99999999999997,
+      "pnlNetUsd": 176.99999999999997
     },
     {
       "id": "bar5m-1778736600000",
       "bar5mTime": 1778736600000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79643.6,
       "entryMs": 1778736983688,
       "tpPrice": 74864.984,
       "slPrice": 84422.21600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74864.984,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000034,
+      "pnlNetUsd": 177.00000000000034
     },
     {
       "id": "bar5m-1778736000000",
       "bar5mTime": 1778736000000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79549.7,
       "entryMs": 1778736383251,
       "tpPrice": 74776.718,
       "slPrice": 84322.682,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74776.718,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000014,
+      "pnlNetUsd": 177.00000000000014
     },
     {
       "id": "bar5m-1778735400000",
@@ -3792,50 +3919,70 @@
     {
       "id": "bar5m-1778735100000",
       "bar5mTime": 1778735100000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79420.5,
       "entryMs": 1778735482950,
       "tpPrice": 74655.26999999999,
       "slPrice": 84185.73000000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74655.26999999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000004,
+      "pnlNetUsd": 177.0000000000004
     },
     {
       "id": "bar5m-1778734800000",
       "bar5mTime": 1778734800000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79419.4,
       "entryMs": 1778735182941,
       "tpPrice": 74654.23599999999,
       "slPrice": 84184.564,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74654.23599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000017,
+      "pnlNetUsd": 177.00000000000017
     },
     {
       "id": "bar5m-1778734200000",
       "bar5mTime": 1778734200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79410.4,
       "entryMs": 1778734583032,
       "tpPrice": 74645.77599999998,
       "slPrice": 84175.024,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74645.77599999998,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000004,
+      "pnlNetUsd": 177.0000000000004
     },
     {
       "id": "bar5m-1778733900000",
       "bar5mTime": 1778733900000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79400.1,
       "entryMs": 1778734282764,
       "tpPrice": 74636.094,
       "slPrice": 84164.10600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74636.094,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1778733600000",
@@ -3960,14 +4107,19 @@
     {
       "id": "bar5m-1778727600000",
       "bar5mTime": 1778727600000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "sr_long",
       "entryPrice": 79396.7,
       "entryMs": 1778727982888,
       "tpPrice": 84160.50200000001,
       "slPrice": 74632.89799999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74632.89799999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778727000000",
@@ -3984,110 +4136,155 @@
     {
       "id": "bar5m-1778726400000",
       "bar5mTime": 1778726400000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79556.4,
       "entryMs": 1778726723253,
       "tpPrice": 74783.01599999999,
       "slPrice": 84329.784,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74783.01599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000023,
+      "pnlNetUsd": 177.00000000000023
     },
     {
       "id": "bar5m-1778725800000",
       "bar5mTime": 1778725800000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79623.5,
       "entryMs": 1778726123025,
       "tpPrice": 74846.09,
       "slPrice": 84400.91,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74846.09,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000014,
+      "pnlNetUsd": 177.00000000000014
     },
     {
       "id": "bar5m-1778725200000",
       "bar5mTime": 1778725200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79600,
       "entryMs": 1778725582722,
       "tpPrice": 74824,
       "slPrice": 84376,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74824,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180,
+      "pnlNetUsd": 177
     },
     {
       "id": "bar5m-1778724600000",
       "bar5mTime": 1778724600000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79550.1,
       "entryMs": 1778725062740,
       "tpPrice": 74777.094,
       "slPrice": 84323.10600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74777.094,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1778724300000",
       "bar5mTime": 1778724300000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79645.72,
       "entryMs": 1778724618743,
       "tpPrice": 74866.9768,
       "slPrice": 84424.4632,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74866.9768,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 179.9999999999999,
+      "pnlNetUsd": 176.9999999999999
     },
     {
       "id": "bar5m-1778721000000",
       "bar5mTime": 1778721000000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79585.7,
       "entryMs": 1778721581501,
       "tpPrice": 74810.55799999999,
       "slPrice": 84360.842,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74810.55799999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000026,
+      "pnlNetUsd": 177.00000000000026
     },
     {
       "id": "bar5m-1778717700000",
       "bar5mTime": 1778717700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "sr_short",
       "entryPrice": 79471.6,
       "entryMs": 1778718058595,
       "tpPrice": 74703.304,
       "slPrice": 84239.89600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74703.304,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000009,
+      "pnlNetUsd": 177.00000000000009
     },
     {
       "id": "bar5m-1778717400000",
       "bar5mTime": 1778717400000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79501.5,
       "entryMs": 1778717758591,
       "tpPrice": 74731.40999999999,
       "slPrice": 84271.59000000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74731.40999999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000004,
+      "pnlNetUsd": 177.0000000000004
     },
     {
       "id": "bar5m-1778717100000",
       "bar5mTime": 1778717100000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79447.7,
       "entryMs": 1778717458298,
       "tpPrice": 74680.83799999999,
       "slPrice": 84214.562,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74680.83799999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000034,
+      "pnlNetUsd": 177.00000000000034
     },
     {
       "id": "bar5m-1778716500000",
@@ -4104,170 +4301,240 @@
     {
       "id": "bar5m-1778706300000",
       "bar5mTime": 1778706300000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79438.9,
       "entryMs": 1778708610510,
       "tpPrice": 84205.234,
       "slPrice": 74672.56599999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74672.56599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778702700000",
       "bar5mTime": 1778702700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79628.6,
       "entryMs": 1778703124265,
       "tpPrice": 74850.884,
       "slPrice": 84406.316,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74850.884,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180,
+      "pnlNetUsd": 177
     },
     {
       "id": "bar5m-1778702100000",
       "bar5mTime": 1778702100000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79604.8,
       "entryMs": 1778702524242,
       "tpPrice": 74828.512,
       "slPrice": 84381.088,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74828.512,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000003,
+      "pnlNetUsd": 177.00000000000003
     },
     {
       "id": "bar5m-1778700000000",
       "bar5mTime": 1778700000000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79380,
       "entryMs": 1778700424261,
       "tpPrice": 84142.8,
       "slPrice": 74617.2,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74617.2,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778699700000",
       "bar5mTime": 1778699700000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79426.3,
       "entryMs": 1778700124257,
       "tpPrice": 84191.87800000001,
       "slPrice": 74660.722,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74660.722,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778699100000",
       "bar5mTime": 1778699100000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79478.7,
       "entryMs": 1778699524253,
       "tpPrice": 84247.422,
       "slPrice": 74709.97799999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74709.97799999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778698500000",
       "bar5mTime": 1778698500000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79554.9,
       "entryMs": 1778698924317,
       "tpPrice": 84328.194,
       "slPrice": 74781.60599999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74781.60599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1778696700000",
       "bar5mTime": 1778696700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79723.7,
       "entryMs": 1778697124277,
       "tpPrice": 74940.27799999999,
       "slPrice": 84507.122,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74940.27799999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000023,
+      "pnlNetUsd": 177.00000000000023
     },
     {
       "id": "bar5m-1778696400000",
       "bar5mTime": 1778696400000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79732.8,
       "entryMs": 1778696824258,
       "tpPrice": 74948.832,
       "slPrice": 84516.76800000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74948.832,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1778695800000",
       "bar5mTime": 1778695800000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79565.1,
       "entryMs": 1778696224267,
       "tpPrice": 74791.194,
       "slPrice": 84339.00600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74791.194,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000001,
+      "pnlNetUsd": 177.0000000000001
     },
     {
       "id": "bar5m-1778695500000",
       "bar5mTime": 1778695500000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79550,
       "entryMs": 1778695924235,
       "tpPrice": 74777,
       "slPrice": 84323,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74777,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180,
+      "pnlNetUsd": 177
     },
     {
       "id": "bar5m-1778694900000",
       "bar5mTime": 1778694900000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79470.1,
       "entryMs": 1778695324273,
       "tpPrice": 74701.894,
       "slPrice": 84238.30600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74701.894,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000023,
+      "pnlNetUsd": 177.00000000000023
     },
     {
       "id": "bar5m-1778694300000",
       "bar5mTime": 1778694300000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79414.8,
       "entryMs": 1778694681692,
       "tpPrice": 74649.912,
       "slPrice": 84179.68800000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74649.912,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000023,
+      "pnlNetUsd": 177.00000000000023
     },
     {
       "id": "bar5m-1778694000000",
       "bar5mTime": 1778694000000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79388.9,
       "entryMs": 1778694321823,
       "tpPrice": 74625.56599999999,
       "slPrice": 84152.234,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74625.56599999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000001,
+      "pnlNetUsd": 177.0000000000001
     },
     {
       "id": "bar5m-1778693400000",
@@ -4452,26 +4719,36 @@
     {
       "id": "bar5m-1777938300000",
       "bar5mTime": 1777938300000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79754.4,
       "entryMs": 1777938727181,
       "tpPrice": 84539.664,
       "slPrice": 74969.13599999998,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74969.13599999998,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777937700000",
       "bar5mTime": 1777937700000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79771,
       "entryMs": 1777938127191,
       "tpPrice": 84557.26000000001,
       "slPrice": 74984.73999999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74984.73999999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777937400000",
@@ -4536,26 +4813,36 @@
     {
       "id": "bar5m-1777934100000",
       "bar5mTime": 1777934100000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 80106.1,
       "entryMs": 1777934527187,
       "tpPrice": 84912.46600000001,
       "slPrice": 75299.734,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75299.734,
+      "exitMs": 1779521092579,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777933800000",
       "bar5mTime": 1777933800000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 80117.2,
       "entryMs": 1777934227161,
       "tpPrice": 84924.232,
       "slPrice": 75310.16799999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75310.16799999999,
+      "exitMs": 1779521092579,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777932600000",
@@ -4635,14 +4922,19 @@
     {
       "id": "bar5m-1777925400000",
       "bar5mTime": 1777925400000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 80090.3,
       "entryMs": 1777925827141,
       "tpPrice": 75284.882,
       "slPrice": 84895.71800000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75284.882,
+      "exitMs": 1779521092579,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000017,
+      "pnlNetUsd": 177.00000000000017
     },
     {
       "id": "bar5m-1777923300000",
@@ -4889,26 +5181,36 @@
     {
       "id": "bar5m-1777911000000",
       "bar5mTime": 1777911000000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79671.4,
       "entryMs": 1777911427109,
       "tpPrice": 84451.684,
       "slPrice": 74891.116,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74891.116,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777908000000",
       "bar5mTime": 1777908000000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79504.1,
       "entryMs": 1777908427104,
       "tpPrice": 84274.346,
       "slPrice": 74733.854,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74733.854,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777905900000",
@@ -4925,14 +5227,19 @@
     {
       "id": "bar5m-1777905300000",
       "bar5mTime": 1777905300000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79467.1,
       "entryMs": 1777905728774,
       "tpPrice": 74699.07400000001,
       "slPrice": 84235.126,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74699.07400000001,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 179.99999999999991,
+      "pnlNetUsd": 176.99999999999991
     },
     {
       "id": "bar5m-1777905000000",
@@ -5033,86 +5340,121 @@
     {
       "id": "bar5m-1777887300000",
       "bar5mTime": 1777887300000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79775.1,
       "entryMs": 1777887736166,
       "tpPrice": 74988.594,
       "slPrice": 84561.60600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74988.594,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1777887000000",
       "bar5mTime": 1777887000000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "sr_long",
       "entryPrice": 79744.2,
       "entryMs": 1777887376162,
       "tpPrice": 84528.852,
       "slPrice": 74959.548,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74959.548,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777886700000",
       "bar5mTime": 1777886700000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "sr_long",
       "entryPrice": 79686.5,
       "entryMs": 1777887076158,
       "tpPrice": 84467.69,
       "slPrice": 74905.31,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74905.31,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777885500000",
       "bar5mTime": 1777885500000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 79663,
       "entryMs": 1777885936125,
       "tpPrice": 74883.22,
       "slPrice": 84442.78,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74883.22,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 179.99999999999991,
+      "pnlNetUsd": 176.99999999999991
     },
     {
       "id": "bar5m-1777881600000",
       "bar5mTime": 1777881600000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79606.8,
       "entryMs": 1777882036134,
       "tpPrice": 84383.20800000001,
       "slPrice": 74830.39199999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74830.39199999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777875900000",
       "bar5mTime": 1777875900000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79671.5,
       "entryMs": 1777876336124,
       "tpPrice": 84451.79000000001,
       "slPrice": 74891.20999999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74891.20999999999,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777875300000",
       "bar5mTime": 1777875300000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 79770,
       "entryMs": 1777875676127,
       "tpPrice": 84556.2,
       "slPrice": 74983.8,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 74983.8,
+      "exitMs": 1779523262672,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777875000000",
@@ -5165,14 +5507,19 @@
     {
       "id": "bar5m-1777871400000",
       "bar5mTime": 1777871400000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 80112.8,
       "entryMs": 1777871776154,
       "tpPrice": 84919.56800000001,
       "slPrice": 75306.03199999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75306.03199999999,
+      "exitMs": 1779521092579,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777871100000",
@@ -5371,26 +5718,36 @@
     {
       "id": "bar5m-1777865100000",
       "bar5mTime": 1777865100000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 80082.1,
       "entryMs": 1777865536122,
       "tpPrice": 84887.02600000001,
       "slPrice": 75277.174,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75277.174,
+      "exitMs": 1779522168383,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777864800000",
       "bar5mTime": 1777864800000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 80100,
       "entryMs": 1777865176121,
       "tpPrice": 84906,
       "slPrice": 75294,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 75294,
+      "exitMs": 1779521092579,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1777864200000",
@@ -12868,17 +13225,297 @@
     {
       "t": 1779520141194,
       "equity": 18785.000000000004
+    },
+    {
+      "t": 1779521092579,
+      "equity": 18963.500000000004
+    },
+    {
+      "t": 1779521092579,
+      "equity": 18932.000000000004
+    },
+    {
+      "t": 1779521092579,
+      "equity": 18900.500000000004
+    },
+    {
+      "t": 1779521092579,
+      "equity": 19079.000000000004
+    },
+    {
+      "t": 1779521092579,
+      "equity": 19047.500000000004
+    },
+    {
+      "t": 1779521092579,
+      "equity": 19016.000000000004
+    },
+    {
+      "t": 1779522152658,
+      "equity": 19014.500000000004
+    },
+    {
+      "t": 1779522168383,
+      "equity": 18983.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19161.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19340.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19518.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19697.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19875.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19844.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19812.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19781.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19749.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19928.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 19896.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20075.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20253.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20432.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20400.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20369.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20337.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20516.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20694.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 20873.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21051.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21230.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21408.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21587.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21765.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21944.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 21912.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 22091.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 22269.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 22448.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 22626.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 22805.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 22983.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23162.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23340.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23519.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23487.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23666.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23844.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23813.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23781.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23750.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23718.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 23897.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24075.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24254.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24432.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24611.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24789.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24968.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24936.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24905.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24873.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 24842.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25020.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25199.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25167.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25136.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25314.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25283.000000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25251.500000000004
+    },
+    {
+      "t": 1779523262672,
+      "equity": 25220.000000000004
     }
   ],
   "stats": {
-    "totalClosed": 289,
-    "wins": 121,
-    "losses": 168,
-    "totalPnlUsd": 14313.000000000007,
-    "totalFeeUsd": 1395,
-    "lastEntryMs": 1779520141194,
+    "totalClosed": 358,
+    "wins": 162,
+    "losses": 196,
+    "totalPnlUsd": 20646.000000000007,
+    "totalFeeUsd": 1500,
+    "lastEntryMs": 1779522152658,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1779520141195,
+  "updatedAt": 1779523262672,
   "capitalVersion": 2
 }
