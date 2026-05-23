@@ -1,45 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1779523288956,
+  "updatedAt": 1779524419212,
   "trades": [
-    {
-      "id": "ts39gz9g22b",
-      "ruleId": "5m:1",
-      "tfKey": "5m",
-      "side": "LONG",
-      "status": "LOSS",
-      "entryPrice": 77987.16,
-      "slPrice": 79546.9032,
-      "tpPrice": 74867.6736,
-      "leverage": 100,
-      "targetPct": 4,
-      "stopPct": 2,
-      "maxHoldBars": 50,
-      "openedMs": 1777188657692,
-      "deadlineMs": 1777203600000,
-      "exitPrice": 79546.9032,
-      "leveragedPnlPct": -200,
-      "closedMs": 1777188660035
-    },
-    {
-      "id": "text64wszi",
-      "ruleId": "1h:24",
-      "tfKey": "1h",
-      "side": "LONG",
-      "status": "LOSS",
-      "entryPrice": 78000,
-      "slPrice": 76440,
-      "tpPrice": 80340,
-      "leverage": 100,
-      "targetPct": 3,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1777188426995,
-      "deadlineMs": 1777546800000,
-      "exitPrice": 76440,
-      "leveragedPnlPct": -200,
-      "closedMs": 1777360584117
-    },
     {
       "id": "wq0cvqrjd28",
       "ruleId": "5m:1",
@@ -3783,6 +3745,38 @@
       "maxHoldBars": 100,
       "openedMs": 1779497393781,
       "deadlineMs": 1779854400000
+    },
+    {
+      "id": "j0uz9uhfp8b",
+      "ruleId": "1h:7",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 74573.7,
+      "slPrice": 82031.07,
+      "tpPrice": 63387.645,
+      "leverage": 100,
+      "targetPct": 15,
+      "stopPct": 10,
+      "maxHoldBars": 100,
+      "openedMs": 1779523452260,
+      "deadlineMs": 1779883200000
+    },
+    {
+      "id": "e7lvollob9v",
+      "ruleId": "1h:17",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 74573.7,
+      "slPrice": 76065.174,
+      "tpPrice": 70099.27799999999,
+      "leverage": 100,
+      "targetPct": 6,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1779523452262,
+      "deadlineMs": 1779883200000
     }
   ]
 }
