@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1779590134303,
+  "updatedAt": 1779678923743,
   "trades": [
     {
       "id": "sfpnmd18lmc",
@@ -3779,7 +3779,7 @@
       "ruleId": "15m:8",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "TIMEOUT",
       "entryPrice": 76705.5,
       "slPrice": 78239.61,
       "tpPrice": 72870.22499999999,
@@ -3788,7 +3788,10 @@
       "stopPct": 2,
       "maxHoldBars": 100,
       "openedMs": 1779589688337,
-      "deadlineMs": 1779678900000
+      "deadlineMs": 1779678900000,
+      "exitPrice": 77093.74,
+      "leveragedPnlPct": -50.61,
+      "closedMs": 1779678903474
     }
   ]
 }
