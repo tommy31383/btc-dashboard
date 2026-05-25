@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1779678923743,
+  "updatedAt": 1779730704641,
   "trades": [
     {
       "id": "sfpnmd18lmc",
@@ -3709,7 +3709,7 @@
       "ruleId": "1h:6",
       "tfKey": "1h",
       "side": "LONG",
-      "status": "OPEN",
+      "status": "WIN",
       "entryPrice": 75412.9,
       "slPrice": 67871.61,
       "tpPrice": 77675.287,
@@ -3718,7 +3718,10 @@
       "stopPct": 10,
       "maxHoldBars": 100,
       "openedMs": 1779497393781,
-      "deadlineMs": 1779854400000
+      "deadlineMs": 1779854400000,
+      "exitPrice": 77675.287,
+      "leveragedPnlPct": 300,
+      "closedMs": 1779727988804
     },
     {
       "id": "j0uz9uhfp8b",
