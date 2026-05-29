@@ -175,10 +175,16 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
   const engineWallet: number = (th as any).engineWallet ?? wallet;
   const initialCap: number = th.initialCapital ?? 1000;
 
-  // Compute uPnL realtime
-  const uPnLLong = (markPrice && longNet.qty > 0) ? longNet.qty * (markPrice - longNet.avgEntry) : 0;
-  const uPnLShort = (markPrice && shortNet.qty > 0) ? shortNet.qty * (shortNet.avgEntry - markPrice) : 0;
-  const totalUpnl = uPnLLong + uPnLShort;
+  // Trend buckets (S12/S13/S14 — active khi V040_ENABLE_AGGREGATE=false)
+  const trendLongNet = (th as any).trendLongNet || { qty: 0, avgEntry: 0 };
+  const trendShortNet = (th as any).trendShortNet || { qty: 0, avgEntry: 0 };
+
+  // Compute uPnL realtime — bao gồm cả aggregate + trend buckets
+  const uPnLLong      = (markPrice && longNet.qty > 0)       ? longNet.qty      * (markPrice - longNet.avgEntry)           : 0;
+  const uPnLShort     = (markPrice && shortNet.qty > 0)      ? shortNet.qty     * (shortNet.avgEntry - markPrice)          : 0;
+  const uPnLTrendLong = (markPrice && trendLongNet.qty > 0)  ? trendLongNet.qty * (markPrice - trendLongNet.avgEntry)      : 0;
+  const uPnLTrendShort= (markPrice && trendShortNet.qty > 0) ? trendShortNet.qty* (trendShortNet.avgEntry - markPrice)     : 0;
+  const totalUpnl = uPnLLong + uPnLShort + uPnLTrendLong + uPnLTrendShort;
   const equity = wallet + totalUpnl;
   const roi = ((equity - initialCap) / initialCap) * 100;
   // ROI Engine = (engineWallet + uPnL - initial) / initial — ROI thuần từ trade engine, không bao gồm funding fee/manual deposit.
@@ -216,7 +222,7 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
           </View>
           <View style={styles.kpi}>
             <Text style={styles.kpiLabel}>uPnL</Text>
-            <Text style={[styles.kpiVal, { color: totalUpnl >= 0 ? P.green : P.error }]}>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.kpiVal, { color: totalUpnl >= 0 ? P.green : P.error }]}>
               {totalUpnl >= 0 ? "+" : ""}${totalUpnl.toFixed(2)}
             </Text>
           </View>
