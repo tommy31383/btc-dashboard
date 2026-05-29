@@ -261,14 +261,14 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
 
       {/* CHART — entry/close markers + weekly bias */}
       <TomiHedgeChart
-        eventLog={th.eventLog}
+        eventLog={(th.eventLog ?? []).filter((e: any) => (e.qty ?? 0) >= 0.001)}
         weeklyTrend={th.lastWeeklyTrend}
         title={isPaper ? "TomiHedge PAPER — Entry/Close Markers" : "TomiHedge REAL — Entry/Close Markers"}
       />
 
       {/* v0.4.5: LOG ADD/CLOSE — 20 entries mới nhất */}
       <TomiHedgeLogPanel
-        eventLog={th.eventLog}
+        eventLog={(th.eventLog ?? []).filter((e: any) => (e.qty ?? 0) >= 0.001)}
         title={isPaper ? "TomiHedge PAPER Log" : "TomiHedge REAL Log"}
       />
     </View>
