@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 4911.5,
+  "capital": 4910,
   "positions": [
+    {
+      "id": "bar5m-1780157100000",
+      "bar5mTime": 1780157100000,
+      "status": "OPEN",
+      "side": "SHORT",
+      "source": "sr_short",
+      "entryPrice": 73894.1,
+      "entryMs": 1780157518293,
+      "tpPrice": 69460.454,
+      "slPrice": 78327.74600000001,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1780156500000",
       "bar5mTime": 1780156500000,
@@ -951,6 +963,10 @@
     {
       "t": 1780156978325,
       "equity": 4911.5
+    },
+    {
+      "t": 1780157518293,
+      "equity": 4910
     }
   ],
   "stats": {
@@ -958,10 +974,10 @@
     "wins": 0,
     "losses": 0,
     "totalPnlUsd": 0,
-    "totalFeeUsd": 88.5,
-    "lastEntryMs": 1780156978325,
+    "totalFeeUsd": 90,
+    "lastEntryMs": 1780157518293,
     "lastResetMs": 1780072714101
   },
-  "updatedAt": 1780156978325,
+  "updatedAt": 1780157518293,
   "capitalVersion": 2
 }
