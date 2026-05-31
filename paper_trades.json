@@ -1,26 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1780239761803,
+  "updatedAt": 1780240661807,
   "trades": [
-    {
-      "id": "ewqb90b12zb",
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 73350.7,
-      "slPrice": 74817.71399999999,
-      "tpPrice": 69683.165,
-      "leverage": 100,
-      "targetPct": 5,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1779966122304,
-      "deadlineMs": 1780056000000,
-      "exitPrice": 73485.14,
-      "leveragedPnlPct": -18.33,
-      "closedMs": 1780056003105
-    },
     {
       "id": "gddxlldsczs",
       "ruleId": "15m:2",
@@ -181,7 +162,7 @@
       "deadlineMs": 1780221600000,
       "exitPrice": 73828.15,
       "leveragedPnlPct": -254.73,
-      "closedMs": 1780221823492
+      "closedMs": 1780221823420
     },
     {
       "id": "h9sa4e92s9f",
@@ -3699,7 +3680,7 @@
       "closedMs": 1780072715944
     },
     {
-      "id": "tjqv5xaxxo",
+      "id": "p7jaj58v5ke",
       "ruleId": "15m:8",
       "tfKey": "15m",
       "side": "SHORT",
@@ -3711,14 +3692,14 @@
       "targetPct": 5,
       "stopPct": 2,
       "maxHoldBars": 100,
-      "openedMs": 1780147978346,
+      "openedMs": 1780147978281,
       "deadlineMs": 1780237800000,
       "exitPrice": 73582.79,
       "leveragedPnlPct": 17.54,
-      "closedMs": 1780237801085
+      "closedMs": 1780237801081
     },
     {
-      "id": "fl407xjxmss",
+      "id": "uopfrpck0ed",
       "ruleId": "1h:6",
       "tfKey": "1h",
       "side": "LONG",
@@ -3730,11 +3711,11 @@
       "targetPct": 3,
       "stopPct": 10,
       "maxHoldBars": 100,
-      "openedMs": 1780229120871,
+      "openedMs": 1780229120833,
       "deadlineMs": 1780585200000
     },
     {
-      "id": "yi9wrrtgz8e",
+      "id": "45w2y8v2mk1",
       "ruleId": "15m:8",
       "tfKey": "15m",
       "side": "SHORT",
@@ -3746,11 +3727,11 @@
       "targetPct": 5,
       "stopPct": 2,
       "maxHoldBars": 100,
-      "openedMs": 1780237940957,
+      "openedMs": 1780237940969,
       "deadlineMs": 1780327800000
     },
     {
-      "id": "av54mtnlt3w",
+      "id": "6f1uzvs8cki",
       "ruleId": "15m:2",
       "tfKey": "15m",
       "side": "SHORT",
@@ -3762,11 +3743,11 @@
       "targetPct": 3,
       "stopPct": 2,
       "maxHoldBars": 100,
-      "openedMs": 1780239740986,
+      "openedMs": 1780239740987,
       "deadlineMs": 1780329600000
     },
     {
-      "id": "33i6gckjxi8",
+      "id": "5bd93d9rtlp",
       "ruleId": "15m:22",
       "tfKey": "15m",
       "side": "SHORT",
@@ -3778,8 +3759,24 @@
       "targetPct": 5,
       "stopPct": 2,
       "maxHoldBars": 100,
-      "openedMs": 1780239740986,
+      "openedMs": 1780239740987,
       "deadlineMs": 1780329600000
+    },
+    {
+      "id": "22gvqbv5zr8",
+      "ruleId": "15m:16",
+      "tfKey": "15m",
+      "side": "LONG",
+      "status": "OPEN",
+      "entryPrice": 73635.5,
+      "slPrice": 66271.95,
+      "tpPrice": 74740.03249999999,
+      "leverage": 100,
+      "targetPct": 1.5,
+      "stopPct": 10,
+      "maxHoldBars": 100,
+      "openedMs": 1780240640935,
+      "deadlineMs": 1780330500000
     }
   ]
 }
