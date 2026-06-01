@@ -8,8 +8,8 @@ import json, math, datetime
 from collections import defaultdict
 
 CACHE="/Users/lap16116/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json"
-FEE=0.05/100; H4=4*3600*1000; MAX_HOLD=200; SL_I=4.0; SL_T=3.0; SL_TR=12
-ADX_P=14; VOL_MA=10; VOL_MULT=1.2; ATR_PCT_LB=90; ATR_PCT_PCTL=0.30
+FEE=0.05/100; H4=4*3600*1000; MAX_HOLD=200; SL_I=4.0; SL_T=3.0; SL_TR=24  # 96h=24×4h bars
+ADX_P=14; VOL_MA=10; VOL_MULT=1.2; ATR_PCT_LB=90; ATR_PCT_PCTL=0.50  # hedge01 prod: 50th pctl
 DONCHIAN_LB=20; ATR_BM=1.5; EF=50; ES=200
 
 def load_tf(ms):

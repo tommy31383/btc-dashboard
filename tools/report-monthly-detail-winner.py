@@ -115,7 +115,7 @@ def ctx40_ok(i4h):
     vs=[atr4[j]/c4h[j] for j in range(i4h-ATR_LB,i4h) if atr4[j] and c4h[j]]
     if len(vs)<ATR_LB: return False
     cur=atr4[i4h]/c4h[i4h] if atr4[i4h] and c4h[i4h] else None
-    return cur is not None and cur>=sorted(vs)[int(len(vs)*.4)]
+    return cur is not None and cur>=sorted(vs)[int(len(vs)*.35)]   # hedge04 ATR_PCT_PCTL=0.35
 ctx40=[ctx40_ok(i) for i in range(n4h)]
 
 def filt1h(i):

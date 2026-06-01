@@ -14,8 +14,8 @@ from collections import defaultdict
 
 CACHE = "/Users/lap16116/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json"
 FEE = 0.05/100; H4 = 4*3600*1000
-MAX_HOLD=200; SL_INIT=4.0; SL_TRAIL=3.0; SL_TRANS=12
-ADX_P=14; VOL_MA=10; VOL_MULT=1.2; ATR_PCT_LB=90; ATR_PCT_PCTL=0.30
+MAX_HOLD=200; SL_INIT=4.0; SL_TRAIL=3.0; SL_TRANS=24  # 96h=24×4h bars
+ADX_P=14; VOL_MA=10; VOL_MULT=1.2; ATR_PCT_LB=90; ATR_PCT_PCTL=0.50  # hedge01 prod: 50th pctl
 DONCHIAN_LB=20; ATR_BREAK_MULT=1.5; EMA_FAST=50; EMA_SLOW=200
 
 def load_tf(ms):
