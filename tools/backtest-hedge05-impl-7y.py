@@ -22,6 +22,13 @@ FEE   = 0.05 / 100
 BASE_QTY      = 0.003
 DCA_MAX       = 0 if "--nodca" in sys.argv else 2   # --nodca: disable DCA (test rescue thesis)
 NO_SHORT      = "--noshort" in sys.argv             # --noshort: skip BEAR (no short side)
+# ── Management primitives (test independently) ──
+P_TRAIL_ALL = "--trail-all" in sys.argv   # P1: RANGE/BEAR dùng trailing thay fixed TP
+P_SCALEOUT  = "--scaleout"  in sys.argv   # P2: chốt 50% ở TP1, phần còn lại trail từ breakeven
+P_PYRAMID   = "--pyramid"   in sys.argv   # P3: nhồi thêm khi LÃI + trend mạnh (max 1)
+P_MIXEDTP   = "--mixedtp"   in sys.argv   # P4: TP mult theo loại entry (BB×1.5, RSI/STK×1.0)
+SCALE_TP1_MULT = 1.5    # P2: TP1 (chốt 1 phần) tại +1.5×ATR
+PYR_TRIG_ATR   = 1.0    # P3: pyramid khi profit >= +1×ATR
 HARD_SL_MULT  = 4.0
 RANGE_TP_MULT = 2.0
 BULL_TRAIL_MULT = 3.0
@@ -145,23 +152,25 @@ def signal_at(i, regime):
         # short: RSI cross<60 OR ATR breakdown 4h
         rsi_cross = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]>=60 and rsi1h[i]<60
         brk = c4h[j4] < c4h[j4-1] - atr4[j4]*1.2
-        if rsi_cross or brk: return "SHORT"
+        if rsi_cross or brk: return ("SHORT","SHORT")
         return None
     if regime=="BULL":
         vmok = vma10_4h[j4] is not None and bars4h[j4]["volume"]>=vma10_4h[j4]*1.2
         brk  = c4h[j4] > c4h[j4-1] + atr4[j4]*1.2
-        if brk and vmok: return "LONG"
-        if dh20_4h[j4] is not None and c4h[j4]>dh20_4h[j4]: return "LONG"
+        if brk and vmok: return ("LONG","BRK")
+        if dh20_4h[j4] is not None and c4h[j4]>dh20_4h[j4]: return ("LONG","DON")
         # fallback
-        if hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return "LONG"
+        if hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
         return None
     # RANGE
     if e200_1h[i] is not None and c1h[i] < e200_1h[i]: return None  # EMA200 1h gate
     bb = bbl1h[i] is not None and bars1h[i]["low"]<=bbl1h[i] and c1h[i]>bars1h[i]["open"]
     rc = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]<40 and rsi1h[i]>=40
     sc = stk1h[i] is not None and stk1h[i-1] is not None and stk1h[i-1]<20 and stk1h[i]>=20
-    if bb or rc or sc: return "LONG"
-    if hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return "LONG"
+    if bb: return ("LONG","BB")
+    if rc: return ("LONG","RSI")
+    if sc: return ("LONG","STK")
+    if hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
     return None
 
 # ── Simulate ────────────────────────────────────────────────────────────────────
@@ -172,28 +181,34 @@ last_reverse_i=-10**9
 pending_reverse=None   # side to open
 n_dca_total=0; n_reverse_total=0; n_cut_total=0
 
-def open_campaign(i, side, regime):
+def tp_mult_for(kind):
+    """P4: TP mult theo loại entry (hedge04 tinh hoa). Default = RANGE_TP_MULT."""
+    if not P_MIXEDTP: return RANGE_TP_MULT
+    return {"BB":1.5, "RSI":1.0, "STK":1.0}.get(kind, RANGE_TP_MULT)
+
+def open_campaign(i, side, regime, kind="?"):
     global camp, last_entry_day
     ts=bars1h[i]["time"]; j4=idx4h(ts); a=atr4[j4]
     if a is None or a<=0: return False
     px=c1h[i]
     camp={"side":side,"avg":px,"qty":BASE_QTY,"atr0":a,"open_i":i,"dca":0,
-          "regAt":regime,"hwm":px,"fees":FEE*px*BASE_QTY,"ts_open":ts,
-          "entry_px":px}
+          "regAt":regime,"hwm":px,"lwm":px,"fees":FEE*px*BASE_QTY,"ts_open":ts,
+          "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":BASE_QTY}
     last_entry_day=utc_day(ts)
     return True
 
 def close_campaign(i, exit_px, reason):
     global camp, campaigns
     c=camp; side=c["side"]
-    c["fees"] += FEE*exit_px*c["qty"]   # close fee
+    c["fees"] += FEE*exit_px*c["qty"]   # close fee on remaining qty
     pnl = c["qty"]*(exit_px-c["avg"]) if side=="LONG" else c["qty"]*(c["avg"]-exit_px)
-    pnl_usd = pnl - c["fees"]
-    deployed = c["avg"]*c["qty"]
+    pnl_usd = c["realized"] + pnl - c["fees"]   # realized = partial scale-out already booked
+    deployed = c["avg"]*c["max_qty"]            # return on peak capital deployed
     ret = pnl_usd/deployed
     ts=bars1h[i]["time"]; d=datetime.datetime.utcfromtimestamp(ts/1000)
     campaigns.append({"ret":ret,"pnl_usd":pnl_usd,"mo":d.year*100+d.month,"yr":d.year,
-                      "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed})
+                      "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
+                      "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"]})
     camp=None
 
 WARM=210*24  # ~210 days of 1h bars for regime warmup
@@ -211,20 +226,38 @@ for i in range(WARM, n1h):
             if side=="LONG":  flip="reverse" if regime=="BEAR" else "soft"
             else:             flip="reverse" if regime!="BEAR" else "soft"
         closed=False
-        # 1. BULL trailing (LONG)
-        if regAt=="BULL" and side=="LONG":
-            if bar["high"]>c["hwm"]: c["hwm"]=bar["high"]
-            trail=c["hwm"]-atr0*BULL_TRAIL_MULT
-            if bar["low"]<=trail:
-                close_campaign(i, trail, "SL"); closed=True
-        # 2. RANGE/BEAR fixed TP
-        if not closed and regAt in ("RANGE","BEAR"):
+        if bar["high"]>c["hwm"]: c["hwm"]=bar["high"]
+        if bar["low"] <c["lwm"]: c["lwm"]=bar["low"]
+        # trailing active for: BULL-LONG (always) | P1 trail-all RANGE/BEAR | P2 after scale-out
+        trailing = (regAt=="BULL" and side=="LONG") or (P_TRAIL_ALL and regAt in ("RANGE","BEAR")) or c["scaled"]
+
+        # 1. Trailing exit
+        if not closed and trailing:
             if side=="LONG":
-                tp=avg+atr0*RANGE_TP_MULT
-                if bar["high"]>=tp: close_campaign(i, tp, "TP"); closed=True
+                trail=c["hwm"]-atr0*BULL_TRAIL_MULT
+                if c["scaled"]: trail=max(trail, avg)     # breakeven floor after partial
+                if bar["low"]<=trail: close_campaign(i, trail, "TRAIL"); closed=True
             else:
-                tp=avg-atr0*RANGE_TP_MULT
-                if bar["low"]<=tp: close_campaign(i, tp, "TP"); closed=True
+                trail=c["lwm"]+atr0*BULL_TRAIL_MULT
+                if c["scaled"]: trail=min(trail, avg)
+                if bar["high"]>=trail: close_campaign(i, trail, "TRAIL"); closed=True
+        # 2. Fixed TP / scale-out TP1 (RANGE/BEAR, không trail-all, chưa scaled)
+        if not closed and regAt in ("RANGE","BEAR") and not P_TRAIL_ALL and not c["scaled"]:
+            tp1 = SCALE_TP1_MULT if P_SCALEOUT else tp_mult_for(c["kind"])
+            if side=="LONG":
+                tp=avg+atr0*tp1
+                if bar["high"]>=tp:
+                    if P_SCALEOUT:
+                        half=c["qty"]/2; c["realized"]+=half*(tp-avg)-FEE*tp*half
+                        c["qty"]-=half; c["scaled"]=True
+                    else: close_campaign(i, tp, "TP"); closed=True
+            else:
+                tp=avg-atr0*tp1
+                if bar["low"]<=tp:
+                    if P_SCALEOUT:
+                        half=c["qty"]/2; c["realized"]+=half*(avg-tp)-FEE*tp*half
+                        c["qty"]-=half; c["scaled"]=True
+                    else: close_campaign(i, tp, "TP"); closed=True
         # 3. Hard SL
         if not closed:
             if side=="LONG":
@@ -247,20 +280,27 @@ for i in range(WARM, n1h):
         if not closed and flip=="soft":
             n_cut_total+=1
             close_campaign(i, px, "CUT"); closed=True
-        # 7. DCA (close+reopen fee model)
+        # 7. Pyramid (P3): nhồi khi LÃI + BULL-LONG trend mạnh (max 1)
+        if not closed and P_PYRAMID and regAt=="BULL" and side=="LONG" and c["pyr"]<1:
+            if px >= avg + atr0*PYR_TRIG_ATR:
+                oldq=c["qty"]; newq=oldq+BASE_QTY
+                c["fees"]+=FEE*px*BASE_QTY        # add leg fee
+                c["avg"]=(oldq*avg+BASE_QTY*px)/newq
+                c["qty"]=newq; c["pyr"]=1; c["max_qty"]=max(c["max_qty"],newq)
+        # 8. DCA (loss, regime unchanged) — close+reopen fee model
         if not closed:
             thr = DCA1_ATR if c["dca"]==0 else DCA2_ATR
             if c["dca"]<DCA_MAX and loss>=thr:
                 oldq=c["qty"]; newq=oldq+BASE_QTY
-                c["fees"] += FEE*px*oldq          # close old (TS close-reopen)
-                c["fees"] += FEE*px*newq          # reopen new total
+                c["fees"] += FEE*px*oldq
+                c["fees"] += FEE*px*newq
                 c["avg"]=(oldq*avg+BASE_QTY*px)/newq
-                c["qty"]=newq; c["dca"]+=1; n_dca_total+=1
+                c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
         continue  # one action per bar while managing
 
     # ── Pending reverse: open opposite immediately ──────────────────────────
     if pending_reverse is not None:
-        if open_campaign(i, pending_reverse, regime):
+        if open_campaign(i, pending_reverse, regime, "REV"):
             pending_reverse=None
         continue
 
@@ -271,7 +311,7 @@ for i in range(WARM, n1h):
     # ── Fresh entry signal ──────────────────────────────────────────────────
     sig = signal_at(i, regime)
     if sig is not None:
-        open_campaign(i, sig, regime)
+        open_campaign(i, sig[0], regime, sig[1])
 
 # Close trailing open campaign at end
 if camp is not None:
