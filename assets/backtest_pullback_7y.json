@@ -1,0 +1,914 @@
+[
+  {
+    "scenario": "V0_trend_baseline",
+    "full": {
+      "name": "V0_trend_baseline",
+      "roi": 0.51,
+      "maxDD": 0.69,
+      "ra": 0.74,
+      "entries": 1000,
+      "closes": 999,
+      "wr": 40.34,
+      "rr": 1.77,
+      "exp": 0.7,
+      "totalFees": 189,
+      "setupCounts": {
+        "S14S": 287,
+        "S13L": 163,
+        "S14L": 278,
+        "S12L": 14,
+        "S13S": 233,
+        "S12S": 25
+      },
+      "byYear": {
+        "2019": {
+          "entries": 140,
+          "closes": 139,
+          "pnl": 29
+        },
+        "2020": {
+          "entries": 146,
+          "closes": 146,
+          "pnl": 75
+        },
+        "2021": {
+          "entries": 122,
+          "closes": 119,
+          "pnl": -118
+        },
+        "2022": {
+          "entries": 90,
+          "closes": 90,
+          "pnl": 169
+        },
+        "2023": {
+          "entries": 144,
+          "closes": 148,
+          "pnl": 156
+        },
+        "2024": {
+          "entries": 149,
+          "closes": 148,
+          "pnl": 185
+        },
+        "2025": {
+          "entries": 171,
+          "closes": 171,
+          "pnl": 104
+        },
+        "2026": {
+          "entries": 38,
+          "closes": 36,
+          "pnl": 1
+        }
+      }
+    },
+    "train": {
+      "name": "V0_trend_baseline",
+      "roi": 0.14,
+      "maxDD": 0.25,
+      "ra": 0.55,
+      "entries": 498,
+      "closes": 496,
+      "wr": 39.52,
+      "rr": 1.74,
+      "exp": 0.37,
+      "totalFees": 48,
+      "setupCounts": {
+        "S14S": 149,
+        "S13L": 74,
+        "S14L": 155,
+        "S12L": 7,
+        "S13S": 100,
+        "S12S": 13
+      },
+      "byYear": {
+        "2019": {
+          "entries": 140,
+          "closes": 139,
+          "pnl": 29
+        },
+        "2020": {
+          "entries": 146,
+          "closes": 146,
+          "pnl": 75
+        },
+        "2021": {
+          "entries": 122,
+          "closes": 119,
+          "pnl": -118
+        },
+        "2022": {
+          "entries": 90,
+          "closes": 90,
+          "pnl": 169
+        }
+      }
+    },
+    "test": {
+      "name": "V0_trend_baseline",
+      "roi": 0.38,
+      "maxDD": 0.54,
+      "ra": 0.7,
+      "entries": 503,
+      "closes": 502,
+      "wr": 41.63,
+      "rr": 1.74,
+      "exp": 1.04,
+      "totalFees": 142,
+      "setupCounts": {
+        "S13L": 89,
+        "S14L": 124,
+        "S13S": 133,
+        "S14S": 138,
+        "S12L": 7,
+        "S12S": 12
+      },
+      "byYear": {
+        "2023": {
+          "entries": 144,
+          "closes": 144,
+          "pnl": 159
+        },
+        "2024": {
+          "entries": 149,
+          "closes": 148,
+          "pnl": 185
+        },
+        "2025": {
+          "entries": 172,
+          "closes": 172,
+          "pnl": 106
+        },
+        "2026": {
+          "entries": 38,
+          "closes": 36,
+          "pnl": 1
+        }
+      }
+    },
+    "stab": "7/8"
+  },
+  {
+    "scenario": "V1_pullback_ema20_R3",
+    "full": {
+      "name": "V1_pullback_ema20_R3",
+      "roi": -0.26,
+      "maxDD": 0.98,
+      "ra": -0.27,
+      "entries": 3742,
+      "closes": 3741,
+      "wr": 42.02,
+      "rr": 1.51,
+      "exp": 0.22,
+      "totalFees": 1074,
+      "setupCounts": {
+        "S21S": 1389,
+        "S14S": 287,
+        "S13L": 163,
+        "S14L": 278,
+        "S12L": 14,
+        "S21L": 1353,
+        "S13S": 233,
+        "S12S": 25
+      },
+      "byYear": {
+        "2019": {
+          "entries": 515,
+          "closes": 513,
+          "pnl": 46
+        },
+        "2020": {
+          "entries": 494,
+          "closes": 495,
+          "pnl": 87
+        },
+        "2021": {
+          "entries": 497,
+          "closes": 493,
+          "pnl": 105
+        },
+        "2022": {
+          "entries": 460,
+          "closes": 458,
+          "pnl": 19
+        },
+        "2023": {
+          "entries": 575,
+          "closes": 579,
+          "pnl": 89
+        },
+        "2024": {
+          "entries": 495,
+          "closes": 495,
+          "pnl": 241
+        },
+        "2025": {
+          "entries": 591,
+          "closes": 592,
+          "pnl": -348
+        },
+        "2026": {
+          "entries": 115,
+          "closes": 114,
+          "pnl": -113
+        }
+      }
+    },
+    "train": {
+      "name": "V1_pullback_ema20_R3",
+      "roi": 0.15,
+      "maxDD": 0.61,
+      "ra": 0.25,
+      "entries": 1966,
+      "closes": 1962,
+      "wr": 43.78,
+      "rr": 1.47,
+      "exp": 0.24,
+      "totalFees": 308,
+      "setupCounts": {
+        "S21S": 805,
+        "S14S": 149,
+        "S13L": 74,
+        "S14L": 155,
+        "S12L": 7,
+        "S21L": 663,
+        "S13S": 100,
+        "S12S": 13
+      },
+      "byYear": {
+        "2019": {
+          "entries": 515,
+          "closes": 513,
+          "pnl": 46
+        },
+        "2020": {
+          "entries": 494,
+          "closes": 495,
+          "pnl": 87
+        },
+        "2021": {
+          "entries": 497,
+          "closes": 493,
+          "pnl": 105
+        },
+        "2022": {
+          "entries": 460,
+          "closes": 458,
+          "pnl": 19
+        }
+      }
+    },
+    "test": {
+      "name": "V1_pullback_ema20_R3",
+      "roi": -0.4,
+      "maxDD": 0.95,
+      "ra": -0.42,
+      "entries": 1777,
+      "closes": 1776,
+      "wr": 40.2,
+      "rr": 1.59,
+      "exp": 0.2,
+      "totalFees": 767,
+      "setupCounts": {
+        "S21S": 584,
+        "S13L": 89,
+        "S14L": 124,
+        "S21L": 690,
+        "S13S": 133,
+        "S14S": 138,
+        "S12L": 7,
+        "S12S": 12
+      },
+      "byYear": {
+        "2023": {
+          "entries": 575,
+          "closes": 572,
+          "pnl": 92
+        },
+        "2024": {
+          "entries": 495,
+          "closes": 495,
+          "pnl": 241
+        },
+        "2025": {
+          "entries": 592,
+          "closes": 593,
+          "pnl": -346
+        },
+        "2026": {
+          "entries": 115,
+          "closes": 114,
+          "pnl": -113
+        }
+      }
+    },
+    "stab": "6/8"
+  },
+  {
+    "scenario": "V2_pullback_ema50_R3",
+    "full": {
+      "name": "V2_pullback_ema50_R3",
+      "roi": -0.01,
+      "maxDD": 0.78,
+      "ra": -0.02,
+      "entries": 2631,
+      "closes": 2630,
+      "wr": 42.05,
+      "rr": 1.53,
+      "exp": 0.27,
+      "totalFees": 730,
+      "setupCounts": {
+        "S21S": 854,
+        "S14S": 287,
+        "S13L": 163,
+        "S14L": 278,
+        "S12L": 14,
+        "S13S": 233,
+        "S21L": 777,
+        "S12S": 25
+      },
+      "byYear": {
+        "2019": {
+          "entries": 380,
+          "closes": 377,
+          "pnl": 56
+        },
+        "2020": {
+          "entries": 320,
+          "closes": 322,
+          "pnl": 84
+        },
+        "2021": {
+          "entries": 373,
+          "closes": 370,
+          "pnl": -78
+        },
+        "2022": {
+          "entries": 296,
+          "closes": 296,
+          "pnl": 165
+        },
+        "2023": {
+          "entries": 382,
+          "closes": 386,
+          "pnl": 177
+        },
+        "2024": {
+          "entries": 365,
+          "closes": 363,
+          "pnl": 37
+        },
+        "2025": {
+          "entries": 424,
+          "closes": 424,
+          "pnl": -109
+        },
+        "2026": {
+          "entries": 91,
+          "closes": 90,
+          "pnl": -72
+        }
+      }
+    },
+    "train": {
+      "name": "V2_pullback_ema50_R3",
+      "roi": 0.16,
+      "maxDD": 0.38,
+      "ra": 0.4,
+      "entries": 1369,
+      "closes": 1367,
+      "wr": 43.75,
+      "rr": 1.47,
+      "exp": 0.27,
+      "totalFees": 209,
+      "setupCounts": {
+        "S21S": 480,
+        "S14S": 149,
+        "S13L": 74,
+        "S14L": 155,
+        "S12L": 7,
+        "S13S": 100,
+        "S21L": 391,
+        "S12S": 13
+      },
+      "byYear": {
+        "2019": {
+          "entries": 380,
+          "closes": 377,
+          "pnl": 56
+        },
+        "2020": {
+          "entries": 320,
+          "closes": 322,
+          "pnl": 84
+        },
+        "2021": {
+          "entries": 373,
+          "closes": 370,
+          "pnl": -78
+        },
+        "2022": {
+          "entries": 296,
+          "closes": 296,
+          "pnl": 165
+        }
+      }
+    },
+    "test": {
+      "name": "V2_pullback_ema50_R3",
+      "roi": -0.16,
+      "maxDD": 0.78,
+      "ra": -0.2,
+      "entries": 1263,
+      "closes": 1262,
+      "wr": 40.41,
+      "rr": 1.61,
+      "exp": 0.29,
+      "totalFees": 521,
+      "setupCounts": {
+        "S21S": 374,
+        "S13L": 89,
+        "S14L": 124,
+        "S13S": 133,
+        "S14S": 138,
+        "S21L": 386,
+        "S12L": 7,
+        "S12S": 12
+      },
+      "byYear": {
+        "2023": {
+          "entries": 382,
+          "closes": 382,
+          "pnl": 180
+        },
+        "2024": {
+          "entries": 365,
+          "closes": 363,
+          "pnl": 37
+        },
+        "2025": {
+          "entries": 425,
+          "closes": 425,
+          "pnl": -107
+        },
+        "2026": {
+          "entries": 91,
+          "closes": 90,
+          "pnl": -72
+        }
+      }
+    },
+    "stab": "5/8"
+  },
+  {
+    "scenario": "V3_pullback_ema20_RSI",
+    "full": {
+      "name": "V3_pullback_ema20_RSI",
+      "roi": -0.19,
+      "maxDD": 0.9,
+      "ra": -0.21,
+      "entries": 3606,
+      "closes": 3605,
+      "wr": 42.16,
+      "rr": 1.51,
+      "exp": 0.23,
+      "totalFees": 1024,
+      "setupCounts": {
+        "S21S": 1317,
+        "S14S": 287,
+        "S13L": 163,
+        "S14L": 278,
+        "S12L": 14,
+        "S21L": 1289,
+        "S13S": 233,
+        "S12S": 25
+      },
+      "byYear": {
+        "2019": {
+          "entries": 502,
+          "closes": 500,
+          "pnl": 42
+        },
+        "2020": {
+          "entries": 485,
+          "closes": 486,
+          "pnl": 85
+        },
+        "2021": {
+          "entries": 476,
+          "closes": 472,
+          "pnl": 44
+        },
+        "2022": {
+          "entries": 439,
+          "closes": 437,
+          "pnl": 4
+        },
+        "2023": {
+          "entries": 551,
+          "closes": 557,
+          "pnl": 79
+        },
+        "2024": {
+          "entries": 479,
+          "closes": 477,
+          "pnl": 299
+        },
+        "2025": {
+          "entries": 563,
+          "closes": 564,
+          "pnl": -245
+        },
+        "2026": {
+          "entries": 111,
+          "closes": 110,
+          "pnl": -126
+        }
+      }
+    },
+    "train": {
+      "name": "V3_pullback_ema20_RSI",
+      "roi": 0.08,
+      "maxDD": 0.6,
+      "ra": 0.13,
+      "entries": 1902,
+      "closes": 1898,
+      "wr": 43.52,
+      "rr": 1.45,
+      "exp": 0.2,
+      "totalFees": 295,
+      "setupCounts": {
+        "S21S": 763,
+        "S14S": 149,
+        "S13L": 74,
+        "S14L": 155,
+        "S12L": 7,
+        "S21L": 641,
+        "S13S": 100,
+        "S12S": 13
+      },
+      "byYear": {
+        "2019": {
+          "entries": 502,
+          "closes": 500,
+          "pnl": 42
+        },
+        "2020": {
+          "entries": 485,
+          "closes": 486,
+          "pnl": 85
+        },
+        "2021": {
+          "entries": 476,
+          "closes": 472,
+          "pnl": 44
+        },
+        "2022": {
+          "entries": 439,
+          "closes": 437,
+          "pnl": 4
+        }
+      }
+    },
+    "test": {
+      "name": "V3_pullback_ema20_RSI",
+      "roi": -0.25,
+      "maxDD": 0.9,
+      "ra": -0.28,
+      "entries": 1705,
+      "closes": 1704,
+      "wr": 40.79,
+      "rr": 1.59,
+      "exp": 0.28,
+      "totalFees": 729,
+      "setupCounts": {
+        "S21S": 554,
+        "S13L": 89,
+        "S14L": 124,
+        "S21L": 648,
+        "S13S": 133,
+        "S14S": 138,
+        "S12L": 7,
+        "S12S": 12
+      },
+      "byYear": {
+        "2023": {
+          "entries": 551,
+          "closes": 550,
+          "pnl": 82
+        },
+        "2024": {
+          "entries": 479,
+          "closes": 477,
+          "pnl": 299
+        },
+        "2025": {
+          "entries": 564,
+          "closes": 565,
+          "pnl": -242
+        },
+        "2026": {
+          "entries": 111,
+          "closes": 110,
+          "pnl": -126
+        }
+      }
+    },
+    "stab": "6/8"
+  },
+  {
+    "scenario": "V4_pullback_ema20_R25",
+    "full": {
+      "name": "V4_pullback_ema20_R25",
+      "roi": -0.17,
+      "maxDD": 1.04,
+      "ra": -0.17,
+      "entries": 3742,
+      "closes": 3741,
+      "wr": 47.55,
+      "rr": 1.21,
+      "exp": 0.24,
+      "totalFees": 1075,
+      "setupCounts": {
+        "S21S": 1389,
+        "S14S": 287,
+        "S13L": 163,
+        "S14L": 278,
+        "S12L": 14,
+        "S21L": 1353,
+        "S13S": 233,
+        "S12S": 25
+      },
+      "byYear": {
+        "2019": {
+          "entries": 515,
+          "closes": 513,
+          "pnl": 41
+        },
+        "2020": {
+          "entries": 494,
+          "closes": 495,
+          "pnl": 126
+        },
+        "2021": {
+          "entries": 497,
+          "closes": 493,
+          "pnl": 266
+        },
+        "2022": {
+          "entries": 460,
+          "closes": 458,
+          "pnl": 61
+        },
+        "2023": {
+          "entries": 575,
+          "closes": 579,
+          "pnl": 86
+        },
+        "2024": {
+          "entries": 495,
+          "closes": 494,
+          "pnl": 240
+        },
+        "2025": {
+          "entries": 591,
+          "closes": 593,
+          "pnl": -426
+        },
+        "2026": {
+          "entries": 115,
+          "closes": 114,
+          "pnl": -178
+        }
+      }
+    },
+    "train": {
+      "name": "V4_pullback_ema20_R25",
+      "roi": 0.39,
+      "maxDD": 0.63,
+      "ra": 0.62,
+      "entries": 1966,
+      "closes": 1962,
+      "wr": 48.93,
+      "rr": 1.26,
+      "exp": 0.36,
+      "totalFees": 308,
+      "setupCounts": {
+        "S21S": 805,
+        "S14S": 149,
+        "S13L": 74,
+        "S14L": 155,
+        "S12L": 7,
+        "S21L": 663,
+        "S13S": 100,
+        "S12S": 13
+      },
+      "byYear": {
+        "2019": {
+          "entries": 515,
+          "closes": 513,
+          "pnl": 41
+        },
+        "2020": {
+          "entries": 494,
+          "closes": 495,
+          "pnl": 126
+        },
+        "2021": {
+          "entries": 497,
+          "closes": 493,
+          "pnl": 266
+        },
+        "2022": {
+          "entries": 460,
+          "closes": 458,
+          "pnl": 61
+        }
+      }
+    },
+    "test": {
+      "name": "V4_pullback_ema20_R25",
+      "roi": -0.55,
+      "maxDD": 1.05,
+      "ra": -0.53,
+      "entries": 1777,
+      "closes": 1776,
+      "wr": 46.17,
+      "rr": 1.21,
+      "exp": 0.12,
+      "totalFees": 767,
+      "setupCounts": {
+        "S21S": 584,
+        "S13L": 89,
+        "S14L": 124,
+        "S21L": 690,
+        "S13S": 133,
+        "S14S": 138,
+        "S12L": 7,
+        "S12S": 12
+      },
+      "byYear": {
+        "2023": {
+          "entries": 575,
+          "closes": 572,
+          "pnl": 89
+        },
+        "2024": {
+          "entries": 495,
+          "closes": 494,
+          "pnl": 240
+        },
+        "2025": {
+          "entries": 592,
+          "closes": 594,
+          "pnl": -424
+        },
+        "2026": {
+          "entries": 115,
+          "closes": 114,
+          "pnl": -178
+        }
+      }
+    },
+    "stab": "6/8"
+  },
+  {
+    "scenario": "V5_pullback_only_ema20",
+    "full": {
+      "name": "V5_pullback_only_ema20",
+      "roi": -0.77,
+      "maxDD": 1.07,
+      "ra": -0.72,
+      "entries": 2742,
+      "closes": 2742,
+      "wr": 42.63,
+      "rr": 1.38,
+      "exp": 0.04,
+      "totalFees": 885,
+      "setupCounts": {
+        "S21S": 1389,
+        "S21L": 1353
+      },
+      "byYear": {
+        "2019": {
+          "entries": 375,
+          "closes": 374,
+          "pnl": 17
+        },
+        "2020": {
+          "entries": 348,
+          "closes": 349,
+          "pnl": 12
+        },
+        "2021": {
+          "entries": 375,
+          "closes": 374,
+          "pnl": 223
+        },
+        "2022": {
+          "entries": 370,
+          "closes": 368,
+          "pnl": -150
+        },
+        "2023": {
+          "entries": 431,
+          "closes": 431,
+          "pnl": -67
+        },
+        "2024": {
+          "entries": 346,
+          "closes": 347,
+          "pnl": 57
+        },
+        "2025": {
+          "entries": 420,
+          "closes": 421,
+          "pnl": -452
+        },
+        "2026": {
+          "entries": 77,
+          "closes": 78,
+          "pnl": -114
+        }
+      }
+    },
+    "train": {
+      "name": "V5_pullback_only_ema20",
+      "roi": 0.02,
+      "maxDD": 0.4,
+      "ra": 0.04,
+      "entries": 1468,
+      "closes": 1466,
+      "wr": 45.23,
+      "rr": 1.39,
+      "exp": 0.19,
+      "totalFees": 260,
+      "setupCounts": {
+        "S21S": 805,
+        "S21L": 663
+      },
+      "byYear": {
+        "2019": {
+          "entries": 375,
+          "closes": 374,
+          "pnl": 17
+        },
+        "2020": {
+          "entries": 348,
+          "closes": 349,
+          "pnl": 12
+        },
+        "2021": {
+          "entries": 375,
+          "closes": 374,
+          "pnl": 223
+        },
+        "2022": {
+          "entries": 370,
+          "closes": 368,
+          "pnl": -150
+        }
+      }
+    },
+    "test": {
+      "name": "V5_pullback_only_ema20",
+      "roi": -0.78,
+      "maxDD": 0.81,
+      "ra": -0.97,
+      "entries": 1274,
+      "closes": 1274,
+      "wr": 39.64,
+      "rr": 1.44,
+      "exp": -0.13,
+      "totalFees": 625,
+      "setupCounts": {
+        "S21S": 584,
+        "S21L": 690
+      },
+      "byYear": {
+        "2023": {
+          "entries": 431,
+          "closes": 428,
+          "pnl": -67
+        },
+        "2024": {
+          "entries": 346,
+          "closes": 347,
+          "pnl": 57
+        },
+        "2025": {
+          "entries": 420,
+          "closes": 421,
+          "pnl": -452
+        },
+        "2026": {
+          "entries": 77,
+          "closes": 78,
+          "pnl": -114
+        }
+      }
+    },
+    "stab": "4/8"
+  }
+]

@@ -271,7 +271,7 @@ function main() {
     finalLong:longNet, finalShort:shortNet, lastPrice,
     finalUpnl, finalEq, wallet, roi, maxDD:peak-trough, peak, trough,
     scoreBreakdown:scoreHist,
-    events: events.slice(-300),
+    events,
     equityCurve,
   }));
   console.log(`\nSaved → assets/backtest_hedge01_v0415.json`);

@@ -1,0 +1,457 @@
+[
+  {
+    "scenario": "BASELINE_v045",
+    "entries": 207,
+    "pyramidAdds": 0,
+    "closes": 205,
+    "wr": 51.7,
+    "roi": 0.71,
+    "maxDD": 0.74,
+    "ra": 0.96,
+    "rr": 1.79,
+    "maxConsecLosses": 9,
+    "ddDurationDays": 247.2,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "closes": 51,
+        "pnl": 83.01694139000007
+      },
+      "2024": {
+        "entries": 65,
+        "closes": 65,
+        "pnl": 483.1542811749998
+      },
+      "2025": {
+        "entries": 77,
+        "closes": 77,
+        "pnl": 82.50004164000023
+      },
+      "2026": {
+        "entries": 14,
+        "closes": 12,
+        "pnl": 91.2959714600001
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 94,
+        "wins": 53,
+        "pnl": 488.77377389
+      },
+      "SHORT": {
+        "entries": 113,
+        "wins": 53,
+        "pnl": 251.19346177500023
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 94,
+        "wins": 46,
+        "pnl": 231.10830916500015
+      },
+      "S14": {
+        "entries": 104,
+        "wins": 54,
+        "pnl": 474.9591920750002
+      },
+      "S12": {
+        "entries": 9,
+        "wins": 6,
+        "pnl": 33.89973442500004
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "A26_24h",
+    "entries": 212,
+    "pyramidAdds": 0,
+    "closes": 210,
+    "wr": 50.5,
+    "roi": 0.63,
+    "maxDD": 0.66,
+    "ra": 0.96,
+    "rr": 1.78,
+    "maxConsecLosses": 11,
+    "ddDurationDays": 344.5,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "closes": 51,
+        "pnl": 86.87352213500002
+      },
+      "2024": {
+        "entries": 68,
+        "closes": 68,
+        "pnl": 402.3534299249999
+      },
+      "2025": {
+        "entries": 79,
+        "closes": 79,
+        "pnl": 63.24736486000027
+      },
+      "2026": {
+        "entries": 14,
+        "closes": 12,
+        "pnl": 105.29637816500008
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 94,
+        "wins": 52,
+        "pnl": 499.2798482250002
+      },
+      "SHORT": {
+        "entries": 118,
+        "wins": 54,
+        "pnl": 158.49084686000015
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 95,
+        "wins": 44,
+        "pnl": 189.11605746000004
+      },
+      "S14": {
+        "entries": 108,
+        "wins": 56,
+        "pnl": 434.0305412000003
+      },
+      "S12": {
+        "entries": 9,
+        "wins": 6,
+        "pnl": 34.624096425000054
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "A28_3stageSL",
+    "entries": 207,
+    "pyramidAdds": 0,
+    "closes": 205,
+    "wr": 51.7,
+    "roi": 0.71,
+    "maxDD": 0.75,
+    "ra": 0.96,
+    "rr": 1.8,
+    "maxConsecLosses": 9,
+    "ddDurationDays": 247.2,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "closes": 51,
+        "pnl": 84.34491707000005
+      },
+      "2024": {
+        "entries": 65,
+        "closes": 65,
+        "pnl": 485.4834451749998
+      },
+      "2025": {
+        "entries": 77,
+        "closes": 77,
+        "pnl": 82.50004164000023
+      },
+      "2026": {
+        "entries": 14,
+        "closes": 12,
+        "pnl": 91.2959714600001
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 94,
+        "wins": 53,
+        "pnl": 490.10174957
+      },
+      "SHORT": {
+        "entries": 113,
+        "wins": 53,
+        "pnl": 253.52262577500017
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 94,
+        "wins": 46,
+        "pnl": 233.93546404500012
+      },
+      "S14": {
+        "entries": 104,
+        "wins": 54,
+        "pnl": 475.7891768750001
+      },
+      "S12": {
+        "entries": 9,
+        "wins": 6,
+        "pnl": 33.89973442500004
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "A23_weightedQty",
+    "entries": 185,
+    "pyramidAdds": 0,
+    "closes": 183,
+    "wr": 50.8,
+    "roi": 0.65,
+    "maxDD": 0.69,
+    "ra": 0.94,
+    "rr": 1.64,
+    "maxConsecLosses": 9,
+    "ddDurationDays": 436.7,
+    "byYear": {
+      "2023": {
+        "entries": 46,
+        "closes": 46,
+        "pnl": 115.80504634250009
+      },
+      "2024": {
+        "entries": 56,
+        "closes": 56,
+        "pnl": 475.56909281499986
+      },
+      "2025": {
+        "entries": 70,
+        "closes": 70,
+        "pnl": -28.240682019999756
+      },
+      "2026": {
+        "entries": 13,
+        "closes": 11,
+        "pnl": 121.86382359750024
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 80,
+        "wins": 44,
+        "pnl": 450.37519662750026
+      },
+      "SHORT": {
+        "entries": 105,
+        "wins": 49,
+        "pnl": 234.6220841075003
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 87,
+        "wins": 43,
+        "pnl": 271.56115018500026
+      },
+      "S14": {
+        "entries": 90,
+        "wins": 44,
+        "pnl": 361.1915370500002
+      },
+      "S12": {
+        "entries": 8,
+        "wins": 6,
+        "pnl": 52.24459350000005
+      }
+    },
+    "stab": "3/4"
+  },
+  {
+    "scenario": "A25_pyramid",
+    "entries": 181,
+    "pyramidAdds": 144,
+    "closes": 179,
+    "wr": 46.9,
+    "roi": 0.75,
+    "maxDD": 0.8,
+    "ra": 0.94,
+    "rr": 2.01,
+    "maxConsecLosses": 9,
+    "ddDurationDays": 450.5,
+    "byYear": {
+      "2023": {
+        "entries": 46,
+        "closes": 46,
+        "pnl": 105.05925995000021
+      },
+      "2024": {
+        "entries": 55,
+        "closes": 55,
+        "pnl": 561.7703276474999
+      },
+      "2025": {
+        "entries": 67,
+        "closes": 67,
+        "pnl": 13.337411202500695
+      },
+      "2026": {
+        "entries": 13,
+        "closes": 11,
+        "pnl": 108.47860821500025
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 81,
+        "wins": 42,
+        "pnl": 487.3249637450002
+      },
+      "SHORT": {
+        "entries": 100,
+        "wins": 42,
+        "pnl": 301.32064327000074
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 85,
+        "wins": 38,
+        "pnl": 338.00455115250037
+      },
+      "S14": {
+        "entries": 88,
+        "wins": 41,
+        "pnl": 416.2010242250001
+      },
+      "S12": {
+        "entries": 8,
+        "wins": 5,
+        "pnl": 34.44003163750031
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "A26_72h",
+    "entries": 206,
+    "pyramidAdds": 0,
+    "closes": 204,
+    "wr": 52.5,
+    "roi": 0.62,
+    "maxDD": 0.66,
+    "ra": 0.94,
+    "rr": 1.59,
+    "maxConsecLosses": 9,
+    "ddDurationDays": 346.5,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "closes": 51,
+        "pnl": 76.27456461500005
+      },
+      "2024": {
+        "entries": 65,
+        "closes": 65,
+        "pnl": 430.7173118549999
+      },
+      "2025": {
+        "entries": 76,
+        "closes": 76,
+        "pnl": 63.4583518700004
+      },
+      "2026": {
+        "entries": 14,
+        "closes": 12,
+        "pnl": 79.53893588000004
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 94,
+        "wins": 53,
+        "pnl": 473.1826933300004
+      },
+      "SHORT": {
+        "entries": 112,
+        "wins": 54,
+        "pnl": 176.80647088999999
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 94,
+        "wins": 46,
+        "pnl": 196.77303612000014
+      },
+      "S14": {
+        "entries": 103,
+        "wins": 55,
+        "pnl": 420.5119499500001
+      },
+      "S12": {
+        "entries": 9,
+        "wins": 6,
+        "pnl": 32.704178150000054
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "A_ALL_combo",
+    "entries": 156,
+    "pyramidAdds": 127,
+    "closes": 154,
+    "wr": 48.1,
+    "roi": 0.82,
+    "maxDD": 0.88,
+    "ra": 0.94,
+    "rr": 1.91,
+    "maxConsecLosses": 8,
+    "ddDurationDays": 441.3,
+    "byYear": {
+      "2023": {
+        "entries": 39,
+        "closes": 39,
+        "pnl": 149.67771808125016
+      },
+      "2024": {
+        "entries": 50,
+        "closes": 50,
+        "pnl": 553.2216622387494
+      },
+      "2025": {
+        "entries": 56,
+        "closes": 56,
+        "pnl": 23.660384154999978
+      },
+      "2026": {
+        "entries": 11,
+        "closes": 9,
+        "pnl": 138.55608045125055
+      }
+    },
+    "byDir": {
+      "LONG": {
+        "entries": 68,
+        "wins": 35,
+        "pnl": 537.64572721875
+      },
+      "SHORT": {
+        "entries": 88,
+        "wins": 39,
+        "pnl": 327.4701177075005
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "entries": 71,
+        "wins": 31,
+        "pnl": 248.7442755075
+      },
+      "S14": {
+        "entries": 77,
+        "wins": 38,
+        "pnl": 577.1939291687501
+      },
+      "S12": {
+        "entries": 8,
+        "wins": 5,
+        "pnl": 39.177640249999996
+      }
+    },
+    "stab": "4/4"
+  }
+]

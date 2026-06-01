@@ -1,0 +1,202 @@
+[
+  {
+    "variant": "BASELINE_v0.4.32",
+    "wallet": 100711,
+    "hwm": 101352,
+    "lowestWallet": 99839,
+    "roi": 0.71,
+    "maxDD": 1.49,
+    "riskAdj": 0.48,
+    "entries": 462,
+    "closes": 71,
+    "wins": 49,
+    "losses": 22,
+    "wr": 69.01,
+    "avgWin": 108.62,
+    "avgLoss": -205.56,
+    "expectancy": 11.27,
+    "rr": 0.53,
+    "totalFees": 89,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "closes": 12,
+        "pnl": 249.52869951230144
+      },
+      "2024": {
+        "entries": 184,
+        "closes": 32,
+        "pnl": 478.54229887620147
+      },
+      "2025": {
+        "entries": 157,
+        "closes": 18,
+        "pnl": -102.37082913994657
+      },
+      "2026": {
+        "entries": 70,
+        "closes": 8,
+        "pnl": 125.18137747731379
+      }
+    }
+  },
+  {
+    "variant": "A_SL_tight_8pct",
+    "wallet": 101032,
+    "hwm": 101513,
+    "lowestWallet": 99935,
+    "roi": 1.03,
+    "maxDD": 1.55,
+    "riskAdj": 0.66,
+    "entries": 484,
+    "closes": 85,
+    "wins": 49,
+    "losses": 36,
+    "wr": 57.65,
+    "avgWin": 103.54,
+    "avgLoss": -109.57,
+    "expectancy": 13.28,
+    "rr": 0.95,
+    "totalFees": 98,
+    "byYear": {
+      "2023": {
+        "entries": 54,
+        "closes": 14,
+        "pnl": 253.26625919521854
+      },
+      "2024": {
+        "entries": 189,
+        "closes": 37,
+        "pnl": 846.6740051463048
+      },
+      "2025": {
+        "entries": 169,
+        "closes": 23,
+        "pnl": -182.71618925620754
+      },
+      "2026": {
+        "entries": 72,
+        "closes": 10,
+        "pnl": 158.18486945656156
+      }
+    }
+  },
+  {
+    "variant": "B_no_stack",
+    "wallet": 100143,
+    "hwm": 100187,
+    "lowestWallet": 99799,
+    "roi": 0.14,
+    "maxDD": 0.39,
+    "riskAdj": 0.37,
+    "entries": 85,
+    "closes": 85,
+    "wins": 48,
+    "losses": 37,
+    "wr": 56.47,
+    "avgWin": 21.45,
+    "avgLoss": -23.5,
+    "expectancy": 1.88,
+    "rr": 0.91,
+    "totalFees": 17,
+    "byYear": {
+      "2023": {
+        "entries": 12,
+        "closes": 10,
+        "pnl": 28.76303255587667
+      },
+      "2024": {
+        "entries": 39,
+        "closes": 39,
+        "pnl": -18.020101113445172
+      },
+      "2025": {
+        "entries": 27,
+        "closes": 27,
+        "pnl": 145.67682465813687
+      },
+      "2026": {
+        "entries": 7,
+        "closes": 8,
+        "pnl": -10.723221749039148
+      }
+    }
+  },
+  {
+    "variant": "C_per_entry_SL_8",
+    "wallet": 100255,
+    "hwm": 101134,
+    "lowestWallet": 99923,
+    "roi": 0.25,
+    "maxDD": 1.2,
+    "riskAdj": 0.21,
+    "entries": 491,
+    "closes": 446,
+    "wins": 192,
+    "losses": 254,
+    "wr": 43.05,
+    "avgWin": 24.4,
+    "avgLoss": -17.06,
+    "expectancy": 0.79,
+    "rr": 1.43,
+    "totalFees": 98,
+    "byYear": {
+      "2023": {
+        "entries": 57,
+        "closes": 46,
+        "pnl": 224.16428072562178
+      },
+      "2024": {
+        "entries": 192,
+        "closes": 173,
+        "pnl": 385.63756947784657
+      },
+      "2025": {
+        "entries": 170,
+        "closes": 151,
+        "pnl": -145.83181902779998
+      },
+      "2026": {
+        "entries": 72,
+        "closes": 75,
+        "pnl": -160.328874212553
+      }
+    }
+  },
+  {
+    "variant": "D_no_aggregate_SL",
+    "wallet": 100116,
+    "hwm": 103178,
+    "lowestWallet": 100000,
+    "roi": 0.12,
+    "maxDD": 3.08,
+    "riskAdj": 0.04,
+    "entries": 194,
+    "closes": 21,
+    "wins": 17,
+    "losses": 4,
+    "wr": 80.95,
+    "avgWin": 189.14,
+    "avgLoss": -765.66,
+    "expectancy": 7.27,
+    "rr": 0.25,
+    "totalFees": 37,
+    "byYear": {
+      "2023": {
+        "entries": 47,
+        "closes": 7,
+        "pnl": 361.20351238931863
+      },
+      "2024": {
+        "entries": 64,
+        "closes": 8,
+        "pnl": 1380.7768042886355
+      },
+      "2025": {
+        "entries": 83,
+        "closes": 4,
+        "pnl": 1452.8472048873773
+      }
+    }
+  }
+]

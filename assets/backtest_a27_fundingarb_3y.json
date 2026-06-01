@@ -1,0 +1,202 @@
+[
+  {
+    "scenario": "V3_fundingArb_strict",
+    "totalEntries": 203,
+    "trendEntries": 201,
+    "simpleEntries": 2,
+    "totalCloses": 201,
+    "wr": 52.2,
+    "roi": 0.73,
+    "maxDD": 0.74,
+    "ra": 0.99,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "pnl": 65.33274639000008
+      },
+      "2024": {
+        "entries": 63,
+        "pnl": 495.47603335999986
+      },
+      "2025": {
+        "entries": 76,
+        "pnl": 82.66626105500018
+      },
+      "2026": {
+        "entries": 13,
+        "pnl": 112.09354388500017
+      }
+    },
+    "bySource": {
+      "trend": {
+        "entries": 201,
+        "pnl": 749.0601394150005
+      },
+      "simple": {
+        "entries": 2,
+        "pnl": 6.508445275000023
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "V0_baseline_v046",
+    "totalEntries": 201,
+    "trendEntries": 201,
+    "simpleEntries": 0,
+    "totalCloses": 199,
+    "wr": 52.3,
+    "roi": 0.72,
+    "maxDD": 0.73,
+    "ra": 0.98,
+    "byYear": {
+      "2023": {
+        "entries": 51,
+        "pnl": 65.33274639000008
+      },
+      "2024": {
+        "entries": 61,
+        "pnl": 488.96758808499976
+      },
+      "2025": {
+        "entries": 76,
+        "pnl": 82.66626105500018
+      },
+      "2026": {
+        "entries": 13,
+        "pnl": 112.09354388500017
+      }
+    },
+    "bySource": {
+      "trend": {
+        "entries": 201,
+        "pnl": 749.0601394150005
+      },
+      "simple": {
+        "entries": 0,
+        "pnl": 0
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "V1_fundingArb_basic",
+    "totalEntries": 225,
+    "trendEntries": 201,
+    "simpleEntries": 24,
+    "totalCloses": 223,
+    "wr": 49.8,
+    "roi": 0.67,
+    "maxDD": 0.68,
+    "ra": 0.98,
+    "byYear": {
+      "2023": {
+        "entries": 55,
+        "pnl": 67.4914251150001
+      },
+      "2024": {
+        "entries": 77,
+        "pnl": 471.02327923499973
+      },
+      "2025": {
+        "entries": 80,
+        "pnl": 47.989492030000264
+      },
+      "2026": {
+        "entries": 13,
+        "pnl": 112.09354388500017
+      }
+    },
+    "bySource": {
+      "trend": {
+        "entries": 201,
+        "pnl": 749.0601394150005
+      },
+      "simple": {
+        "entries": 24,
+        "pnl": -50.46239914999994
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "V2_fundingArb_volWrap",
+    "totalEntries": 214,
+    "trendEntries": 201,
+    "simpleEntries": 13,
+    "totalCloses": 212,
+    "wr": 50.9,
+    "roi": 0.71,
+    "maxDD": 0.72,
+    "ra": 0.98,
+    "byYear": {
+      "2023": {
+        "entries": 54,
+        "pnl": 67.4914251150001
+      },
+      "2024": {
+        "entries": 69,
+        "pnl": 502.4690530849998
+      },
+      "2025": {
+        "entries": 78,
+        "pnl": 58.98776233000022
+      },
+      "2026": {
+        "entries": 13,
+        "pnl": 112.09354388500017
+      }
+    },
+    "bySource": {
+      "trend": {
+        "entries": 201,
+        "pnl": 749.0601394150005
+      },
+      "simple": {
+        "entries": 13,
+        "pnl": -8.018354999999875
+      }
+    },
+    "stab": "4/4"
+  },
+  {
+    "scenario": "V4_fundingArb_loose",
+    "totalEntries": 271,
+    "trendEntries": 201,
+    "simpleEntries": 70,
+    "totalCloses": 269,
+    "wr": 48.7,
+    "roi": 0.71,
+    "maxDD": 0.72,
+    "ra": 0.98,
+    "byYear": {
+      "2023": {
+        "entries": 74,
+        "pnl": 124.20358046500006
+      },
+      "2024": {
+        "entries": 93,
+        "pnl": 476.2808122599998
+      },
+      "2025": {
+        "entries": 91,
+        "pnl": 39.65488208000025
+      },
+      "2026": {
+        "entries": 13,
+        "pnl": 112.09354388500017
+      }
+    },
+    "bySource": {
+      "trend": {
+        "entries": 201,
+        "pnl": 749.0601394150005
+      },
+      "simple": {
+        "entries": 70,
+        "pnl": 3.172679275000103
+      }
+    },
+    "stab": "4/4"
+  }
+]

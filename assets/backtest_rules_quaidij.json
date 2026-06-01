@@ -1,0 +1,149 @@
+[
+  {
+    "name": "omni01",
+    "roi": -116.81,
+    "dd": 116.79,
+    "ra": -1,
+    "trades": 18781,
+    "wr": 38.58,
+    "avgW": 23.51,
+    "avgL": -24.9,
+    "rr": 0.94,
+    "exp": -6.22,
+    "byYear": {
+      "2024": -29915,
+      "2025": -70972,
+      "2026": -15926
+    },
+    "bySignal": {
+      "5cFade": {
+        "count": 5693,
+        "pnl": -50086,
+        "wr": 37.7
+      },
+      "roundNum": {
+        "count": 7411,
+        "pnl": -31820,
+        "wr": 38.6
+      },
+      "bbCompress": {
+        "count": 2542,
+        "pnl": -20867,
+        "wr": 39.1
+      },
+      "timeOfDay": {
+        "count": 701,
+        "pnl": -2754,
+        "wr": 44.1
+      },
+      "volSqueeze": {
+        "count": 1426,
+        "pnl": -6587,
+        "wr": 36.4
+      },
+      "volSpike": {
+        "count": 876,
+        "pnl": -4315,
+        "wr": 40.5
+      },
+      "vwapExt": {
+        "count": 107,
+        "pnl": -560,
+        "wr": 40.2
+      },
+      "weekend": {
+        "count": 25,
+        "pnl": 176,
+        "wr": 60
+      }
+    }
+  },
+  {
+    "name": "chaos01",
+    "roi": -8.07,
+    "dd": 8.12,
+    "ra": -0.99,
+    "trades": 872,
+    "wr": 39.45,
+    "avgW": 34.6,
+    "avgL": -37.82,
+    "rr": 0.91,
+    "exp": -9.25,
+    "byYear": {
+      "2024": -2203,
+      "2025": -5300,
+      "2026": -563
+    },
+    "bySignal": {
+      "score3_SHORT": {
+        "count": 406,
+        "pnl": -4221,
+        "wr": 37.2
+      },
+      "score4_LONG": {
+        "count": 37,
+        "pnl": -264,
+        "wr": 40.5
+      },
+      "score3_LONG": {
+        "count": 394,
+        "pnl": -3065,
+        "wr": 43.1
+      },
+      "score4_SHORT": {
+        "count": 35,
+        "pnl": -516,
+        "wr": 22.9
+      }
+    }
+  },
+  {
+    "name": "kraken01",
+    "roi": -14.95,
+    "dd": 19.85,
+    "ra": -0.75,
+    "trades": 472,
+    "wr": 43.01,
+    "avgW": 358.73,
+    "avgL": -326.3,
+    "rr": 1.1,
+    "exp": -31.68,
+    "byYear": {
+      "2024": -771,
+      "2025": -11337,
+      "2026": -2844
+    },
+    "bySignal": {
+      "vote4_SHORT": {
+        "count": 84,
+        "pnl": 2299,
+        "wr": 47.6
+      },
+      "vote3_SHORT": {
+        "count": 115,
+        "pnl": -3252,
+        "wr": 45.2
+      },
+      "vote3_LONG": {
+        "count": 157,
+        "pnl": -12174,
+        "wr": 36.3
+      },
+      "vote4_LONG": {
+        "count": 86,
+        "pnl": -1269,
+        "wr": 48.8
+      },
+      "vote5_SHORT": {
+        "count": 16,
+        "pnl": -67,
+        "wr": 37.5
+      },
+      "vote5_LONG": {
+        "count": 14,
+        "pnl": -489,
+        "wr": 42.9
+      }
+    }
+  }
+]

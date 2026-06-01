@@ -1,0 +1,576 @@
+{
+  "stageA_full_7y": {
+    "scenario": "A_full_7y",
+    "roi": 0.73,
+    "maxDD": 1.33,
+    "ra": 0.55,
+    "entries": 3275,
+    "closes": 2494,
+    "wr": 41.74,
+    "rr": 1.59,
+    "exp": 0.47,
+    "setupCounts": {
+      "S17S": 669,
+      "S17L": 372,
+      "S10": 57,
+      "S16L": 33,
+      "agg(9)": 569,
+      "S14S": 314,
+      "S13L": 163,
+      "S14L": 301,
+      "S16S": 42,
+      "aggS(10)": 70,
+      "S12L": 12,
+      "S11": 22,
+      "S13S": 236,
+      "aggS(9)": 192,
+      "agg(10)": 117,
+      "S12S": 28,
+      "agg(10)+S9": 15,
+      "agg(9)+S9": 13,
+      "agg(11)": 19,
+      "aggS(11)": 11,
+      "agg(11)+S9": 4,
+      "S15S": 15,
+      "S15L": 1
+    },
+    "byYear": {
+      "2019": {
+        "entries": 505,
+        "closes": 402,
+        "pnl": 52
+      },
+      "2020": {
+        "entries": 433,
+        "closes": 345,
+        "pnl": 120
+      },
+      "2021": {
+        "entries": 494,
+        "closes": 315,
+        "pnl": -479
+      },
+      "2022": {
+        "entries": 359,
+        "closes": 266,
+        "pnl": 97
+      },
+      "2023": {
+        "entries": 435,
+        "closes": 386,
+        "pnl": 141
+      },
+      "2024": {
+        "entries": 467,
+        "closes": 349,
+        "pnl": 646
+      },
+      "2025": {
+        "entries": 455,
+        "closes": 349,
+        "pnl": 156
+      },
+      "2026": {
+        "entries": 127,
+        "closes": 78,
+        "pnl": 185
+      }
+    }
+  },
+  "stageB_per_setup": [
+    {
+      "scenario": "agg_only",
+      "roi": 0.18,
+      "maxDD": 1.04,
+      "ra": 0.18,
+      "entries": 1067,
+      "closes": 292,
+      "wr": 53.77,
+      "rr": 0.91,
+      "exp": 1.01,
+      "setupCounts": {
+        "S10": 57,
+        "agg(9)": 569,
+        "aggS(10)": 70,
+        "aggS(9)": 192,
+        "agg(10)": 117,
+        "agg(10)+S9": 15,
+        "agg(9)+S9": 13,
+        "agg(11)": 19,
+        "aggS(11)": 11,
+        "agg(11)+S9": 4
+      },
+      "byYear": {
+        "2019": {
+          "entries": 149,
+          "closes": 48,
+          "pnl": -13
+        },
+        "2020": {
+          "entries": 131,
+          "closes": 44,
+          "pnl": 59
+        },
+        "2021": {
+          "entries": 241,
+          "closes": 66,
+          "pnl": -382
+        },
+        "2022": {
+          "entries": 139,
+          "closes": 45,
+          "pnl": 12
+        },
+        "2023": {
+          "entries": 70,
+          "closes": 21,
+          "pnl": 10
+        },
+        "2024": {
+          "entries": 152,
+          "closes": 34,
+          "pnl": 438
+        },
+        "2025": {
+          "entries": 127,
+          "closes": 21,
+          "pnl": -103
+        },
+        "2026": {
+          "entries": 58,
+          "closes": 11,
+          "pnl": 211
+        }
+      }
+    },
+    {
+      "scenario": "S11_only",
+      "roi": 0,
+      "maxDD": 0.02,
+      "ra": 0.22,
+      "entries": 22,
+      "closes": 22,
+      "wr": 50,
+      "rr": 1.26,
+      "exp": 0.19,
+      "setupCounts": {
+        "S11": 22
+      },
+      "byYear": {
+        "2019": {
+          "entries": 5,
+          "closes": 5,
+          "pnl": 1
+        },
+        "2020": {
+          "entries": 4,
+          "closes": 4,
+          "pnl": 2
+        },
+        "2023": {
+          "entries": 11,
+          "closes": 11,
+          "pnl": 1
+        },
+        "2024": {
+          "entries": 2,
+          "closes": 2,
+          "pnl": 0
+        }
+      }
+    },
+    {
+      "scenario": "trend_S12_S13_S14_only",
+      "roi": 0.73,
+      "maxDD": 0.86,
+      "ra": 0.85,
+      "entries": 1054,
+      "closes": 1052,
+      "wr": 40.02,
+      "rr": 1.97,
+      "exp": 0.86,
+      "setupCounts": {
+        "S14S": 314,
+        "S13L": 163,
+        "S14L": 301,
+        "S12L": 12,
+        "S13S": 236,
+        "S12S": 28
+      },
+      "byYear": {
+        "2019": {
+          "entries": 147,
+          "closes": 146,
+          "pnl": 69
+        },
+        "2020": {
+          "entries": 151,
+          "closes": 151,
+          "pnl": 62
+        },
+        "2021": {
+          "entries": 143,
+          "closes": 139,
+          "pnl": -86
+        },
+        "2022": {
+          "entries": 108,
+          "closes": 109,
+          "pnl": 88
+        },
+        "2023": {
+          "entries": 152,
+          "closes": 156,
+          "pnl": 141
+        },
+        "2024": {
+          "entries": 156,
+          "closes": 155,
+          "pnl": 247
+        },
+        "2025": {
+          "entries": 161,
+          "closes": 161,
+          "pnl": 316
+        },
+        "2026": {
+          "entries": 36,
+          "closes": 34,
+          "pnl": -19
+        }
+      }
+    },
+    {
+      "scenario": "S15_only",
+      "roi": -0.03,
+      "maxDD": 0.03,
+      "ra": -1,
+      "entries": 16,
+      "closes": 17,
+      "wr": 29.41,
+      "rr": 1.14,
+      "exp": -1.63,
+      "setupCounts": {
+        "S15S": 15,
+        "S15L": 1
+      },
+      "byYear": {
+        "2023": {
+          "entries": 3,
+          "closes": 1,
+          "pnl": -4
+        },
+        "2024": {
+          "entries": 12,
+          "closes": 14,
+          "pnl": -15
+        },
+        "2025": {
+          "entries": 1,
+          "closes": 1,
+          "pnl": -12
+        }
+      }
+    },
+    {
+      "scenario": "S16_only",
+      "roi": 0,
+      "maxDD": 0.02,
+      "ra": -0.22,
+      "entries": 75,
+      "closes": 75,
+      "wr": 38.67,
+      "rr": 1.66,
+      "exp": 0.04,
+      "setupCounts": {
+        "S16L": 33,
+        "S16S": 42
+      },
+      "byYear": {
+        "2019": {
+          "entries": 25,
+          "closes": 25,
+          "pnl": -3
+        },
+        "2020": {
+          "entries": 14,
+          "closes": 14,
+          "pnl": 1
+        },
+        "2021": {
+          "entries": 16,
+          "closes": 16,
+          "pnl": -7
+        },
+        "2022": {
+          "entries": 7,
+          "closes": 7,
+          "pnl": -2
+        },
+        "2023": {
+          "entries": 7,
+          "closes": 7,
+          "pnl": 2
+        },
+        "2024": {
+          "entries": 2,
+          "closes": 2,
+          "pnl": -7
+        },
+        "2025": {
+          "entries": 4,
+          "closes": 4,
+          "pnl": 14
+        }
+      }
+    },
+    {
+      "scenario": "S17_only",
+      "roi": -0.17,
+      "maxDD": 0.17,
+      "ra": -1,
+      "entries": 1041,
+      "closes": 1041,
+      "wr": 40.44,
+      "rr": 1.39,
+      "exp": -0.01,
+      "setupCounts": {
+        "S17S": 669,
+        "S17L": 372
+      },
+      "byYear": {
+        "2019": {
+          "entries": 179,
+          "closes": 179,
+          "pnl": -2
+        },
+        "2020": {
+          "entries": 133,
+          "closes": 133,
+          "pnl": -3
+        },
+        "2021": {
+          "entries": 94,
+          "closes": 94,
+          "pnl": -4
+        },
+        "2022": {
+          "entries": 105,
+          "closes": 105,
+          "pnl": -1
+        },
+        "2023": {
+          "entries": 192,
+          "closes": 192,
+          "pnl": -9
+        },
+        "2024": {
+          "entries": 143,
+          "closes": 143,
+          "pnl": -31
+        },
+        "2025": {
+          "entries": 162,
+          "closes": 162,
+          "pnl": -58
+        },
+        "2026": {
+          "entries": 33,
+          "closes": 33,
+          "pnl": -7
+        }
+      }
+    },
+    {
+      "scenario": "no_short_aggregate",
+      "roi": 0.75,
+      "maxDD": 1.51,
+      "ra": 0.5,
+      "entries": 3002,
+      "closes": 2400,
+      "wr": 41.54,
+      "rr": 1.64,
+      "exp": 0.49,
+      "setupCounts": {
+        "S17S": 669,
+        "S17L": 372,
+        "S10": 57,
+        "S16L": 33,
+        "agg(9)": 569,
+        "S14S": 314,
+        "S13L": 163,
+        "S14L": 301,
+        "S16S": 42,
+        "S12L": 12,
+        "S11": 22,
+        "S13S": 236,
+        "agg(10)": 117,
+        "S12S": 28,
+        "agg(10)+S9": 15,
+        "agg(9)+S9": 13,
+        "agg(11)": 19,
+        "agg(11)+S9": 4,
+        "S15S": 15,
+        "S15L": 1
+      },
+      "byYear": {
+        "2019": {
+          "entries": 464,
+          "closes": 388,
+          "pnl": -5
+        },
+        "2020": {
+          "entries": 400,
+          "closes": 332,
+          "pnl": 138
+        },
+        "2021": {
+          "entries": 429,
+          "closes": 297,
+          "pnl": -531
+        },
+        "2022": {
+          "entries": 317,
+          "closes": 251,
+          "pnl": -63
+        },
+        "2023": {
+          "entries": 417,
+          "closes": 377,
+          "pnl": 261
+        },
+        "2024": {
+          "entries": 440,
+          "closes": 338,
+          "pnl": 726
+        },
+        "2025": {
+          "entries": 426,
+          "closes": 340,
+          "pnl": 207
+        },
+        "2026": {
+          "entries": 109,
+          "closes": 74,
+          "pnl": 194
+        }
+      }
+    }
+  ],
+  "stageC_walkforward": {
+    "train": {
+      "scenario": "C_train_2019_22",
+      "roi": -0.25,
+      "maxDD": 0.79,
+      "ra": -0.32,
+      "entries": 1791,
+      "closes": 1333,
+      "wr": 41.56,
+      "rr": 1.35,
+      "exp": -0.1,
+      "setupCounts": {
+        "S17S": 331,
+        "S17L": 180,
+        "S10": 40,
+        "S16L": 26,
+        "agg(9)": 316,
+        "S14S": 170,
+        "S13L": 76,
+        "S14L": 174,
+        "S16S": 36,
+        "aggS(10)": 51,
+        "S12L": 6,
+        "S11": 9,
+        "S13S": 107,
+        "aggS(9)": 122,
+        "agg(10)": 85,
+        "S12S": 16,
+        "agg(10)+S9": 13,
+        "agg(9)+S9": 12,
+        "agg(11)": 10,
+        "aggS(11)": 8,
+        "agg(11)+S9": 3
+      },
+      "byYear": {
+        "2019": {
+          "entries": 505,
+          "closes": 402,
+          "pnl": 52
+        },
+        "2020": {
+          "entries": 433,
+          "closes": 345,
+          "pnl": 120
+        },
+        "2021": {
+          "entries": 494,
+          "closes": 315,
+          "pnl": -479
+        },
+        "2022": {
+          "entries": 359,
+          "closes": 266,
+          "pnl": 97
+        }
+      }
+    },
+    "test": {
+      "scenario": "C_test_2023_26",
+      "roi": 1.03,
+      "maxDD": 1.23,
+      "ra": 0.84,
+      "entries": 1484,
+      "closes": 1161,
+      "wr": 42.2,
+      "rr": 1.76,
+      "exp": 1.17,
+      "setupCounts": {
+        "S17S": 338,
+        "S13L": 87,
+        "S14L": 127,
+        "S17L": 192,
+        "agg(9)": 253,
+        "S11": 13,
+        "S13S": 129,
+        "S14S": 144,
+        "aggS(9)": 70,
+        "S10": 17,
+        "agg(10)": 32,
+        "S16L": 7,
+        "aggS(10)": 19,
+        "aggS(11)": 3,
+        "S12L": 6,
+        "agg(11)": 9,
+        "S12S": 12,
+        "S16S": 6,
+        "S15S": 15,
+        "agg(10)+S9": 2,
+        "S15L": 1,
+        "agg(11)+S9": 1,
+        "agg(9)+S9": 1
+      },
+      "byYear": {
+        "2023": {
+          "entries": 435,
+          "closes": 381,
+          "pnl": 177
+        },
+        "2024": {
+          "entries": 467,
+          "closes": 349,
+          "pnl": 646
+        },
+        "2025": {
+          "entries": 455,
+          "closes": 349,
+          "pnl": 156
+        },
+        "2026": {
+          "entries": 127,
+          "closes": 78,
+          "pnl": 185
+        }
+      }
+    }
+  }
+}
