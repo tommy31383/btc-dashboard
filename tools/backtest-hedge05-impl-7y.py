@@ -29,6 +29,12 @@ P_PYRAMID   = "--pyramid"   in sys.argv   # P3: nhồi thêm khi LÃI + trend m�
 P_MIXEDTP   = "--mixedtp"   in sys.argv   # P4: TP mult theo loại entry (BB×1.5, RSI/STK×1.0)
 SCALE_TP1_MULT = 1.5    # P2: TP1 (chốt 1 phần) tại +1.5×ATR
 PYR_TRIG_ATR   = 1.0    # P3: pyramid khi profit >= +1×ATR
+# ── Hard-SL drag fixes (test independently) ──
+F_SL3        = "--sl3" in sys.argv          # hard SL -4→-3×ATR (cut mọi loser nhanh hơn)
+F_SL_AFT_DCA = "--sl-after-dca" in sys.argv # hard SL -3×ATR CHỈ khi đã DCA max (surgical)
+F_DCA1       = "--dca1" in sys.argv         # DCA_MAX 2→1 (blowup nhỏ hơn)
+F_NOFB       = "--nofb" in sys.argv         # bỏ fallback entry (forced-daily "close>EMA9 20h")
+if F_DCA1 and DCA_MAX>0: DCA_MAX = 1
 HARD_SL_MULT  = 4.0
 RANGE_TP_MULT = 2.0
 BULL_TRAIL_MULT = 3.0
@@ -160,7 +166,7 @@ def signal_at(i, regime):
         if brk and vmok: return ("LONG","BRK")
         if dh20_4h[j4] is not None and c4h[j4]>dh20_4h[j4]: return ("LONG","DON")
         # fallback
-        if hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
+        if not F_NOFB and hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
         return None
     # RANGE
     if e200_1h[i] is not None and c1h[i] < e200_1h[i]: return None  # EMA200 1h gate
@@ -170,7 +176,7 @@ def signal_at(i, regime):
     if bb: return ("LONG","BB")
     if rc: return ("LONG","RSI")
     if sc: return ("LONG","STK")
-    if hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
+    if not F_NOFB and hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
     return None
 
 # ── Simulate ────────────────────────────────────────────────────────────────────
@@ -208,7 +214,8 @@ def close_campaign(i, exit_px, reason):
     ts=bars1h[i]["time"]; d=datetime.datetime.utcfromtimestamp(ts/1000)
     campaigns.append({"ret":ret,"pnl_usd":pnl_usd,"mo":d.year*100+d.month,"yr":d.year,
                       "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
-                      "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"]})
+                      "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"],
+                      "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"]})
     camp=None
 
 WARM=210*24  # ~210 days of 1h bars for regime warmup
@@ -258,13 +265,14 @@ for i in range(WARM, n1h):
                         half=c["qty"]/2; c["realized"]+=half*(avg-tp)-FEE*tp*half
                         c["qty"]-=half; c["scaled"]=True
                     else: close_campaign(i, tp, "TP"); closed=True
-        # 3. Hard SL
+        # 3. Hard SL (F_SL3: -3 global | F_SL_AFT_DCA: -3 chỉ khi DCA đã max)
         if not closed:
+            cut = 3.0 if F_SL3 else (3.0 if (F_SL_AFT_DCA and c["dca"]>=DCA_MAX) else CUT_ATR)
             if side=="LONG":
-                sl=avg-atr0*CUT_ATR
+                sl=avg-atr0*cut
                 if bar["low"]<=sl: close_campaign(i, sl, "HARDSL"); closed=True
             else:
-                sl=avg+atr0*CUT_ATR
+                sl=avg+atr0*cut
                 if bar["high"]>=sl: close_campaign(i, sl, "HARDSL"); closed=True
         # 4. Time stop
         if not closed and (i - c["open_i"]) >= TIME_STOP_H:
@@ -396,6 +404,23 @@ if c22:
     print(f"\n  ── 2022 BEAR deep dive (n={len(c22)}) ──")
     print(f"    SHORT: n={len(sh)} ROI={sum(c['ret'] for c in sh)*100:+.1f}% WR={(sum(1 for c in sh if c['ret']>0)/len(sh)*100) if sh else 0:.0f}%")
     print(f"    LONG : n={len(lo)} ROI={sum(c['ret'] for c in lo)*100:+.1f}% WR={(sum(1 for c in lo if c['ret']>0)/len(lo)*100) if lo else 0:.0f}%")
+
+# ── HARD-SL deep dive ───────────────────────────────────────────────────────────
+hs=[c for c in campaigns if c["reason"]=="HARDSL"]
+if hs:
+    print(f"\n  ── HARD-SL deep dive (n={len(hs)}, ROI={sum(c['ret'] for c in hs)*100:+.1f}%) ──")
+    def grp(key):
+        d=defaultdict(lambda:[0,0.0])
+        for c in hs: d[c[key]][0]+=1; d[c[key]][1]+=c["ret"]*100
+        return d
+    for key in ("side","regAt","kind","dca","yr"):
+        parts=[f"{k}:{v[0]}({v[1]:+.0f}%)" for k,v in sorted(grp(key).items(), key=lambda x:str(x[0]))]
+        print(f"    by {key:6s}: " + "  ".join(parts))
+    helds=sorted(c["held"] for c in hs)
+    print(f"    held(bars/1h): min={helds[0]} med={helds[len(helds)//2]} max={helds[-1]}  (TS={TIME_STOP_H}h)")
+    # how many DCA'd to max before blowing up?
+    maxed=sum(1 for c in hs if c["dca"]==DCA_MAX)
+    print(f"    DCA'd to max ({DCA_MAX}) before HARDSL: {maxed}/{len(hs)} ({maxed/len(hs)*100:.0f}%)")
 
 mode = []
 if DCA_MAX==0: mode.append("NO-DCA")
