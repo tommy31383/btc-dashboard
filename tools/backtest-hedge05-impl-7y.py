@@ -44,6 +44,8 @@ F_FLIP_FAV_NONE = "--flip-fav-none" in sys.argv  # #5 fix: regime quay về thu�
 F_DCA_GATE_BAR = "--dca-gate-bar" in sys.argv    # chỉ DCA trên bar ổn định/đảo (LONG: green, SHORT: red)
 F_DCA_GATE_MOM = "--dca-gate-mom" in sys.argv    # chỉ DCA khi momentum 2-bar chưa adverse mạnh
 DCA_MOM_THR    = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--dca-mom=")), 0.01)
+F_ENTRY_CONFIRM = "--entry-confirm" in sys.argv  # entry cần candle xác nhận hướng (1h close theo side)
+F_BULL_STRONG   = "--bull-strong" in sys.argv    # BULL breakout cần mạnh hơn (ATR×1.5 thay 1.2)
 def dca_gate(i, side):
     if not (F_DCA_GATE_BAR or F_DCA_GATE_MOM): return True
     bar=bars1h[i]
@@ -183,7 +185,7 @@ def signal_at(i, regime):
         return None
     if regime=="BULL":
         vmok = vma10_4h[j4] is not None and bars4h[j4]["volume"]>=vma10_4h[j4]*1.2
-        brk  = c4h[j4] > c4h[j4-1] + atr4[j4]*1.2
+        brk  = c4h[j4] > c4h[j4-1] + atr4[j4]*(1.5 if F_BULL_STRONG else 1.2)
         if brk and vmok: return ("LONG","BRK")
         if dh20_4h[j4] is not None and c4h[j4]>dh20_4h[j4]: return ("LONG","DON")
         # fallback
@@ -191,9 +193,10 @@ def signal_at(i, regime):
         return None
     # RANGE
     if e200_1h[i] is not None and c1h[i] < e200_1h[i]: return None  # EMA200 1h gate
+    _cf = (bars1h[i]["close"] > bars1h[i]["open"]) if F_ENTRY_CONFIRM else True  # candle xác nhận hướng LONG
     bb = bbl1h[i] is not None and bars1h[i]["low"]<=bbl1h[i] and c1h[i]>bars1h[i]["open"]
-    rc = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]<40 and rsi1h[i]>=40
-    sc = stk1h[i] is not None and stk1h[i-1] is not None and stk1h[i-1]<20 and stk1h[i]>=20
+    rc = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]<40 and rsi1h[i]>=40 and _cf
+    sc = stk1h[i] is not None and stk1h[i-1] is not None and stk1h[i-1]<20 and stk1h[i]>=20 and _cf
     if bb: return ("LONG","BB")
     if rc: return ("LONG","RSI")
     if sc: return ("LONG","STK")
@@ -223,7 +226,9 @@ def open_campaign(i, side, regime, kind="?"):
     camp={"side":side,"avg":px,"qty":BASE_QTY,"atr0":a,"open_i":i,"dca":0,
           "regAt":regime,"hwm":px,"lwm":px,"fees":FEE*px*BASE_QTY,"ts_open":ts,
           "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":BASE_QTY,
-          "from_flip":pending_from_flip,"path":("F" if pending_from_flip else "E"),"maxadv":0.0}
+          "from_flip":pending_from_flip,"path":("F" if pending_from_flip else "E"),"maxadv":0.0,
+          "hr":datetime.datetime.utcfromtimestamp(ts/1000).hour,
+          "dow":datetime.datetime.utcfromtimestamp(ts/1000).weekday()}
     pending_from_flip=False
     last_entry_day=utc_day(ts)
     return True
@@ -241,7 +246,8 @@ def close_campaign(i, exit_px, reason):
                       "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
                       "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"],
                       "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"],
-                      "from_flip":c.get("from_flip",False),"path":c.get("path","E"),"maxadv":c.get("maxadv",0.0)})
+                      "from_flip":c.get("from_flip",False),"path":c.get("path","E"),"maxadv":c.get("maxadv",0.0),
+                      "hr":c.get("hr",-1),"dow":c.get("dow",-1)})
     if ret>0: lflip_chain=0   # winning close → reset whipsaw chain
     camp=None
 
@@ -507,6 +513,42 @@ print(f"\n  ── 4. REGIME ASSESSMENT (regime lúc entry → outcome) ──")
 for rg in ("BULL","RANGE","BEAR"):
     cs=[c for c in campaigns if c["regAt"]==rg]
     if cs: print(f"    {rg:6s}: {stat(cs)}")
+
+# ── LOSS RESEARCH: tìm hiểu các lệnh THUA ───────────────────────────────────────
+losers=[c for c in campaigns if c["ret"]<0]
+winners=[c for c in campaigns if c["ret"]>0]
+tot_loss=sum(c["ret"] for c in losers)*100
+print(f"\n{'='*92}\n  LOSS RESEARCH — {len(losers)}/{len(campaigns)} lệnh thua ({len(losers)/len(campaigns)*100:.0f}%), tổng lỗ {tot_loss:.0f}%\n{'='*92}")
+
+def contrib(dimfn, order=None):
+    """net contribution (sum ret%) + WR theo 1 dimension"""
+    d=defaultdict(lambda:[0,0,0.0])  # n, wins, sum_ret
+    for c in campaigns:
+        k=dimfn(c); d[k][0]+=1; d[k][1]+=(1 if c["ret"]>0 else 0); d[k][2]+=c["ret"]*100
+    keys=order if order else sorted(d.keys(), key=lambda k: d[k][2])
+    for k in keys:
+        if k not in d: continue
+        n,w,r=d[k]; print(f"    {str(k):10s}: n={n:4d}  WR={w/n*100:3.0f}%  netROI={r:+7.1f}%  avg={r/n:+.2f}%")
+
+print(f"\n  ── Net contribution theo ENTRY KIND (signal nào lỗ?) ──")
+contrib(lambda c: c["kind"])
+print(f"\n  ── Net theo REGIME × SIDE ──")
+contrib(lambda c: f"{c['regAt'][:3]}-{c['side'][:1]}")
+print(f"\n  ── Net theo ENTRY HOUR UTC (pattern giờ?) ──")
+contrib(lambda c: f"h{c['hr']:02d}", order=[f"h{h:02d}" for h in range(24)])
+print(f"\n  ── Net theo DOW (0=Mon..6=Sun) ──")
+contrib(lambda c: f"d{c['dow']}", order=[f"d{d}" for d in range(7)])
+print(f"\n  ── Net theo DCA count ──")
+contrib(lambda c: f"dca{c['dca']}", order=[f"dca{i}" for i in range(4)])
+
+# Deep losers: lỗ nặng < -2%
+deep=[c for c in losers if c["ret"]<-0.02]
+print(f"\n  ── DEEP LOSERS (ret < -2%): {len(deep)} lệnh, tổng {sum(c['ret'] for c in deep)*100:.0f}% ──")
+from collections import Counter
+print(f"    by reason: " + "  ".join(f"{k}={v}" for k,v in Counter(c['reason'] for c in deep).most_common()))
+print(f"    by kind  : " + "  ".join(f"{k}={v}" for k,v in Counter(c['kind'] for c in deep).most_common()))
+print(f"    by regime: " + "  ".join(f"{k}={v}" for k,v in Counter(c['regAt'] for c in deep).most_common()))
+print(f"    from_flip: {sum(1 for c in deep if c['from_flip'])}/{len(deep)}  |  maxDCA: {sum(1 for c in deep if c['dca']==DCA_MAX)}/{len(deep)}")
 
 mode = []
 if DCA_MAX==0: mode.append("NO-DCA")
