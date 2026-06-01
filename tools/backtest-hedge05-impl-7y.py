@@ -39,6 +39,22 @@ F_FLIP3      = "--flip3" in sys.argv        # tại -3×ATR: REVERSE (cut+flip) 
 F_FLIPDCA2   = "--flip-dca2" in sys.argv    # tại -2×ATR (would-DCA2): FLIP thay vì nhồi DCA lần 2
 FLIP_ATR     = 3.0
 MAX_LFLIP    = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--maxflip=")), 99)  # cap chống whipsaw
+F_FLIP_FAV_NONE = "--flip-fav-none" in sys.argv  # #5 fix: regime quay về thuận → HOLD (none), không soft-cut
+# ── DCA gates: chỉ DCA khi tình huống còn "dip" (mean-rev), KHÔNG khi trend xác nhận ngược ──
+F_DCA_GATE_BAR = "--dca-gate-bar" in sys.argv    # chỉ DCA trên bar ổn định/đảo (LONG: green, SHORT: red)
+F_DCA_GATE_MOM = "--dca-gate-mom" in sys.argv    # chỉ DCA khi momentum 2-bar chưa adverse mạnh
+DCA_MOM_THR    = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--dca-mom=")), 0.01)
+def dca_gate(i, side):
+    if not (F_DCA_GATE_BAR or F_DCA_GATE_MOM): return True
+    bar=bars1h[i]
+    if F_DCA_GATE_BAR:
+        if side=="LONG"  and not (bar["close"]>=bar["open"]): return False  # chờ bar green (stabilize)
+        if side=="SHORT" and not (bar["close"]<=bar["open"]): return False
+    if F_DCA_GATE_MOM and i>=3:
+        mom=(c1h[i]-c1h[i-2])/c1h[i-2]
+        if side=="LONG"  and mom < -DCA_MOM_THR: return False  # còn rơi mạnh → đừng nhồi
+        if side=="SHORT" and mom >  DCA_MOM_THR: return False
+    return True
 if F_DCA1 and DCA_MAX>0: DCA_MAX = 1
 HARD_SL_MULT  = 4.0
 RANGE_TP_MULT = 2.0
@@ -192,6 +208,7 @@ last_reverse_i=-10**9
 pending_reverse=None   # side to open
 n_dca_total=0; n_reverse_total=0; n_cut_total=0; n_lflip_total=0
 lflip_chain=0          # consecutive loss-flips (reset on winning close) — chống whipsaw
+pending_from_flip=False # campaign mở kế tiếp là từ 1 flip (ride trend)
 
 def tp_mult_for(kind):
     """P4: TP mult theo loại entry (hedge04 tinh hoa). Default = RANGE_TP_MULT."""
@@ -199,13 +216,15 @@ def tp_mult_for(kind):
     return {"BB":1.5, "RSI":1.0, "STK":1.0}.get(kind, RANGE_TP_MULT)
 
 def open_campaign(i, side, regime, kind="?"):
-    global camp, last_entry_day
+    global camp, last_entry_day, pending_from_flip
     ts=bars1h[i]["time"]; j4=idx4h(ts); a=atr4[j4]
     if a is None or a<=0: return False
     px=c1h[i]
     camp={"side":side,"avg":px,"qty":BASE_QTY,"atr0":a,"open_i":i,"dca":0,
           "regAt":regime,"hwm":px,"lwm":px,"fees":FEE*px*BASE_QTY,"ts_open":ts,
-          "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":BASE_QTY}
+          "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":BASE_QTY,
+          "from_flip":pending_from_flip,"path":("F" if pending_from_flip else "E"),"maxadv":0.0}
+    pending_from_flip=False
     last_entry_day=utc_day(ts)
     return True
 
@@ -221,7 +240,8 @@ def close_campaign(i, exit_px, reason):
     campaigns.append({"ret":ret,"pnl_usd":pnl_usd,"mo":d.year*100+d.month,"yr":d.year,
                       "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
                       "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"],
-                      "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"]})
+                      "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"],
+                      "from_flip":c.get("from_flip",False),"path":c.get("path","E"),"maxadv":c.get("maxadv",0.0)})
     if ret>0: lflip_chain=0   # winning close → reset whipsaw chain
     camp=None
 
@@ -234,11 +254,14 @@ for i in range(WARM, n1h):
     if camp is not None:
         c=camp; side=c["side"]; avg=c["avg"]; atr0=c["atr0"]; regAt=c["regAt"]
         loss = (avg-px)/atr0 if side=="LONG" else (px-avg)/atr0
+        adv = (avg-bar["low"])/atr0 if side=="LONG" else (bar["high"]-avg)/atr0  # intrabar adverse excursion
+        if adv>c["maxadv"]: c["maxadv"]=adv
         # flip classification
         flip="none"
         if regAt!=regime:
-            if side=="LONG":  flip="reverse" if regime=="BEAR" else "soft"
-            else:             flip="reverse" if regime!="BEAR" else "soft"
+            _soft = "none" if F_FLIP_FAV_NONE else "soft"   # #5: regime thuận → hold thay vì cut
+            if side=="LONG":  flip="reverse" if regime=="BEAR" else _soft
+            else:             flip="reverse" if regime!="BEAR" else _soft
         closed=False
         if bar["high"]>c["hwm"]: c["hwm"]=bar["high"]
         if bar["low"] <c["lwm"]: c["lwm"]=bar["low"]
@@ -280,6 +303,7 @@ for i in range(WARM, n1h):
                 n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
                 close_campaign(i, fp, "REVERSE")
                 pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                pending_from_flip=True   # campaign kế = ride trend từ flip
                 last_reverse_i=i; closed=True
         # 3. Hard SL (F_SL3: -3 global | F_SL_AFT_DCA: -3 chỉ khi DCA đã max)
         if not closed:
@@ -298,6 +322,7 @@ for i in range(WARM, n1h):
             n_reverse_total+=1
             close_campaign(i, px, "REVERSE")
             pending_reverse = "SHORT" if side=="LONG" else "LONG"
+            pending_from_flip=True   # campaign kế = từ regime-reverse
             last_reverse_i=i
             closed=True
         # 6. Soft flip
@@ -314,7 +339,7 @@ for i in range(WARM, n1h):
         # 8. DCA (loss, regime unchanged) — close+reopen fee model
         if not closed:
             thr = DCA1_ATR if c["dca"]==0 else DCA2_ATR
-            if c["dca"]<DCA_MAX and loss>=thr:
+            if c["dca"]<DCA_MAX and loss>=thr and dca_gate(i, side):
                 # F_FLIPDCA2: tại -2×ATR (would-DCA2, dca==1) → FLIP thay vì nhồi tiếp
                 if F_FLIPDCA2 and c["dca"]==1 and lflip_chain < MAX_LFLIP:
                     n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
@@ -327,6 +352,7 @@ for i in range(WARM, n1h):
                     c["fees"] += FEE*px*newq
                     c["avg"]=(oldq*avg+BASE_QTY*px)/newq
                     c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
+                    c["path"]+="+D"
         continue  # one action per bar while managing
 
     # ── Pending reverse: open opposite immediately ──────────────────────────
@@ -445,6 +471,42 @@ if hs:
     maxed=sum(1 for c in hs if c["dca"]==DCA_MAX)
     print(f"    DCA'd to max ({DCA_MAX}) before HARDSL: {maxed}/{len(hs)} ({maxed/len(hs)*100:.0f}%)")
 print(f"  loss-flips fired (n_lflip)={n_lflip_total}  MAX_LFLIP={MAX_LFLIP}  F_FLIP3={F_FLIP3}")
+
+# ── SITUATION ASSESSMENT & HANDLING QUALITY ─────────────────────────────────────
+def stat(cs):
+    if not cs: return "n=0"
+    w=sum(1 for c in cs if c["ret"]>0); roi=sum(c["ret"] for c in cs)*100; avg=sum(c["ret"] for c in cs)/len(cs)*100
+    return f"n={len(cs):4d} WR={w/len(cs)*100:3.0f}% avg={avg:+.2f}% ROI={roi:+7.1f}%"
+
+print(f"\n{'='*92}\n  ĐÁNH GIÁ TÌNH HUỐNG & XỬ LÝ — chất lượng quyết định\n{'='*92}")
+
+# 1. Flip-into: lệnh mở TỪ flip (ride trend) có thắng không?
+print(f"\n  ── 1. FLIP-INTO (xử lý 'đảo chiều': lệnh mở sau flip có ride được trend?) ──")
+fresh=[c for c in campaigns if not c["from_flip"]]
+flipd=[c for c in campaigns if c["from_flip"]]
+print(f"    Fresh entry : {stat(fresh)}")
+print(f"    From-flip   : {stat(flipd)}   ← riding trend sau khi cắt loser @-3")
+
+# 2. Decision-path: DCA rescue có hiệu quả theo độ sâu?
+print(f"\n  ── 2. DECISION PATH (DCA rescue theo số lần nhồi) ──")
+for path,label in [("E","Direct (0 DCA)"),("E+D","1 DCA"),("E+D+D","2 DCA (max)"),("F","From-flip"),("F+D","Flip+1DCA"),("F+D+D","Flip+2DCA")]:
+    cs=[c for c in campaigns if c["path"]==path]
+    if cs: print(f"    {label:16s}: {stat(cs)}")
+
+# 3. Max adverse excursion vs recovery: lệnh lún sâu bao nhiêu thì cứu được?
+print(f"\n  ── 3. MAX ADVERSE EXCURSION → recovery rate (lún sâu mấy ATR còn cứu?) ──")
+buckets=[(0,0.5),(0.5,1),(1,2),(2,3),(3,4),(4,99)]
+for lo,hi in buckets:
+    cs=[c for c in campaigns if lo<=c["maxadv"]<hi]
+    if cs:
+        w=sum(1 for c in cs if c["ret"]>0)
+        print(f"    adv {lo:.1f}-{hi if hi<99 else '∞':>3}×ATR: n={len(cs):4d}  recover→win {w/len(cs)*100:3.0f}%  ROI={sum(c['ret'] for c in cs)*100:+7.1f}%")
+
+# 4. Regime assessment: regime lúc entry có dự báo đúng kết quả?
+print(f"\n  ── 4. REGIME ASSESSMENT (regime lúc entry → outcome) ──")
+for rg in ("BULL","RANGE","BEAR"):
+    cs=[c for c in campaigns if c["regAt"]==rg]
+    if cs: print(f"    {rg:6s}: {stat(cs)}")
 
 mode = []
 if DCA_MAX==0: mode.append("NO-DCA")
