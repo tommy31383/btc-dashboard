@@ -21,11 +21,13 @@ FEE   = 0.05 / 100
 # hedge05 constants (mirror hedge05.ts)
 BASE_QTY      = 0.003
 DCA_MAX       = 0 if "--nodca" in sys.argv else 2   # --nodca: disable DCA (test rescue thesis)
+NO_SHORT      = "--noshort" in sys.argv             # --noshort: skip BEAR (no short side)
 HARD_SL_MULT  = 4.0
 RANGE_TP_MULT = 2.0
 BULL_TRAIL_MULT = 3.0
 BULL_TP_MULT  = 5.0
-TIME_STOP_H   = 48          # 48h in 1h bars
+# --ts=N override time stop hours (default 48)
+TIME_STOP_H   = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--ts=")), 48)
 REVERSE_CD_H  = 2
 DEADLINE_HOUR = 20
 DCA1_ATR = 1.0
@@ -139,6 +141,7 @@ def signal_at(i, regime):
     ts=bars1h[i]["time"]; j4=idx4h(ts); hr=datetime.datetime.utcfromtimestamp(ts/1000).hour
     if j4 < 21 or atr4[j4] is None: return None
     if regime=="BEAR":
+        if NO_SHORT: return None        # --noshort: skip BEAR entirely (like hedge01)
         # short: RSI cross<60 OR ATR breakdown 4h
         rsi_cross = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]>=60 and rsi1h[i]<60
         brk = c4h[j4] < c4h[j4-1] - atr4[j4]*1.2
@@ -329,3 +332,33 @@ def ra_of(cs):
     r=[c["ret"] for c in cs]; m=sum(r)/len(r); s=(sum((x-m)**2 for x in r)/len(r))**0.5
     return m/s if s>0 else 0
 print(f"  Walk-forward: TRAIN(2019-22) RA={ra_of(tr):.3f} (n={len(tr)})  TEST(2023-26) RA={ra_of(te):.3f} (n={len(te)})")
+
+# ── Per-side breakdown ─────────────────────────────────────────────────────────
+print(f"\n  ── Per-side ──")
+for sd in ("LONG","SHORT"):
+    cs=[c for c in campaigns if c["side"]==sd]
+    if not cs: print(f"    {sd:5s}: (none)"); continue
+    w=sum(1 for c in cs if c["ret"]>0); roi=sum(c["ret"] for c in cs)*100
+    print(f"    {sd:5s}: n={len(cs):4d}  WR={w/len(cs)*100:.0f}%  ROI={roi:+.1f}%  RA={ra_of(cs):.3f}")
+
+# ── Per-reason avg return (is TIME-stop a win or loss?) ─────────────────────────
+print(f"\n  ── Per-exit-reason ──")
+for rs in ("TP","SL","HARDSL","TIME","CUT","REVERSE","EOD"):
+    cs=[c for c in campaigns if c["reason"]==rs]
+    if not cs: continue
+    w=sum(1 for c in cs if c["ret"]>0); roi=sum(c["ret"] for c in cs)*100; avg=sum(c["ret"] for c in cs)/len(cs)*100
+    print(f"    {rs:8s}: n={len(cs):4d}  WR={w/len(cs)*100:3.0f}%  avg={avg:+.2f}%  ROI={roi:+.1f}%")
+
+# ── 2022 BEAR deep dive ─────────────────────────────────────────────────────────
+c22=[c for c in campaigns if c["yr"]==2022]
+if c22:
+    sh=[c for c in c22 if c["side"]=="SHORT"]; lo=[c for c in c22 if c["side"]=="LONG"]
+    print(f"\n  ── 2022 BEAR deep dive (n={len(c22)}) ──")
+    print(f"    SHORT: n={len(sh)} ROI={sum(c['ret'] for c in sh)*100:+.1f}% WR={(sum(1 for c in sh if c['ret']>0)/len(sh)*100) if sh else 0:.0f}%")
+    print(f"    LONG : n={len(lo)} ROI={sum(c['ret'] for c in lo)*100:+.1f}% WR={(sum(1 for c in lo if c['ret']>0)/len(lo)*100) if lo else 0:.0f}%")
+
+mode = []
+if DCA_MAX==0: mode.append("NO-DCA")
+if NO_SHORT: mode.append("NO-SHORT")
+mode.append(f"TS={TIME_STOP_H}h")
+print(f"\n  [mode: {' '.join(mode)}]")
