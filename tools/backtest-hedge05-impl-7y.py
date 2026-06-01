@@ -34,6 +34,11 @@ F_SL3        = "--sl3" in sys.argv          # hard SL -4→-3×ATR (cut mọi lo
 F_SL_AFT_DCA = "--sl-after-dca" in sys.argv # hard SL -3×ATR CHỈ khi đã DCA max (surgical)
 F_DCA1       = "--dca1" in sys.argv         # DCA_MAX 2→1 (blowup nhỏ hơn)
 F_NOFB       = "--nofb" in sys.argv         # bỏ fallback entry (forced-daily "close>EMA9 20h")
+# ── Stop-and-reverse methods (biến loser thành flip, KHÔNG giảm lệnh) ──
+F_FLIP3      = "--flip3" in sys.argv        # tại -3×ATR: REVERSE (cut+flip) thay vì để chạy tới hard-SL -4
+F_FLIPDCA2   = "--flip-dca2" in sys.argv    # tại -2×ATR (would-DCA2): FLIP thay vì nhồi DCA lần 2
+FLIP_ATR     = 3.0
+MAX_LFLIP    = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--maxflip=")), 99)  # cap chống whipsaw
 if F_DCA1 and DCA_MAX>0: DCA_MAX = 1
 HARD_SL_MULT  = 4.0
 RANGE_TP_MULT = 2.0
@@ -185,7 +190,8 @@ camp=None      # active: {side, avg, qty, atr0, open_i, dca, regAt, hwm, fees, t
 last_entry_day=-1
 last_reverse_i=-10**9
 pending_reverse=None   # side to open
-n_dca_total=0; n_reverse_total=0; n_cut_total=0
+n_dca_total=0; n_reverse_total=0; n_cut_total=0; n_lflip_total=0
+lflip_chain=0          # consecutive loss-flips (reset on winning close) — chống whipsaw
 
 def tp_mult_for(kind):
     """P4: TP mult theo loại entry (hedge04 tinh hoa). Default = RANGE_TP_MULT."""
@@ -204,7 +210,7 @@ def open_campaign(i, side, regime, kind="?"):
     return True
 
 def close_campaign(i, exit_px, reason):
-    global camp, campaigns
+    global camp, campaigns, lflip_chain
     c=camp; side=c["side"]
     c["fees"] += FEE*exit_px*c["qty"]   # close fee on remaining qty
     pnl = c["qty"]*(exit_px-c["avg"]) if side=="LONG" else c["qty"]*(c["avg"]-exit_px)
@@ -216,6 +222,7 @@ def close_campaign(i, exit_px, reason):
                       "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
                       "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"],
                       "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"]})
+    if ret>0: lflip_chain=0   # winning close → reset whipsaw chain
     camp=None
 
 WARM=210*24  # ~210 days of 1h bars for regime warmup
@@ -265,6 +272,15 @@ for i in range(WARM, n1h):
                         half=c["qty"]/2; c["realized"]+=half*(avg-tp)-FEE*tp*half
                         c["qty"]-=half; c["scaled"]=True
                     else: close_campaign(i, tp, "TP"); closed=True
+        # 2.5 FLIP3 stop-and-reverse tại -3×ATR (biến blowup thành flip ride trend)
+        if not closed and F_FLIP3 and lflip_chain < MAX_LFLIP:
+            fp = avg-atr0*FLIP_ATR if side=="LONG" else avg+atr0*FLIP_ATR
+            hit = bar["low"]<=fp if side=="LONG" else bar["high"]>=fp
+            if hit:
+                n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
+                close_campaign(i, fp, "REVERSE")
+                pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                last_reverse_i=i; closed=True
         # 3. Hard SL (F_SL3: -3 global | F_SL_AFT_DCA: -3 chỉ khi DCA đã max)
         if not closed:
             cut = 3.0 if F_SL3 else (3.0 if (F_SL_AFT_DCA and c["dca"]>=DCA_MAX) else CUT_ATR)
@@ -299,11 +315,18 @@ for i in range(WARM, n1h):
         if not closed:
             thr = DCA1_ATR if c["dca"]==0 else DCA2_ATR
             if c["dca"]<DCA_MAX and loss>=thr:
-                oldq=c["qty"]; newq=oldq+BASE_QTY
-                c["fees"] += FEE*px*oldq
-                c["fees"] += FEE*px*newq
-                c["avg"]=(oldq*avg+BASE_QTY*px)/newq
-                c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
+                # F_FLIPDCA2: tại -2×ATR (would-DCA2, dca==1) → FLIP thay vì nhồi tiếp
+                if F_FLIPDCA2 and c["dca"]==1 and lflip_chain < MAX_LFLIP:
+                    n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
+                    close_campaign(i, px, "REVERSE")
+                    pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                    last_reverse_i=i; closed=True
+                else:
+                    oldq=c["qty"]; newq=oldq+BASE_QTY
+                    c["fees"] += FEE*px*oldq
+                    c["fees"] += FEE*px*newq
+                    c["avg"]=(oldq*avg+BASE_QTY*px)/newq
+                    c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
         continue  # one action per bar while managing
 
     # ── Pending reverse: open opposite immediately ──────────────────────────
@@ -421,6 +444,7 @@ if hs:
     # how many DCA'd to max before blowing up?
     maxed=sum(1 for c in hs if c["dca"]==DCA_MAX)
     print(f"    DCA'd to max ({DCA_MAX}) before HARDSL: {maxed}/{len(hs)} ({maxed/len(hs)*100:.0f}%)")
+print(f"  loss-flips fired (n_lflip)={n_lflip_total}  MAX_LFLIP={MAX_LFLIP}  F_FLIP3={F_FLIP3}")
 
 mode = []
 if DCA_MAX==0: mode.append("NO-DCA")
