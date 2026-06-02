@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 65330.00000000001,
+  "capital": 65507.00000000001,
   "positions": [
+    {
+      "id": "bar5m-1780408500000",
+      "bar5mTime": 1780408500000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "stoch_long",
+      "entryPrice": 68788.9,
+      "entryMs": 1780408875784,
+      "tpPrice": 72916.234,
+      "slPrice": 64661.56599999999,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1780408200000",
       "bar5mTime": 1780408200000,
@@ -1685,14 +1697,19 @@
     {
       "id": "bar5m-1779951000000",
       "bar5mTime": 1779951000000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 73078.3,
       "entryMs": 1779951436781,
       "tpPrice": 68693.602,
       "slPrice": 77462.998,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 68693.602,
+      "exitMs": 1780408870155,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000017,
+      "pnlNetUsd": 177.00000000000017
     },
     {
       "id": "bar5m-1779950400000",
@@ -16002,30 +16019,6 @@
   ],
   "equityHistory": [
     {
-      "t": 1779265659608,
-      "equity": 12834.500000000002
-    },
-    {
-      "t": 1779274059671,
-      "equity": 12833.000000000002
-    },
-    {
-      "t": 1779274599651,
-      "equity": 12831.500000000002
-    },
-    {
-      "t": 1779274899674,
-      "equity": 12830.000000000002
-    },
-    {
-      "t": 1779288914983,
-      "equity": 12828.500000000002
-    },
-    {
-      "t": 1779307876587,
-      "equity": 12827.000000000002
-    },
-    {
       "t": 1779318254230,
       "equity": 12825.500000000002
     },
@@ -20016,17 +20009,25 @@
     {
       "t": 1780408825092,
       "equity": 65330.00000000001
+    },
+    {
+      "t": 1780408870155,
+      "equity": 65508.50000000001
+    },
+    {
+      "t": 1780408875784,
+      "equity": 65507.00000000001
     }
   ],
   "stats": {
-    "totalClosed": 869,
-    "wins": 432,
+    "totalClosed": 870,
+    "wins": 433,
     "losses": 437,
-    "totalPnlUsd": 60483.00000000001,
-    "totalFeeUsd": 2760,
-    "lastEntryMs": 1780408575755,
+    "totalPnlUsd": 60660.00000000001,
+    "totalFeeUsd": 2763,
+    "lastEntryMs": 1780408875784,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780408825092,
+  "updatedAt": 1780408875785,
   "capitalVersion": 2
 }
