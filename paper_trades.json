@@ -1,45 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1780414276720,
+  "updatedAt": 1780414356722,
   "trades": [
-    {
-      "id": "q57yhx9v1vi",
-      "ruleId": "1h:7",
-      "tfKey": "1h",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 75715.9,
-      "slPrice": 83287.49,
-      "tpPrice": 64358.51499999999,
-      "leverage": 100,
-      "targetPct": 15,
-      "stopPct": 10,
-      "maxHoldBars": 100,
-      "openedMs": 1779883358514,
-      "deadlineMs": 1780243200000,
-      "exitPrice": 73574.33,
-      "leveragedPnlPct": 282.84,
-      "closedMs": 1780244652188
-    },
-    {
-      "id": "88dwe0cieet",
-      "ruleId": "15m:22",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 75890,
-      "slPrice": 77407.8,
-      "tpPrice": 72095.5,
-      "leverage": 100,
-      "targetPct": 5,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1779869860003,
-      "deadlineMs": 1779959700000,
-      "exitPrice": 73508.97,
-      "leveragedPnlPct": 313.75,
-      "closedMs": 1779965413553
-    },
     {
       "id": "cjc7s13tdnm",
       "ruleId": "15m:8",
@@ -3783,6 +3745,38 @@
       "maxHoldBars": 100,
       "openedMs": 1780409835820,
       "deadlineMs": 1780499700000
+    },
+    {
+      "id": "8j3lh0mbcni",
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 67383.1,
+      "slPrice": 68730.762,
+      "tpPrice": 64013.945,
+      "leverage": 100,
+      "targetPct": 5,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1780414335804,
+      "deadlineMs": 1780504200000
+    },
+    {
+      "id": "rqwic40whn",
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 67383.1,
+      "slPrice": 68730.762,
+      "tpPrice": 64013.945,
+      "leverage": 100,
+      "targetPct": 5,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1780414335804,
+      "deadlineMs": 1780504200000
     }
   ]
 }
