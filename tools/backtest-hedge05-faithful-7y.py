@@ -1,0 +1,560 @@
+#!/usr/bin/env python3
+"""FAITHFUL harness — bỏ lookahead: 4h bar ĐÃ ĐÓNG (idx-1) + regime D-1.
+   So với backtest-hedge05-impl-7y.py (lookahead). Dùng để re-tune (KHÔNG tune trên bản lookahead)."""
+"""
+backtest-hedge05-impl-7y.py — Backtest ĐÚNG logic hedge05.ts đã implement
+(regime-first daily + DCA/cut/reverse), KHÔNG phải grid concept cũ.
+
+Replicate faithfully:
+  Entry: 1 lệnh/ngày. BULL→ATR breakout/Donchian 4h; RANGE→BB/RSI/Stoch 1h + EMA200_1h gate;
+         BEAR→RSI cross<60 / ATR breakdown 4h short; fallback ≥20h UTC → close>EMA9 4h LONG.
+  Manage (mỗi 1h bar, ATR_4h tại entry): BULL trail ×3 / RANGE-BEAR fixed TP ±2×ATR /
+         hard SL ±4×ATR / time stop 48h / regime reverse (cut+flip) / soft flip (cut) /
+         DCA ×2 (loss -1/-2×ATR, regime unchanged) — close+reopen fee model như TS.
+  Regime: 1d 3-bar persistence.
+Capital $100k, FEE 0.05%/side. Per-campaign return% = PnL_usd / capital_deployed, net fees.
+"""
+import json, datetime, sys
+from collections import defaultdict
+
+CACHE = "/Users/lap16116/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json"
+FEE   = 0.05 / 100
+
+# hedge05 constants (mirror hedge05.ts)
+BASE_QTY      = 0.003
+DCA_MAX       = 0 if "--nodca" in sys.argv else 2   # --nodca: disable DCA (test rescue thesis)
+NO_SHORT      = "--noshort" in sys.argv             # --noshort: skip BEAR (no short side)
+# ── Management primitives (test independently) ──
+P_TRAIL_ALL = "--trail-all" in sys.argv   # P1: RANGE/BEAR dùng trailing thay fixed TP
+P_SCALEOUT  = "--scaleout"  in sys.argv   # P2: chốt 50% ở TP1, phần còn lại trail từ breakeven
+P_PYRAMID   = "--pyramid"   in sys.argv   # P3: nhồi thêm khi LÃI + trend mạnh (max 1)
+P_MIXEDTP   = "--mixedtp"   in sys.argv   # P4: TP mult theo loại entry (BB×1.5, RSI/STK×1.0)
+SCALE_TP1_MULT = 1.5    # P2: TP1 (chốt 1 phần) tại +1.5×ATR
+PYR_TRIG_ATR   = 1.0    # P3: pyramid khi profit >= +1×ATR
+# ── Hard-SL drag fixes (test independently) ──
+F_SL3        = "--sl3" in sys.argv          # hard SL -4→-3×ATR (cut mọi loser nhanh hơn)
+F_SL_AFT_DCA = "--sl-after-dca" in sys.argv # hard SL -3×ATR CHỈ khi đã DCA max (surgical)
+F_DCA1       = "--dca1" in sys.argv         # DCA_MAX 2→1 (blowup nhỏ hơn)
+F_NOFB       = "--nofb" in sys.argv         # bỏ fallback entry (forced-daily "close>EMA9 20h")
+# ── Stop-and-reverse methods (biến loser thành flip, KHÔNG giảm lệnh) ──
+F_FLIP3      = "--flip3" in sys.argv        # tại -3×ATR: REVERSE (cut+flip) thay vì để chạy tới hard-SL -4
+F_FLIPDCA2   = "--flip-dca2" in sys.argv    # tại -2×ATR (would-DCA2): FLIP thay vì nhồi DCA lần 2
+FLIP_ATR     = 3.0
+MAX_LFLIP    = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--maxflip=")), 99)  # cap chống whipsaw
+F_FLIP_FAV_NONE = "--flip-fav-none" in sys.argv  # #5 fix: regime quay về thuận → HOLD (none), không soft-cut
+# ── DCA gates: chỉ DCA khi tình huống còn "dip" (mean-rev), KHÔNG khi trend xác nhận ngược ──
+F_DCA_GATE_BAR = "--dca-gate-bar" in sys.argv    # chỉ DCA trên bar ổn định/đảo (LONG: green, SHORT: red)
+F_DCA_GATE_MOM = "--dca-gate-mom" in sys.argv    # chỉ DCA khi momentum 2-bar chưa adverse mạnh
+DCA_MOM_THR    = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--dca-mom=")), 0.01)
+F_ENTRY_CONFIRM = "--entry-confirm" in sys.argv  # entry cần candle xác nhận hướng (1h close theo side)
+F_BULL_STRONG   = "--bull-strong" in sys.argv    # BULL breakout cần mạnh hơn (ATR×1.5 thay 1.2)
+def dca_gate(i, side):
+    if not (F_DCA_GATE_BAR or F_DCA_GATE_MOM): return True
+    bar=bars1h[i]
+    if F_DCA_GATE_BAR:
+        if side=="LONG"  and not (bar["close"]>=bar["open"]): return False  # chờ bar green (stabilize)
+        if side=="SHORT" and not (bar["close"]<=bar["open"]): return False
+    if F_DCA_GATE_MOM and i>=3:
+        mom=(c1h[i]-c1h[i-2])/c1h[i-2]
+        if side=="LONG"  and mom < -DCA_MOM_THR: return False  # còn rơi mạnh → đừng nhồi
+        if side=="SHORT" and mom >  DCA_MOM_THR: return False
+    return True
+if F_DCA1 and DCA_MAX>0: DCA_MAX = 1
+HARD_SL_MULT  = 4.0
+RANGE_TP_MULT = 2.0
+BULL_TRAIL_MULT = 3.0
+BULL_TP_MULT  = 5.0
+# --ts=N override time stop hours (default 48)
+TIME_STOP_H   = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--ts=")), 48)
+REVERSE_CD_H  = 2
+DEADLINE_HOUR = 20
+DCA1_ATR = 1.0
+DCA2_ATR = 2.0
+CUT_ATR  = 4.0
+
+raw = json.load(open(CACHE)); raw.sort(key=lambda x: x["time"])
+
+def agg(bars, ms):
+    b = {}
+    for c in bars:
+        k = c["time"] // ms
+        if k not in b:
+            b[k] = {"time": k*ms, "open": c["open"], "high": c["high"], "low": c["low"], "close": c["close"], "volume": c["volume"]}
+        else:
+            o = b[k]; o["high"]=max(o["high"],c["high"]); o["low"]=min(o["low"],c["low"]); o["close"]=c["close"]; o["volume"]+=c["volume"]
+    return [b[k] for k in sorted(b)]
+
+bars1h = agg(raw, 3600*1000); bars4h = agg(raw, 4*3600*1000); bars1d = agg(raw, 86400*1000)
+n1h = len(bars1h); n4h = len(bars4h)
+c1h = [b["close"] for b in bars1h]; c4h = [b["close"] for b in bars4h]
+
+def ema(xs, p):
+    k=2/(p+1); out=[None]*len(xs); e=None
+    for i,x in enumerate(xs): e=x if e is None else x*k+e*(1-k); out[i]=e
+    return out
+def _dtr(bars):
+    n=len(bars); pdm=[0.]*n; ndm=[0.]*n; tr=[0.]*n
+    for i in range(1,n):
+        up=bars[i]["high"]-bars[i-1]["high"]; dn=bars[i-1]["low"]-bars[i]["low"]
+        pdm[i]=up if up>dn and up>0 else 0; ndm[i]=dn if dn>up and dn>0 else 0
+        tr[i]=max(bars[i]["high"]-bars[i]["low"], abs(bars[i]["high"]-bars[i-1]["close"]), abs(bars[i]["low"]-bars[i-1]["close"]))
+    return pdm,ndm,tr
+def atr_w(bars, p=14):
+    _,_,tr=_dtr(bars); n=len(bars); out=[None]*n
+    s=sum(tr[1:p+1]); out[p]=s/p
+    for i in range(p+1,n): out[i]=(out[i-1]*(p-1)+tr[i])/p
+    return out
+def rsi_s(cls, n=14):
+    out=[None]*len(cls); ag=al=0.
+    for i in range(1,n+1):
+        d=cls[i]-cls[i-1]
+        if d>0: ag+=d
+        else: al-=d
+    ag/=n; al/=n; out[n]=100-100/(1+ag/al) if al>0 else 100
+    for i in range(n+1,len(cls)):
+        d=cls[i]-cls[i-1]; g=max(d,0); l=max(-d,0)
+        ag=(ag*(n-1)+g)/n; al=(al*(n-1)+l)/n
+        out[i]=100-100/(1+ag/al) if al>0 else 100
+    return out
+def stoch_s(bars, n=14):
+    out=[None]*len(bars)
+    for i in range(n-1,len(bars)):
+        hi=max(b["high"] for b in bars[i-n+1:i+1]); lo=min(b["low"] for b in bars[i-n+1:i+1])
+        out[i]=100*(bars[i]["close"]-lo)/(hi-lo) if hi>lo else 50
+    return out
+def bb_lower(cls, n=20, k=2.):
+    l=[None]*len(cls)
+    for i in range(n-1,len(cls)):
+        w=cls[i-n+1:i+1]; m=sum(w)/n; s=(sum((x-m)**2 for x in w)/n)**0.5
+        l[i]=m-k*s
+    return l
+def don_hi(bars, p=20):
+    out=[None]*len(bars)
+    for i in range(p,len(bars)): out[i]=max(bars[j]["high"] for j in range(i-p,i))
+    return out
+def vol_ma(bars, p=10):
+    out=[None]*len(bars)
+    for i in range(p-1,len(bars)): out[i]=sum(bars[j]["volume"] for j in range(i-p+1,i+1))/p
+    return out
+def regime_wp(bars1d, persist=3):
+    cs=[b["close"] for b in bars1d]; n=len(bars1d); rw=["RANGE"]*n
+    for i in range(200,n):
+        ma200=sum(cs[i-199:i+1])/200; ma50=sum(cs[i-50:i+1])/50
+        ar=sum((b["high"]-b["low"])/b["close"] for b in bars1d[i-19:i+1])/20
+        if cs[i]<ma200: rw[i]="BEAR"
+        elif cs[i]>ma50 and ma50>ma200 and ar>0.04: rw[i]="BULL"
+    out=["RANGE"]*n; cur="RANGE"; cnt=0; lr="RANGE"
+    for i in range(n):
+        r=rw[i]
+        if r==lr: cnt+=1
+        else: cnt=1; lr=r
+        if cnt>=persist: cur=r
+        out[i]=cur
+    return out
+
+print("Computing indicators...")
+atr4=atr_w(bars4h); e50_4h=ema(c4h,50); e200_4h=ema(c4h,200)
+e9_4h=ema(c4h,9); dh20_4h=don_hi(bars4h,20); vma10_4h=vol_ma(bars4h,10)
+atr1h=atr_w(bars1h); rsi1h=rsi_s(c1h); stk1h=stoch_s(bars1h)
+e200_1h=ema(c1h,200); bbl1h=bb_lower(c1h)
+reg1d=regime_wp(bars1d); reg_map={}
+for i,b in enumerate(bars1d): reg_map[b["time"]//86400000]=reg1d[i]
+
+ts4h=[b["time"] for b in bars4h]
+def reg_at(ts): return reg_map.get(ts//86400000 - 1, "RANGE")
+def idx4h(ts):
+    k=ts//(4*3600*1000); lo,hi,idx=0,len(ts4h)-1,0
+    while lo<=hi:
+        m=(lo+hi)//2
+        if ts4h[m]//(4*3600*1000)<=k: idx=m; lo=m+1
+        else: hi=m-1
+    return idx
+def utc_day(ts):
+    d=datetime.datetime.utcfromtimestamp(ts/1000)
+    return d.year*10000+d.month*100+d.day
+
+# ── Signal detection at a 1h bar i ──────────────────────────────────────────────
+def signal_at(i, regime):
+    """Return (side, ) if a fresh entry signal fires given regime. None = no signal."""
+    ts=bars1h[i]["time"]; j4=idx4h(ts)-1; hr=datetime.datetime.utcfromtimestamp(ts/1000).hour
+    if j4 < 21 or atr4[j4] is None: return None
+    if regime=="BEAR":
+        if NO_SHORT: return None        # --noshort: skip BEAR entirely (like hedge01)
+        # short: RSI cross<60 OR ATR breakdown 4h
+        rsi_cross = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]>=60 and rsi1h[i]<60
+        brk = c4h[j4] < c4h[j4-1] - atr4[j4]*1.2
+        if rsi_cross or brk: return ("SHORT","SHORT")
+        return None
+    if regime=="BULL":
+        vmok = vma10_4h[j4] is not None and bars4h[j4]["volume"]>=vma10_4h[j4]*1.2
+        brk  = c4h[j4] > c4h[j4-1] + atr4[j4]*(1.5 if F_BULL_STRONG else 1.2)
+        if brk and vmok: return ("LONG","BRK")
+        if dh20_4h[j4] is not None and c4h[j4]>dh20_4h[j4]: return ("LONG","DON")
+        # fallback
+        if not F_NOFB and hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
+        return None
+    # RANGE
+    if e200_1h[i] is not None and c1h[i] < e200_1h[i]: return None  # EMA200 1h gate
+    _cf = (bars1h[i]["close"] > bars1h[i]["open"]) if F_ENTRY_CONFIRM else True  # candle xác nhận hướng LONG
+    bb = bbl1h[i] is not None and bars1h[i]["low"]<=bbl1h[i] and c1h[i]>bars1h[i]["open"]
+    rc = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]<40 and rsi1h[i]>=40 and _cf
+    sc = stk1h[i] is not None and stk1h[i-1] is not None and stk1h[i-1]<20 and stk1h[i]>=20 and _cf
+    if bb: return ("LONG","BB")
+    if rc: return ("LONG","RSI")
+    if sc: return ("LONG","STK")
+    if not F_NOFB and hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
+    return None
+
+# ── Simulate ────────────────────────────────────────────────────────────────────
+campaigns=[]   # closed campaign results
+camp=None      # active: {side, avg, qty, atr0, open_i, dca, regAt, hwm, fees, ts_open}
+last_entry_day=-1
+last_reverse_i=-10**9
+pending_reverse=None   # side to open
+n_dca_total=0; n_reverse_total=0; n_cut_total=0; n_lflip_total=0
+lflip_chain=0          # consecutive loss-flips (reset on winning close) — chống whipsaw
+pending_from_flip=False # campaign mở kế tiếp là từ 1 flip (ride trend)
+
+def tp_mult_for(kind):
+    """P4: TP mult theo loại entry (hedge04 tinh hoa). Default = RANGE_TP_MULT."""
+    if not P_MIXEDTP: return RANGE_TP_MULT
+    return {"BB":1.5, "RSI":1.0, "STK":1.0}.get(kind, RANGE_TP_MULT)
+
+def open_campaign(i, side, regime, kind="?"):
+    global camp, last_entry_day, pending_from_flip
+    ts=bars1h[i]["time"]; j4=idx4h(ts)-1; a=atr4[j4]
+    if a is None or a<=0: return False
+    px=c1h[i]
+    camp={"side":side,"avg":px,"qty":BASE_QTY,"atr0":a,"open_i":i,"dca":0,
+          "regAt":regime,"hwm":px,"lwm":px,"fees":FEE*px*BASE_QTY,"ts_open":ts,
+          "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":BASE_QTY,
+          "from_flip":pending_from_flip,"path":("F" if pending_from_flip else "E"),"maxadv":0.0,
+          "hr":datetime.datetime.utcfromtimestamp(ts/1000).hour,
+          "dow":datetime.datetime.utcfromtimestamp(ts/1000).weekday()}
+    pending_from_flip=False
+    last_entry_day=utc_day(ts)
+    return True
+
+def close_campaign(i, exit_px, reason):
+    global camp, campaigns, lflip_chain
+    c=camp; side=c["side"]
+    c["fees"] += FEE*exit_px*c["qty"]   # close fee on remaining qty
+    pnl = c["qty"]*(exit_px-c["avg"]) if side=="LONG" else c["qty"]*(c["avg"]-exit_px)
+    pnl_usd = c["realized"] + pnl - c["fees"]   # realized = partial scale-out already booked
+    deployed = c["avg"]*c["max_qty"]            # return on peak capital deployed
+    ret = pnl_usd/deployed
+    ts=bars1h[i]["time"]; d=datetime.datetime.utcfromtimestamp(ts/1000)
+    campaigns.append({"ret":ret,"pnl_usd":pnl_usd,"mo":d.year*100+d.month,"yr":d.year,
+                      "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
+                      "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"],
+                      "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"],
+                      "from_flip":c.get("from_flip",False),"path":c.get("path","E"),"maxadv":c.get("maxadv",0.0),
+                      "hr":c.get("hr",-1),"dow":c.get("dow",-1)})
+    if ret>0: lflip_chain=0   # winning close → reset whipsaw chain
+    camp=None
+
+WARM=210*24  # ~210 days of 1h bars for regime warmup
+for i in range(WARM, n1h):
+    bar=bars1h[i]; ts=bar["time"]; px=bar["close"]; day=utc_day(ts)
+    regime=reg_at(ts)
+
+    # ── Manage open campaign ─────────────────────────────────────────────────
+    if camp is not None:
+        c=camp; side=c["side"]; avg=c["avg"]; atr0=c["atr0"]; regAt=c["regAt"]
+        loss = (avg-px)/atr0 if side=="LONG" else (px-avg)/atr0
+        adv = (avg-bar["low"])/atr0 if side=="LONG" else (bar["high"]-avg)/atr0  # intrabar adverse excursion
+        if adv>c["maxadv"]: c["maxadv"]=adv
+        # flip classification
+        flip="none"
+        if regAt!=regime:
+            _soft = "none" if F_FLIP_FAV_NONE else "soft"   # #5: regime thuận → hold thay vì cut
+            if side=="LONG":  flip="reverse" if regime=="BEAR" else _soft
+            else:             flip="reverse" if regime!="BEAR" else _soft
+        closed=False
+        if bar["high"]>c["hwm"]: c["hwm"]=bar["high"]
+        if bar["low"] <c["lwm"]: c["lwm"]=bar["low"]
+        # trailing active for: BULL-LONG (always) | P1 trail-all RANGE/BEAR | P2 after scale-out
+        trailing = (regAt=="BULL" and side=="LONG") or (P_TRAIL_ALL and regAt in ("RANGE","BEAR")) or c["scaled"]
+
+        # 1. Trailing exit
+        if not closed and trailing:
+            if side=="LONG":
+                trail=c["hwm"]-atr0*BULL_TRAIL_MULT
+                if c["scaled"]: trail=max(trail, avg)     # breakeven floor after partial
+                if bar["low"]<=trail: close_campaign(i, trail, "TRAIL"); closed=True
+            else:
+                trail=c["lwm"]+atr0*BULL_TRAIL_MULT
+                if c["scaled"]: trail=min(trail, avg)
+                if bar["high"]>=trail: close_campaign(i, trail, "TRAIL"); closed=True
+        # 2. Fixed TP / scale-out TP1 (RANGE/BEAR, không trail-all, chưa scaled)
+        if not closed and regAt in ("RANGE","BEAR") and not P_TRAIL_ALL and not c["scaled"]:
+            tp1 = SCALE_TP1_MULT if P_SCALEOUT else tp_mult_for(c["kind"])
+            if side=="LONG":
+                tp=avg+atr0*tp1
+                if bar["high"]>=tp:
+                    if P_SCALEOUT:
+                        half=c["qty"]/2; c["realized"]+=half*(tp-avg)-FEE*tp*half
+                        c["qty"]-=half; c["scaled"]=True
+                    else: close_campaign(i, tp, "TP"); closed=True
+            else:
+                tp=avg-atr0*tp1
+                if bar["low"]<=tp:
+                    if P_SCALEOUT:
+                        half=c["qty"]/2; c["realized"]+=half*(avg-tp)-FEE*tp*half
+                        c["qty"]-=half; c["scaled"]=True
+                    else: close_campaign(i, tp, "TP"); closed=True
+        # 2.5 FLIP3 stop-and-reverse tại -3×ATR (biến blowup thành flip ride trend)
+        if not closed and F_FLIP3 and lflip_chain < MAX_LFLIP:
+            fp = avg-atr0*FLIP_ATR if side=="LONG" else avg+atr0*FLIP_ATR
+            hit = bar["low"]<=fp if side=="LONG" else bar["high"]>=fp
+            if hit:
+                n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
+                close_campaign(i, fp, "REVERSE")
+                pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                pending_from_flip=True   # campaign kế = ride trend từ flip
+                last_reverse_i=i; closed=True
+        # 3. Hard SL (F_SL3: -3 global | F_SL_AFT_DCA: -3 chỉ khi DCA đã max)
+        if not closed:
+            cut = 3.0 if F_SL3 else (3.0 if (F_SL_AFT_DCA and c["dca"]>=DCA_MAX) else CUT_ATR)
+            if side=="LONG":
+                sl=avg-atr0*cut
+                if bar["low"]<=sl: close_campaign(i, sl, "HARDSL"); closed=True
+            else:
+                sl=avg+atr0*cut
+                if bar["high"]>=sl: close_campaign(i, sl, "HARDSL"); closed=True
+        # 4. Time stop
+        if not closed and (i - c["open_i"]) >= TIME_STOP_H:
+            close_campaign(i, px, "TIME"); closed=True
+        # 5. Reverse
+        if not closed and flip=="reverse":
+            n_reverse_total+=1
+            close_campaign(i, px, "REVERSE")
+            pending_reverse = "SHORT" if side=="LONG" else "LONG"
+            pending_from_flip=True   # campaign kế = từ regime-reverse
+            last_reverse_i=i
+            closed=True
+        # 6. Soft flip
+        if not closed and flip=="soft":
+            n_cut_total+=1
+            close_campaign(i, px, "CUT"); closed=True
+        # 7. Pyramid (P3): nhồi khi LÃI + BULL-LONG trend mạnh (max 1)
+        if not closed and P_PYRAMID and regAt=="BULL" and side=="LONG" and c["pyr"]<1:
+            if px >= avg + atr0*PYR_TRIG_ATR:
+                oldq=c["qty"]; newq=oldq+BASE_QTY
+                c["fees"]+=FEE*px*BASE_QTY        # add leg fee
+                c["avg"]=(oldq*avg+BASE_QTY*px)/newq
+                c["qty"]=newq; c["pyr"]=1; c["max_qty"]=max(c["max_qty"],newq)
+        # 8. DCA (loss, regime unchanged) — close+reopen fee model
+        if not closed:
+            thr = DCA1_ATR if c["dca"]==0 else DCA2_ATR
+            if c["dca"]<DCA_MAX and loss>=thr and dca_gate(i, side):
+                # F_FLIPDCA2: tại -2×ATR (would-DCA2, dca==1) → FLIP thay vì nhồi tiếp
+                if F_FLIPDCA2 and c["dca"]==1 and lflip_chain < MAX_LFLIP:
+                    n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
+                    close_campaign(i, px, "REVERSE")
+                    pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                    last_reverse_i=i; closed=True
+                else:
+                    oldq=c["qty"]; newq=oldq+BASE_QTY
+                    c["fees"] += FEE*px*oldq
+                    c["fees"] += FEE*px*newq
+                    c["avg"]=(oldq*avg+BASE_QTY*px)/newq
+                    c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
+                    c["path"]+="+D"
+        continue  # one action per bar while managing
+
+    # ── Pending reverse: open opposite immediately ──────────────────────────
+    if pending_reverse is not None:
+        if open_campaign(i, pending_reverse, regime, "REV"):
+            pending_reverse=None
+        continue
+
+    # ── Reverse cooldown ────────────────────────────────────────────────────
+    if i - last_reverse_i < REVERSE_CD_H: continue
+    # ── Daily constraint ────────────────────────────────────────────────────
+    if last_entry_day == day: continue
+    # ── Fresh entry signal ──────────────────────────────────────────────────
+    sig = signal_at(i, regime)
+    if sig is not None:
+        open_campaign(i, sig[0], regime, sig[1])
+
+# Close trailing open campaign at end
+if camp is not None:
+    close_campaign(n1h-1, c1h[-1], "EOD")
+
+# ── Report ───────────────────────────────────────────────────────────────────
+by_mo=defaultdict(list); by_yr=defaultdict(list)
+for c in campaigns: by_mo[c["mo"]].append(c); by_yr[c["yr"]].append(c)
+
+MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+print("="*92)
+print("HEDGE05 (implemented logic) — Regime-First Daily + DCA/cut/reverse — 7y")
+print("="*92)
+print(f"\n{'Yr Mon':10s} {'n':>3s} {'ROI%':>8s} {'TP':>3s} {'SL':>3s} {'CUT':>3s} {'REV':>3s} {'DCA':>3s}  St")
+print("-"*92)
+yr_sum=defaultdict(lambda:{"n":0,"roi":0,"win_mo":0,"tot_mo":0})
+for mo in sorted(by_mo):
+    cs=by_mo[mo]; yr=mo//100; mn=mo%100
+    roi=sum(c["ret"] for c in cs)*100
+    tp=sum(1 for c in cs if c["reason"]=="TP"); sl=sum(1 for c in cs if c["reason"] in ("SL","HARDSL"))
+    cut=sum(1 for c in cs if c["reason"]=="CUT"); rev=sum(1 for c in cs if c["reason"]=="REVERSE")
+    dca=sum(c["dca"] for c in cs)
+    st="OK" if roi>0 else "XX"
+    print(f"  {yr:4d} {MN[mn-1]:>3s} {len(cs):>3d} {roi:>+7.1f}% {tp:>3d} {sl:>3d} {cut:>3d} {rev:>3d} {dca:>3d}  {st}")
+    s=yr_sum[yr]; s["n"]+=len(cs); s["roi"]+=roi; s["win_mo"]+=(1 if roi>0 else 0); s["tot_mo"]+=1
+print("-"*92)
+print(f"\n{'Year':>6s} {'n/yr':>5s} {'ROI%':>8s} {'WinMonths':>11s}")
+for yr in sorted(yr_sum):
+    s=yr_sum[yr]
+    print(f"  {yr:4d} {s['n']:>5d} {s['roi']:>+7.1f}% {s['win_mo']:>4d}/{s['tot_mo']:<2d} ({s['win_mo']/s['tot_mo']*100:.0f}%)")
+
+rets=[c["ret"] for c in campaigns]; n=len(rets)
+mean=sum(rets)/n; sd=(sum((r-mean)**2 for r in rets)/n)**0.5 or 1e-9
+ra=mean/sd; wr=sum(1 for r in rets if r>0)/n*100
+wins=[r for r in rets if r>0]; losses=[r for r in rets if r<=0]
+rr=(sum(wins)/len(wins) if wins else 0)/abs(sum(losses)/len(losses) if losses else 1e-9)
+yrs=len(by_yr); stab=sum(1 for yr in by_yr if sum(c["ret"] for c in by_yr[yr])>0)
+total_mo=len(by_mo); win_mo=sum(1 for mo in by_mo if sum(c["ret"] for c in by_mo[mo])>0)
+total_fees=sum((c["deployed"]*0+ (c.get("fees") or 0)) for c in campaigns) if False else None
+print(f"\n{'='*92}")
+print(f"  n={n} ({n//yrs}/yr)  WR={wr:.0f}%  R:R={rr:.2f}  RA={ra:.3f}")
+print(f"  ROI sum={sum(rets)*100:+.1f}%  per-campaign avg={mean*100:+.2f}%")
+print(f"  DOLLAR P&L (size 0.003 BTC): ${sum(c['pnl_usd'] for c in campaigns):+.0f} /7y  |  recent 2023-26: ${sum(c['pnl_usd'] for c in campaigns if c['yr']>=2023):+.0f}")
+print(f"  Yearly stab={stab}/{yrs}  Monthly win={win_mo}/{total_mo} ({win_mo/total_mo*100:.0f}%)")
+# reason + DCA breakdown
+from collections import Counter
+rc=Counter(c["reason"] for c in campaigns)
+print(f"  Exits: " + "  ".join(f"{k}={v}" for k,v in sorted(rc.items(), key=lambda x:-x[1])))
+print(f"  Total DCA adds={n_dca_total}  Reverses={n_reverse_total}  Cuts={n_cut_total}")
+dca_camps=[c for c in campaigns if c["dca"]>0]
+if dca_camps:
+    dca_wr=sum(1 for c in dca_camps if c["ret"]>0)/len(dca_camps)*100
+    print(f"  Campaigns w/ DCA: {len(dca_camps)} ({len(dca_camps)/n*100:.0f}%)  their WR={dca_wr:.0f}%  their ROI={sum(c['ret'] for c in dca_camps)*100:+.1f}%")
+# walk-forward
+cut_ts=datetime.datetime(2023,1,1).year
+tr=[c for c in campaigns if c["yr"]<2023]; te=[c for c in campaigns if c["yr"]>=2023]
+def ra_of(cs):
+    if len(cs)<5: return None
+    r=[c["ret"] for c in cs]; m=sum(r)/len(r); s=(sum((x-m)**2 for x in r)/len(r))**0.5
+    return m/s if s>0 else 0
+print(f"  Walk-forward: TRAIN(2019-22) RA={ra_of(tr):.3f} (n={len(tr)})  TEST(2023-26) RA={ra_of(te):.3f} (n={len(te)})")
+
+# ── Per-side breakdown ─────────────────────────────────────────────────────────
+print(f"\n  ── Per-side ──")
+for sd in ("LONG","SHORT"):
+    cs=[c for c in campaigns if c["side"]==sd]
+    if not cs: print(f"    {sd:5s}: (none)"); continue
+    w=sum(1 for c in cs if c["ret"]>0); roi=sum(c["ret"] for c in cs)*100
+    print(f"    {sd:5s}: n={len(cs):4d}  WR={w/len(cs)*100:.0f}%  ROI={roi:+.1f}%  RA={ra_of(cs):.3f}")
+
+# ── Per-reason avg return (is TIME-stop a win or loss?) ─────────────────────────
+print(f"\n  ── Per-exit-reason ──")
+for rs in ("TP","SL","HARDSL","TIME","CUT","REVERSE","EOD"):
+    cs=[c for c in campaigns if c["reason"]==rs]
+    if not cs: continue
+    w=sum(1 for c in cs if c["ret"]>0); roi=sum(c["ret"] for c in cs)*100; avg=sum(c["ret"] for c in cs)/len(cs)*100
+    print(f"    {rs:8s}: n={len(cs):4d}  WR={w/len(cs)*100:3.0f}%  avg={avg:+.2f}%  ROI={roi:+.1f}%")
+
+# ── 2022 BEAR deep dive ─────────────────────────────────────────────────────────
+c22=[c for c in campaigns if c["yr"]==2022]
+if c22:
+    sh=[c for c in c22 if c["side"]=="SHORT"]; lo=[c for c in c22 if c["side"]=="LONG"]
+    print(f"\n  ── 2022 BEAR deep dive (n={len(c22)}) ──")
+    print(f"    SHORT: n={len(sh)} ROI={sum(c['ret'] for c in sh)*100:+.1f}% WR={(sum(1 for c in sh if c['ret']>0)/len(sh)*100) if sh else 0:.0f}%")
+    print(f"    LONG : n={len(lo)} ROI={sum(c['ret'] for c in lo)*100:+.1f}% WR={(sum(1 for c in lo if c['ret']>0)/len(lo)*100) if lo else 0:.0f}%")
+
+# ── HARD-SL deep dive ───────────────────────────────────────────────────────────
+hs=[c for c in campaigns if c["reason"]=="HARDSL"]
+if hs:
+    print(f"\n  ── HARD-SL deep dive (n={len(hs)}, ROI={sum(c['ret'] for c in hs)*100:+.1f}%) ──")
+    def grp(key):
+        d=defaultdict(lambda:[0,0.0])
+        for c in hs: d[c[key]][0]+=1; d[c[key]][1]+=c["ret"]*100
+        return d
+    for key in ("side","regAt","kind","dca","yr"):
+        parts=[f"{k}:{v[0]}({v[1]:+.0f}%)" for k,v in sorted(grp(key).items(), key=lambda x:str(x[0]))]
+        print(f"    by {key:6s}: " + "  ".join(parts))
+    helds=sorted(c["held"] for c in hs)
+    print(f"    held(bars/1h): min={helds[0]} med={helds[len(helds)//2]} max={helds[-1]}  (TS={TIME_STOP_H}h)")
+    # how many DCA'd to max before blowing up?
+    maxed=sum(1 for c in hs if c["dca"]==DCA_MAX)
+    print(f"    DCA'd to max ({DCA_MAX}) before HARDSL: {maxed}/{len(hs)} ({maxed/len(hs)*100:.0f}%)")
+print(f"  loss-flips fired (n_lflip)={n_lflip_total}  MAX_LFLIP={MAX_LFLIP}  F_FLIP3={F_FLIP3}")
+
+# ── SITUATION ASSESSMENT & HANDLING QUALITY ─────────────────────────────────────
+def stat(cs):
+    if not cs: return "n=0"
+    w=sum(1 for c in cs if c["ret"]>0); roi=sum(c["ret"] for c in cs)*100; avg=sum(c["ret"] for c in cs)/len(cs)*100
+    return f"n={len(cs):4d} WR={w/len(cs)*100:3.0f}% avg={avg:+.2f}% ROI={roi:+7.1f}%"
+
+print(f"\n{'='*92}\n  ĐÁNH GIÁ TÌNH HUỐNG & XỬ LÝ — chất lượng quyết định\n{'='*92}")
+
+# 1. Flip-into: lệnh mở TỪ flip (ride trend) có thắng không?
+print(f"\n  ── 1. FLIP-INTO (xử lý 'đảo chiều': lệnh mở sau flip có ride được trend?) ──")
+fresh=[c for c in campaigns if not c["from_flip"]]
+flipd=[c for c in campaigns if c["from_flip"]]
+print(f"    Fresh entry : {stat(fresh)}")
+print(f"    From-flip   : {stat(flipd)}   ← riding trend sau khi cắt loser @-3")
+
+# 2. Decision-path: DCA rescue có hiệu quả theo độ sâu?
+print(f"\n  ── 2. DECISION PATH (DCA rescue theo số lần nhồi) ──")
+for path,label in [("E","Direct (0 DCA)"),("E+D","1 DCA"),("E+D+D","2 DCA (max)"),("F","From-flip"),("F+D","Flip+1DCA"),("F+D+D","Flip+2DCA")]:
+    cs=[c for c in campaigns if c["path"]==path]
+    if cs: print(f"    {label:16s}: {stat(cs)}")
+
+# 3. Max adverse excursion vs recovery: lệnh lún sâu bao nhiêu thì cứu được?
+print(f"\n  ── 3. MAX ADVERSE EXCURSION → recovery rate (lún sâu mấy ATR còn cứu?) ──")
+buckets=[(0,0.5),(0.5,1),(1,2),(2,3),(3,4),(4,99)]
+for lo,hi in buckets:
+    cs=[c for c in campaigns if lo<=c["maxadv"]<hi]
+    if cs:
+        w=sum(1 for c in cs if c["ret"]>0)
+        print(f"    adv {lo:.1f}-{hi if hi<99 else '∞':>3}×ATR: n={len(cs):4d}  recover→win {w/len(cs)*100:3.0f}%  ROI={sum(c['ret'] for c in cs)*100:+7.1f}%")
+
+# 4. Regime assessment: regime lúc entry có dự báo đúng kết quả?
+print(f"\n  ── 4. REGIME ASSESSMENT (regime lúc entry → outcome) ──")
+for rg in ("BULL","RANGE","BEAR"):
+    cs=[c for c in campaigns if c["regAt"]==rg]
+    if cs: print(f"    {rg:6s}: {stat(cs)}")
+
+# ── LOSS RESEARCH: tìm hiểu các lệnh THUA ───────────────────────────────────────
+losers=[c for c in campaigns if c["ret"]<0]
+winners=[c for c in campaigns if c["ret"]>0]
+tot_loss=sum(c["ret"] for c in losers)*100
+print(f"\n{'='*92}\n  LOSS RESEARCH — {len(losers)}/{len(campaigns)} lệnh thua ({len(losers)/len(campaigns)*100:.0f}%), tổng lỗ {tot_loss:.0f}%\n{'='*92}")
+
+def contrib(dimfn, order=None):
+    """net contribution (sum ret%) + WR theo 1 dimension"""
+    d=defaultdict(lambda:[0,0,0.0])  # n, wins, sum_ret
+    for c in campaigns:
+        k=dimfn(c); d[k][0]+=1; d[k][1]+=(1 if c["ret"]>0 else 0); d[k][2]+=c["ret"]*100
+    keys=order if order else sorted(d.keys(), key=lambda k: d[k][2])
+    for k in keys:
+        if k not in d: continue
+        n,w,r=d[k]; print(f"    {str(k):10s}: n={n:4d}  WR={w/n*100:3.0f}%  netROI={r:+7.1f}%  avg={r/n:+.2f}%")
+
+print(f"\n  ── Net contribution theo ENTRY KIND (signal nào lỗ?) ──")
+contrib(lambda c: c["kind"])
+print(f"\n  ── Net theo REGIME × SIDE ──")
+contrib(lambda c: f"{c['regAt'][:3]}-{c['side'][:1]}")
+print(f"\n  ── Net theo ENTRY HOUR UTC (pattern giờ?) ──")
+contrib(lambda c: f"h{c['hr']:02d}", order=[f"h{h:02d}" for h in range(24)])
+print(f"\n  ── Net theo DOW (0=Mon..6=Sun) ──")
+contrib(lambda c: f"d{c['dow']}", order=[f"d{d}" for d in range(7)])
+print(f"\n  ── Net theo DCA count ──")
+contrib(lambda c: f"dca{c['dca']}", order=[f"dca{i}" for i in range(4)])
+
+# Deep losers: lỗ nặng < -2%
+deep=[c for c in losers if c["ret"]<-0.02]
+print(f"\n  ── DEEP LOSERS (ret < -2%): {len(deep)} lệnh, tổng {sum(c['ret'] for c in deep)*100:.0f}% ──")
+from collections import Counter
+print(f"    by reason: " + "  ".join(f"{k}={v}" for k,v in Counter(c['reason'] for c in deep).most_common()))
+print(f"    by kind  : " + "  ".join(f"{k}={v}" for k,v in Counter(c['kind'] for c in deep).most_common()))
+print(f"    by regime: " + "  ".join(f"{k}={v}" for k,v in Counter(c['regAt'] for c in deep).most_common()))
+print(f"    from_flip: {sum(1 for c in deep if c['from_flip'])}/{len(deep)}  |  maxDCA: {sum(1 for c in deep if c['dca']==DCA_MAX)}/{len(deep)}")
+
+mode = []
+if DCA_MAX==0: mode.append("NO-DCA")
+if NO_SHORT: mode.append("NO-SHORT")
+mode.append(f"TS={TIME_STOP_H}h")
+print(f"\n  [mode: {' '.join(mode)}]")
