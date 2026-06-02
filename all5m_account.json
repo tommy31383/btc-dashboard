@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "capital": 64616.00000000001,
+  "capital": 64973.00000000001,
   "positions": [
     {
       "id": "bar5m-1780408200000",
@@ -1668,14 +1668,19 @@
     {
       "id": "bar5m-1779951600000",
       "bar5mTime": 1779951600000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 73153.2,
       "entryMs": 1779952036779,
       "tpPrice": 68764.00799999999,
       "slPrice": 77542.392,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 68764.00799999999,
+      "exitMs": 1780408739091,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.0000000000004,
+      "pnlNetUsd": 177.0000000000004
     },
     {
       "id": "bar5m-1779951000000",
@@ -1824,14 +1829,19 @@
     {
       "id": "bar5m-1779943200000",
       "bar5mTime": 1779943200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 73150.1,
       "entryMs": 1779943636751,
       "tpPrice": 68761.094,
       "slPrice": 77539.10600000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 68761.094,
+      "exitMs": 1780408739091,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000034,
+      "pnlNetUsd": 177.00000000000034
     },
     {
       "id": "bar5m-1779942900000",
@@ -19980,17 +19990,25 @@
     {
       "t": 1780408575755,
       "equity": 64616.00000000001
+    },
+    {
+      "t": 1780408739091,
+      "equity": 64794.50000000001
+    },
+    {
+      "t": 1780408739091,
+      "equity": 64973.00000000001
     }
   ],
   "stats": {
-    "totalClosed": 865,
-    "wins": 428,
+    "totalClosed": 867,
+    "wins": 430,
     "losses": 437,
-    "totalPnlUsd": 59775.00000000001,
-    "totalFeeUsd": 2754,
+    "totalPnlUsd": 60129.00000000001,
+    "totalFeeUsd": 2757,
     "lastEntryMs": 1780408575755,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780408575755,
+  "updatedAt": 1780408739092,
   "capitalVersion": 2
 }
