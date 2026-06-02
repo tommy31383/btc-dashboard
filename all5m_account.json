@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 59268.50000000001,
+  "capital": 59235.50000000001,
   "positions": [
+    {
+      "id": "bar5m-1780383000000",
+      "bar5mTime": 1780383000000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "sr_long",
+      "entryPrice": 70139.9,
+      "entryMs": 1780383423728,
+      "tpPrice": 74348.294,
+      "slPrice": 65931.506,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1780382700000",
       "bar5mTime": 1780382700000,
@@ -1462,14 +1474,19 @@
     {
       "id": "bar5m-1779922800000",
       "bar5mTime": 1779922800000,
-      "status": "OPEN",
+      "status": "LOSS",
       "side": "LONG",
       "source": "sr_long",
       "entryPrice": 74430.3,
       "entryMs": 1779923539022,
       "tpPrice": 78896.118,
       "slPrice": 69964.482,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 69964.482,
+      "exitMs": 1780383419059,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": -30,
+      "pnlNetUsd": -33
     },
     {
       "id": "bar5m-1779864900000",
@@ -15227,14 +15244,6 @@
   ],
   "equityHistory": [
     {
-      "t": 1779163881471,
-      "equity": 12977.000000000002
-    },
-    {
-      "t": 1779164181481,
-      "equity": 12975.500000000002
-    },
-    {
       "t": 1779164781473,
       "equity": 12974.000000000002
     },
@@ -19225,17 +19234,25 @@
     {
       "t": 1780383123722,
       "equity": 59268.50000000001
+    },
+    {
+      "t": 1780383419059,
+      "equity": 59237.00000000001
+    },
+    {
+      "t": 1780383423728,
+      "equity": 59235.50000000001
     }
   ],
   "stats": {
-    "totalClosed": 810,
+    "totalClosed": 811,
     "wins": 394,
-    "losses": 416,
-    "totalPnlUsd": 54450.00000000001,
-    "totalFeeUsd": 2611.5,
-    "lastEntryMs": 1780383123722,
+    "losses": 417,
+    "totalPnlUsd": 54417.00000000001,
+    "totalFeeUsd": 2614.5,
+    "lastEntryMs": 1780383423728,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780383123722,
+  "updatedAt": 1780383423728,
   "capitalVersion": 2
 }
