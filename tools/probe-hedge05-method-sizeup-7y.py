@@ -42,6 +42,12 @@ F_FLIPDCA2   = "--flip-dca2" in sys.argv    # tại -2×ATR (would-DCA2): FLIP t
 FLIP_ATR     = 3.0
 MAX_LFLIP    = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--maxflip=")), 99)  # cap chống whipsaw
 F_FLIP_FAV_NONE = "--flip-fav-none" in sys.argv  # #5 fix: regime quay về thuận → HOLD (none), không soft-cut
+F_NOREV = "--norev" in sys.argv  # tắt MỌI reverse (flip3 + regime-reverse) — test long-bias no-amplifier
+F_SMARTFLIP = "--smartflip" in sys.argv  # flip3 chỉ bắn khi trend 4h (đã đóng) confirm hướng đảo — tránh whipsaw exhaustion
+F_FLIPNODCA = "--flipnodca" in sys.argv  # cú flip (from_flip) RIDE SẠCH — không DCA sau khi đảo (cohort 85% WR)
+F_SMARTFLIP2 = "--smartflip2" in sys.argv  # reverse v2: confirm = trend(EMA50)+S/R(Donchian break)+momentum(EMA9)
+F_BBONLY = "--bbonly" in sys.argv  # chỉ đánh BB lower-touch RANGE (cô lập edge mean-rev thật, bỏ breakout/stoch/donchian)
+CONFIRM_N = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--confirm=")), 2)  # cần ≥N/3 tín hiệu confirm flip
 # ── DCA gates: chỉ DCA khi tình huống còn "dip" (mean-rev), KHÔNG khi trend xác nhận ngược ──
 F_DCA_GATE_BAR = "--dca-gate-bar" in sys.argv    # chỉ DCA trên bar ổn định/đảo (LONG: green, SHORT: red)
 F_DCA_GATE_MOM = "--dca-gate-mom" in sys.argv    # chỉ DCA khi momentum 2-bar chưa adverse mạnh
@@ -61,7 +67,7 @@ def dca_gate(i, side):
     return True
 if F_DCA1 and DCA_MAX>0: DCA_MAX = 1
 HARD_SL_MULT  = 4.0
-RANGE_TP_MULT = 2.0
+RANGE_TP_MULT = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--tpm=")), 2.0)  # mean-rev TP ×ATR (tune)
 BULL_TRAIL_MULT = 3.0
 BULL_TP_MULT  = 5.0
 # --ts=N override time stop hours (default 48)
@@ -70,7 +76,12 @@ REVERSE_CD_H  = 2
 DEADLINE_HOUR = 20
 DCA1_ATR = 1.0
 DCA2_ATR = 2.0
-CUT_ATR  = 4.0
+CUT_ATR  = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--cut=")), 4.0)  # ngưỡng hard-cut ×ATR (test gradient cắt sớm/muộn)
+# ── SIZE-UP method (Tommy "đảo chiều tăng size" / martingale DCA) ──
+SIZEUP_REV = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--sizeup=")), 1.0)   # reverse mở size = closed_qty × K
+DCAUP      = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--dcaup=")), 1.0)     # DCA leg grow K^n (martingale)
+SIZE_CAP   = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--sizecap=")), 0.10)  # trần qty BTC chống ruin (~33× base)
+CONV       = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--conv=")), 1.0)      # conviction-sizing: FB (filler) qty × CONV (giữ count, giảm size ngày yếu)
 
 raw = json.load(open(CACHE)); raw.sort(key=lambda x: x["time"])
 
@@ -132,6 +143,10 @@ def don_hi(bars, p=20):
     out=[None]*len(bars)
     for i in range(p,len(bars)): out[i]=max(bars[j]["high"] for j in range(i-p,i))
     return out
+def don_lo(bars, p=20):
+    out=[None]*len(bars)
+    for i in range(p,len(bars)): out[i]=min(bars[j]["low"] for j in range(i-p,i))
+    return out
 def vol_ma(bars, p=10):
     out=[None]*len(bars)
     for i in range(p-1,len(bars)): out[i]=sum(bars[j]["volume"] for j in range(i-p+1,i+1))/p
@@ -154,9 +169,9 @@ def regime_wp(bars1d, persist=3):
 
 print("Computing indicators...")
 atr4=atr_w(bars4h); e50_4h=ema(c4h,50); e200_4h=ema(c4h,200)
-e9_4h=ema(c4h,9); dh20_4h=don_hi(bars4h,20); vma10_4h=vol_ma(bars4h,10)
+e9_4h=ema(c4h,9); dh20_4h=don_hi(bars4h,20); dl20_4h=don_lo(bars4h,20); vma10_4h=vol_ma(bars4h,10)
 atr1h=atr_w(bars1h); rsi1h=rsi_s(c1h); stk1h=stoch_s(bars1h)
-e200_1h=ema(c1h,200); bbl1h=bb_lower(c1h)
+e200_1h=ema(c1h,200); bbl1h=bb_lower(c1h, next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--bbper=")),20), next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--bbstd=")),2.0))
 reg1d=regime_wp(bars1d); reg_map={}
 for i,b in enumerate(bars1d): reg_map[b["time"]//86400000]=reg1d[i]
 
@@ -186,6 +201,7 @@ def signal_at(i, regime):
         if rsi_cross or brk: return ("SHORT","SHORT")
         return None
     if regime=="BULL":
+        if F_BBONLY: return None
         vmok = vma10_4h[j4] is not None and bars4h[j4]["volume"]>=vma10_4h[j4]*1.2
         brk  = c4h[j4] > c4h[j4-1] + atr4[j4]*(1.5 if F_BULL_STRONG else 1.2)
         if brk and vmok: return ("LONG","BRK")
@@ -200,6 +216,7 @@ def signal_at(i, regime):
     rc = rsi1h[i] is not None and rsi1h[i-1] is not None and rsi1h[i-1]<40 and rsi1h[i]>=40 and _cf
     sc = stk1h[i] is not None and stk1h[i-1] is not None and stk1h[i-1]<20 and stk1h[i]>=20 and _cf
     if bb: return ("LONG","BB")
+    if F_BBONLY: return None
     if rc: return ("LONG","RSI")
     if sc: return ("LONG","STK")
     if not F_NOFB and hr>=DEADLINE_HOUR and e9_4h[j4] is not None and c4h[j4]>e9_4h[j4]: return ("LONG","FB")
@@ -211,23 +228,51 @@ camp=None      # active: {side, avg, qty, atr0, open_i, dca, regAt, hwm, fees, t
 last_entry_day=-1
 last_reverse_i=-10**9
 pending_reverse=None   # side to open
+pending_rev_qty=None   # size cho reverse kế (size-up)
 n_dca_total=0; n_reverse_total=0; n_cut_total=0; n_lflip_total=0
 lflip_chain=0          # consecutive loss-flips (reset on winning close) — chống whipsaw
 pending_from_flip=False # campaign mở kế tiếp là từ 1 flip (ride trend)
+
+def flip_confirmed(ts, side):
+    """smartflip: chỉ đảo nếu trend 4h (bar đã đóng) confirm hướng reverse — tránh flip tại exhaustion.
+       side = side ĐANG giữ (lỗ). LONG→flip SHORT cần downtrend (c4h<EMA9); SHORT→flip LONG cần uptrend."""
+    j4 = idx4h(ts)-1
+    if j4 < 1 or e9_4h[j4] is None: return True
+    return (c4h[j4] < e9_4h[j4]) if side=="LONG" else (c4h[j4] > e9_4h[j4])
+
+def flip_confirmed_v2(ts, side, need):
+    """reverse v2: confirm flip bằng 3 yếu tố — trend(EMA50) + S/R(Donchian break) + momentum(EMA9).
+       LONG lỗ→flip SHORT cần: dưới EMA50 (downtrend) + thủng Donchian-low (mất support) + dưới EMA9 (mom).
+       SHORT lỗ→flip LONG: mirror. Cần ≥need/3 đồng thuận."""
+    j4 = idx4h(ts)-1
+    if j4 < 1: return True
+    c = c4h[j4]; conf = 0
+    if side=="LONG":
+        if e50_4h[j4] is not None and c < e50_4h[j4]: conf += 1   # trend down
+        if dl20_4h[j4] is not None and c < dl20_4h[j4]: conf += 1  # thủng support (S/R)
+        if e9_4h[j4]  is not None and c < e9_4h[j4]:  conf += 1     # momentum down
+    else:
+        if e50_4h[j4] is not None and c > e50_4h[j4]: conf += 1   # trend up
+        if dh20_4h[j4] is not None and c > dh20_4h[j4]: conf += 1  # phá resistance
+        if e9_4h[j4]  is not None and c > e9_4h[j4]:  conf += 1     # momentum up
+    return conf >= need
 
 def tp_mult_for(kind):
     """P4: TP mult theo loại entry (hedge04 tinh hoa). Default = RANGE_TP_MULT."""
     if not P_MIXEDTP: return RANGE_TP_MULT
     return {"BB":1.5, "RSI":1.0, "STK":1.0}.get(kind, RANGE_TP_MULT)
 
-def open_campaign(i, side, regime, kind="?"):
+def open_campaign(i, side, regime, kind="?", qty=None):
     global camp, last_entry_day, pending_from_flip
     ts=bars1h[i]["time"]; j4=idx4h(ts)-1; a=atr4[j4]
     if a is None or a<=0: return False
     px=c1h[i]
-    camp={"side":side,"avg":px,"qty":BASE_QTY,"atr0":a,"open_i":i,"dca":0,
-          "regAt":regime,"hwm":px,"lwm":px,"fees":FEE*px*BASE_QTY,"ts_open":ts,
-          "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":BASE_QTY,
+    q0 = qty if qty is not None else BASE_QTY
+    if kind=="FB": q0 *= CONV   # conviction: filler ngày yếu size nhỏ (count giữ nguyên)
+    q = min(q0, SIZE_CAP)
+    camp={"side":side,"avg":px,"qty":q,"atr0":a,"open_i":i,"dca":0,
+          "regAt":regime,"hwm":px,"lwm":px,"fees":FEE*px*q,"ts_open":ts,
+          "entry_px":px,"kind":kind,"scaled":False,"pyr":0,"realized":0.0,"max_qty":q,
           "from_flip":pending_from_flip,"path":("F" if pending_from_flip else "E"),"maxadv":0.0,
           "hr":datetime.datetime.utcfromtimestamp(ts/1000).hour,
           "dow":datetime.datetime.utcfromtimestamp(ts/1000).weekday()}
@@ -245,12 +290,11 @@ def close_campaign(i, exit_px, reason):
     ret = pnl_usd/deployed
     ts=bars1h[i]["time"]; d=datetime.datetime.utcfromtimestamp(ts/1000)
     campaigns.append({"ret":ret,"pnl_usd":pnl_usd,"mo":d.year*100+d.month,"yr":d.year,
-                      "open_ts":c["ts_open"],"close_ts":ts,
                       "reason":reason,"dca":c["dca"],"side":side,"deployed":deployed,
                       "kind":c["kind"],"pyr":c["pyr"],"scaled":c["scaled"],
                       "held":i-c["open_i"],"regAt":c["regAt"],"entry_px":c["entry_px"],
                       "from_flip":c.get("from_flip",False),"path":c.get("path","E"),"maxadv":c.get("maxadv",0.0),
-                      "hr":c.get("hr",-1),"dow":c.get("dow",-1)})
+                      "hr":c.get("hr",-1),"dow":c.get("dow",-1),"max_qty":c["max_qty"]})
     if ret>0: lflip_chain=0   # winning close → reset whipsaw chain
     camp=None
 
@@ -271,6 +315,7 @@ for i in range(WARM, n1h):
             _soft = "none" if F_FLIP_FAV_NONE else "soft"   # #5: regime thuận → hold thay vì cut
             if side=="LONG":  flip="reverse" if regime=="BEAR" else _soft
             else:             flip="reverse" if regime!="BEAR" else _soft
+        if F_NOREV: flip="none"
         closed=False
         if bar["high"]>c["hwm"]: c["hwm"]=bar["high"]
         if bar["low"] <c["lwm"]: c["lwm"]=bar["low"]
@@ -305,13 +350,15 @@ for i in range(WARM, n1h):
                         c["qty"]-=half; c["scaled"]=True
                     else: close_campaign(i, tp, "TP"); closed=True
         # 2.5 FLIP3 stop-and-reverse tại -3×ATR (biến blowup thành flip ride trend)
-        if not closed and F_FLIP3 and lflip_chain < MAX_LFLIP:
+        if not closed and F_FLIP3 and not F_NOREV and lflip_chain < MAX_LFLIP:
             fp = avg-atr0*FLIP_ATR if side=="LONG" else avg+atr0*FLIP_ATR
             hit = bar["low"]<=fp if side=="LONG" else bar["high"]>=fp
-            if hit:
+            if hit and (not F_SMARTFLIP or flip_confirmed(ts, side)) and (not F_SMARTFLIP2 or flip_confirmed_v2(ts, side, CONFIRM_N)):
                 n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
+                _rq = c["qty"]*SIZEUP_REV
                 close_campaign(i, fp, "REVERSE")
                 pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                pending_rev_qty = _rq
                 pending_from_flip=True   # campaign kế = ride trend từ flip
                 last_reverse_i=i; closed=True
         # 3. Hard SL (F_SL3: -3 global | F_SL_AFT_DCA: -3 chỉ khi DCA đã max)
@@ -329,8 +376,10 @@ for i in range(WARM, n1h):
         # 5. Reverse
         if not closed and flip=="reverse":
             n_reverse_total+=1
+            _rq = c["qty"]*SIZEUP_REV
             close_campaign(i, px, "REVERSE")
             pending_reverse = "SHORT" if side=="LONG" else "LONG"
+            pending_rev_qty = _rq
             pending_from_flip=True   # campaign kế = từ regime-reverse
             last_reverse_i=i
             closed=True
@@ -348,26 +397,30 @@ for i in range(WARM, n1h):
         # 8. DCA (loss, regime unchanged) — close+reopen fee model
         if not closed:
             thr = DCA1_ATR if c["dca"]==0 else DCA2_ATR
-            if c["dca"]<DCA_MAX and loss>=thr and dca_gate(i, side):
+            if c["dca"]<DCA_MAX and loss>=thr and dca_gate(i, side) and not (F_FLIPNODCA and c.get("from_flip")):
                 # F_FLIPDCA2: tại -2×ATR (would-DCA2, dca==1) → FLIP thay vì nhồi tiếp
                 if F_FLIPDCA2 and c["dca"]==1 and lflip_chain < MAX_LFLIP:
                     n_reverse_total+=1; n_lflip_total+=1; lflip_chain+=1
+                    _rq = c["qty"]*SIZEUP_REV
                     close_campaign(i, px, "REVERSE")
                     pending_reverse = "SHORT" if side=="LONG" else "LONG"
+                    pending_rev_qty = _rq
                     last_reverse_i=i; closed=True
                 else:
-                    oldq=c["qty"]; newq=oldq+BASE_QTY
-                    c["fees"] += FEE*px*oldq
-                    c["fees"] += FEE*px*newq
-                    c["avg"]=(oldq*avg+BASE_QTY*px)/newq
-                    c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
-                    c["path"]+="+D"
+                    oldq=c["qty"]; addq=BASE_QTY*(DCAUP**(c["dca"]+1))
+                    newq=min(oldq+addq, SIZE_CAP); addq=newq-oldq
+                    if addq>0:
+                        c["fees"] += FEE*px*oldq
+                        c["fees"] += FEE*px*newq
+                        c["avg"]=(oldq*avg+addq*px)/newq
+                        c["qty"]=newq; c["dca"]+=1; n_dca_total+=1; c["max_qty"]=max(c["max_qty"],newq)
+                        c["path"]+="+D"
         continue  # one action per bar while managing
 
-    # ── Pending reverse: open opposite immediately ──────────────────────────
+    # ── Pending reverse: open opposite immediately (size-up) ─────────────────
     if pending_reverse is not None:
-        if open_campaign(i, pending_reverse, regime, "REV"):
-            pending_reverse=None
+        if open_campaign(i, pending_reverse, regime, "REV", qty=pending_rev_qty):
+            pending_reverse=None; pending_rev_qty=None
         continue
 
     # ── Reverse cooldown ────────────────────────────────────────────────────
@@ -396,12 +449,12 @@ print("-"*92)
 yr_sum=defaultdict(lambda:{"n":0,"roi":0,"win_mo":0,"tot_mo":0})
 for mo in sorted(by_mo):
     cs=by_mo[mo]; yr=mo//100; mn=mo%100
-    roi=sum(c["ret"] for c in cs)*100; usd=sum(c["pnl_usd"] for c in cs)
+    roi=sum(c["ret"] for c in cs)*100
     tp=sum(1 for c in cs if c["reason"]=="TP"); sl=sum(1 for c in cs if c["reason"] in ("SL","HARDSL"))
     cut=sum(1 for c in cs if c["reason"]=="CUT"); rev=sum(1 for c in cs if c["reason"]=="REVERSE")
     dca=sum(c["dca"] for c in cs)
     st="OK" if roi>0 else "XX"
-    print(f"  {yr:4d} {MN[mn-1]:>3s} {len(cs):>3d} {roi:>+7.1f}% {tp:>3d} {sl:>3d} {cut:>3d} {rev:>3d} {dca:>3d}  {st}  ${usd:>+5.0f}")
+    print(f"  {yr:4d} {MN[mn-1]:>3s} {len(cs):>3d} {roi:>+7.1f}% {tp:>3d} {sl:>3d} {cut:>3d} {rev:>3d} {dca:>3d}  {st}")
     s=yr_sum[yr]; s["n"]+=len(cs); s["roi"]+=roi; s["win_mo"]+=(1 if roi>0 else 0); s["tot_mo"]+=1
 print("-"*92)
 print(f"\n{'Year':>6s} {'n/yr':>5s} {'ROI%':>8s} {'WinMonths':>11s}")
@@ -420,7 +473,12 @@ total_fees=sum((c["deployed"]*0+ (c.get("fees") or 0)) for c in campaigns) if Fa
 print(f"\n{'='*92}")
 print(f"  n={n} ({n//yrs}/yr)  WR={wr:.0f}%  R:R={rr:.2f}  RA={ra:.3f}")
 print(f"  ROI sum={sum(rets)*100:+.1f}%  per-campaign avg={mean*100:+.2f}%")
-print(f"  DOLLAR P&L (size 0.003 BTC): ${sum(c['pnl_usd'] for c in campaigns):+.0f} /7y  |  recent 2023-26: ${sum(c['pnl_usd'] for c in campaigns if c['yr']>=2023):+.0f}")
+print(f"  DOLLAR P&L (size 0.003 BTC base): ${sum(c['pnl_usd'] for c in campaigns):+.0f} /7y  |  recent 2023-26: ${sum(c['pnl_usd'] for c in campaigns if c['yr']>=2023):+.0f}")
+_wy=defaultdict(float)
+for _c in campaigns: _wy[_c['yr']]+=_c['pnl_usd']
+_worst=min((c['pnl_usd'] for c in campaigns), default=0); _mq=max((c.get('max_qty',BASE_QTY) for c in campaigns), default=BASE_QTY)
+_stabY=sum(1 for y in _wy if _wy[y]>0)
+print(f"  TAIL/RUIN: worst campaign ${_worst:+.0f} | worst year ${min(_wy.values(), default=0):+.0f} | $-stab {_stabY}/{len(_wy)}yr | max size {_mq:.4f}BTC ({_mq/BASE_QTY:.0f}x base) [SIZEUP={SIZEUP_REV} DCAUP={DCAUP}]")
 print(f"  Yearly stab={stab}/{yrs}  Monthly win={win_mo}/{total_mo} ({win_mo/total_mo*100:.0f}%)")
 # reason + DCA breakdown
 from collections import Counter
@@ -559,22 +617,3 @@ if DCA_MAX==0: mode.append("NO-DCA")
 if NO_SHORT: mode.append("NO-SHORT")
 mode.append(f"TS={TIME_STOP_H}h")
 print(f"\n  [mode: {' '.join(mode)}]")
-
-# ── Trade-by-trade dump cho 1 tháng (--trades=YYYYMM) ──────────────────────────
-_tm = next((a.split("=")[1] for a in sys.argv if a.startswith("--trades=")), None)
-if _tm:
-    _tmi = int(_tm)
-    sel = [c for c in campaigns if c["mo"]==_tmi]
-    print(f"\n{'='*104}\n  TRADE-BY-TRADE — {_tm} (hedge05 LIVE config: ts72 flip3 fav-none maxflip3, DCA×2, short on)  n={len(sel)}\n{'='*104}")
-    print(f"  {'open(UTC)':14s} {'close(UTC)':14s} {'side':5s} {'kind':4s} {'D':>1s} {'reason':7s} {'entry$':>8s} {'qtyBTC':>7s} {'held_h':>6s} {'pnl$':>8s} {'cum$':>8s}")
-    print(f"  {'-'*100}")
-    cum=0.0
-    for c in sorted(sel, key=lambda x:x["open_ts"]):
-        od=datetime.datetime.utcfromtimestamp(c["open_ts"]/1000).strftime("%m-%d %H:%M")
-        cd=datetime.datetime.utcfromtimestamp(c["close_ts"]/1000).strftime("%m-%d %H:%M")
-        cum+=c["pnl_usd"]; qty=c["deployed"]/c["entry_px"] if c["entry_px"] else 0
-        flag=" ←FLIP" if c.get("from_flip") else ""
-        print(f"  {od:14s} {cd:14s} {c['side']:5s} {c['kind']:4s} {c['dca']:>1d} {c['reason']:7s} {c['entry_px']:>8.0f} {qty:>7.4f} {c['held']:>6d} {c['pnl_usd']:>+8.2f} {cum:>+8.2f}{flag}")
-    print(f"  {'-'*100}")
-    w=sum(1 for c in sel if c['pnl_usd']>0)
-    print(f"  TOTAL {_tm}: ${sum(c['pnl_usd'] for c in sel):+.2f}  |  {len(sel)} lệnh, {w} win ({w/len(sel)*100:.0f}% WR)  |  DCA-adds={sum(c['dca'] for c in sel)}  reverses={sum(1 for c in sel if c['reason']=='REVERSE')}" if sel else f"  {_tm}: no trades")

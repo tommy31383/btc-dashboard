@@ -14,6 +14,9 @@ import { join } from "path";
 
 const INITIAL_CAPITAL = 100_000;
 const FEE_PCT = 0.05;
+const TREND_1D_GATE = process.argv.includes("--gate1d");  // chỉ LONG khi 1d-close > MA50_1d (skip downtrend chop — fix 2021)
+const TREND_200_GATE = process.argv.includes("--gate200"); // chỉ LONG khi 1d-close > MA200_1d (slower, giữ bull-pullback)
+const OVEREXT = (() => { const a = process.argv.find(x => x.startsWith("--overext=")); return a ? parseFloat(a.split("=")[1]) : 0; })(); // skip LONG khi close > MA50d×(1+X) (blow-off top)
 const COOLDOWN_MS = 60 * 60_000;
 const TP_PCT = 10;
 const AGGREGATE_SL_PCT = 8;
@@ -213,6 +216,7 @@ function runBacktest(
   let lowestWallet = INITIAL_CAPITAL, totalFees = 0;
   const setupCounts: Record<string, number> = {};
   const byYear: Record<string, { entries: number; closes: number; pnl: number }> = {};
+  const byMonth: Record<string, { closes: number; pnl: number }> = {};
   let last15IdxProcessed = -1, last4hIdxProcessed = -1;
   let idx15 = 0, idx1h = 0, idx1d = 0, idx1w = 0, idx4h = 0, fIdx = 0;
 
@@ -237,7 +241,7 @@ function runBacktest(
         if (pnl > 0) { wins++; sumWin += pnl; } else { losses++; sumLoss += pnl; }
         const y = new Date(ts).toISOString().slice(0, 4);
         byYear[y] = byYear[y] ?? { entries: 0, closes: 0, pnl: 0 };
-        byYear[y].closes++; byYear[y].pnl += pnl - fee;
+        byYear[y].closes++; byYear[y].pnl += pnl - fee; { const mo = new Date(ts).toISOString().slice(0, 7); byMonth[mo] = byMonth[mo] ?? { closes: 0, pnl: 0 }; byMonth[mo].closes++; byMonth[mo].pnl += pnl - fee; }
         longNet = { qty: Math.max(0, longNet.qty - t.qty), avg: longNet.qty - t.qty > 0 ? longNet.avg : 0 };
       } else newS11.push(t);
     }
@@ -260,7 +264,7 @@ function runBacktest(
         if (pnl > 0) { wins++; sumWin += pnl; } else { losses++; sumLoss += pnl; }
         const y = new Date(ts).toISOString().slice(0, 4);
         byYear[y] = byYear[y] ?? { entries: 0, closes: 0, pnl: 0 };
-        byYear[y].closes++; byYear[y].pnl += pnl - fee;
+        byYear[y].closes++; byYear[y].pnl += pnl - fee; { const mo = new Date(ts).toISOString().slice(0, 7); byMonth[mo] = byMonth[mo] ?? { closes: 0, pnl: 0 }; byMonth[mo].closes++; byMonth[mo].pnl += pnl - fee; }
         const net = t.side === "LONG" ? trendLongNet : trendShortNet;
         const rq = Math.max(0, net.qty - t.qty);
         if (t.side === "LONG") trendLongNet = { qty: rq, avg: rq > 0 ? net.avg : 0 };
@@ -291,7 +295,7 @@ function runBacktest(
         if (pnl > 0) { wins++; sumWin += pnl; } else { losses++; sumLoss += pnl; }
         const y = new Date(ts).toISOString().slice(0, 4);
         byYear[y] = byYear[y] ?? { entries: 0, closes: 0, pnl: 0 };
-        byYear[y].closes++; byYear[y].pnl += pnl - fee;
+        byYear[y].closes++; byYear[y].pnl += pnl - fee; { const mo = new Date(ts).toISOString().slice(0, 7); byMonth[mo] = byMonth[mo] ?? { closes: 0, pnl: 0 }; byMonth[mo].closes++; byMonth[mo].pnl += pnl - fee; }
         const net = t.side === "LONG" ? simpleLongNet : simpleShortNet;
         const rq = Math.max(0, net.qty - t.qty);
         if (t.side === "LONG") simpleLongNet = { qty: rq, avg: rq > 0 ? net.avg : 0 };
@@ -312,7 +316,7 @@ function runBacktest(
         if (pnl > 0) { wins++; sumWin += pnl; } else { losses++; sumLoss += pnl; }
         const y = new Date(ts).toISOString().slice(0, 4);
         byYear[y] = byYear[y] ?? { entries: 0, closes: 0, pnl: 0 };
-        byYear[y].closes++; byYear[y].pnl += pnl - fee;
+        byYear[y].closes++; byYear[y].pnl += pnl - fee; { const mo = new Date(ts).toISOString().slice(0, 7); byMonth[mo] = byMonth[mo] ?? { closes: 0, pnl: 0 }; byMonth[mo].closes++; byMonth[mo].pnl += pnl - fee; }
         longNet = { qty: 0, avg: 0 }; setup11Trades = [];
       }
     }
@@ -327,7 +331,7 @@ function runBacktest(
         if (pnl > 0) { wins++; sumWin += pnl; } else { losses++; sumLoss += pnl; }
         const y = new Date(ts).toISOString().slice(0, 4);
         byYear[y] = byYear[y] ?? { entries: 0, closes: 0, pnl: 0 };
-        byYear[y].closes++; byYear[y].pnl += pnl - fee;
+        byYear[y].closes++; byYear[y].pnl += pnl - fee; { const mo = new Date(ts).toISOString().slice(0, 7); byMonth[mo] = byMonth[mo] ?? { closes: 0, pnl: 0 }; byMonth[mo].closes++; byMonth[mo].pnl += pnl - fee; }
         shortNet = { qty: 0, avg: 0 };
       }
     }
@@ -518,6 +522,9 @@ function runBacktest(
         if (ts - lastTs.v < cdMs) return;
         if (atrVal4h === null || atrVal4h <= 0) return;
         if (side === "LONG" && !allowMomLong) return;
+        if (side === "LONG" && TREND_1D_GATE) { const md1d = ind.ma50d[idx1dc]; if (md1d == null || c1d[idx1dc].close <= md1d) return; }
+        if (side === "LONG" && TREND_200_GATE) { const md2 = ind.ma200d[idx1dc]; if (md2 == null || c1d[idx1dc].close <= md2) return; }
+        if (side === "LONG" && OVEREXT > 0) { const mdo = ind.ma50d[idx1dc]; if (mdo != null && c1d[idx1dc].close > mdo * (1 + OVEREXT)) return; }
         if (side === "SHORT" && !allowShortSide) return;
         let qty = baseQty * hwmScale * atrScale;
         if (qty > 0 && qty < MIN_BINANCE_QTY) qty = MIN_BINANCE_QTY;
@@ -715,6 +722,7 @@ function runBacktest(
     exp: +exp.toFixed(2),
     setupCounts,
     byYear: Object.fromEntries(Object.entries(byYear).map(([k, v]) => [k, { ...v, pnl: Math.round(v.pnl) }])),
+    byMonth: Object.fromEntries(Object.entries(byMonth).map(([k, v]) => [k, { ...v, pnl: Math.round(v.pnl) }])),
   };
 }
 
@@ -811,6 +819,25 @@ function main() {
     console.log(`${r.scenario.padEnd(29)} | ${String(r.roi).padStart(6)} | ${String(r.maxDD).padStart(5)} | ${String(r.ra).padStart(5)} | ${String(r.entries).padStart(7)} | ${String(r.wr).padStart(5)} | ${String(r.rr).padStart(4)} | ${String(r.exp).padStart(8)}`);
   }
 
+  console.log("\n--- 🔴 2021 BLOW-UP diagnosis ($ in 2021 per scenario) ---");
+  console.log(`  ${"FULL (Stage A)".padEnd(29)} → 2021: $${rA.byYear["2021"]?.pnl ?? 0}`);
+  for (const r of stageB) {
+    const p = (r as any).byYear?.["2021"]?.pnl ?? 0;
+    console.log(`  ${r.scenario.padEnd(29)} → 2021: $${p}`);
+  }
+  console.log("  --- Stage A 2021 per-month ---");
+  for (const mo of Object.keys(rA.byMonth).filter(m => m.startsWith("2021")).sort()) {
+    console.log(`    ${mo}: $${rA.byMonth[mo].pnl}`);
+  }
+  const trendOnly = stageB.find(r => r.scenario === "trend_S12_S13_S14_only") as any;
+  if (trendOnly?.byYear) {
+    console.log("\n--- ✅ LIVE-equiv (trend_S12_S13_S14_only) per-YEAR ---");
+    for (const y of Object.keys(trendOnly.byYear).sort()) console.log(`    ${y}: $${trendOnly.byYear[y].pnl}`);
+    console.log("  trend-only 2021 per-month:");
+    for (const mo of Object.keys(trendOnly.byMonth).filter((m: string) => m.startsWith("2021")).sort())
+      console.log(`    ${mo}: $${trendOnly.byMonth[mo].pnl}`);
+  }
+
   console.log("\n--- Stage C: walk-forward ---");
   console.log("Phase                         | ROI%   | DD%   | RA    | Entries | WR%   | R:R  | Exp/trade");
   console.log("-".repeat(110));
@@ -823,6 +850,13 @@ function main() {
     const yd = rA.byYear[y];
     const sign = yd.pnl >= 0 ? "+" : "";
     console.log(`  ${y}: ${String(yd.entries).padStart(4)}E ${String(yd.closes).padStart(4)}C ${sign}$${yd.pnl}`);
+  }
+
+  console.log("\n--- Stage A: per-MONTH detail ($/month, hedge01 v0438 full) ---");
+  for (const mo of Object.keys(rA.byMonth).sort()) {
+    const md = rA.byMonth[mo];
+    const sign = md.pnl >= 0 ? "+" : "";
+    console.log(`  ${mo}: ${String(md.closes).padStart(3)}C  ${sign}$${md.pnl}`);
   }
 
   const output = {
