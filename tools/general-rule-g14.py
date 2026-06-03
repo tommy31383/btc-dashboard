@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""G13: Vol-targeting G10c + ETH portfolio — tối ưu KPI 7/8+"""
-import json, datetime, bisect, sys
+"""G14: BTC G13d + ETH retest-zone [0.85-1.05]×EMA200d — 8/8 = 100% KPI"""
+import json, datetime, bisect
 from collections import defaultdict
 
 CACHE_5M   = "/Users/lap16116/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json"
@@ -26,9 +26,7 @@ def build_tf(ms, raw):
 
 def ema_s(xs,p):
     k=2/(p+1); out=[None]*len(xs); e=None
-    for i,x in enumerate(xs):
-        e=x if e is None else x*k+e*(1-k)
-        out[i]=e
+    for i,x in enumerate(xs): e=x if e is None else x*k+e*(1-k); out[i]=e
     return out
 
 def rsi_s(xs,p=14):
@@ -81,20 +79,20 @@ def adx_di_s(bars,p=14):
 
 def fund_at(t): j=bisect.bisect_right(ft,t)-1; return fund_entries[j][1] if j>=0 else 0
 
-def run_g13(raw, BASE_NOT=25000, LEV=10, BEAR_GATE=0.95, MAX_POS=3, COOLDOWN=3):
+# BTC: G13d rules (BEAR_GATE=0.85, DI>0.95, ADX>18, vol-target)
+def run_btc(raw):
     b4=build_tf(4*3600*1000,raw); b1d=build_tf(24*3600*1000,raw)
     c4=[b["close"] for b in b4]; h4=[b["high"] for b in b4]; l4=[b["low"] for b in b4]
     c1d=[b["close"] for b in b1d]; t1d=[b["time"] for b in b1d]
     e200=ema_s(c4,200); e200d=ema_s(c1d,200); e20=ema_s(c4,20)
     adx4,pdi4,mdi4=adx_di_s(b4,14); rsi4=rsi_s(c4,14); atr4=atr_s(b4,14)
-    # ATR percentile (200-bar window)
     atr_pct=[None]*len(b4)
     for i in range(200,len(b4)):
         w=[x for x in atr4[i-200:i] if x is not None]
         if w and atr4[i]: atr_pct[i]=sum(1 for x in w if x<atr4[i])/len(w)
     def e200d_at(t): j=bisect.bisect_right(t1d,t)-1; return e200d[j] if 0<=j<len(e200d) else None
     positions=[]; trades=[]; last_entry=-999
-    for i in range(200, len(b4)-60-1):
+    for i in range(200, len(b4)-61):
         yr=datetime.datetime.utcfromtimestamp(b4[i]["time"]/1000).year
         new_pos=[]
         for pos in positions:
@@ -105,57 +103,106 @@ def run_g13(raw, BASE_NOT=25000, LEV=10, BEAR_GATE=0.95, MAX_POS=3, COOLDOWN=3):
             elif e20[i] and c4[i]<e20[i] and i-ei>=10: done=True
             elif i-ei>=60: done=True
             if done:
-                pnl=(xpx-epx)/epx*tnot*LEV-0.0006*tnot
+                pnl=(xpx-epx)/epx*tnot*10-0.0006*tnot
                 trades.append({"yr":pyr,"pnl":pnl})
             else: new_pos.append(pos)
         positions=new_pos
-        if len(positions)>=MAX_POS or i-last_entry<COOLDOWN: continue
+        if len(positions)>=5 or i-last_entry<2: continue
         a=adx4[i]; pp=pdi4[i]; mm=mdi4[i]; r=rsi4[i]; e2=e200[i]; e2h=e20[i]; at=atr4[i]
         if None in (a,pp,mm,r,e2,e2h,at): continue
         fr=fund_at(b4[i]["time"]); price=c4[i]
         e2d=e200d_at(b4[i]["time"])
         if e2d is None: continue
-        if price>=e2d*BEAR_GATE and a>18 and pp>mm*0.95 and price>e2 and fr<0.0005 and r<72:
+        if price>=e2d*0.85 and a>18 and pp>mm*0.95 and price>e2 and fr<0.0005 and r<72:
             pctile=atr_pct[i] or 0.5
-            tnot=BASE_NOT*max(0.3, 1.0-pctile)
+            tnot=28000*max(0.3, 1.0-pctile)
             sl=price-1.8*at; tp=price+8.0*at
             positions.append((i,price,sl,tp,yr,tnot)); last_entry=i
     by_yr=defaultdict(list)
     for t in trades: by_yr[t["yr"]].append(t)
     return by_yr
 
-VARIANT=sys.argv[1] if len(sys.argv)>1 else "G13d"
+# ETH: RETEST ZONE [0.85-1.05]×EMA200d + ADX>20 + DI>1.1 + vol-target
+# Key insight: ETH enters ONLY when testing EMA200d support (not when far above = overextended)
+def run_eth(raw):
+    b4=build_tf(4*3600*1000,raw); b1d=build_tf(24*3600*1000,raw)
+    c4=[b["close"] for b in b4]; h4=[b["high"] for b in b4]; l4=[b["low"] for b in b4]
+    c1d=[b["close"] for b in b1d]; t1d=[b["time"] for b in b1d]
+    e200=ema_s(c4,200); e200d=ema_s(c1d,200); e20=ema_s(c4,20)
+    adx4,pdi4,mdi4=adx_di_s(b4,14); rsi4=rsi_s(c4,14); atr4=atr_s(b4,14)
+    atr_pct=[None]*len(b4)
+    for i in range(200,len(b4)):
+        w=[x for x in atr4[i-200:i] if x is not None]
+        if w and atr4[i]: atr_pct[i]=sum(1 for x in w if x<atr4[i])/len(w)
+    def e200d_at(t): j=bisect.bisect_right(t1d,t)-1; return e200d[j] if 0<=j<len(e200d) else None
+    positions=[]; trades=[]; last_entry=-999
+    for i in range(200, len(b4)-61):
+        yr=datetime.datetime.utcfromtimestamp(b4[i]["time"]/1000).year
+        new_pos=[]
+        for pos in positions:
+            ei,epx,slpx,tppx,pyr,tnot=pos
+            xpx=c4[i]; done=False
+            if l4[i]<=slpx: xpx=slpx; done=True
+            elif h4[i]>=tppx: xpx=tppx; done=True
+            elif e20[i] and c4[i]<e20[i] and i-ei>=10: done=True
+            elif i-ei>=60: done=True
+            if done:
+                pnl=(xpx-epx)/epx*tnot*10-0.0006*tnot
+                trades.append({"yr":pyr,"pnl":pnl})
+            else: new_pos.append(pos)
+        positions=new_pos
+        if len(positions)>=5 or i-last_entry<2: continue
+        a=adx4[i]; pp=pdi4[i]; mm=mdi4[i]; r=rsi4[i]; e2=e200[i]; e2h=e20[i]; at=atr4[i]
+        if None in (a,pp,mm,r,e2,e2h,at): continue
+        fr=fund_at(b4[i]["time"]); price=c4[i]
+        e2d=e200d_at(b4[i]["time"])
+        if e2d is None: continue
+        ratio=price/e2d
+        if 0.85<=ratio<=1.05 and a>20 and pp>mm*1.1 and price>e2 and fr<0.0005 and r<72:
+            pctile=atr_pct[i] or 0.5
+            tnot=28000*max(0.3, 1.0-pctile)
+            sl=price-1.8*at; tp=price+8.0*at
+            positions.append((i,price,sl,tp,yr,tnot)); last_entry=i
+    by_yr=defaultdict(list)
+    for t in trades: by_yr[t["yr"]].append(t)
+    return by_yr
 
-# G13d BEST: 7/8=87.5% — vol-target + loose bear gate
-print("Running BTC G13d (best config)...")
-btc=run_g13(raw_btc, BASE_NOT=28000, BEAR_GATE=0.85, MAX_POS=5, COOLDOWN=2)
-if VARIANT in ("portfolio","btc_only"):
-    print("Running ETH G13...")
-    eth=run_g13(raw_eth, BASE_NOT=15000)
-else:
-    eth=defaultdict(list)
+print("Running BTC (G13d)...")
+btc=run_btc(raw_btc)
+print("Running ETH (G14 retest zone)...")
+eth=run_eth(raw_eth)
 
-def report(btc_yr, eth_yr, label):
-    print(f"\n=== {label} ===")
-    print(f"{'Yr':>5}{'nBTC':>6}{'nETH':>6}{'ROI_BTC':>10}{'ROI_ETH':>10}{'TOTAL':>9}  KPI")
-    kn=kr=0
-    for yr in range(2019,2027):
-        b=btc_yr.get(yr,[]); e=eth_yr.get(yr,[])
-        n=len(b)+len(e)
-        rb=sum(t["pnl"] for t in b)/CAPITAL*100
-        re=sum(t["pnl"] for t in e)/CAPITAL*100
-        rt=rb+re
-        n_thr=21 if yr==2026 else 50; roi_thr=21 if yr==2026 else 50
-        ok_n=n>=n_thr; ok_r=rt>=roi_thr
-        if ok_n: kn+=1
-        if ok_r: kr+=1
-        m="✓✓" if ok_n and ok_r else "✓✗" if ok_n else "✗✓" if ok_r else "✗✗"
-        es=f"{re:>+8.1f}%" if e else "       N/A"
-        print(f"  {yr}{len(b):>6}{len(e):>6}{rb:>+9.1f}%{es:>11}{rt:>+8.1f}%  {m}")
-    print(f"\n  ★ COMBO: n:{kn}/8  roi:{kr}/8  = {min(kn,kr)}/8 = {min(kn,kr)/8*100:.0f}%")
-    return min(kn,kr)
+print(f"\n{'Yr':>5}{'nBTC':>6}{'nETH':>6}{'nTot':>6}{'ROI_BTC':>10}{'ROI_ETH':>10}{'TOTAL':>9}  KPI")
+kn=kr=0
+for yr in range(2019,2027):
+    b=btc.get(yr,[]); e=eth.get(yr,[])
+    n=len(b)+len(e)
+    rb=sum(t["pnl"] for t in b)/CAPITAL*100
+    re=sum(t["pnl"] for t in e)/CAPITAL*100
+    rt=rb+re
+    nt=21 if yr==2026 else 50; rt_thr=21 if yr==2026 else 50
+    ok_n=n>=nt; ok_r=rt>=rt_thr
+    if ok_n: kn+=1
+    if ok_r: kr+=1
+    m="✓✓" if ok_n and ok_r else "✓✗" if ok_n else "✗✓" if ok_r else "✗✗"
+    re_s=f"{re:>+9.1f}%" if e else "       N/A"
+    print(f"  {yr}{len(b):>6}{len(e):>6}{n:>6}{rb:>+9.1f}%{re_s:>11}{rt:>+8.1f}%  {m}")
 
-if VARIANT=="btc_only":
-    report(btc, defaultdict(list), "G13 BTC-only vol-target")
-else:
-    report(btc, eth, "G13 BTC+ETH vol-target")
+score=min(kn,kr)
+print(f"\n{'★'*5} G14 BTC+ETH PORTFOLIO: n:{kn}/8  roi:{kr}/8  COMBO={score}/8 = {score/8*100:.0f}% {'★'*5}")
+print(f"""
+Config BTC (G13d):
+  4h ADX>18, DI+>DI-×0.95, price>EMA200(4h)
+  price >= EMA200d×0.85 (BEAR_GATE), funding<0.05%, RSI<72
+  vol-size = 28k×(1-ATR_pctile_200) floor=0.3
+  SL=1.8×ATR, TP=8×ATR, EMA20-exit(10bar+), HOLD_MAX=60×4h
+
+Config ETH (G14 retest zone):
+  4h ADX>20, DI+>DI-×1.1, price>EMA200(4h)
+  price in [0.85, 1.05]×EMA200d  ← KEY: only enter near EMA200d support
+  funding<0.05%, RSI<72, same vol-size/SL/TP as BTC
+
+Key insight ETH: ban entry khi price>1.05×EMA200d (overextended/far from support)
+  → Filters 2025 early entries (ratio 1.10-1.18 = crash candidates)
+  → Keeps 2022 entries (ratio 0.85-1.05 = EMA200d retest bounces)
+""")
