@@ -210,3 +210,24 @@ STRONG_UP:    7y +0.83% / OOS +0.31%  7y +0.97% / OOS +0.50%  ← v4 WINS
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).
 - [ ] Audit: zone hiện tại có "dính" (sticky) không hay flip liên tục (whipsaw cost)?
+
+## Iteration 19-20 — RCI reversal OOS recalibrate ⚠️ CRITICAL
+
+```
+OOS 2023-26 base rate = 26.7% reversal >=3% / 48h
+
+Component         OOS prec    TRAIN prec
+Funding>0.05%:     30.0%        42.0%  (only survivor, decay -12pp)
+RSI4h>70:          16.4%        30.2%  (KILLS OOS — 10pp BELOW base)
+Stoch4h>80-90:     19-21%       30.9%  (kills OOS)
+BB%B>0.95-1.1:     20-23%       —      (kills OOS)
+Fund+RSI+Stoch:    37.5%        —      (n=16, too small OOS)
+```
+
+RSI/Stoch/BB DEAD OOS — below base rate 16-23% vs 26.7%. 2023-26 bull sustained,
+overbought != reversal. Only Funding survives (30-31%, +3-4pp, decayed from 42% train).
+
+Applied: RSI weight x0.5 (1.5->0.7), Stoch x0.5 (0.8->0.4), BB x0.5 (0.8->0.4).
+Funding weight kept at 2.0. RCI v5. Deploy v4.10.4.
+
+Implication: RCI = crowding display (funding), reversal precision LOW OOS. Not standalone entry trigger.

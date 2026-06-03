@@ -80,46 +80,50 @@ export function computeRCI(input: RCIInput): RCIResult {
     return { value: null, zone: "NEUTRAL", components: comp, fundingPct: null };
   }
 
-  // ── Layer 1: RSI (4h primary + 1h secondary) ──
+  // ── Layer 1: RSI (4h) — iter19-20 OOS audit: RSI>70 OOS 2023-26 prec=16% < base 27%
+  // RSI weight CUT 50% — sustained bull market làm RSI overbought ≠ reversal OOS.
+  // Giữ lại để display nhưng không dominant.
   const rsi4Series = calcRSISeries(closes4h, 14);
   const r4 = rsi4Series[rsi4Series.length - 1];
   const r4p = rsi4Series[rsi4Series.length - 2];
   if (r4 !== undefined) {
-    if (r4 > 75) comp.rsi += 1.5;
-    else if (r4 > 70) comp.rsi += 1.0;
-    else if (r4 < 25) comp.rsi -= 1.5;
-    else if (r4 < 30) comp.rsi -= 1.0;
+    if (r4 > 75) comp.rsi += 0.7;        // cut từ 1.5
+    else if (r4 > 70) comp.rsi += 0.4;   // cut từ 1.0
+    else if (r4 < 25) comp.rsi -= 0.7;
+    else if (r4 < 30) comp.rsi -= 0.4;
     if (r4p !== undefined) {
-      if (r4p > 70 && r4 < r4p) comp.rsi += 0.5;
-      if (r4p < 30 && r4 > r4p) comp.rsi -= 0.5;
+      if (r4p > 70 && r4 < r4p) comp.rsi += 0.2;
+      if (r4p < 30 && r4 > r4p) comp.rsi -= 0.2;
     }
   }
   if (closes1h.length >= 20) {
     const rsi1Series = calcRSISeries(closes1h, 14);
     const r1 = rsi1Series[rsi1Series.length - 1];
     if (r1 !== undefined) {
-      if (r1 > 75) comp.rsi += 0.8;
-      else if (r1 > 70) comp.rsi += 0.4;
-      else if (r1 < 25) comp.rsi -= 0.8;
-      else if (r1 < 30) comp.rsi -= 0.4;
+      if (r1 > 75) comp.rsi += 0.3;   // cut từ 0.8
+      else if (r1 > 70) comp.rsi += 0.15;
+      else if (r1 < 25) comp.rsi -= 0.3;
+      else if (r1 < 30) comp.rsi -= 0.15;
     }
   }
 
-  // ── Layer 2: Stochastic (4h) ──
+  // ── Layer 2: Stochastic (4h) — iter20: Stoch>80 OOS 2023-26 prec=19% < base 27%
+  // Weight cut 50%
   const sk4 = calcStochRaw(klines4h, 14);
   const sk4p = calcStochRaw(klines4h.slice(0, -1), 14);
   if (sk4 !== null && sk4p !== null) {
-    if (sk4 > 80 && sk4 < sk4p) comp.stoch += 0.8;
-    if (sk4 < 20 && sk4 > sk4p) comp.stoch -= 0.8;
+    if (sk4 > 80 && sk4 < sk4p) comp.stoch += 0.4;   // cut từ 0.8
+    if (sk4 < 20 && sk4 > sk4p) comp.stoch -= 0.4;
   }
 
-  // ── Layer 3: Bollinger %B (4h) ──
+  // ── Layer 3: Bollinger %B (4h) — iter20: BB>0.95 OOS prec=20% < base 27%
+  // Weight cut 50%
   const bb = calcBollingerPctB(closes4h, 20, 2);
   if (bb !== null) {
-    if (bb > 1.1) comp.bollinger += 0.8;
-    else if (bb > 0.95) comp.bollinger += 0.4;
-    else if (bb < -0.1) comp.bollinger -= 0.8;
-    else if (bb < 0.05) comp.bollinger -= 0.4;
+    if (bb > 1.1) comp.bollinger += 0.4;    // cut từ 0.8
+    else if (bb > 0.95) comp.bollinger += 0.2;
+    else if (bb < -0.1) comp.bollinger -= 0.4;
+    else if (bb < 0.05) comp.bollinger -= 0.2;
   }
 
   // ── Layer 4: MACD histogram declining (4h) ──
