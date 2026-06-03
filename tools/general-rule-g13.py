@@ -124,10 +124,11 @@ def run_g13(raw, BASE_NOT=25000, LEV=10, BEAR_GATE=0.95, MAX_POS=3, COOLDOWN=3):
     for t in trades: by_yr[t["yr"]].append(t)
     return by_yr
 
-VARIANT=sys.argv[1] if len(sys.argv)>1 else "portfolio"
+VARIANT=sys.argv[1] if len(sys.argv)>1 else "G13d"
 
-print("Running BTC G13...")
-btc=run_g13(raw_btc, BASE_NOT=28000)
+# G13d BEST: 7/8=87.5% — vol-target + loose bear gate
+print("Running BTC G13d (best config)...")
+btc=run_g13(raw_btc, BASE_NOT=28000, BG=0.85, MAX_POS=5, COOLDOWN=2)
 if VARIANT in ("portfolio","btc_only"):
     print("Running ETH G13...")
     eth=run_g13(raw_eth, BASE_NOT=15000)
