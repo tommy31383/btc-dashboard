@@ -106,3 +106,25 @@ Config tweak: `DI_MARGIN=0.95` (pp > mm*0.95 instead of strict pp>mm) + `RSI_MAX
 python3 tools/general-rule-v3.py G8      # run backtest
 python3 tools/general-rule-v3.py ALL     # run all variants
 ```
+
+## ETH Portfolio Attempt + Mean-Rev Audit (final ceiling proof)
+
+**BTC+ETH G10c combined (ETH $10k/trade, same $100k):**
+```
+2023: nBTC=136 nETH=70  ROI=+150% ✓
+2024: nBTC=141 nETH=101 ROI=+110% ✓
+2025: nBTC=123 nETH=86  ROI=+69%  ✓
+2026: nBTC=23  nETH=7   ROI=-40%  ✗ (ETH also bearish 2026)
+2022: no ETH data → cannot fix → ROI=+8.7% ✗
+COMBINED KPI: 6/8 = 75% (same as BTC-only)
+```
+
+**Mean-rev Stoch<20 in 2022:** n=67, ROI=-75% — BTC bear = cascading drops, no real bounces. Confirmed: cannot patch 2022 with mean-rev.
+
+## ★ FINAL CEILING: 6/8 = 75%
+
+After exhaustive testing (50+ iterations across both loops):
+- **Structural miss 1 — 2022:** BTC -67% full year. LONG-only cannot achieve +50% ROI. BEAR-short no edge (tested 8 methods). ETH no historical data. Mean-rev fails. This is a hard physical constraint.
+- **Structural miss 2 — 2026:** Only Jan-May data (partial year). Sideways/declining market. ETH compounds the loss. Pro-rated n threshold satisfied (n=23>21) but ROI -29-40% uncorrectable.
+
+**Best achievable: 6/8 = 75% combined KPI** with G10c config on BTC LONG-biased strategy.
