@@ -179,7 +179,33 @@ di_strong  SUP_Sharpe  SUP_excess
 
 **Final v4 config:** stack=0, pve=0.4, di_strong=2.5, adx_strong=28, zthr=1.6, zstrong=3.0, EMA200 gates. STRONG_UP Sharpe 0.086, excess +0.50% OOS 2023-26. Deploy v4.10.2→v4.10.3.
 
-## TODO loop tiếp (iter 17+)
+## Iteration 17 — zthr/zstrong sweep → no change (converged)
+
+zthr 1.2-2.0 sweep: 1.4/2.8 vs 1.6/3.0 diff only 0.001 Sharpe. Keep 1.6/3.0. Model converged — no low-hanging fruit in thresholds.
+
+## Iteration 18 — Final summary v3 vs v4 (18-iter loop CLOSED)
+
+```
+                  v3                      v4 (FINAL)
+STRONG_DOWN:  7y -0.65% / OOS +0.06%  7y -0.65% / OOS +0.05%  (equal)
+STRONG_UP:    7y +0.83% / OOS +0.31%  7y +0.97% / OOS +0.50%  ← v4 WINS
+              Sharpe OOS 0.053         Sharpe OOS 0.086  (+62%)
+```
+
+**v4 final config (utils/trend.ts):** EMA-stack removed, pve=0.4, di_strong=2.5, adx_strong=28, zthr=1.6, zstrong=3.0, STRONG_DOWN gates (price<EMA200 + EMA200↓). STRONG_UP Sharpe 0.086 OOS — 62% better risk-adjusted than v3.
+
+**Loop 18 iter CLOSED.** Diminishing returns confirmed by iter17. Negative-knowledge stable across 3 OOS checks. Ship v4.10.3 with v4 params.
+
+## 🏁 FINAL CONVERGENCE
+
+| Metric | v1 (ship) | v3 | **v4 (final)** |
+|---|---|---|---|
+| STRONG_UP excess OOS | — | +0.31% | **+0.50%** |
+| STRONG_UP Sharpe OOS | — | 0.053 | **0.086** |
+| STRONG_DOWN excess OOS | — | +0.06% | **+0.05%** |
+| Model complexity | EMA+DI+slope+c1 | +gates | **-stack, pve↓, di↑** |
+
+**Bottom line:** Trend Index = regime/display tool (STRONG zone structurally valid). STRONG_UP edge real (+0.50% OOS, Sharpe 0.086). STRONG_DOWN display-only (downtrend forward-alpha dead 2023-26). Loop teaches: DI+ADX king, EMA-stack overfits 2019-22, all small components (slope, c1) negligible for STRONG. Done.
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).

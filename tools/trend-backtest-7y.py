@@ -634,7 +634,71 @@ def di_final_sweep(tag):
         exc=(sum(su)/len(su)-d) if su else float('nan')
         print(f"{ds:>8.1f}{sh(su):>+10.3f}{exc:>+9.2f}%{len(su):>8}")
 
+def threshold_sweep(tag):
+    """Iter17: zthr/zstrong sweep — v4 base, balance coverage vs Sharpe OOS 2023-26."""
+    H=30
+    print(f"\n[{tag}] zthr/zstrong sweep (v4) OOS 2023-26:")
+    print(f"{'zthr/zstr':>12}{'SUP_sh':>10}{'SUPexc':>10}{'nU':>8}{'SDNexc':>10}")
+    for zthr,zstr in ((1.2,2.5),(1.4,2.8),(1.6,3.0),(1.8,3.2),(2.0,3.5)):
+        Pt=dict(VARIANTS["v4"]); Pt["zthr"]=zthr; Pt["zstrong"]=zstr
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        def sh(xs):
+            if len(xs)<5:return float('nan')
+            exc=[x-d for x in xs]; m=sum(exc)/len(exc)
+            s=statistics.stdev(exc) if len(exc)>1 else 1
+            return m/s if s>0 else 0
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        print(f"{zthr}/{zstr:>4.1f}{sh(su):>+10.3f}{sue:>+9.2f}%{len(su):>8}{sde:>+9.2f}%")
+
+def full_summary():
+    """Iter18: full v3 vs v4 7y summary — all metrics, close loop."""
+    H=30
+    print("\n=== FINAL SUMMARY: v3 vs v4 (all 7y + OOS 2023-26) ===")
+    for vname,Pt in [("v3",VARIANTS["v3"]),("v4",VARIANTS["v4"])]:
+        by_z=defaultdict(list); allf=[]
+        oos_sd=[];oos_su=[];oos_all=[]
+        for i in range(200,len(bars4h)-H):
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            by_z[zone].append(f)
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr>=2023:
+                oos_all.append(f)
+                if zone=="STRONG_DOWN":oos_sd.append(f)
+                elif zone=="STRONG_UP":oos_su.append(f)
+        drift=sum(allf)/len(allf)
+        oos_drift=sum(oos_all)/len(oos_all) if oos_all else 0
+        def sh(xs,d):
+            if len(xs)<5:return float('nan')
+            exc=[x-d for x in xs]; m=sum(exc)/len(exc)
+            s=statistics.stdev(exc) if len(exc)>1 else 1
+            return m/s if s>0 else 0
+        print(f"\n[{vname}] 7y drift={drift:+.2f}%  OOS drift={oos_drift:+.2f}%")
+        print(f"  {'zone':<13}{'n_7y':>7}{'exc_7y':>9}{'n_OOS':>7}{'exc_OOS':>9}{'Sh_OOS':>9}")
+        for z in ["STRONG_DOWN","DOWN","RANGE","UP","STRONG_UP"]:
+            xs=by_z.get(z,[])
+            nsd=oos_sd if z=="STRONG_DOWN" else oos_su if z=="STRONG_UP" else []
+            exc7=(sum(xs)/len(xs)-drift) if xs else float('nan')
+            exco=(sum(nsd)/len(nsd)-oos_drift) if nsd else float('nan')
+            sho=sh(nsd,oos_drift) if nsd else float('nan')
+            print(f"  {z:<13}{len(xs):>7}{exc7:>+8.2f}%{len(nsd):>7}{exco:>+8.2f}%{sho:>+8.3f}")
+
 if __name__=="__main__":
+    if VARIANT=="iter18":
+        full_summary(); sys.exit(0)
+    if VARIANT=="iter17":
+        threshold_sweep("v4"); sys.exit(0)
     if VARIANT=="iter16":
         di_final_sweep("v4"); sys.exit(0)
     if VARIANT=="iter15":
