@@ -142,24 +142,58 @@ export default function RCIPanel({ rci, trend }: Props) {
         <Text style={styles.axisLabel}>đỉnh (bear) ↓</Text>
       </View>
 
-      {/* Components breakdown (v4: 8 components) */}
+      {/* Funding rate — PROMINENT (iter23: funding is king, only signal surviving OOS) */}
+      {fundingPct !== null && (
+        <FundingBar fundingPct={fundingPct} />
+      )}
+
+      {/* Components breakdown (v5: funding dominant, RSI/Stoch/BB cut 50% weight) */}
       <View style={styles.compRow}>
         <Comp label="Fund" v={components.funding} highlight={Math.abs(components.funding) >= 1.5} />
         <Comp label="FAcc" v={components.fundingAccel} highlight={Math.abs(components.fundingAccel) >= 1.2} />
-        <Comp label="RSI" v={components.rsi} />
-        <Comp label="Stoch" v={components.stoch} />
-        <Comp label="BB" v={components.bollinger} />
+        <Comp label="RSI*" v={components.rsi} />
+        <Comp label="Stoch*" v={components.stoch} />
+        <Comp label="BB*" v={components.bollinger} />
         <Comp label="MACD" v={components.macd} />
         <Comp label="ADX" v={components.adxSlope} />
         <Comp label="VolX" v={components.volExhaust} />
       </View>
+      <Text style={styles.footNote}>* weight ×0.5 (OOS 2023-26: RSI/Stoch/BB dưới base rate)</Text>
+    </View>
+  );
+}
 
-      {fundingPct !== null && (
-        <Text style={styles.funding}>
-          Funding: {fundingPct >= 0 ? "+" : ""}{fundingPct.toFixed(4)}%/8h
-          {fundingPct > 0.05 ? "  ⚠️ LONGS crowded (squeeze risk)" : fundingPct < -0.01 ? "  ⚠️ SHORTS crowded" : ""}
+function FundingBar({ fundingPct }: { fundingPct: number }) {
+  // iter23: funding is king — show prominently with color-coded bar
+  // OOS precision: >0.03% = +4.8pp, >0.05% = +3.3pp above base rate
+  const extreme = fundingPct > 0.05;
+  const elevated = fundingPct > 0.03;
+  const negative = fundingPct < -0.01;
+  const color = extreme ? COLORS.bear : elevated ? COLORS.warning : negative ? COLORS.bull : COLORS.textDim;
+  const label = extreme ? "⚠ LONGS crowded — squeeze risk (>0.05%)"
+    : elevated ? "LONGS elevated — watch crowding (>0.03%)"
+    : negative ? "SHORTS crowded — bullish pressure"
+    : "Funding bình thường";
+  // Bar: -0.05% → +0.15% range
+  const barPct = Math.max(0, Math.min(100, ((fundingPct + 0.05) / 0.20) * 100));
+  const zeroPct = Math.max(0, Math.min(100, (0.05 / 0.20) * 100));
+  return (
+    <View style={styles.fundingBox}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.fundingLabel, { color }]}>FUNDING RATE</Text>
+        <Text style={[styles.fundingValue, { color }]}>
+          {fundingPct >= 0 ? "+" : ""}{fundingPct.toFixed(4)}%/8h
         </Text>
-      )}
+      </View>
+      <View style={[styles.barBg, { marginTop: 4 }]}>
+        <View style={[styles.zeroLine, { left: `${zeroPct}%` }]} />
+        <View style={[styles.fill, {
+          left: fundingPct >= 0 ? `${zeroPct}%` : `${barPct}%`,
+          width: `${Math.abs(barPct - zeroPct)}%`,
+          backgroundColor: color,
+        }]} />
+      </View>
+      <Text style={[styles.axisLabel, { color, marginTop: 3 }]}>{label}</Text>
     </View>
   );
 }
@@ -276,5 +310,30 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#ffffff20",
+  },
+  fundingBox: {
+    paddingVertical: 8,
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    backgroundColor: "#ffffff08",
+    borderRadius: 6,
+    borderLeftWidth: 3,
+    borderLeftColor: "#d29922",
+  },
+  fundingLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+  },
+  fundingValue: {
+    fontSize: 14,
+    fontWeight: "800",
+    fontFamily: "monospace",
+  },
+  footNote: {
+    color: "#7d8590",
+    fontSize: 8,
+    marginTop: 4,
+    fontStyle: "italic",
   },
 });
