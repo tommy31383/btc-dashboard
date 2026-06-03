@@ -253,3 +253,33 @@ CONCLUSION: funding>0.03% alone gives n=178 OOS (2.5x more than v5 composite n=7
 with comparable precision (+4.8pp vs +6pp). Composite v5 = over-engineering.
 FUNDING IS KING confirmed. Panel must display funding rate PROMINENTLY.
 RCI composite = context display only, not primary signal. RCI LOOP FULLY CONVERGED.
+
+## Iteration 24-27 — RCI UI + Final Component Audit
+
+**iter24:** FundingBar prominent UI — color-coded bar, footnote RSI*/Stoch*/BB* (weight x0.5). v4.10.6.
+
+**iter25:** MACD dead OOS (22% < base 27%, -4.4pp). FundAccel STAR: OOS 48% (+21pp, n=25). MACD weight 0.4->0.15. v4.10.7.
+
+**iter26:** ADXslope dead OOS (22-24% < base). Weight 0.8->0. ALL technical indicators confirmed dead OOS 2023-26. v4.10.8.
+
+**iter27:** VolExhaust n=9 +6.7pp (keep but sparse). RCI v6 (Fund+FundAccel only):
+```
+thr=1.5: n=123 OOS, prec=31.7% (+5.1pp), stable 4/5 years  <- FINAL CONFIG
+thr=2.0: n=25,      prec=48.0% (+21pp)                      <- BEAR_STRONG gate
+```
+
+## 🏁 FINAL RCI CONVERGENCE (27 iterations)
+
+**Surviving components OOS 2023-26:**
+| Component | OOS prec | vs base | Status |
+|---|---|---|---|
+| Funding >0.03% | 31.5% | +4.8pp | KING |
+| FundingAccel | 48.0% | +21pp | STAR (n=25) |
+| VolExhaust | 33.3% | +6.7pp | sparse (n=9) |
+| RSI/Stoch/BB | 16-23% | -3 to -10pp | DEAD |
+| MACD | 22% | -4.4pp | DEAD |
+| ADXslope | 22-24% | -3 to -6pp | DEAD |
+
+**Final RCI v6 config:** weights RSI/Stoch/BB x0.5, MACD 0.15, ADXslope 0, Funding 2.0, FundAccel 1.2. Threshold BEAR_STRONG>2.5+fundDom, BEAR_WATCH>2.0. Deployed v4.10.8.
+
+**Lesson:** Bull market 2023-26 made all momentum-overbought signals ANTI-predictive. Only crowding (Funding) and crowding-acceleration (FundAccel) capture the structural dynamics. RSI/Stoch/BB/MACD/ADX = rear-view mirrors, not forward predictors in trending bull.
