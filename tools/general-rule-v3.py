@@ -219,7 +219,7 @@ def report(trades, tag, capital=CAPITAL):
     print(f"  ★ COMBINED KPI: {min(kn,kr)}/8 = {min(kn,kr)/8*100:.0f}%")
     return kn,kr
 
-def backtest_G8(TRADE_NOT=20000, LEV=10, ATR_SL=1.8, ATR_TP=8.0, MAX_HOLD=60, COOLDOWN=3, ADX_THR=18):
+def backtest_G8(TRADE_NOT=20000, LEV=10, ATR_SL=1.8, ATR_TP=8.0, MAX_HOLD=60, COOLDOWN=3, ADX_THR=18, BEAR_GATE=0.95, MAX_POS=3, RSI_MAX=70, DI_MARGIN=1.0):
     """G8: G6 + EMA200_1d BEAR gate + nới lỏng RSI/EMA20 để tăng n."""
     # Build 1d EMA200
     bars1d=build(24*3600*1000); c1d=[b["close"] for b in bars1d]
@@ -249,7 +249,7 @@ def backtest_G8(TRADE_NOT=20000, LEV=10, ATR_SL=1.8, ATR_TP=8.0, MAX_HOLD=60, CO
             pnl_usd=pnl_pct*TRADE_NOT*LEV - 0.0006*TRADE_NOT
             trades.append({"yr":pyr,"side":side,"pnl_usd":pnl_usd,"held":i-ei,"sl":hit_sl,"tp":hit_tp})
         positions=new_pos
-        if len(positions)>=3: continue
+        if len(positions)>=MAX_POS: continue
         if i-last_entry<COOLDOWN: continue
         a=adx4[i]; pp=pdi4[i]; mm=mdi4[i]; r=rsi4[i]; e2=e200[i]; e2h=e20[i]; at=atr4[i]
         if None in (a,pp,mm,r,e2,e2h,at): continue
@@ -257,9 +257,9 @@ def backtest_G8(TRADE_NOT=20000, LEV=10, ATR_SL=1.8, ATR_TP=8.0, MAX_HOLD=60, CO
         # 1d EMA200 regime gate
         e2d=e200d_at(bars4h[i]["time"])
         if e2d is None: continue
-        bear_market = price < e2d * 0.95  # price >5% below 1d EMA200
+        bear_market = price < e2d * BEAR_GATE
         # LONG: not BEAR + uptrend + dip
-        if not bear_market and a>ADX_THR and pp>mm and price>e2 and fr<0.0005 and r<68:
+        if not bear_market and a>ADX_THR and pp>mm*DI_MARGIN and price>e2 and fr<0.0005 and r<RSI_MAX:
             sl=price-ATR_SL*at; tp=price+ATR_TP*at
             positions.append((i,"LONG",price,sl,tp,yr)); last_entry=i
         # SHORT: confirmed BEAR only (strict)
@@ -276,6 +276,14 @@ elif VARIANT=="G6X":
     # Aggressive sizing: $20k notional, LEV 10×
     trades=backtest_G6(TRADE_NOT=20000,LEV=10,ATR_SL=1.5,ATR_TP=4.0,COOLDOWN=2,ADX_THR=18)
     report(trades,"G6-agg")
+elif VARIANT=="G10c":
+    # G10c BEST: DI_MARGIN=0.95 + RSI=72 → 6/8 combo (2023+111%, 2025+54%)
+    trades=backtest_G8(TRADE_NOT=20000,LEV=10,ATR_SL=1.8,ATR_TP=8.0,MAX_HOLD=60,COOLDOWN=3,ADX_THR=18,BEAR_GATE=0.95,MAX_POS=3,RSI_MAX=72,DI_MARGIN=0.95)
+    report(trades,"G10c")
+elif VARIANT=="G9g":
+    # G9g: BG=0.80, HOLD=20, TP=4, POS=5 — n:8/8, roi:6/8, combo:6/8 (2026 positive!)
+    trades=backtest_G8(TRADE_NOT=20000,LEV=10,ATR_SL=1.8,ATR_TP=4.0,MAX_HOLD=20,COOLDOWN=2,ADX_THR=18,BEAR_GATE=0.80,MAX_POS=5)
+    report(trades,"G9g")
 elif VARIANT=="G8":
     trades=backtest_G8(); report(trades,"G8")
 elif VARIANT=="ALL":

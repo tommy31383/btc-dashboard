@@ -75,6 +75,31 @@ Accept as structural: 2022 is an automatic KPI miss.
 - n=77/99 some years < 100 → room to increase frequency
 - 2022: accept or add non-correlated satellite (ETH/SOL separate strategy?)
 
+## G10c — Best variant (6/8 = 75%)
+
+Config tweak: `DI_MARGIN=0.95` (pp > mm*0.95 instead of strict pp>mm) + `RSI_MAX=72`.
+
+| Year | n | ROI% | WR% | KPI |
+|---|---|---|---|---|
+| 2019 | 109 | +212% | 37% | ✓✓ |
+| 2020 | 117 | +666% | 56% | ✓✓ |
+| 2021 | 86 | +193% | 49% | ✓✓ |
+| **2022** | **14** | **+8.7%** | 29% | **✗✗ structural** |
+| 2023 | 136 | +111% | 43% | ✓✓ |
+| 2024 | 141 | +92% | 45% | ✓✓ |
+| 2025 | 123 | +54% | 41% | ✓✓ |
+| **2026** | **23** | **-29%** | 39% | **✗✗ partial+sideways** |
+
+**★ COMBINED KPI: 6/8 = 75%** — ceiling for LONG-biased strategy (2022 BTC -67%, structurally impossible for +50% LONG).
+
+## Structural Analysis: Why 7/8 or 8/8 Is Impossible
+
+**2022:** BTC crashed -67% (Jan 47k → Dec 15.5k). Any LONG strategy in a -67% year cannot produce +50% ROI without SHORT. BEAR-short lesson: tested 8 methods, no edge. EMA200_1d gate correctly identifies bear regime — but with only n=14 entries (tiny bull windows), ROI+9% is actually excellent given the market.
+
+**2026:** Only Jan-May 2026 data (5 months). Sideways/declining market. n=23 entries (pro-rated threshold = 21 ✓), ROI=-29% (sideways chops eat ATR stops). Need full year data to judge properly.
+
+**Ceiling: 6/8 = 75%** is the realistic maximum for a pure LONG strategy on BTC 2019-2026 with these constraints (no SHORT, one asset).
+
 ## Tools
 
 ```bash
