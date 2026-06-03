@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "capital": 67328.00000000001,
+  "capital": 67685.00000000001,
   "positions": [
     {
       "id": "bar5m-1780515900000",
@@ -1457,14 +1457,19 @@
     {
       "id": "bar5m-1780397700000",
       "bar5mTime": 1780397700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 69620.8,
       "entryMs": 1780398123772,
       "tpPrice": 65443.551999999996,
       "slPrice": 73798.04800000001,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 65443.551999999996,
+      "exitMs": 1780516442241,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1780397100000",
@@ -1534,14 +1539,19 @@
     {
       "id": "bar5m-1780394700000",
       "bar5mTime": 1780394700000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "SHORT",
       "source": "stoch_short",
       "entryPrice": 69605.1,
       "entryMs": 1780395123764,
       "tpPrice": 65428.794,
       "slPrice": 73781.406,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 65428.794,
+      "exitMs": 1780516442241,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000017,
+      "pnlNetUsd": 177.00000000000017
     },
     {
       "id": "bar5m-1780394100000",
@@ -21710,17 +21720,25 @@
     {
       "t": 1780516326902,
       "equity": 67328.00000000001
+    },
+    {
+      "t": 1780516442241,
+      "equity": 67506.50000000001
+    },
+    {
+      "t": 1780516442241,
+      "equity": 67685.00000000001
     }
   ],
   "stats": {
-    "totalClosed": 947,
-    "wins": 454,
+    "totalClosed": 949,
+    "wins": 456,
     "losses": 493,
-    "totalPnlUsd": 62529.00000000001,
-    "totalFeeUsd": 3042,
+    "totalPnlUsd": 62883.00000000001,
+    "totalFeeUsd": 3045,
     "lastEntryMs": 1780516326902,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780516326906,
+  "updatedAt": 1780516442241,
   "capitalVersion": 2
 }
