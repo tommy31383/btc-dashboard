@@ -283,3 +283,18 @@ thr=2.0: n=25,      prec=48.0% (+21pp)                      <- BEAR_STRONG gate
 **Final RCI v6 config:** weights RSI/Stoch/BB x0.5, MACD 0.15, ADXslope 0, Funding 2.0, FundAccel 1.2. Threshold BEAR_STRONG>2.5+fundDom, BEAR_WATCH>2.0. Deployed v4.10.8.
 
 **Lesson:** Bull market 2023-26 made all momentum-overbought signals ANTI-predictive. Only crowding (Funding) and crowding-acceleration (FundAccel) capture the structural dynamics. RSI/Stoch/BB/MACD/ADX = rear-view mirrors, not forward predictors in trending bull.
+
+## Iteration 28 — Trend STRONG_DOWN × hedge01 RANGE gate overlap
+
+```
+hedge01 RANGE gate (price>EMA200_1d):
+  RANGE-pass + Trend-pass:   n=9438  avg_fwd +0.47%/2d
+  RANGE-pass + Trend-BLOCK:  n=858   avg_fwd -0.30%/2d  <- 8.3% of bars
+
+Delta: +0.77%/2d — Trend gate ADDITIVE (not redundant with hedge01 EMA200_1d gate)
+VERDICT: ADDITIVE ✓
+```
+
+Trend STRONG_DOWN (ADX/DI 4h bearish + price<EMA200_4h + EMA200_4h slope down) is STRICTER than hedge01 EMA200_1d gate — catches 8.3% of RANGE-pass bars with negative forward returns. Panel STRONG_DOWN = useful live context for hedge01: consider reducing size / not opening new entries even when server's RANGE gate passes.
+
+Action: dashboard display only (no server change). STRONG_DOWN = risk-off size reduction signal ON TOP of hedge01 regime gate.
