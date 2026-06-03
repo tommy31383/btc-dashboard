@@ -158,7 +158,9 @@ P_V2 = dict(P_V1); P_V2.update(need_below200=True, di_strong=2.0, di_weak=0.8)
 # v3: thêm EMA200 slope gate + ngưỡng zone cao hơn (ít signal, sạch hơn)
 P_V3 = dict(P_V2); P_V3.update(ema200slope=True, zthr=1.6, zstrong=3.0)
 
-VARIANTS = {"v1": P_V1, "v2": P_V2, "v3": P_V3}
+# v4: bỏ EMA stack (ablation iter14 cho thấy stack hurt STRONG_UP OOS), giữ pve=0.4
+P_V4 = dict(P_V3); P_V4.update(stack_full=0, stack_part=0, pve=0.4)
+VARIANTS = {"v1": P_V1, "v2": P_V2, "v3": P_V3, "v4": P_V4}
 
 def run(P, tag):
     by_zone=defaultdict(list); by_year_dir=defaultdict(lambda:[0,0])  # [correct,total]
@@ -221,6 +223,26 @@ def excess_report(P, tag):
         if xs:
             ex=sum(xs)/len(xs)-GLOBAL_DRIFT
             print(f"   {z:<13} n={len(xs):>5}  excess={ex:+.2f}%")
+
+def oos_v4_compare():
+    """Compare v3 vs v4 (no-stack) OOS 2023-26."""
+    H=30
+    print("\n=== v3 vs v4 (no-stack) OOS 2023-26 compare ===")
+    print(f"{'variant':>8}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    for vname,P in [("v3",VARIANTS["v3"]),("v4",VARIANTS["v4"])]:
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,P)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        print(f"{vname:>8}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
 
 def oos_split(P, tag, split_year=2023):
     """Excess STRONG zones, train (<split) vs test (>=split) — OOS robustness."""
@@ -516,7 +538,58 @@ def c1_sweep(P, tag):
         sue=(sum(su)/len(su)-d) if su else float('nan')
         print(f"{c1:>6.1f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
 
+def ablation(P, tag):
+    """Iter14: ablation — bỏ từng component, đo impact lên STRONG excess OOS 2023-26."""
+    H=30
+    components=["stack_full","pve","di","slope","c1"]
+    print(f"\n[{tag}] Component ablation (STRONG excess OOS 2023-26, baseline vs remove each):")
+    print(f"{'removed':>14}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    for remove in ["(none)"]+components:
+        Pt=dict(P)
+        if remove=="stack_full": Pt["stack_full"]=0; Pt["stack_part"]=0
+        elif remove=="pve": Pt["pve"]=0
+        elif remove=="di": Pt["di_strong"]=0; Pt["di_weak"]=0
+        elif remove=="slope": Pt["slope_hi"]=0; Pt["slope_lo"]=0
+        elif remove=="c1": Pt["c1"]=0
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        flag="←KILL" if (not(sde!=sde) and sde>0.1) or (not(sue!=sue) and sue<0.1) else ""
+        print(f"{remove:>14}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}  {flag}")
+
+def pve_sweep(P, tag):
+    """Iter14b: pve weight sweep 0→1.5 — đóng góp vào STRONG_UP."""
+    H=30
+    print(f"\n[{tag}] PVE weight sweep — STRONG excess OOS 2023-26:")
+    print(f"{'pve':>6}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    for pve in (0.0,0.4,0.8,1.2,1.5):
+        Pt=dict(P); Pt["pve"]=pve
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        print(f"{pve:>6.1f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
+
 if __name__=="__main__":
+    if VARIANT=="iter14":
+        ablation(VARIANTS["v3"],"v3"); pve_sweep(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter13":
         c1_sweep(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter12":

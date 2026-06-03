@@ -95,18 +95,14 @@ export function computeTrend(input: TrendInput): TrendResult {
   const ema50 = calcEMA(closes4h, 50);
   const ema200 = calcEMA(closes4h, 200);
 
-  // ── 1. EMA stack alignment (4h) ──
-  if (ema20 != null && ema50 != null && ema200 != null) {
-    if (ema20 > ema50 && ema50 > ema200) comp.emaStack += 1.5;       // full bull stack
-    else if (ema20 > ema50) comp.emaStack += 0.7;                     // partial up
-    if (ema20 < ema50 && ema50 < ema200) comp.emaStack -= 1.5;        // full bear stack
-    else if (ema20 < ema50) comp.emaStack -= 0.7;                     // partial down
-  }
+  // ── 1. EMA stack alignment — iter14 ablation: bỏ stack (hurt STRONG_UP OOS, overfit 2019-22)
+  // stack_full=0, giữ priceVsEma làm anchor chính giữa EMA200
+  // (ema20/ema50 ordering decorrelated với forward-return OOS 2023-26)
 
-  // ── 2. Giá vs EMA50 ──
+  // ── 2. Giá vs EMA50 (weight 0.4 — iter14 pve sweet spot) ──
   if (ema50 != null) {
-    if (price > ema50) comp.priceVsEma += 0.8;
-    else comp.priceVsEma -= 0.8;
+    if (price > ema50) comp.priceVsEma += 0.4;
+    else comp.priceVsEma -= 0.4;
   }
 
   // ── 3. ADX/DI (v3: trọng số DI tăng — backtest 7y, DI là driver phía down) ──
