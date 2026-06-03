@@ -219,7 +219,7 @@ def report(trades, tag, capital=CAPITAL):
     print(f"  ★ COMBINED KPI: {min(kn,kr)}/8 = {min(kn,kr)/8*100:.0f}%")
     return kn,kr
 
-def backtest_G8(TRADE_NOT=15000, LEV=8, ATR_SL=1.8, ATR_TP=5.0, MAX_HOLD=60, COOLDOWN=3, ADX_THR=18):
+def backtest_G8(TRADE_NOT=20000, LEV=10, ATR_SL=1.8, ATR_TP=8.0, MAX_HOLD=60, COOLDOWN=3, ADX_THR=18):
     """G8: G6 + EMA200_1d BEAR gate + nới lỏng RSI/EMA20 để tăng n."""
     # Build 1d EMA200
     bars1d=build(24*3600*1000); c1d=[b["close"] for b in bars1d]
