@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1780504347788,
+  "updatedAt": 1780507822790,
   "trades": [
     {
       "id": "jrewga130sm",
@@ -3703,7 +3703,7 @@
       "ruleId": "15m:16",
       "tfKey": "15m",
       "side": "LONG",
-      "status": "OPEN",
+      "status": "TIMEOUT",
       "entryPrice": 67813.7,
       "slPrice": 61032.33,
       "tpPrice": 68830.9055,
@@ -3712,7 +3712,10 @@
       "stopPct": 10,
       "maxHoldBars": 100,
       "openedMs": 1780417875825,
-      "deadlineMs": 1780507800000
+      "deadlineMs": 1780507800000,
+      "exitPrice": 65945.94,
+      "leveragedPnlPct": -275.43,
+      "closedMs": 1780507802074
     },
     {
       "id": "a8z6kkjwfqe",
