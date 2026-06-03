@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCI + Trend Preview</title>
+<style>
+  :root{
+    --bg:#0d1117; --bgCard:#161b22; --text:#e6edf3; --textMuted:#7d8590;
+    --textDim:#9aa4ad; --bear:#f85149; --bull:#3fb950; --warning:#d29922;
+    --neutral:#6e7681; --bullSoft:#26de81;
+  }
+  body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+    margin:0;padding:24px;color:var(--text)}
+  h2{font-size:14px;color:var(--textMuted);font-weight:600;margin:0 0 12px}
+  .wrap{display:flex;gap:16px;flex-wrap:wrap;max-width:1100px}
+  .card{background:var(--bgCard);border-radius:8px;padding:12px;width:320px;
+    border-left:4px solid var(--neutral)}
+  .trendBox{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #ffffff20}
+  .headerRow{display:flex;justify-content:space-between;align-items:center}
+  .title{font-size:13px;font-weight:700}
+  .value{font-size:18px;font-weight:800;font-family:monospace}
+  .zone{font-size:12px;font-weight:600;margin:2px 0 8px}
+  .barBg{height:10px;background:#ffffff12;border-radius:5px;position:relative;overflow:hidden}
+  .zeroLine{position:absolute;top:0;width:1.5px;height:100%;background:#ffffff60}
+  .thMarker{position:absolute;top:0;width:1px;height:100%;opacity:.5}
+  .fill{position:absolute;top:0;height:100%;border-radius:5px}
+  .axisRow{display:flex;justify-content:space-between;margin-top:3px}
+  .axisLabel{color:var(--textMuted);font-size:9px}
+  .compRow{display:flex;justify-content:space-between;margin-top:10px;gap:4px}
+  .comp{display:flex;flex-direction:column;align-items:center;flex:1}
+  .compLabel{color:var(--textMuted);font-size:9px;margin-bottom:2px}
+  .compVal{font-size:12px;font-family:monospace;font-weight:600}
+  .funding{color:var(--textDim);font-size:10px;margin-top:8px;font-family:monospace}
+</style>
+</head>
+<body>
+<h2>RCIPanel — section XU HƯỚNG (Trend) mới thêm lên trên + RCI reversal giữ nguyên dưới</h2>
+<div class="wrap" id="wrap"></div>
+
+<script>
+const C={bear:'#f85149',bull:'#3fb950',warning:'#d29922',neutral:'#6e7681',bullSoft:'#26de81',muted:'#7d8590'};
+function trendPct(v){return Math.max(0,Math.min(100,((v+4)/8)*100));}
+function rciPct(v){return Math.max(0,Math.min(100,((v-(-4))/10)*100));}
+
+// 3 scenario: [trend, rci]
+const scenarios=[
+  {name:'① BTC đang GIẢM MẠNH',
+   borderColor:C.warning,
+   trend:{v:-3.1,zone:'XU HƯỚNG GIẢM MẠNH ▼▼',color:C.bear,adx:32,dip:14,dim:30,note:'  ✓ trend mạnh'},
+   rci:{v:-2.7,zone:'ĐÁY — áp lực bật lên MẠNH',color:C.bull,comps:[['Fund',-1.5],['FAcc',0],['RSI',-1.0],['Stoch',-0.8],['BB',-0.4],['MACD',0],['ADX',-0.8],['VolX',0]],fund:-0.012,fnote:'  ⚠️ SHORTS crowded'}},
+  {name:'② Đi ngang (sideway)',
+   borderColor:C.neutral,
+   trend:{v:0.4,zone:'Đi ngang / sideway ◆',color:C.neutral,adx:15,dip:22,dim:20,note:'  · không trend (range)'},
+   rci:{v:0.6,zone:'Trung tính',color:C.neutral,comps:[['Fund',0.8],['FAcc',0],['RSI',0],['Stoch',0],['BB',0.4],['MACD',0],['ADX',0],['VolX',0]],fund:0.018,fnote:''}},
+  {name:'③ Xu hướng TĂNG + cảnh báo đỉnh',
+   borderColor:C.warning,
+   trend:{v:2.9,zone:'XU HƯỚNG TĂNG MẠNH ▲▲',color:C.bull,adx:29,dip:31,dim:13,note:'  ✓ trend mạnh'},
+   rci:{v:3.2,zone:'Cảnh báo đỉnh — giảm size',color:C.warning,comps:[['Fund',2.0],['FAcc',1.2],['RSI',1.0],['Stoch',0.8],['BB',0.4],['MACD',0.4],['ADX',0],['VolX',0]],fund:0.062,fnote:'  ⚠️ LONGS crowded (squeeze risk)'}},
+];
+
+function compColor(v){return v>0?C.bear:v<0?C.bull:C.muted;}
+function fmt(v){return (v>=0?'+':'')+v.toFixed(2);}
+function fmt1(v){return (v>0?'+':'')+v.toFixed(1);}
+
+const wrap=document.getElementById('wrap');
+scenarios.forEach(s=>{
+  const t=s.trend,r=s.rci;
+  const tZero=trendPct(0),tVal=trendPct(t.v);
+  const tFillL=Math.min(tZero,tVal),tFillW=Math.abs(tVal-tZero);
+  const rZero=rciPct(0),rVal=rciPct(r.v);
+  const rFillL=Math.min(rZero,rVal),rFillW=Math.abs(rVal-rZero);
+  const comps=r.comps.map(([l,v])=>`<div class="comp"><div class="compLabel">${l}</div><div class="compVal" style="color:${compColor(v)}">${fmt1(v)}</div></div>`).join('');
+  wrap.insertAdjacentHTML('beforeend',`
+  <div>
+    <h2 style="margin-bottom:6px">${s.name}</h2>
+    <div class="card" style="border-left-color:${s.borderColor}">
+      <div class="trendBox">
+        <div class="headerRow"><div class="title">XU HƯỚNG (Trend)</div>
+          <div class="value" style="color:${t.color}">${fmt(t.v)}</div></div>
+        <div class="zone" style="color:${t.color}">${t.zone}</div>
+        <div class="barBg">
+          <div class="zeroLine" style="left:${tZero}%"></div>
+          <div class="fill" style="left:${tFillL}%;width:${tFillW}%;background:${t.color}"></div>
+        </div>
+        <div class="axisRow"><span class="axisLabel">▼ giảm</span><span class="axisLabel">sideway</span><span class="axisLabel">tăng ▲</span></div>
+        <div class="funding">ADX ${t.adx} · DI+ ${t.dip} / DI− ${t.dim}${t.note}</div>
+      </div>
+
+      <div class="headerRow"><div class="title">RCI — Reversal Index</div>
+        <div class="value" style="color:${r.color}">${fmt(r.v)}</div></div>
+      <div class="zone" style="color:${r.color}">${r.zone}</div>
+      <div class="barBg">
+        <div class="thMarker" style="left:${rciPct(3)}%;background:${C.warning}"></div>
+        <div class="thMarker" style="left:${rciPct(4)}%;background:${C.bear}"></div>
+        <div class="thMarker" style="left:${rciPct(-1.5)}%;background:${C.bullSoft}"></div>
+        <div class="thMarker" style="left:${rciPct(-2.5)}%;background:${C.bull}"></div>
+        <div class="zeroLine" style="left:${rZero}%"></div>
+        <div class="fill" style="left:${rFillL}%;width:${rFillW}%;background:${r.color}"></div>
+      </div>
+      <div class="axisRow"><span class="axisLabel">↑ đáy (bull)</span><span class="axisLabel">0</span><span class="axisLabel">đỉnh (bear) ↓</span></div>
+      <div class="compRow">${comps}</div>
+      <div class="funding">Funding: ${(r.fund>=0?'+':'')+r.fund.toFixed(4)}%/8h${r.fnote}</div>
+    </div>
+  </div>`);
+});
+</script>
+</body>
+</html>

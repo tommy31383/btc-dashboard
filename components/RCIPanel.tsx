@@ -17,9 +17,26 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { COLORS } from "../utils/constants";
 import { RCIResult, zoneLabel } from "../utils/rci";
+import { TrendResult, TrendZone, trendLabel } from "../utils/trend";
 
 interface Props {
   rci: RCIResult;
+  trend?: TrendResult;
+}
+
+function trendColor(zone: TrendZone): string {
+  switch (zone) {
+    case "STRONG_UP":   return COLORS.bull;
+    case "UP":          return "#26de81";
+    case "STRONG_DOWN": return COLORS.bear;
+    case "DOWN":        return COLORS.warning;
+    default:            return COLORS.neutral;
+  }
+}
+
+// Trend score range cho thanh bar (-4 → +4, 0 = sideway)
+function trendPct(v: number): number {
+  return Math.max(0, Math.min(100, ((v + 4) / 8) * 100));
 }
 
 // Oscillator range for the bar visualization
@@ -41,7 +58,42 @@ function zoneColor(zone: RCIResult["zone"]): string {
   }
 }
 
-export default function RCIPanel({ rci }: Props) {
+function TrendSection({ trend }: { trend: TrendResult }) {
+  if (trend.value === null) return null;
+  const tc = trendColor(trend.zone);
+  const zeroP = trendPct(0);
+  const valP = trendPct(trend.value);
+  const fillLeft = Math.min(zeroP, valP);
+  const fillWidth = Math.abs(valP - zeroP);
+  return (
+    <View style={styles.trendBox}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>XU HƯỚNG (Trend)</Text>
+        <Text style={[styles.value, { color: tc }]}>
+          {trend.value >= 0 ? "+" : ""}{trend.value.toFixed(2)}
+        </Text>
+      </View>
+      <Text style={[styles.zone, { color: tc }]}>{trendLabel(trend.zone)}</Text>
+      <View style={styles.barBg}>
+        <View style={[styles.zeroLine, { left: `${zeroP}%` }]} />
+        <View style={[styles.fill, { left: `${fillLeft}%`, width: `${fillWidth}%`, backgroundColor: tc }]} />
+      </View>
+      <View style={styles.axisRow}>
+        <Text style={styles.axisLabel}>▼ giảm</Text>
+        <Text style={styles.axisLabel}>sideway</Text>
+        <Text style={styles.axisLabel}>tăng ▲</Text>
+      </View>
+      {trend.adx !== null && (
+        <Text style={styles.funding}>
+          ADX {trend.adx.toFixed(0)} · DI+ {trend.diPlus?.toFixed(0)} / DI− {trend.diMinus?.toFixed(0)}
+          {trend.adx > 25 ? "  ✓ trend mạnh" : trend.adx < 18 ? "  · không trend (range)" : "  · trend yếu"}
+        </Text>
+      )}
+    </View>
+  );
+}
+
+export default function RCIPanel({ rci, trend }: Props) {
   const { value, zone, components, fundingPct } = rci;
 
   if (value === null) {
@@ -62,6 +114,8 @@ export default function RCIPanel({ rci }: Props) {
 
   return (
     <View style={[styles.card, { borderLeftColor: color, borderLeftWidth: 4 }]}>
+      {trend && <TrendSection trend={trend} />}
+
       <View style={styles.headerRow}>
         <Text style={styles.title}>RCI — Reversal Index</Text>
         <Text style={[styles.value, { color }]}>{value >= 0 ? "+" : ""}{value.toFixed(2)}</Text>
@@ -216,5 +270,11 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     fontSize: 11,
     marginTop: 6,
+  },
+  trendBox: {
+    paddingBottom: 10,
+    marginBottom: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#ffffff20",
   },
 });

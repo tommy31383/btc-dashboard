@@ -441,10 +441,12 @@ function main() {
   // c1m: skip (no 1m data — use 5m as proxy or compute via 5m bars)
   const c1m = c5;  // fallback: 5m as "1m proxy" — best available
 
-  const oiArr = loadMaybe<any>("binance-oi-1h-7y.json");
-  const topLSArr = loadMaybe<any>("binance-topLSPosition-1h-7y.json");
-  const globalLSArr = loadMaybe<any>("binance-globalLS-1h-7y.json");
-  const takerArr = loadMaybe<any>("binance-takerRatio-1h-7y.json");
+  // NOTE: these sentiment files are ~13-day recent snapshots, not 7y (Binance futures-data
+  // endpoints only serve ~30 days). Renamed from "-7y" to "-recent" suffix to avoid confusion.
+  const oiArr = loadMaybe<any>("binance-oi-1h-recent.json");
+  const topLSArr = loadMaybe<any>("binance-topLSPosition-1h-recent.json");
+  const globalLSArr = loadMaybe<any>("binance-globalLS-1h-recent.json");
+  const takerArr = loadMaybe<any>("binance-takerRatio-1h-recent.json");
   console.log(`  Market data: OI=${oiArr.length}, topLS=${topLSArr.length}, globalLS=${globalLSArr.length}, taker=${takerArr.length}`);
   if (oiArr.length === 0) console.log("  ⚠️ No OI data — V2 will degrade gracefully");
 
