@@ -340,7 +340,107 @@ def adx_sweep(P, tag):
         sue=(sum(su)/len(su)-d) if su else float('nan')
         print(f"{thr:>8}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
 
+def sup_rci_bull(P, tag):
+    """Iter8: STRONG_UP-bias giúp hay hại RCI-bull (mua dip RSI<30)?
+    Ngược iter6 (gate khi STRONG_DOWN), giờ test: chỉ mua khi STRONG_UP active."""
+    def rsi_series(closes,p=14):
+        n=len(closes);out=[None]*n
+        if n<=p:return out
+        ag=al=0
+        for i in range(1,p+1):
+            d=closes[i]-closes[i-1];ag+=max(d,0);al+=max(-d,0)
+        ag/=p;al/=p
+        out[p]=100-100/(1+ag/al) if al>0 else 100
+        for i in range(p+1,n):
+            d=closes[i]-closes[i-1]
+            ag=(ag*(p-1)+max(d,0))/p;al=(al*(p-1)+max(-d,0))/p
+            out[i]=100-100/(1+ag/al) if al>0 else 100
+        return out
+    rsi4=rsi_series(c4,14)
+    H=30
+    for era,lo in (("ALL 7y",2019),("OOS 2023-26",2023)):
+        ung=[];sup_only=[];non_sup=[]
+        for i in range(200,len(bars4h)-H):
+            if rsi4[i] is None or rsi4[i]>=30:continue
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<lo:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100;ung.append(f)
+            _,zone,_=score_trend(i,P)
+            if zone=="STRONG_UP":sup_only.append(f)
+            else:non_sup.append(f)
+        def s(xs):return (len(xs),sum(xs)/len(xs) if xs else 0,100*sum(1 for x in xs if x>0)/len(xs) if xs else 0)
+        nu,au,pu=s(ung);ns,as_,ps=s(sup_only);nn,an,pn=s(non_sup)
+        print(f"\n[{tag}] STRONG_UP-bias × RCI-bull (RSI4h<30) — {era}:")
+        print(f"  ungated:        n={nu:>4} avg {au:+.2f}% %pos {pu:.1f}")
+        print(f"  STRONG_UP only: n={ns:>4} avg {as_:+.2f}% %pos {ps:.1f}  ← UP bias filter")
+        print(f"  non-STRONG_UP:  n={nn:>4} avg {an:+.2f}% %pos {pn:.1f}")
+
+def eth_check(P, tag):
+    """Iter9: Trend Index precision trên ETH (3y data) vs BTC — corr check."""
+    import os
+    eth_path="/Users/lap16116/BTC_PC/btc-dashboard/.cache/binance-eth-5m-3y.json"
+    if not os.path.exists(eth_path):
+        print("ETH cache không có, skip"); return
+    raw_e=json.load(open(eth_path)); raw_e.sort(key=lambda x:x["time"])
+    def build(ms,raw):
+        b={}
+        for c in raw:
+            k=c["time"]//ms
+            if k not in b: b[k]={"time":k*ms,"open":c["open"],"high":c["high"],"low":c["low"],"close":c["close"],"volume":c["volume"]}
+            else: o=b[k];o["high"]=max(o["high"],c["high"]);o["low"]=min(o["low"],c["low"]);o["close"]=c["close"];o["volume"]+=c["volume"]
+        return [b[k] for k in sorted(b)]
+    e4=build(4*3600*1000,raw_e); e1=build(3600*1000,raw_e)
+    ce4=[b["close"] for b in e4]; ce1=[b["close"] for b in e1]
+    # recompute EMAs for ETH
+    def _ema(xs,p):
+        k=2/(p+1);out=[None]*len(xs);e=None
+        for i,x in enumerate(xs):
+            e=x if e is None else x*k+e*(1-k); out[i]=e
+        return out
+    ee20=_ema(ce4,20); ee50=_ema(ce4,50); ee200=_ema(ce4,200)
+    _,epdi,emdi=adx_di_series(e4,14)
+    adxe_raw,_,_=adx_di_series(e4,14)
+    ee20_1h=_ema(ce1,20); ee50_1h=_ema(ce1,50)
+    H=30
+    by_z=defaultdict(list)
+    for i in range(200,len(e4)-H):
+        if ee200[i] is None or adxe_raw[i] is None: continue
+        price=ce4[i]; a=adxe_raw[i]; pp=epdi[i]; mm=emdi[i]
+        cs=cpv=cdi=csl=cc1=0.0
+        if ee20[i]>ee50[i] and ee50[i]>ee200[i]: cs+=1.5
+        elif ee20[i]>ee50[i]: cs+=0.7
+        if ee20[i]<ee50[i] and ee50[i]<ee200[i]: cs-=1.5
+        elif ee20[i]<ee50[i]: cs-=0.7
+        cpv+=0.8 if price>ee50[i] else -0.8
+        if pp is not None and mm is not None:
+            if a>28: cdi+=(2.0 if pp>mm else -2.0)
+            elif a>18: cdi+=(0.8 if pp>mm else -0.8)
+        if i>=5 and ee50[i-5]: sl=(ee50[i]-ee50[i-5])/ee50[i-5]*100; csl+=(0.7 if sl>0.5 else 0.3 if sl>0.1 else -0.7 if sl<-0.5 else -0.3 if sl<-0.1 else 0)
+        j=min(i*4,len(ee20_1h)-1)
+        if ee20_1h[j] and ee50_1h[j]: cc1+=0.5 if ee20_1h[j]>ee50_1h[j] else -0.5
+        val=cs+cpv+cdi+csl+cc1
+        strong=a>28; below200=price<ee200[i]
+        # EMA200 slope 10 bar
+        e200up=e200dn=True
+        if i>=10 and ee200[i-10]: s200=(ee200[i]-ee200[i-10])/ee200[i-10]*100; e200up=s200>0; e200dn=s200<0
+        zone="RANGE"
+        if val>1.6: zone="STRONG_UP" if (strong and val>3.0 and e200up) else "UP"
+        elif val<-1.6:
+            sd=strong and val<-3.0 and below200 and e200dn
+            zone="STRONG_DOWN" if sd else "DOWN"
+        by_z[zone].append((ce4[i+H]-ce4[i])/ce4[i]*100)
+    drift=sum(sum(v) for v in by_z.values())/sum(len(v) for v in by_z.values())
+    print(f"\n[{tag}] ETH per-asset (3y, fwd {H}×4h, drift {drift:+.2f}%):")
+    print(f"{'ZONE':<13}{'n':>6}{'excess':>10}")
+    for z in ["STRONG_DOWN","DOWN","RANGE","UP","STRONG_UP"]:
+        xs=by_z.get(z,[])
+        if xs: print(f"{z:<13}{len(xs):>6}{sum(xs)/len(xs)-drift:>+9.2f}%")
+
 if __name__=="__main__":
+    if VARIANT=="iter9":
+        eth_check(VARIANTS["v3"],"v3"); sys.exit(0)
+    if VARIANT=="iter8":
+        sup_rci_bull(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter7":
         stickiness(VARIANTS["v3"], "v3"); adx_sweep(VARIANTS["v3"], "v3"); sys.exit(0)
     if VARIANT=="rcigate":

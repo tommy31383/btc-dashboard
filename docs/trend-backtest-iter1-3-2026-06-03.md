@@ -121,7 +121,21 @@ ADX-strong sweep (STRONG excess OOS 2023-26):
 
 **Applied:** `adx_strong 25→28` trong trend.ts (sharpen STRONG_UP OOS, STRONG_DOWN vẫn ~0 = đúng kỳ vọng downtrend display-only). Zone đủ sticky cho UX.
 
-## TODO loop tiếp (iter 8+, diminishing returns)
+## Iteration 8 — STRONG_UP-bias × RCI-bull → STRUCTURAL MISS
+
+STRONG_UP + RSI4h<30 = **0 bar** — structurally mutually exclusive (RSI<30 = price falling → EMA stack cannot be bullish simultaneously). Dip-buy happens DURING downtrend not during uptrend — corroborates iter6. No change.
+
+## Iteration 9 — ETH per-asset check (3y)
+
+```
+          BTC (7y OOS)   ETH (3y)
+STRONG_DOWN  -0.65%       -0.26%
+STRONG_UP    +0.83%       +1.27%  ← ETH MẠNH HƠN
+```
+
+ETH STRONG_UP excess +1.27% > BTC +0.83% — trend index more effective on ETH. STRONG_DOWN ETH also negative (structural validity cross-asset). If ETH panel added later, trend index applies well. SOL skipped per `feedback_only_btc_eth_sol` (bear-short lesson).
+
+## TODO loop tiếp (iter 10+)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).
