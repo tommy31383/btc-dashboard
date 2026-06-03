@@ -84,7 +84,30 @@ horizon    STRONG_DOWN exc   STRONG_UP exc   (n D/U)
 
 **Kết luận:** không horizon nào hồi được downtrend forward-edge OOS (excess ≈0 mọi nơi). Chỉ **STRONG_UP còn edge nhỏ ổn định +0.2~0.3%**. Khớp tuyệt đối lesson `bear-short-no-edge`: không đoán downtrend, ngồi cash là đúng. → Panel chỉ nên dùng STRONG_DOWN làm **cảnh báo risk-off / giảm size**, KHÔNG làm short-signal.
 
-## TODO loop tiếp (iter 6+)
+## Iteration 6 — Trend-gate × RCI-bull integration → GATE INVERTS OOS, REJECT
+
+```
+RCI-bull (mua dip RSI4h<30, fwd 5d):
+                          ALL 7y       OOS 2023-26
+  ungated (mọi dip):      +0.61%        +1.84%
+  GATED (bỏ STRONG_DOWN): +1.52% ✓      +1.24% ✗
+  skipped (STRONG_DOWN):  +0.22%        +2.15%  ← ĐẢO DẤU
+```
+
+**Kết luận:** gate bỏ-mua-dip-khi-STRONG_DOWN hoạt động train-era (tránh dao rơi) nhưng **ĐẢO NGƯỢC OOS** — dip trong downtrend 2023-26 bật mạnh nhất (V-recovery), gate đi = HẠI. **REJECT gating RCI bằng trend.** Đúng META-LESSON gốc (trend+reversal bolt = đánh nhau với edge). Cùng cảnh báo overfit như case overext (`feedback_verify_on_live_faithful_harness`).
+
+---
+
+## 🏁 LOOP CONVERGENCE (sau 6 iter)
+
+3 kiểm tra OOS độc lập đều 1 hướng: **Trend Index = chỉ báo REGIME/hiển thị, KHÔNG phải nguồn alpha.**
+- iter4: forward-alpha decay 2019-22 → 2023-26.
+- iter5: downtrend-prediction chết mọi horizon OOS (bear-short-no-edge).
+- iter6: trend-gate cho RCI đảo dấu OOS → reject.
+
+**Ship:** Trend section trên RCIPanel = mô tả xu hướng cấu trúc hiện tại (EMA/ADX/DI) — hợp lệ làm risk-context. STRONG_DOWN = cảnh báo risk-off/giảm size, KHÔNG short, KHÔNG gate RCI.
+
+## TODO loop tiếp (iter 7+, diminishing returns)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).

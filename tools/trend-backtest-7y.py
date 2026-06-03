@@ -258,7 +258,48 @@ def horizon_oos(P, tag):
         sue=(sum(su)/len(su)-drift) if su else float('nan')
         print(f"{H:>8}×4h{drift:>+8.2f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
 
+def rci_gate(P, tag):
+    """RCI-bull proxy = RSI4h oversold reversal (buy dip). So precision khi
+    GATE bằng Trend (bỏ entry nếu zone STRONG_DOWN). Test integration thesis."""
+    def rsi_series(closes,p=14):
+        n=len(closes); out=[None]*n
+        if n<=p: return out
+        g=l=0
+        for i in range(1,p+1):
+            d=closes[i]-closes[i-1]; g+=max(d,0); l+=max(-d,0)
+        ag=g/p; al=l/p
+        out[p]=100-100/(1+ag/al) if al>0 else 100
+        for i in range(p+1,n):
+            d=closes[i]-closes[i-1]
+            ag=(ag*(p-1)+max(d,0))/p; al=(al*(p-1)+max(-d,0))/p
+            out[i]=100-100/(1+ag/al) if al>0 else 100
+        return out
+    rsi4=rsi_series(c4,14)
+    H=30
+    def stats(rows):
+        if not rows: return (0,0,0)
+        pos=100*sum(1 for r in rows if r>0)/len(rows)
+        return (len(rows), sum(rows)/len(rows), pos)
+    for era,lo in (("ALL 7y",2019),("OOS 2023-26",2023)):
+        ungated=[]; gated=[]; skipped=[]
+        for i in range(200,len(bars4h)-H):
+            if rsi4[i] is None or rsi4[i]>=30: continue   # oversold dip entry
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<lo: continue
+            f=(c4[i+H]-c4[i])/c4[i]*100
+            ungated.append(f)
+            _,zone,_=score_trend(i,P)
+            if zone=="STRONG_DOWN": skipped.append(f)
+            else: gated.append(f)
+        nu,au,pu=stats(ungated); ng,ag,pg=stats(gated); ns,ask,ps=stats(skipped)
+        print(f"\n[{tag}] RCI-bull(RSI<30) × Trend-gate — {era}:")
+        print(f"  ungated (mọi dip):       n={nu:>4} avgFwd {au:+.2f}% %pos {pu:.1f}")
+        print(f"  GATED (bỏ STRONG_DOWN):  n={ng:>4} avgFwd {ag:+.2f}% %pos {pg:.1f}")
+        print(f"  skipped (STRONG_DOWN):   n={ns:>4} avgFwd {ask:+.2f}% %pos {ps:.1f}  ← gate có loại đúng dao rơi?")
+
 if __name__=="__main__":
+    if VARIANT=="rcigate":
+        rci_gate(VARIANTS["v3"], "v3"); sys.exit(0)
     if VARIANT=="horizon":
         horizon_oos(VARIANTS["v3"], "v3"); sys.exit(0)
     if VARIANT=="oos":
