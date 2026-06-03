@@ -126,7 +126,8 @@ export function computeRCI(input: RCIInput): RCIResult {
     else if (bb < 0.05) comp.bollinger -= 0.2;
   }
 
-  // ── Layer 4: MACD histogram declining (4h) ──
+  // ── Layer 4: MACD histogram declining (4h) — iter25 audit: MACD OOS=22% < base 27%
+  // MACD chết OOS 2023-26 (cùng fate RSI/Stoch/BB). Weight cut 0.4→0.15 (display only)
   const macdNow = calcMACD(closes4h);
   const macdPrev = calcMACD(closes4h.slice(0, -1));
   const macdPrev2 = calcMACD(closes4h.slice(0, -2));
@@ -136,8 +137,8 @@ export function computeRCI(input: RCIInput): RCIResult {
     macdPrev2.histogram !== null
   ) {
     const m = macdNow.histogram, mp = macdPrev.histogram, mpp = macdPrev2.histogram;
-    if (m > 0 && m < mp && mp < mpp) comp.macd += 0.4; // bearish momentum fade
-    if (m < 0 && m > mp && mp > mpp) comp.macd -= 0.4; // bullish momentum fade
+    if (m > 0 && m < mp && mp < mpp) comp.macd += 0.15;
+    if (m < 0 && m > mp && mp > mpp) comp.macd -= 0.15;
   }
 
   // ── Layer 5: Funding rate (crowding — strongest signal) ──
