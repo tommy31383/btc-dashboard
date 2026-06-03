@@ -54,3 +54,9 @@
 - sleeves[41E] exit_ema20=True filters(fund=False rsi=False bear=True)
 - per-yr: 2019:+248% 2020:+494% 2021:+251% 2022:+21% 2023:+161% 2024:+67% 2025:+12% 2026:+9%
 - params: `{"adx4": 16, "di4": 0.9, "sl4": 1.6, "tp4": 12, "hold4": 70, "cool4": 2, "pos4": 7, "adx1": 16, "di1": 1.05, "sl1": 1.4, "tp1": 10, "hold1": 30, "cool1": 1, "pos1": 2, "adxe": 20, "die": 1.3, "sle": 1.4, "tpe": 12, "eblo": 0.8, "ebhi": 1.1, "bg": 0.8, "risk": 0.04, "cap": 1.0, "use_btc4h": true, "use_btc1h": true, "use_eth": true, "exit_ema20": true, "f_funding": false, "f_rsi": false, "f_bear": true}`
+
+## Champion #9 - gen 794 - 2026-06-03 18:53
+- Calmar 6.45 | CAGR 132.7% DD 20.6% min_n 306 testCAGR 34.5%
+- sleeves[41E] exit_ema20=True filters(fund=False rsi=False bear=True)
+- per-yr: 2019:+231% 2020:+547% 2021:+237% 2022:+21% 2023:+165% 2024:+68% 2025:+11% 2026:+9%
+- params: `{"adx4": 16, "di4": 0.9, "sl4": 1.6, "tp4": 12, "hold4": 40, "cool4": 2, "pos4": 7, "adx1": 16, "di1": 1.05, "sl1": 1.4, "tp1": 10, "hold1": 30, "cool1": 1, "pos1": 2, "adxe": 20, "die": 1.3, "sle": 1.4, "tpe": 12, "eblo": 0.8, "ebhi": 1.1, "bg": 0.8, "risk": 0.04, "cap": 1.0, "use_btc4h": true, "use_btc1h": true, "use_eth": true, "exit_ema20": true, "f_funding": false, "f_rsi": false, "f_bear": true}`
