@@ -231,3 +231,25 @@ Applied: RSI weight x0.5 (1.5->0.7), Stoch x0.5 (0.8->0.4), BB x0.5 (0.8->0.4).
 Funding weight kept at 2.0. RCI v5. Deploy v4.10.4.
 
 Implication: RCI = crowding display (funding), reversal precision LOW OOS. Not standalone entry trigger.
+
+## Iteration 22 — v5 per-year stability (SPARSE signal problem)
+
+v5 thr=2.0/2.5 only fires 2020/2021/2024. 2019/2022/2025/2026 = zero signal.
+2023 = n=1. n=35 total OOS thr=2.5. No signal 2025-26 (most recent era).
+Apply: BEAR_STRONG requires fundingDominant>=1.5 gate. Thresholds: BEAR_STRONG>2.5+fund,
+BEAR_WATCH>2.0, BULL_WATCH<-2.0, BULL_STRONG<-2.5. Deploy v4.10.5.
+
+## Iteration 23 — Funding-only baseline final (LOOP CONVERGE RCI)
+
+```
+Signal          7y prec    OOS 23-26     n OOS
+fund>0.03%      +13pp       +4.8pp        178   <- robust
+fund>0.05%      +14pp       +3.3pp         50
+fund>0.08%      +15pp      +23pp!           4   <- sparse
+v5 composite thr=2.0: +6pp OOS prec 33%, n=70
+```
+
+CONCLUSION: funding>0.03% alone gives n=178 OOS (2.5x more than v5 composite n=70)
+with comparable precision (+4.8pp vs +6pp). Composite v5 = over-engineering.
+FUNDING IS KING confirmed. Panel must display funding rate PROMINENTLY.
+RCI composite = context display only, not primary signal. RCI LOOP FULLY CONVERGED.
