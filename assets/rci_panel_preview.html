@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCI Panel Preview</title>
+<style>
+  body { background:#0a0a14; color:#fff; font-family:-apple-system,system-ui,sans-serif; padding:20px; max-width:480px; margin:0 auto; }
+  h1 { font-size:16px; color:#f7931a; }
+  .sub { color:#888; font-size:12px; margin-bottom:20px; }
+  .card { background:#0d1117; border-radius:8px; padding:12px; margin:12px 0; }
+  .headerRow { display:flex; justify-content:space-between; align-items:center; }
+  .title { font-size:13px; font-weight:700; }
+  .value { font-size:18px; font-weight:800; font-family:monospace; }
+  .zone { font-size:12px; font-weight:600; margin:2px 0 8px; }
+  .barBg { height:10px; background:#ffffff12; border-radius:5px; position:relative; overflow:hidden; }
+  .zeroLine { position:absolute; top:0; width:1.5px; height:100%; background:#ffffff60; }
+  .thMarker { position:absolute; top:0; width:1px; height:100%; opacity:0.5; }
+  .fill { position:absolute; top:0; height:100%; border-radius:5px; }
+  .axisRow { display:flex; justify-content:space-between; margin-top:3px; }
+  .axisLabel { color:#666; font-size:9px; }
+  .compRow { display:flex; justify-content:space-between; margin-top:10px; gap:4px; }
+  .comp { flex:1; text-align:center; }
+  .compLabel { color:#666; font-size:9px; }
+  .compVal { font-size:12px; font-family:monospace; }
+  .funding { color:#aaa; font-size:10px; margin-top:8px; font-family:monospace; }
+</style>
+</head>
+<body>
+<h1>RCI Panel — Preview 5 trạng thái</h1>
+<div class="sub">Reversal Confluence Index · range -4 → +6 · Funding(64% precision) + RSI/Stoch/BB/MACD multi-TF</div>
+<div class="card" style="border-left:4px solid #ff4757">
+    <div class="headerRow"><div class="title">RCI — Reversal Index</div><div class="value" style="color:#ff4757">+6.30</div></div>
+    <div class="zone" style="color:#ff4757">ĐỈNH — áp lực quay đầu MẠNH</div>
+    <div class="barBg">
+      <div class="thMarker" style="left:70%;background:#ffa502"></div>
+      <div class="thMarker" style="left:80%;background:#ff4757"></div>
+      <div class="thMarker" style="left:25%;background:#26de81"></div>
+      <div class="thMarker" style="left:15%;background:#2ed573"></div>
+      <div class="zeroLine" style="left:40%"></div>
+      <div class="fill" style="left:40%;width:60%;background:#ff4757"></div>
+    </div>
+    <div class="axisRow"><span class="axisLabel">↑ đáy (bull)</span><span class="axisLabel">0</span><span class="axisLabel">đỉnh (bear) ↓</span></div>
+    <div class="compRow"><div class="comp"><div class="compLabel">Fund</div><div class="compVal" style="color:#ff4757;font-weight:800">+2.0</div></div><div class="comp"><div class="compLabel">RSI</div><div class="compVal" style="color:#ff4757;font-weight:600">+2.3</div></div><div class="comp"><div class="compLabel">Stoch</div><div class="compVal" style="color:#ff4757;font-weight:600">+0.8</div></div><div class="comp"><div class="compLabel">BB</div><div class="compVal" style="color:#ff4757;font-weight:600">+0.8</div></div><div class="comp"><div class="compLabel">MACD</div><div class="compVal" style="color:#ff4757;font-weight:600">+0.4</div></div></div>
+    <div class="funding">Funding: +0.0600%/8h  ⚠️ LONGS crowded (squeeze risk)</div>
+  </div>
+<div class="card" style="border-left:4px solid #ffa502">
+    <div class="headerRow"><div class="title">RCI — Reversal Index</div><div class="value" style="color:#ffa502">+3.80</div></div>
+    <div class="zone" style="color:#ffa502">Cảnh báo đỉnh — giảm size</div>
+    <div class="barBg">
+      <div class="thMarker" style="left:70%;background:#ffa502"></div>
+      <div class="thMarker" style="left:80%;background:#ff4757"></div>
+      <div class="thMarker" style="left:25%;background:#26de81"></div>
+      <div class="thMarker" style="left:15%;background:#2ed573"></div>
+      <div class="zeroLine" style="left:40%"></div>
+      <div class="fill" style="left:40%;width:38%;background:#ffa502"></div>
+    </div>
+    <div class="axisRow"><span class="axisLabel">↑ đáy (bull)</span><span class="axisLabel">0</span><span class="axisLabel">đỉnh (bear) ↓</span></div>
+    <div class="compRow"><div class="comp"><div class="compLabel">Fund</div><div class="compVal" style="color:#ff4757;font-weight:800">+1.5</div></div><div class="comp"><div class="compLabel">RSI</div><div class="compVal" style="color:#ff4757;font-weight:600">+1.4</div></div><div class="comp"><div class="compLabel">Stoch</div><div class="compVal" style="color:#ff4757;font-weight:600">+0.8</div></div><div class="comp"><div class="compLabel">BB</div><div class="compVal" style="color:#ff4757;font-weight:600">+0.4</div></div><div class="comp"><div class="compLabel">MACD</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div></div>
+    <div class="funding">Funding: +0.0200%/8h</div>
+  </div>
+<div class="card" style="border-left:4px solid #888">
+    <div class="headerRow"><div class="title">RCI — Reversal Index</div><div class="value" style="color:#888">+0.00</div></div>
+    <div class="zone" style="color:#888">Trung tính</div>
+    <div class="barBg">
+      <div class="thMarker" style="left:70%;background:#ffa502"></div>
+      <div class="thMarker" style="left:80%;background:#ff4757"></div>
+      <div class="thMarker" style="left:25%;background:#26de81"></div>
+      <div class="thMarker" style="left:15%;background:#2ed573"></div>
+      <div class="zeroLine" style="left:40%"></div>
+      <div class="fill" style="left:40%;width:0%;background:#888"></div>
+    </div>
+    <div class="axisRow"><span class="axisLabel">↑ đáy (bull)</span><span class="axisLabel">0</span><span class="axisLabel">đỉnh (bear) ↓</span></div>
+    <div class="compRow"><div class="comp"><div class="compLabel">Fund</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div><div class="comp"><div class="compLabel">RSI</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div><div class="comp"><div class="compLabel">Stoch</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div><div class="comp"><div class="compLabel">BB</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div><div class="comp"><div class="compLabel">MACD</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div></div>
+    <div class="funding">Funding: +0.0050%/8h</div>
+  </div>
+<div class="card" style="border-left:4px solid #26de81">
+    <div class="headerRow"><div class="title">RCI — Reversal Index</div><div class="value" style="color:#26de81">-2.30</div></div>
+    <div class="zone" style="color:#26de81">Cảnh báo đáy — chờ entry</div>
+    <div class="barBg">
+      <div class="thMarker" style="left:70%;background:#ffa502"></div>
+      <div class="thMarker" style="left:80%;background:#ff4757"></div>
+      <div class="thMarker" style="left:25%;background:#26de81"></div>
+      <div class="thMarker" style="left:15%;background:#2ed573"></div>
+      <div class="zeroLine" style="left:40%"></div>
+      <div class="fill" style="left:17%;width:23%;background:#26de81"></div>
+    </div>
+    <div class="axisRow"><span class="axisLabel">↑ đáy (bull)</span><span class="axisLabel">0</span><span class="axisLabel">đỉnh (bear) ↓</span></div>
+    <div class="compRow"><div class="comp"><div class="compLabel">Fund</div><div class="compVal" style="color:#2ed573;font-weight:600">-0.8</div></div><div class="comp"><div class="compLabel">RSI</div><div class="compVal" style="color:#2ed573;font-weight:600">-0.8</div></div><div class="comp"><div class="compLabel">Stoch</div><div class="compVal" style="color:#2ed573;font-weight:600">-0.8</div></div><div class="comp"><div class="compLabel">BB</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div><div class="comp"><div class="compLabel">MACD</div><div class="compVal" style="color:#666;font-weight:600">0.0</div></div></div>
+    <div class="funding">Funding: -0.0060%/8h</div>
+  </div>
+<div class="card" style="border-left:4px solid #2ed573">
+    <div class="headerRow"><div class="title">RCI — Reversal Index</div><div class="value" style="color:#2ed573">-5.80</div></div>
+    <div class="zone" style="color:#2ed573">ĐÁY — áp lực bật lên MẠNH</div>
+    <div class="barBg">
+      <div class="thMarker" style="left:70%;background:#ffa502"></div>
+      <div class="thMarker" style="left:80%;background:#ff4757"></div>
+      <div class="thMarker" style="left:25%;background:#26de81"></div>
+      <div class="thMarker" style="left:15%;background:#2ed573"></div>
+      <div class="zeroLine" style="left:40%"></div>
+      <div class="fill" style="left:0%;width:40%;background:#2ed573"></div>
+    </div>
+    <div class="axisRow"><span class="axisLabel">↑ đáy (bull)</span><span class="axisLabel">0</span><span class="axisLabel">đỉnh (bear) ↓</span></div>
+    <div class="compRow"><div class="comp"><div class="compLabel">Fund</div><div class="compVal" style="color:#2ed573;font-weight:800">-1.5</div></div><div class="comp"><div class="compLabel">RSI</div><div class="compVal" style="color:#2ed573;font-weight:600">-2.3</div></div><div class="comp"><div class="compLabel">Stoch</div><div class="compVal" style="color:#2ed573;font-weight:600">-0.8</div></div><div class="comp"><div class="compLabel">BB</div><div class="compVal" style="color:#2ed573;font-weight:600">-0.8</div></div><div class="comp"><div class="compLabel">MACD</div><div class="compVal" style="color:#2ed573;font-weight:600">-0.4</div></div></div>
+    <div class="funding">Funding: -0.0150%/8h  ⚠️ SHORTS crowded</div>
+  </div>
+</body>
+</html>

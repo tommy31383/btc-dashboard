@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "expo-web-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start", "--web", "--port", "8088"],
+      "port": 8088
+    },
+    {
       "name": "btc-web",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "docs", "-l", "5599"],
