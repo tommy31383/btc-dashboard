@@ -436,7 +436,47 @@ def eth_check(P, tag):
         xs=by_z.get(z,[])
         if xs: print(f"{z:<13}{len(xs):>6}{sum(xs)/len(xs)-drift:>+9.2f}%")
 
+def range_audit(P, tag):
+    """Iter10: tại sao RANGE excess âm? Kiểm tra: RANGE ở đâu trong chu kỳ (trước/sau trend)."""
+    H=30
+    from collections import Counter
+    # Lấy sequence zone, xem RANGE xuất hiện sau STRONG_DOWN nhiều không
+    prev_zones=[]; cur_zones=[]
+    for i in range(201,len(bars4h)-H):
+        val,zone,_=score_trend(i,P)
+        vp,zonep,_=score_trend(i-1,P)
+        if val is None or vp is None: continue
+        prev_zones.append(zonep); cur_zones.append(zone)
+    # fwd return theo (prev_zone, cur_zone) pair — chỉ quan tâm RANGE hiện tại
+    range_by_prev=defaultdict(list)
+    for i in range(201,len(bars4h)-H):
+        val,zone,_=score_trend(i,P)
+        vp,zonep,_=score_trend(i-1,P)
+        if val is None or vp is None or zone!="RANGE": continue
+        f=(c4[i+H]-c4[i])/c4[i]*100
+        range_by_prev[zonep].append(f)
+    allf=sum(range_by_prev.values(),[])
+    drift=sum(allf)/len(allf) if allf else 0
+    print(f"\n[{tag}] RANGE zone breakdown by PREV zone (fwd {H}×4h, drift {drift:+.2f}%):")
+    print(f"{'prev_zone':<14}{'n':>6}{'excess':>10}")
+    for z in ["STRONG_DOWN","DOWN","RANGE","UP","STRONG_UP"]:
+        xs=range_by_prev.get(z,[])
+        if xs: print(f"{z:<14}{len(xs):>6}{sum(xs)/len(xs)-drift:>+9.2f}%")
+    # cũng check: RANGE split by ADX level
+    range_adx_lo=[]; range_adx_hi=[]
+    for i in range(200,len(bars4h)-H):
+        val,zone,a=score_trend(i,P)
+        if val is None or zone!="RANGE" or a is None: continue
+        f=(c4[i+H]-c4[i])/c4[i]*100
+        if a<15: range_adx_lo.append(f)
+        else: range_adx_hi.append(f)
+    dall=[x for xs in range_by_prev.values() for x in xs]; d=sum(dall)/len(dall) if dall else 0
+    print(f"  RANGE ADX<15 (true sideways): n={len(range_adx_lo)} excess={sum(range_adx_lo)/len(range_adx_lo)-d:+.2f}%" if range_adx_lo else "")
+    print(f"  RANGE ADX≥15 (weak trend):    n={len(range_adx_hi)} excess={sum(range_adx_hi)/len(range_adx_hi)-d:+.2f}%" if range_adx_hi else "")
+
 if __name__=="__main__":
+    if VARIANT=="iter10":
+        range_audit(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter9":
         eth_check(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter8":

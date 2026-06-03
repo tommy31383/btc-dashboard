@@ -135,7 +135,17 @@ STRONG_UP    +0.83%       +1.27%  ← ETH MẠNH HƠN
 
 ETH STRONG_UP excess +1.27% > BTC +0.83% — trend index more effective on ETH. STRONG_DOWN ETH also negative (structural validity cross-asset). If ETH panel added later, trend index applies well. SOL skipped per `feedback_only_btc_eth_sol` (bear-short lesson).
 
-## TODO loop tiếp (iter 10+)
+## Iteration 10 — RANGE audit: bí ẩn excess âm giải quyết
+
+```
+RANGE split by ADX:
+  ADX<15 (sideway thật): n=365   excess +0.39%  ← BTC drift, bullish
+  ADX≥15 (weak trend):   n=2351  excess -0.06%  ← noise = đúng
+```
+
+86% RANGE bar là "weak trend chưa đủ ADX 28". True sideway (ADX<15) bullish (+BTC drift). Không phải structural defect — RANGE label đúng: "không đủ ADX để classify". **Action:** panel label RANGE hiện tại OK. Có thể thêm ADX số vào badge để user biết "28 flat" vs "12 flat".
+
+## TODO loop tiếp (iter 11+)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).
