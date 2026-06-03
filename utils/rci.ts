@@ -1,15 +1,20 @@
 /**
- * rci.ts — Reversal Confluence Index (RCI v3)
+ * rci.ts — Reversal Confluence Index (RCI v4)
  *
  * Một đường oscillator âm/dương xác định thời điểm giá quay đầu (đỉnh/đáy).
  *   Dương (+) = bearish pressure (đỉnh sắp quay đầu xuống)
  *   Âm  (−)  = bullish pressure (đáy sắp quay đầu lên)
  *
- * Backtest 7y/3y (docs/rci-indicator-research-2026-06-03.md):
- *   Funding rate extreme >0.05%/8h = 64.3% precision (signal mạnh nhất)
- *   RCI v3 combined thr=4.0 = 60% precision (~5 signal/yr)
+ * Backtest 7y (docs/rci-v4-research-2026-06-03.md):
+ *   v4 = v3 + Group3 (ADX slope + Funding Accel + Vol Exhaustion)
+ *   thr=2.5 → 63.2% precision, 16 signals/yr, 6/6 years robust
+ *   OOS (2023-2026): 57.1% precision
  *
- * Weight: Funding ×2.0-2.5 (crowding) + RSI ×1.5 + Stoch ×0.8 + BB ×0.8 + MACD ×0.4
+ * Weight: Funding ×2.0 + RSI ×1.5 + Stoch ×0.8 + BB ×0.8 + MACD ×0.4
+ *       + ADX slope ×0.8 + Funding acceleration ×1.2 + Vol exhaustion ×0.8
+ *
+ * Rejected (Group1 HTF — too sticky, hurts precision):
+ *   RSI-1d, BB%B-1w, EMA200 distance fire on 39.8% of bars → noise.
  */
 import { calcRSISeries, calcBollinger, calcMACD } from "./indicators";
 
@@ -17,7 +22,11 @@ export interface RCIInput {
   closes4h: number[];
   closes1h: number[];
   klines4h: { high: number; low: number; close: number; volume: number }[];
-  fundingRate: number | null; // current funding rate (decimal, 0.0005 = 0.05%)
+  fundingRate: number | null;     // current funding rate (decimal, 0.0005 = 0.05%)
+  prevFundingRate?: number | null; // previous 8h funding rate (for acceleration)
+  adx4h?: number | null;          // ADX(14) current value
+  adxPrev1?: number | null;       // ADX 1 bar ago
+  adxPrev2?: number | null;       // ADX 2 bars ago
 }
 
 export interface RCIResult {
@@ -29,6 +38,9 @@ export interface RCIResult {
     bollinger: number;
     macd: number;
     funding: number;
+    adxSlope: number;      // v4 new
+    fundingAccel: number;  // v4 new
+    volExhaust: number;    // v4 new
   };
   fundingPct: number | null;   // funding in % for display
 }
@@ -55,11 +67,13 @@ function calcBollingerPctB(closes: number[], period = 20, mult = 2): number | nu
   return range > 0 ? (close - bb.lower) / range : 0.5;
 }
 
-/** Compute RCI v3 score from current market state. */
+/** Compute RCI v4 score from current market state. */
 export function computeRCI(input: RCIInput): RCIResult {
-  const { closes4h, closes1h, klines4h, fundingRate } = input;
+  const { closes4h, closes1h, klines4h, fundingRate,
+          prevFundingRate, adx4h, adxPrev1, adxPrev2 } = input;
 
-  const comp = { rsi: 0, stoch: 0, bollinger: 0, macd: 0, funding: 0 };
+  const comp = { rsi: 0, stoch: 0, bollinger: 0, macd: 0, funding: 0,
+                 adxSlope: 0, fundingAccel: 0, volExhaust: 0 };
 
   // Need enough data
   if (closes4h.length < 30 || klines4h.length < 30) {
@@ -134,14 +148,50 @@ export function computeRCI(input: RCIInput): RCIResult {
     else if (fr < -0.00005) comp.funding -= 0.8;
   }
 
-  const raw =
-    comp.rsi + comp.stoch + comp.bollinger + comp.macd + comp.funding;
+  // ── Group3 NEW (v4): ADX slope + Funding acceleration + Volume exhaustion ──
 
+  // ADX slope: ADX > 25 AND declining 3 bars (trend weakening)
+  if (adx4h != null && adxPrev1 != null && adxPrev2 != null && adx4h > 25) {
+    if (adx4h < adxPrev1 && adxPrev1 < adxPrev2) {
+      const close = closes4h[closes4h.length - 1];
+      const closePrev3 = closes4h.length >= 4 ? closes4h[closes4h.length - 4] : close;
+      if (close > closePrev3) comp.adxSlope += 0.8;  // up-trend weakening = bearish
+      else                    comp.adxSlope -= 0.8;  // down-trend weakening = bullish
+    }
+  }
+
+  // Funding acceleration: funding > 0.03% AND > prev × 1.5
+  if (fundingRate != null && prevFundingRate != null) {
+    const fr = fundingRate; const pfr = prevFundingRate;
+    if (fr > 0.0003 && pfr > 0 && fr > pfr * 1.5) comp.fundingAccel += 1.2;
+    else if (fr < -0.0003 && pfr < 0 && fr < pfr * 1.5) comp.fundingAccel -= 1.2;
+  }
+
+  // Volume exhaustion: vol > vol_MA × 3 AND body < 20% of range
+  if (klines4h.length >= 20) {
+    const vols = klines4h.map((k) => k.volume);
+    const volMa = vols.slice(-20).reduce((a, b) => a + b, 0) / 20;
+    const last = klines4h[klines4h.length - 1];
+    const range = last.high - last.low;
+    const body = Math.abs(last.close - (klines4h[klines4h.length - 2]?.close ?? last.close));
+    if (last.volume > volMa * 3.0 && range > 0 && body / range < 0.20) {
+      if (last.close > (klines4h[klines4h.length - 2]?.close ?? last.close))
+        comp.volExhaust += 0.8;  // up-close climax = bearish
+      else
+        comp.volExhaust -= 0.8;  // down-close climax = bullish
+    }
+  }
+
+  const raw =
+    comp.rsi + comp.stoch + comp.bollinger + comp.macd + comp.funding +
+    comp.adxSlope + comp.fundingAccel + comp.volExhaust;
+
+  // v4 thresholds (calibrated to 7y backtest: thr=2.5 → 63.2% precision)
   let zone: RCIResult["zone"] = "NEUTRAL";
-  if (raw > 4.0) zone = "BEAR_STRONG";
-  else if (raw > 3.0) zone = "BEAR_WATCH";
-  else if (raw < -2.5) zone = "BULL_STRONG";
-  else if (raw < -1.5) zone = "BULL_WATCH";
+  if (raw > 3.0) zone = "BEAR_STRONG";
+  else if (raw > 2.5) zone = "BEAR_WATCH";
+  else if (raw < -3.0) zone = "BULL_STRONG";
+  else if (raw < -2.5) zone = "BULL_WATCH";
 
   return { value: raw, zone, components: comp, fundingPct };
 }

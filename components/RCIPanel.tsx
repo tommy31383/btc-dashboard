@@ -88,13 +88,16 @@ export default function RCIPanel({ rci }: Props) {
         <Text style={styles.axisLabel}>đỉnh (bear) ↓</Text>
       </View>
 
-      {/* Components breakdown */}
+      {/* Components breakdown (v4: 8 components) */}
       <View style={styles.compRow}>
         <Comp label="Fund" v={components.funding} highlight={Math.abs(components.funding) >= 1.5} />
+        <Comp label="FAcc" v={components.fundingAccel} highlight={Math.abs(components.fundingAccel) >= 1.2} />
         <Comp label="RSI" v={components.rsi} />
         <Comp label="Stoch" v={components.stoch} />
         <Comp label="BB" v={components.bollinger} />
         <Comp label="MACD" v={components.macd} />
+        <Comp label="ADX" v={components.adxSlope} />
+        <Comp label="VolX" v={components.volExhaust} />
       </View>
 
       {fundingPct !== null && (
