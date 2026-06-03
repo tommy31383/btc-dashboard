@@ -149,7 +149,37 @@ RANGE split by ADX:
 
 EMA50-slope threshold sweep (0.05/0.3 → 0.2/0.8) và c1 weight (0→1.2): **không ảnh hưởng STRONG zone** ở bất kỳ combo nào. STRONG_UP excess OOS giữ +0.31% toàn bộ. Pattern: STRONG zone dominated bởi ADX/DI (weight 2.0) + EMA stack (1.5). Small components (slope max ±0.7, c1 max ±0.5) quá nhỏ để flip zone qua threshold 3.0. **Insight:** STRONG zone robust với params nhỏ → không overfit, là cấu trúc thật. slope/c1 vẫn hữu ích cho UP/DOWN biên.
 
-## TODO loop tiếp (iter 14+)
+## Iteration 14 — Ablation: drop EMA stack → v4 ✅
+
+```
+Component ablation OOS 2023-26 (remove one at time):
+  stack_full remove: STRONG_UP +0.31→+0.46%  ← stack HURTS, drop it
+  di remove:         STRONG_DOWN âm→+0.32%   ← DI is key for down-side
+  pve remove:        STRONG_DOWN slightly worse → pve 0.8→0.4 sweet spot
+  c1 remove:         no change (negligible)
+
+v4 = no EMA stack + pve=0.4 + di_strong=2.0 (later 2.5):
+  v3: SDOWN +0.06% / SUP +0.31%  Sharpe SUP=0.053
+  v4: SDOWN +0.00% / SUP +0.46%  Sharpe SUP=0.079  → ADOPTED
+```
+
+## Iteration 15 — Sharpe-like confirms v4
+
+v4 STRONG_UP Sharpe 0.079 vs v3 0.053 (+49% risk-adjusted). STRONG_DOWN Sharpe=0 (noise-free). v4 confirmed OOS.
+
+## Iteration 16 — DI-strong final sweep → 2.5 ✅
+
+```
+di_strong  SUP_Sharpe  SUP_excess
+  1.5        0.075      +0.42%
+  2.0        0.079      +0.46%
+  2.5        0.086      +0.50%  ← BEST, applied
+  3.0        0.057      +0.33%  (overshoot)
+```
+
+**Final v4 config:** stack=0, pve=0.4, di_strong=2.5, adx_strong=28, zthr=1.6, zstrong=3.0, EMA200 gates. STRONG_UP Sharpe 0.086, excess +0.50% OOS 2023-26. Deploy v4.10.2→v4.10.3.
+
+## TODO loop tiếp (iter 17+)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).

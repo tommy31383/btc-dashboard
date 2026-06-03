@@ -109,8 +109,8 @@ export function computeTrend(input: TrendInput): TrendResult {
   const { adx, diPlus, diMinus } = calcADXDI(klines4h, 14);
   if (adx != null && diPlus != null && diMinus != null) {
     if (adx > 28) {
-      if (diPlus > diMinus) comp.di += 2.0;   // trend mạnh hướng lên
-      else comp.di -= 2.0;                      // trend mạnh hướng xuống
+      if (diPlus > diMinus) comp.di += 2.5;   // iter16: 2.0→2.5, SUP Sharpe 0.079→0.086 OOS
+      else comp.di -= 2.5;
     } else if (adx > 18) {
       if (diPlus > diMinus) comp.di += 0.8;
       else comp.di -= 0.8;

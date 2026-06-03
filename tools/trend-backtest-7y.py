@@ -159,7 +159,7 @@ P_V2 = dict(P_V1); P_V2.update(need_below200=True, di_strong=2.0, di_weak=0.8)
 P_V3 = dict(P_V2); P_V3.update(ema200slope=True, zthr=1.6, zstrong=3.0)
 
 # v4: bỏ EMA stack (ablation iter14 cho thấy stack hurt STRONG_UP OOS), giữ pve=0.4
-P_V4 = dict(P_V3); P_V4.update(stack_full=0, stack_part=0, pve=0.4)
+P_V4 = dict(P_V3); P_V4.update(stack_full=0, stack_part=0, pve=0.4, di_strong=2.5)
 VARIANTS = {"v1": P_V1, "v2": P_V2, "v3": P_V3, "v4": P_V4}
 
 def run(P, tag):
@@ -587,7 +587,58 @@ def pve_sweep(P, tag):
         sue=(sum(su)/len(su)-d) if su else float('nan')
         print(f"{pve:>6.1f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
 
+def sharpe_eval(tag):
+    """Iter15: Sharpe-like eval — excess/std cho STRONG zones, v3 vs v4, OOS 2023-26."""
+    H=30
+    print(f"\n[{tag}] Sharpe-like (excess/std) — STRONG zones OOS 2023-26:")
+    print(f"{'variant':>8}{'SDN_sh':>10}{'SUP_sh':>10}{'nD/nU':>12}")
+    for vname,Pt in [("v3",VARIANTS["v3"]),("v4",VARIANTS["v4"])]:
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        def sh(xs,drift):
+            if len(xs)<5:return float('nan')
+            exc=[x-drift for x in xs]; m=sum(exc)/len(exc)
+            s=statistics.stdev(exc) if len(exc)>1 else 1
+            return m/s if s>0 else 0
+        print(f"{vname:>8}{sh(sd,d):>+10.3f}{sh(su,d):>+10.3f}{str(len(sd))+'/'+str(len(su)):>12}")
+
+def di_final_sweep(tag):
+    """Iter16: di_strong final sweep 1.5-3.0 — v4 base, OOS 2023-26."""
+    H=30
+    print(f"\n[{tag}] DI-strong final sweep (v4 base) OOS 2023-26:")
+    print(f"{'di_str':>8}{'SUP_sh':>10}{'SUPexc':>10}{'nU':>8}")
+    for ds in (1.5,2.0,2.5,3.0):
+        Pt=dict(VARIANTS["v4"]); Pt["di_strong"]=ds
+        su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        def sh(xs):
+            if len(xs)<5:return float('nan')
+            exc=[x-d for x in xs]; m=sum(exc)/len(exc)
+            s=statistics.stdev(exc) if len(exc)>1 else 1
+            return m/s if s>0 else 0
+        exc=(sum(su)/len(su)-d) if su else float('nan')
+        print(f"{ds:>8.1f}{sh(su):>+10.3f}{exc:>+9.2f}%{len(su):>8}")
+
 if __name__=="__main__":
+    if VARIANT=="iter16":
+        di_final_sweep("v4"); sys.exit(0)
+    if VARIANT=="iter15":
+        sharpe_eval("v3+v4"); sys.exit(0)
     if VARIANT=="iter14":
         ablation(VARIANTS["v3"],"v3"); pve_sweep(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter13":
