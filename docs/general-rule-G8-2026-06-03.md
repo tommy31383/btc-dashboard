@@ -148,3 +148,29 @@ SOL 2023 spectacular but cannot fix 2022/2026 structural issues.
 Fetching `binance-eth-5m-7y.json` to get ETH 2022 data. ETH 2022 = -76% (crash still bad,
 but ETH had Merge event Sep 2022 which caused +80% rally from Jun low). If ETH Q3 2022
 has sufficient signal, may generate some positive trades despite overall bear.
+
+## ★★ G13d Vol-Targeting BREAKTHROUGH: 7/8 = 87.5%
+
+**Config:** Vol-targeting + looser bear gate + more positions
+```
+BASE_NOT=28000, LEV=10, BEAR_GATE=0.85, MAX_POS=5, COOLDOWN=2
+Vol-target: trade_size = BASE_NOT × max(0.3, 1 - ATR_percentile_200bar)
+Strategy: same G10c signals (ADX>18, DI+>DI-×0.95, RSI<72, EMA200_4h+1d, funding<0.05%)
+```
+
+| Year | n | ROI% | KPI |
+|---|---|---|---|
+| 2019 | 170 | +416% | ✓✓ |
+| 2020 | 193 | +713% | ✓✓ |
+| 2021 | 125 | +286% | ✓✓ |
+| 2022 | 51 | +21% | ✓✗ (n OK, ROI not 50%) |
+| 2023 | 206 | +122% | ✓✓ |
+| 2024 | 217 | +74% | ✓✓ |
+| 2025 | 181 | +56% | ✓✓ |
+| 2026 | 64 | +47% | ✓✓ (pro-rated ✓) |
+
+**★ COMBINED KPI: 7/8 = 87.5% (n:8/8=100%, roi:7/8=87.5%)**
+
+Vol-targeting key insight: size down in high-vol periods → 2022 bear chop hits smaller positions → fewer big losses. 2026 sideways also benefits. Trade-off: 2022 ROI only +21% (n=51 entries but avg PnL small due to reduced size).
+
+## Tool: tools/general-rule-g13.py
