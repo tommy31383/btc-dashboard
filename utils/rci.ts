@@ -155,13 +155,11 @@ export function computeRCI(input: RCIInput): RCIResult {
 
   // ── Group3 NEW (v4): ADX slope + Funding acceleration + Volume exhaustion ──
 
-  // ADX slope: ADX > 25 AND declining 3 bars (trend weakening)
+  // ADX slope — iter26 audit: ADX declining OOS 2023-26 prec=22-24% < base 27%.
+  // DEAD OOS. Weight cut 0.8→0.0 (component kept for display only, score=0)
   if (adx4h != null && adxPrev1 != null && adxPrev2 != null && adx4h > 25) {
     if (adx4h < adxPrev1 && adxPrev1 < adxPrev2) {
-      const close = closes4h[closes4h.length - 1];
-      const closePrev3 = closes4h.length >= 4 ? closes4h[closes4h.length - 4] : close;
-      if (close > closePrev3) comp.adxSlope += 0.8;  // up-trend weakening = bearish
-      else                    comp.adxSlope -= 0.8;  // down-trend weakening = bullish
+      comp.adxSlope += 0;  // display only — kills contribution
     }
   }
 
