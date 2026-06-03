@@ -95,6 +95,18 @@ OOS 2023-26: STRONG_UP +7.6% vs ungated +6.7% → weak +0.9% only
 
 **Bottom line:** Market structure 2023-26 has invalidated all classic momentum-overbought indicators for short-side timing. Only crowding (funding) captures real edge. Trend = structural direction display. No forward-alpha gate works OOS. Use panels as human context, not automated rules.
 
+### ⭐ iter31 ACTIONABLE FINDING: Turtle × Funding Extreme
+
+```
+Turtle Donchian entry when funding >0.05% (extreme crowded longs):
+  7y:        n=14  avg= -1.7%  %pos=14%  → delta -17.6pp vs baseline +15.9%
+  OOS 23-26: n=2   avg= -5.7%  %pos=0%   → ALL LOSSES
+
+Normal funding entry: avg +17.8% (7y), +7.3% (OOS) — baseline intact
+```
+
+**RULE: SKIP Turtle entry when funding >0.05%** — extreme longs crowding = breakout is likely squeeze trap not real trend. This is structurally sound (crowded longs = squeeze risk at breakout), confirmed 7y. n=14 small but delta -17pp is extreme. Consider adding funding gate to Turtle server logic.
+
 ---
 
 ## Deployed Versions
