@@ -128,3 +128,23 @@ After exhaustive testing (50+ iterations across both loops):
 - **Structural miss 2 — 2026:** Only Jan-May data (partial year). Sideways/declining market. ETH compounds the loss. Pro-rated n threshold satisfied (n=23>21) but ROI -29-40% uncorrectable.
 
 **Best achievable: 6/8 = 75% combined KPI** with G10c config on BTC LONG-biased strategy.
+
+## SOL Portfolio Attempt (BTC $15k + SOL $8k)
+
+SOL 3y data: May 2023-May 2026 (same as ETH). SOL 2022 = -95% (worse than BTC -67%).
+```
+2023: nBTC=136 nSOL=98   ROI=+321%  ✓✓  (SOL 2023: +237%!)
+2024: nBTC=141 nSOL=124  ROI=+98%   ✓✓
+2025: nBTC=123 nSOL=94   ROI=+77%   ✓✓
+2026: nBTC=23  nSOL=0    ROI=-22%   ✓✗  (SOL gate blocks all 2026)
+2022: no SOL data, BTC only, ROI=+6.5% ✗✗
+COMBINED KPI: 6/8 = 75% (same ceiling)
+```
+
+SOL 2023 spectacular but cannot fix 2022/2026 structural issues.
+
+## Next Steps: ETH 7y Fetch
+
+Fetching `binance-eth-5m-7y.json` to get ETH 2022 data. ETH 2022 = -76% (crash still bad,
+but ETH had Merge event Sep 2022 which caused +80% rally from Jun low). If ETH Q3 2022
+has sufficient signal, may generate some positive trades despite overall bear.
