@@ -474,7 +474,53 @@ def range_audit(P, tag):
     print(f"  RANGE ADX<15 (true sideways): n={len(range_adx_lo)} excess={sum(range_adx_lo)/len(range_adx_lo)-d:+.2f}%" if range_adx_lo else "")
     print(f"  RANGE ADX≥15 (weak trend):    n={len(range_adx_hi)} excess={sum(range_adx_hi)/len(range_adx_hi)-d:+.2f}%" if range_adx_hi else "")
 
+def slope_sweep(P, tag):
+    """Iter12: sweep EMA50 slope thresholds (lo/hi) — tìm optimal trên OOS 2023-26."""
+    H=30
+    print(f"\n[{tag}] EMA50-slope threshold sweep — STRONG_UP excess OOS 2023-26:")
+    print(f"{'lo/hi':>9}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    for lo,hi in ((0.05,0.3),(0.1,0.5),(0.15,0.6),(0.2,0.8)):
+        Pt=dict(P); Pt["slope_lo"]=lo; Pt["slope_hi"]=hi
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        print(f"{lo:.2f}/{hi:.2f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
+
+def c1_sweep(P, tag):
+    """Iter13: 1h-confirm weight sweep (0 → 1.0). Nếu c1 cao thì STRONG zone tốt hơn không?"""
+    H=30
+    print(f"\n[{tag}] 1h-confirm weight sweep — STRONG excess OOS 2023-26:")
+    print(f"{'c1':>6}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    for c1 in (0.0,0.3,0.5,0.8,1.2):
+        Pt=dict(P); Pt["c1"]=c1
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023:continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None:continue
+            if zone=="STRONG_DOWN":sd.append(f)
+            elif zone=="STRONG_UP":su.append(f)
+        d=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        print(f"{c1:>6.1f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
+
 if __name__=="__main__":
+    if VARIANT=="iter13":
+        c1_sweep(VARIANTS["v3"],"v3"); sys.exit(0)
+    if VARIANT=="iter12":
+        slope_sweep(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter10":
         range_audit(VARIANTS["v3"],"v3"); sys.exit(0)
     if VARIANT=="iter9":

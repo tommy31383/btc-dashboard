@@ -145,7 +145,11 @@ RANGE split by ADX:
 
 86% RANGE bar là "weak trend chưa đủ ADX 28". True sideway (ADX<15) bullish (+BTC drift). Không phải structural defect — RANGE label đúng: "không đủ ADX để classify". **Action:** panel label RANGE hiện tại OK. Có thể thêm ADX số vào badge để user biết "28 flat" vs "12 flat".
 
-## TODO loop tiếp (iter 11+)
+## Iteration 12-13 — Sensitivity sweep: slope + 1h-confirm flat
+
+EMA50-slope threshold sweep (0.05/0.3 → 0.2/0.8) và c1 weight (0→1.2): **không ảnh hưởng STRONG zone** ở bất kỳ combo nào. STRONG_UP excess OOS giữ +0.31% toàn bộ. Pattern: STRONG zone dominated bởi ADX/DI (weight 2.0) + EMA stack (1.5). Small components (slope max ±0.7, c1 max ±0.5) quá nhỏ để flip zone qua threshold 3.0. **Insight:** STRONG zone robust với params nhỏ → không overfit, là cấu trúc thật. slope/c1 vẫn hữu ích cho UP/DOWN biên.
+
+## TODO loop tiếp (iter 14+)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).
