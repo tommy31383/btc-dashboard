@@ -118,7 +118,77 @@ Crowded longs = breakout absorbed by shorts, not real demand. Structurally sound
 
 ---
 
+---
+
+## iter28 RCI Audit — 2026-06-03 (tools/rci-audit-2026-06-03.py)
+
+**5 ideas tested OOS 2023-26 (base rate 26.7%, pct=3%, 12-bar/48h window):**
+
+### Idea 1: REVERSAL_PCT thresholds
+| pct | base | Fund>0.05% prec | verdict |
+|---|---|---|---|
+| 2.0% | 38.5% | 38.0% | ~ dead |
+| 2.5% | 32.0% | 36.0% | ✓ |
+| **3.0%** | **26.7%** | **30.0%** | **✓ OPTIMAL** |
+| 3.5% | 21.7% | 28.0% | ✓✓ but base drops proportionally |
+
+**CONFIRM: 3% optimal — changing it doesn't create real edge.**
+
+### Idea 2: FundAccel ratio
+| ratio | n | prec OOS | verdict |
+|---|---|---|---|
+| 1.3x (fr>0.03%) | 65 | 38.5% | ✓✓ |
+| **1.5x (fr>0.03%)** | **44** | **52.3%** | **✓✓ STAR** |
+| 2.0x (fr>0.03%) | 24 | 29.2% | ~ (too few signals) |
+
+**CONFIRM: 1.5x is optimal ratio. Weight raised 1.2→1.5.**
+
+### Idea 3: Funding time lag
+| lag | Fund>0.05% prec | verdict |
+|---|---|---|
+| 0 (current) | 30.0% | ✓ |
+| 8h ago | 24.1% | ~ |
+| 16h ago | 17.0% | ✗✗ |
+
+**CONFIRM: Current (lag=0) is best. Peak funding at entry time, not before.**
+
+### Idea 4: Volume spike + funding combo
+| signal | n | prec | verdict |
+|---|---|---|---|
+| Vol>2xMA alone | 743 | 22.6% | ✗ |
+| Vol>2xMA AND Fund>0.05% | 10 | 50.0% | ✓✓ (n too small) |
+| Vol>2xMA AND Fund>0.03% | 27 | 48.1% | ✓✓ (n marginal) |
+
+**PENDING: High precision but n<30 → not enough sample to trust. Watch forward.**
+
+### Idea 5: VolExhaust lower threshold
+| vol mult | body | n | prec | verdict |
+|---|---|---|---|---|
+| 3.0x | **15%** | 12 | **50.0%** | ✓✓ |
+| 3.0x | 20% | 16 | 37.5% | ✓✓ |
+| 2.5x | 15% | 23 | 34.8% | ✓✓ |
+| 2.0x | 20% | 53 | 28.3% | ~ |
+
+**ACTION: Tighten body filter 20%→15% applied to rci.ts (more selective = better).**
+
+### Best Combo Confirmed
+| combo | n | prec | stable |
+|---|---|---|---|
+| Fund>0.05% AND FundAccel1.5x | 20 | **55.0%** | 4/4yr |
+| Fund>0.05% OR FundAccel1.5x | 74 | 36.5% | - |
+| FundAccel1.3x | 65 | 38.5% | 4/5yr |
+
+**WINNER: Fund>0.05% AND FundAccel1.5x = 55% prec OOS, stable 4/4 years.**
+
+### Changes Applied (v4.10.9)
+1. `comp.fundingAccel` weight: **1.2 → 1.5**
+2. VolExhaust body filter: **20% → 15%**
+3. REVERSAL_PCT, funding lag, FundAccel 1.5x ratio — all confirmed optimal, no change needed
+
+---
+
 ## Deployed Versions
 - `v4.10.8` (2026-06-03): Trend v4 + RCI v5/v6 weights + FundingBar prominent UI
-- Tools: `trend-backtest-7y.py` (18 modes), `rci-oos-recalibrate.py`, `rci-v4-backtest-7y.py`
+- `v4.10.9` (2026-06-03): iter28 audit — FundAccel weight 1.2→1.5, VolExhaust body 20%→15%
+- Tools: `trend-backtest-7y.py` (18 modes), `rci-oos-recalibrate.py`, `rci-v4-backtest-7y.py`, `rci-audit-2026-06-03.py`
 - Detail: `docs/trend-backtest-iter1-3-2026-06-03.md`

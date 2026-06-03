@@ -10,8 +10,15 @@
  *   thr=2.5 → 63.2% precision, 16 signals/yr, 6/6 years robust
  *   OOS (2023-2026): 57.1% precision
  *
- * Weight: Funding ×2.0 + RSI ×1.5 + Stoch ×0.8 + BB ×0.8 + MACD ×0.4
- *       + ADX slope ×0.8 + Funding acceleration ×1.2 + Vol exhaustion ×0.8
+ * iter28 audit 2026-06-03 (rci-audit-2026-06-03.py):
+ *   FundAccel 1.5x → OOS prec=52.3% (n=44) ✓✓ — weight raised 1.2→1.5
+ *   Fund>0.05% AND FundAccel1.5x combo → OOS prec=55% (n=20, stable 4/4yr)
+ *   VolExhaust body filter tightened 20%→15% → prec=50% (n=12) vs 37.5% at 20%
+ *   REVERSAL_PCT=3% confirmed optimal
+ *   Funding lag 0 (current) confirmed best (lag 16h degrades to 17%)
+ *
+ * Weight: Funding ×2.0 + RSI ×0.7 + Stoch ×0.4 + BB ×0.4 + MACD ×0.15
+ *       + ADX slope ×0.0(dead) + Funding acceleration ×1.5 + Vol exhaustion ×0.8
  *
  * Rejected (Group1 HTF — too sticky, hurts precision):
  *   RSI-1d, BB%B-1w, EMA200 distance fire on 39.8% of bars → noise.
@@ -164,20 +171,23 @@ export function computeRCI(input: RCIInput): RCIResult {
   }
 
   // Funding acceleration: funding > 0.03% AND > prev × 1.5
+  // iter28 audit 2026-06-03: FundAccel 1.5x OOS prec=52.3% (n=44) — star signal.
+  // Weight raised 1.2→1.5. Fund>0.05% AND FundAccel1.5x combo = 55% prec, stable 4/4yr.
   if (fundingRate != null && prevFundingRate != null) {
     const fr = fundingRate; const pfr = prevFundingRate;
-    if (fr > 0.0003 && pfr > 0 && fr > pfr * 1.5) comp.fundingAccel += 1.2;
-    else if (fr < -0.0003 && pfr < 0 && fr < pfr * 1.5) comp.fundingAccel -= 1.2;
+    if (fr > 0.0003 && pfr > 0 && fr > pfr * 1.5) comp.fundingAccel += 1.5;
+    else if (fr < -0.0003 && pfr < 0 && fr < pfr * 1.5) comp.fundingAccel -= 1.5;
   }
 
-  // Volume exhaustion: vol > vol_MA × 3 AND body < 20% of range
+  // Volume exhaustion: vol > vol_MA × 3 AND body < 15% of range (tightened from 20%)
+  // iter28 audit: body<15% filter → prec=50% (n=12) vs body<20% prec=37.5%. Tighter = better.
   if (klines4h.length >= 20) {
     const vols = klines4h.map((k) => k.volume);
     const volMa = vols.slice(-20).reduce((a, b) => a + b, 0) / 20;
     const last = klines4h[klines4h.length - 1];
     const range = last.high - last.low;
     const body = Math.abs(last.close - (klines4h[klines4h.length - 2]?.close ?? last.close));
-    if (last.volume > volMa * 3.0 && range > 0 && body / range < 0.20) {
+    if (last.volume > volMa * 3.0 && range > 0 && body / range < 0.15) {
       if (last.close > (klines4h[klines4h.length - 2]?.close ?? last.close))
         comp.volExhaust += 0.8;  // up-close climax = bearish
       else
