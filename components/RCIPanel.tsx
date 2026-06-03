@@ -73,7 +73,7 @@ function TrendSection({ trend }: { trend: TrendResult }) {
           {trend.value >= 0 ? "+" : ""}{trend.value.toFixed(2)}
         </Text>
       </View>
-      <Text style={[styles.zone, { color: tc }]}>{trendLabel(trend.zone)}</Text>
+      <Text style={[styles.zone, { color: tc }]}>{trendLabel(trend.zone, trend.adx)}</Text>
       <View style={styles.barBg}>
         <View style={[styles.zeroLine, { left: `${zeroP}%` }]} />
         <View style={[styles.fill, { left: `${fillLeft}%`, width: `${fillWidth}%`, backgroundColor: tc }]} />

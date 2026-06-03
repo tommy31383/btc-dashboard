@@ -174,12 +174,16 @@ export function computeTrend(input: TrendInput): TrendResult {
   return { value, zone, adx, diPlus, diMinus, components: comp };
 }
 
-export function trendLabel(zone: TrendZone): string {
+export function trendLabel(zone: TrendZone, adx?: number | null): string {
+  const adxStr = adx != null ? ` (ADX ${adx.toFixed(0)})` : "";
   switch (zone) {
     case "STRONG_UP":   return "XU HƯỚNG TĂNG MẠNH ▲▲";
-    case "UP":          return "Xu hướng tăng ▲";
+    case "UP":          return `Xu hướng tăng ▲${adxStr}`;
     case "STRONG_DOWN": return "XU HƯỚNG GIẢM MẠNH ▼▼";
-    case "DOWN":        return "Xu hướng giảm ▼";
-    default:            return "Đi ngang / sideway ◆";
+    case "DOWN":        return `Xu hướng giảm ▼${adxStr}`;
+    // iter10: RANGE có 2 loại — true flat (ADX<15) vs weak trend (ADX 15-28)
+    default:
+      if (adx != null && adx < 15) return `Đi ngang / flat ◆ (ADX ${adx.toFixed(0)})`;
+      return `Sideway — trend chưa rõ ◆${adxStr}`;
   }
 }
