@@ -71,7 +71,20 @@ v3 OOS @2023:        STRONG_DOWN   STRONG_UP    (n train/test)
 - **KHÔNG phải alpha dự báo** forward-return ở thị trường gần đây → không build entry-signal độc lập từ trend-label.
 - Đúng META-LESSON: Trend = DIRECTION/regime, RCI = TIMING. Giữ tách biệt.
 
-## TODO loop tiếp (iter 5+)
+## Iteration 5 — Horizon sweep OOS 2023-26 (v3) → downtrend edge CHẾT
+
+```
+horizon    STRONG_DOWN exc   STRONG_UP exc   (n D/U)
+  6×4h(1d)    +0.01%           +0.17%         1260/1645
+ 12×4h(2d)    +0.01%           +0.27%
+ 18×4h(3d)    +0.04%           +0.31%
+ 30×4h(5d)    +0.06%           +0.31%
+ 42×4h(7d)    -0.09%           +0.25%         1248/1645
+```
+
+**Kết luận:** không horizon nào hồi được downtrend forward-edge OOS (excess ≈0 mọi nơi). Chỉ **STRONG_UP còn edge nhỏ ổn định +0.2~0.3%**. Khớp tuyệt đối lesson `bear-short-no-edge`: không đoán downtrend, ngồi cash là đúng. → Panel chỉ nên dùng STRONG_DOWN làm **cảnh báo risk-off / giảm size**, KHÔNG làm short-signal.
+
+## TODO loop tiếp (iter 6+)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).

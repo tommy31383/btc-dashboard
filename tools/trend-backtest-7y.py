@@ -239,7 +239,28 @@ def oos_split(P, tag, split_year=2023):
         sue=(sum(su)/len(su)-GLOBAL_DRIFT) if su else float('nan')
         print(f"  {s:<14}{sde:>+13.2f}%{sue:>+13.2f}%   (n {len(sd)}/{len(su)})")
 
+def horizon_oos(P, tag):
+    """STRONG zone excess theo nhiều horizon, RIÊNG era OOS 2023-26."""
+    print(f"\n[{tag}] Horizon sweep — OOS era 2023-26 only (STRONG zones):")
+    print(f"{'horizon':>10}{'drift%':>9}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    for H in (6,12,18,30,42):
+        sd=[]; su=[]; allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023: continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,P)
+            if val is None: continue
+            if zone=="STRONG_DOWN": sd.append(f)
+            elif zone=="STRONG_UP": su.append(f)
+        drift=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-drift) if sd else float('nan')
+        sue=(sum(su)/len(su)-drift) if su else float('nan')
+        print(f"{H:>8}×4h{drift:>+8.2f}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
+
 if __name__=="__main__":
+    if VARIANT=="horizon":
+        horizon_oos(VARIANTS["v3"], "v3"); sys.exit(0)
     if VARIANT=="oos":
         oos_split(VARIANTS["v3"], "v3")
         sys.exit(0)
