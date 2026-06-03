@@ -259,7 +259,7 @@ def perturb(params):
     np_=dict(params); k=random.choice(list(STEPS.keys()))
     np_[k]=random.choice(STEPS[k]); return np_
 
-MODE=sys.argv[1] if len(sys.argv)>1 else "baseline"
+MODE=(sys.argv[1] if len(sys.argv)>1 else "baseline") if __name__=="__main__" else None
 
 if MODE=="baseline":
     m,test_ok=split_eval(G15)
