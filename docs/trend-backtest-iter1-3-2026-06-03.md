@@ -298,3 +298,16 @@ VERDICT: ADDITIVE ✓
 Trend STRONG_DOWN (ADX/DI 4h bearish + price<EMA200_4h + EMA200_4h slope down) is STRICTER than hedge01 EMA200_1d gate — catches 8.3% of RANGE-pass bars with negative forward returns. Panel STRONG_DOWN = useful live context for hedge01: consider reducing size / not opening new entries even when server's RANGE gate passes.
 
 Action: dashboard display only (no server change). STRONG_DOWN = risk-off size reduction signal ON TOP of hedge01 regime gate.
+
+## Iteration 29 — OOS validation iter28: Trend gate REDUNDANT OOS
+
+```
+                both-pass   blocked(SD)   delta     verdict
+ALL 7y:          +0.47%      -0.30%       +0.78%    ADDITIVE ✓
+TRAIN 2019-22:   +0.74%      -0.63%       +1.36%    ADDITIVE ✓
+OOS 2023-26:     +0.23%      -0.00%       +0.24%    REDUNDANT ~
+```
+
+Pattern consistent: strong train-era edge, decays OOS. Blocked bars OOS avg = 0% (not negative).
+VERDICT: Trend panel = display/context ONLY. Do NOT use as hard filter for hedge01 live.
+META-LESSON confirmed again: Trend = regime display, no forward-alpha OOS. No server change.
