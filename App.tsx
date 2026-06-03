@@ -34,7 +34,9 @@ import RuleAlertBanner from "./components/RuleAlertBanner";
 import LiveActionItems from "./components/LiveActionItems";
 import RiskRadar from "./components/RiskRadar";
 import GptRuleScreen from "./components/GptRuleScreen";
+import RCIPanel from "./components/RCIPanel";
 import { useRiskRadar } from "./hooks/useRiskRadar";
+import { useRCI } from "./hooks/useRCI";
 // v4.8.25 (anh Tommy): xoá 5 panel useless khỏi tab RULE
 // - GoldenFiringBanner: artifact scan 2.3Y cũ, redirect sang tab risk legacy
 // - LiveRulesSummary:   redundant với TradingRulesPanel
@@ -63,7 +65,7 @@ const CACHE_KEYS = [
   "@btc_backtest_candles",
   "@btc_config_source_by_tf",
 ];
-const APP_VERSION = "4.9.33";
+const APP_VERSION = "4.9.35";
 const BUILD_DATE = "2026-06-03";
 
 /**
@@ -218,6 +220,9 @@ export default function App() {
   // Risk Radar — compute lesson-learn warnings + golden opportunities from rawKlines
   const riskState = useRiskRadar(rawKlines);
   const firingGoldensCount = riskState.goldens.filter((g) => g.allPass).length;
+
+  // RCI — Reversal Confluence Index (funding + RSI/Stoch/BB/MACD multi-TF)
+  const rci = useRCI(rawKlines);
 
   // Highlight state — when user taps an alert in the banner, we scroll to the
   // matching rule card in TradingRulesPanel and auto-expand it.
@@ -501,6 +506,11 @@ export default function App() {
             resistance15m={ltfCtx.resistance15m}
             onGoToLive={() => { setNavTab("live"); setActiveTab("live"); }}
           />
+        </PanelBoundary>
+
+        {/* RCI — Reversal Confluence Index (đỉnh/đáy timing) */}
+        <PanelBoundary name="RCIPanel">
+          <RCIPanel rci={rci} />
         </PanelBoundary>
 
         {/* LIVE TRADING moved to dedicated tab (BottomNav → LIVE) */}
