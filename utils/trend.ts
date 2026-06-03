@@ -112,7 +112,7 @@ export function computeTrend(input: TrendInput): TrendResult {
   // ── 3. ADX/DI (v3: trọng số DI tăng — backtest 7y, DI là driver phía down) ──
   const { adx, diPlus, diMinus } = calcADXDI(klines4h, 14);
   if (adx != null && diPlus != null && diMinus != null) {
-    if (adx > 25) {
+    if (adx > 28) {
       if (diPlus > diMinus) comp.di += 2.0;   // trend mạnh hướng lên
       else comp.di -= 2.0;                      // trend mạnh hướng xuống
     } else if (adx > 18) {
@@ -151,7 +151,7 @@ export function computeTrend(input: TrendInput): TrendResult {
   // Edge nằm ở 2 zone STRONG (excess ±0.65/0.83%/5d). STRONG cần xác nhận cấu trúc:
   //   STRONG_DOWN: ADX>25 + giá < EMA200 + EMA200 dốc xuống (bear thật, không phải dip)
   //   STRONG_UP:   ADX>25 + EMA200 dốc lên
-  const strong = adx != null && adx > 25;
+  const strong = adx != null && adx > 28;  // iter7: 25→28, sharpen STRONG_UP OOS (+0.31→+0.51%)
   const below200 = ema200 != null && price < ema200;
   // EMA200 slope (10 bar)
   let ema200Up = true, ema200Down = true;

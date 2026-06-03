@@ -107,7 +107,21 @@ RCI-bull (mua dip RSI4h<30, fwd 5d):
 
 **Ship:** Trend section trên RCIPanel = mô tả xu hướng cấu trúc hiện tại (EMA/ADX/DI) — hợp lệ làm risk-context. STRONG_DOWN = cảnh báo risk-off/giảm size, KHÔNG short, KHÔNG gate RCI.
 
-## TODO loop tiếp (iter 7+, diminishing returns)
+## Iteration 7 — Whipsaw audit + ADX sweep → adx_strong 25→28 ✅
+
+```
+Stickiness: avg run 8.1 bar 4h = 32h/zone — đủ sticky (12.4 flip/100bar), panel không nhấp nháy.
+ADX-strong sweep (STRONG excess OOS 2023-26):
+  adxThr   SDOWN    SUP
+    22     -0.12%  +0.19%
+    25     +0.06%  +0.31%
+    28     +0.02%  +0.51%   ← applied (n 1057/1440, dư)
+    30     +0.04%  +0.74%   (n giảm 949/1298)
+```
+
+**Applied:** `adx_strong 25→28` trong trend.ts (sharpen STRONG_UP OOS, STRONG_DOWN vẫn ~0 = đúng kỳ vọng downtrend display-only). Zone đủ sticky cho UX.
+
+## TODO loop tiếp (iter 8+, diminishing returns)
 - [ ] Horizon ngắn (1-2 ngày): downtrend có rõ hơn không, hay cũng decay OOS?
 - [ ] ADX threshold sweep cho STRONG trên RIÊNG era 2023-26 (tránh fit 2019-22).
 - [ ] Trend-regime GATE cho RCI reversal: chỉ tin RCI-bull khi Trend ≠ STRONG_DOWN (test net effect 7y).

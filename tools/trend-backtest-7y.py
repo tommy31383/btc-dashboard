@@ -297,7 +297,52 @@ def rci_gate(P, tag):
         print(f"  GATED (bỏ STRONG_DOWN):  n={ng:>4} avgFwd {ag:+.2f}% %pos {pg:.1f}")
         print(f"  skipped (STRONG_DOWN):   n={ns:>4} avgFwd {ask:+.2f}% %pos {ps:.1f}  ← gate có loại đúng dao rơi?")
 
+def stickiness(P, tag):
+    """Đo whipsaw: số lần đổi zone, độ dài trung bình mỗi đoạn zone (bar 4h)."""
+    seq=[]
+    for i in range(200,len(bars4h)-1):
+        val,zone,a=score_trend(i,P)
+        if val is None: continue
+        seq.append(zone)
+    flips=sum(1 for i in range(1,len(seq)) if seq[i]!=seq[i-1])
+    # avg run length
+    runs=[]; cur=1
+    for i in range(1,len(seq)):
+        if seq[i]==seq[i-1]: cur+=1
+        else: runs.append(cur); cur=1
+    runs.append(cur)
+    avg_run=sum(runs)/len(runs)
+    # flips per 100 bar
+    fp100=100*flips/len(seq)
+    print(f"\n[{tag}] Stickiness: {len(seq)} bar, {flips} flip ({fp100:.1f}/100bar), "
+          f"avg run {avg_run:.1f} bar 4h ({avg_run*4:.0f}h). "
+          f"{'WHIPSAW cao ✗' if avg_run<3 else 'đủ sticky ✓'}")
+
+def adx_sweep(P, tag):
+    """Sweep adx_strong threshold, đo STRONG separation OOS 2023-26."""
+    H=30
+    print(f"\n[{tag}] ADX-strong sweep — STRONG excess OOS 2023-26:")
+    print(f"{'adxThr':>8}{'SDOWNexc':>11}{'SUPexc':>10}{'nD/nU':>12}")
+    drift=None
+    for thr in (22,25,28,30):
+        Pt=dict(P); Pt["adx_strong"]=thr
+        sd=[];su=[];allf=[]
+        for i in range(200,len(bars4h)-H):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023: continue
+            f=(c4[i+H]-c4[i])/c4[i]*100; allf.append(f)
+            val,zone,a=score_trend(i,Pt)
+            if val is None: continue
+            if zone=="STRONG_DOWN": sd.append(f)
+            elif zone=="STRONG_UP": su.append(f)
+        d=sum(allf)/len(allf)
+        sde=(sum(sd)/len(sd)-d) if sd else float('nan')
+        sue=(sum(su)/len(su)-d) if su else float('nan')
+        print(f"{thr:>8}{sde:>+10.2f}%{sue:>+9.2f}%{str(len(sd))+'/'+str(len(su)):>12}")
+
 if __name__=="__main__":
+    if VARIANT=="iter7":
+        stickiness(VARIANTS["v3"], "v3"); adx_sweep(VARIANTS["v3"], "v3"); sys.exit(0)
     if VARIANT=="rcigate":
         rci_gate(VARIANTS["v3"], "v3"); sys.exit(0)
     if VARIANT=="horizon":
