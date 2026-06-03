@@ -151,9 +151,11 @@ def build_trades(al,g):
     return allt
 
 def eval_genome(g):
-    al=get_al()
-    m=honest_resim(build_trades(al,g),g["risk"],g["cap"])
-    return m
+    try:
+        al=get_al()
+        return honest_resim(build_trades(al,g),g["risk"],g["cap"])
+    except Exception:
+        return None  # genome xấu → loại tự nhiên, không giết daemon
 
 def seg_cagr(m,years):
     gg=1.0
@@ -227,21 +229,36 @@ if __name__=="__main__":
     base=base_genome()
     pop=[base]+[mutate(al,base) for _ in range(POP-1)]
     hof=[]  # list of (calmar, genome, metrics)
+    champ_sc=-1e9; champ_test=-1e9; idx=0
     if os.path.exists(HOF):
         try:
             saved=json.load(open(HOF))
-            pop[0]=saved["champion"]["params"]; 
+            pop[0]=saved["champion"]["params"]
+            # restore champion bar để KHÔNG re-promote/commit trùng sau restart
+            champ_sc=saved["champion"].get("calmar",-1e9)
+            champ_test=saved["champion"]["metrics"].get("test_cagr",-1e9)
+            idx=saved.get("idx",0)
         except Exception: pass
     if not os.path.exists(REPORT):
         open(REPORT,"w").write("# Evolver v2 (genetic+structural) - champion history\n\n")
-    champ_sc=-1e9; champ_test=-1e9; idx=0
     ex=ProcessPoolExecutor(max_workers=WORKERS,initializer=get_al)
     gen=0
     while gen<GENERATIONS:
         if os.path.exists(STOP):
             sys.stderr.write("STOP - exit gen %d, %d champions\n"%(gen,idx)); os.remove(STOP); break
         gen+=1
-        metrics=list(ex.map(eval_genome,pop))
+        try:
+            metrics=list(ex.map(eval_genome,pop))
+        except Exception as e:
+            sys.stderr.write("gen %d eval error: %s — reset pool, continue\n"%(gen,str(e)[:80]))
+            try: ex.shutdown(wait=False,cancel_futures=True)
+            except Exception: pass
+            ex=ProcessPoolExecutor(max_workers=WORKERS,initializer=get_al)
+            pop=[base]+[mutate(al,base) for _ in range(POP-1)]
+            if os.path.exists(HOF):
+                try: pop[0]=json.load(open(HOF))["champion"]["params"]
+                except Exception: pass
+            continue
         scored=[(calmar(m),pop[i],m) for i,m in enumerate(metrics)]
         scored.sort(key=lambda x:x[0],reverse=True)
         with open(LOG,"a") as f:
@@ -263,7 +280,7 @@ if __name__=="__main__":
                 if frag<=0.15:
                     idx+=1; champ_sc=bsc; champ_test=tc
                     hof.append((bsc,bg,bm)); hof.sort(key=lambda x:x[0],reverse=True); hof=hof[:8]
-                    json.dump(dict(champion=dict(params=bg,calmar=bsc,
+                    json.dump(dict(idx=idx,champion=dict(params=bg,calmar=bsc,
                                    metrics=dict(cagr=bm["cagr"],maxdd=bm["maxdd"],min_n=bm["min_n"],
                                                 test_cagr=tc,yr_roi=bm["yr_roi"],yr_n=bm["yr_n"])),
                                    hall_of_fame=[dict(calmar=s,cagr=m["cagr"],dd=m["maxdd"],min_n=m["min_n"],params=g)
