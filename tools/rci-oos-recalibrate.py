@@ -144,6 +144,34 @@ test_component("RSI>70 AND Stoch>80", lambda i: (rsi4[i] or 0)>70 and (stk4[i] o
 test_component("RSI>70 AND BB>0.95", lambda i: (rsi4[i] or 0)>70 and (bb4[i] or 0)>0.95)
 test_component("Fund>0.05% AND RSI>70 AND Stoch>80", lambda i: (fund_by_bar[i] or 0)>0.0005 and (rsi4[i] or 0)>70 and (stk4[i] or 0)>80)
 
+print(f"\n── RCI COMPOSITE SCORE (v4 vs v5-weights) OOS 2023-26 ──")
+print("Sim composite: trigger when score > threshold, measure reversal precision")
+def composite_score(i, use_v5=False):
+    fr=fund_by_bar[i] or 0; r4=rsi4[i] or 50; sk=stk4[i] or 50; bb=bb4[i] or 0.5
+    # funding
+    fs=2.0*min(fr/0.0005,1.0) if fr>0 else 0
+    # rsi overbought
+    rw=0.7 if use_v5 else 1.5
+    rs=(rw if r4>75 else rw*0.6 if r4>70 else 0)
+    # stoch
+    sw=0.4 if use_v5 else 0.8
+    ss=(sw if sk>80 else 0)
+    # bb
+    bw=0.4 if use_v5 else 0.8
+    bs=(bw if bb>1.1 else bw*0.5 if bb>0.95 else 0)
+    return fs+rs+ss+bs
+
+for label,v5 in (("v4-weights",False),("v5-weights",True)):
+    for thr in (1.0,1.5,2.0,2.5):
+        sigs=[]
+        for i in range(50,len(bars4h)-REVERSAL_BARS):
+            yr=datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            if yr<2023: continue
+            if composite_score(i,v5)>thr: sigs.append(labels[i])
+        n=len(sigs); prec=100*sum(1 for x in sigs if x)/n if n else 0
+        base=100*base_rate; flag="✓" if prec>base+3 else "✗" if prec<base-3 else "~"
+        print(f"  {label} thr={thr:.1f}  n={n:>5}  prec={prec:.1f}%  base={base:.1f}%  {flag}")
+
 print(f"\n── SAME COMPONENTS TRAIN 2019-22 ──")
 for thr in (0.0005,):
     test_component(f"Funding>0.05%", lambda i: fund_by_bar[i] is not None and fund_by_bar[i]>thr, "TRAIN")
