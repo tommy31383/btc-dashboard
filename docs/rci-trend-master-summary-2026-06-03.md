@@ -105,7 +105,16 @@ Turtle Donchian entry when funding >0.05% (extreme crowded longs):
 Normal funding entry: avg +17.8% (7y), +7.3% (OOS) — baseline intact
 ```
 
-**RULE: SKIP Turtle entry when funding >0.05%** — extreme longs crowding = breakout is likely squeeze trap not real trend. This is structurally sound (crowded longs = squeeze risk at breakout), confirmed 7y. n=14 small but delta -17pp is extreme. Consider adding funding gate to Turtle server logic.
+**RULE: SKIP Turtle entry when funding >0.03%** (iter32 sweep confirms):
+```
+threshold  n_blk  avg_blk  avg_pass  delta
+fr>0.02%:    31    +4.1%   +18.2%   +14pp
+fr>0.03%:    27    +4.6%   +17.8%   +13pp  ← OPTIMAL (n sufficient, consistent)
+fr>0.04%:    18    -2.7%   +17.8%   +20pp
+fr>0.05%:    14    -1.7%   +17.3%   +19pp
+```
+Crowded longs = breakout absorbed by shorts, not real demand. Structurally sound.
+**Apply: skip Turtle Donchian entry when funding_rate > 0.0003 (0.03%/8h).** Server change needed.
 
 ---
 
