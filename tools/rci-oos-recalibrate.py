@@ -172,6 +172,24 @@ for label,v5 in (("v4-weights",False),("v5-weights",True)):
         base=100*base_rate; flag="✓" if prec>base+3 else "✗" if prec<base-3 else "~"
         print(f"  {label} thr={thr:.1f}  n={n:>5}  prec={prec:.1f}%  base={base:.1f}%  {flag}")
 
+print(f"\n── ITER22: v5 per-year stability (thr=2.0 vs 2.5) ALL 7y ──")
+for thr in (2.0, 2.5):
+    by_yr = defaultdict(list)
+    for i in range(50, len(bars4h)-REVERSAL_BARS):
+        if composite_score(i, True) > thr:
+            yr = datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year
+            by_yr[yr].append(labels[i])
+    stable = 0; total = 0
+    print(f"\n  v5 thr={thr}:")
+    for yr in sorted(by_yr):
+        xs = by_yr[yr]; n = len(xs)
+        prec = 100*sum(1 for x in xs if x)/n if n else 0
+        base = 100*base_rate; flag = "✓" if prec > base else "✗"
+        if prec > base: stable += 1
+        total += 1
+        print(f"    {yr}: prec={prec:.0f}% n={n:>4}  {flag}")
+    print(f"  stable ≥base: {stable}/{total}")
+
 print(f"\n── SAME COMPONENTS TRAIN 2019-22 ──")
 for thr in (0.0005,):
     test_component(f"Funding>0.05%", lambda i: fund_by_bar[i] is not None and fund_by_bar[i]>thr, "TRAIN")

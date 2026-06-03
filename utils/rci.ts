@@ -190,12 +190,15 @@ export function computeRCI(input: RCIInput): RCIResult {
     comp.rsi + comp.stoch + comp.bollinger + comp.macd + comp.funding +
     comp.adxSlope + comp.fundingAccel + comp.volExhaust;
 
-  // v4 thresholds (calibrated to 7y backtest: thr=2.5 → 63.2% precision)
+  // v5 thresholds (iter22: recalibrate — v5 weights funding-dominant, OOS thr=2.0 prec=33%)
+  // BEAR_STRONG = score>2.5 AND funding must be dominant (funding component ≥1.5)
+  // BEAR_WATCH  = score>2.0 (any combo)
+  const fundingDominant = comp.funding >= 1.5;
   let zone: RCIResult["zone"] = "NEUTRAL";
-  if (raw > 3.0) zone = "BEAR_STRONG";
-  else if (raw > 2.5) zone = "BEAR_WATCH";
-  else if (raw < -3.0) zone = "BULL_STRONG";
-  else if (raw < -2.5) zone = "BULL_WATCH";
+  if (raw > 2.5 && fundingDominant) zone = "BEAR_STRONG";
+  else if (raw > 2.0) zone = "BEAR_WATCH";
+  else if (raw < -2.5) zone = "BULL_STRONG";
+  else if (raw < -2.0) zone = "BULL_WATCH";
 
   return { value: raw, zone, components: comp, fundingPct };
 }
