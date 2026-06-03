@@ -109,15 +109,15 @@ export function computeTrend(input: TrendInput): TrendResult {
     else comp.priceVsEma -= 0.8;
   }
 
-  // ── 3. ADX/DI ──
+  // ── 3. ADX/DI (v3: trọng số DI tăng — backtest 7y, DI là driver phía down) ──
   const { adx, diPlus, diMinus } = calcADXDI(klines4h, 14);
   if (adx != null && diPlus != null && diMinus != null) {
     if (adx > 25) {
-      if (diPlus > diMinus) comp.di += 1.5;   // trend mạnh hướng lên
-      else comp.di -= 1.5;                      // trend mạnh hướng xuống
+      if (diPlus > diMinus) comp.di += 2.0;   // trend mạnh hướng lên
+      else comp.di -= 2.0;                      // trend mạnh hướng xuống
     } else if (adx > 18) {
-      if (diPlus > diMinus) comp.di += 0.6;
-      else comp.di -= 0.6;
+      if (diPlus > diMinus) comp.di += 0.8;
+      else comp.di -= 0.8;
     }
     // ADX < 18 = không có trend rõ → di = 0 (range)
   }
@@ -147,11 +147,29 @@ export function computeTrend(input: TrendInput): TrendResult {
   const value =
     comp.emaStack + comp.priceVsEma + comp.di + comp.slope + comp.confirm1h;
 
-  // Zone: STRONG cần ADX>25 (trend có lực), nếu không chỉ UP/DOWN/RANGE
+  // ── Zone (v3: thresholds + gates calibrate 7y backtest, docs/trend-backtest-iter1-3) ──
+  // Edge nằm ở 2 zone STRONG (excess ±0.65/0.83%/5d). STRONG cần xác nhận cấu trúc:
+  //   STRONG_DOWN: ADX>25 + giá < EMA200 + EMA200 dốc xuống (bear thật, không phải dip)
+  //   STRONG_UP:   ADX>25 + EMA200 dốc lên
   const strong = adx != null && adx > 25;
+  const below200 = ema200 != null && price < ema200;
+  // EMA200 slope (10 bar)
+  let ema200Up = true, ema200Down = true;
+  const e200Series = calcEMASeries(closes4h, 200);
+  const e200now = e200Series[e200Series.length - 1];
+  const e200prev = e200Series[e200Series.length - 11];
+  if (e200now != null && e200prev != null && e200prev !== 0) {
+    const s200 = ((e200now - e200prev) / e200prev) * 100;
+    ema200Up = s200 > 0; ema200Down = s200 < 0;
+  }
+
   let zone: TrendZone = "RANGE";
-  if (value > 1.2) zone = strong && value > 2.5 ? "STRONG_UP" : "UP";
-  else if (value < -1.2) zone = strong && value < -2.5 ? "STRONG_DOWN" : "DOWN";
+  if (value > 1.6) {
+    zone = strong && value > 3.0 && ema200Up ? "STRONG_UP" : "UP";
+  } else if (value < -1.6) {
+    const strongDown = strong && value < -3.0 && below200 && ema200Down;
+    zone = strongDown ? "STRONG_DOWN" : "DOWN";
+  }
 
   return { value, zone, adx, diPlus, diMinus, components: comp };
 }
