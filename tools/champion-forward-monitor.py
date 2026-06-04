@@ -19,7 +19,18 @@ LOG=os.path.join(TOOLS,"champion-forward-SIGNALS.jsonl")
 for a in sys.argv:
     if a.startswith("--file="): LOG=a.split("=",1)[1]
 
-rows=[json.loads(l) for l in open(LOG)] if os.path.exists(LOG) else []
+SERVER="root@159.223.90.60"; REMOTE="/var/lib/btc-trader/champion-forward-SIGNALS.jsonl"
+def load():
+    import subprocess
+    if LOG!=os.path.join(TOOLS,"champion-forward-SIGNALS.jsonl"):
+        return [json.loads(l) for l in open(LOG)] if os.path.exists(LOG) else []
+    try:
+        out=subprocess.check_output(["ssh","-o","ConnectTimeout=12",SERVER,f"cat {REMOTE}"],text=True,timeout=20)
+        return [json.loads(l) for l in out.splitlines() if l.strip()]
+    except Exception as e:
+        print(f"(ssh-pull fail: {e} — thử local)")
+        return [json.loads(l) for l in open(LOG)] if os.path.exists(LOG) else []
+rows=load()
 print("="*66); print("CHAMPION (Calmar 7.16) — paper forward-test vs sizing gate"); print("="*66)
 if not rows: print("Chua co data — logger vua khoi dong."); sys.exit(0)
 start=[r for r in rows if r["event"]=="START"]
