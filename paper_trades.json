@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1780530388008,
+  "updatedAt": 1780538392241,
   "trades": [
     {
       "id": "kpiv1nowt8d",
@@ -3706,7 +3706,7 @@
       "ruleId": "1h:17",
       "tfKey": "1h",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "WIN",
       "entryPrice": 66307.1,
       "slPrice": 67633.24200000001,
       "tpPrice": 62328.674,
@@ -3715,14 +3715,17 @@
       "stopPct": 2,
       "maxHoldBars": 100,
       "openedMs": 1780441275860,
-      "deadlineMs": 1780801200000
+      "deadlineMs": 1780801200000,
+      "exitPrice": 62328.674,
+      "leveragedPnlPct": 600,
+      "closedMs": 1780538371667
     },
     {
       "id": "rj524bt7txh",
       "ruleId": "15m:8",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "WIN",
       "entryPrice": 65644.8,
       "slPrice": 66957.69600000001,
       "tpPrice": 62362.56,
@@ -3731,14 +3734,17 @@
       "stopPct": 2,
       "maxHoldBars": 100,
       "openedMs": 1780504326891,
-      "deadlineMs": 1780594200000
+      "deadlineMs": 1780594200000,
+      "exitPrice": 62362.56,
+      "leveragedPnlPct": 500,
+      "closedMs": 1780538371667
     },
     {
       "id": "u35i9tu7wsg",
       "ruleId": "15m:22",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "WIN",
       "entryPrice": 65644.8,
       "slPrice": 66957.69600000001,
       "tpPrice": 62362.56,
@@ -3747,7 +3753,10 @@
       "stopPct": 2,
       "maxHoldBars": 100,
       "openedMs": 1780504326891,
-      "deadlineMs": 1780594200000
+      "deadlineMs": 1780594200000,
+      "exitPrice": 62362.56,
+      "leveragedPnlPct": 500,
+      "closedMs": 1780538371667
     },
     {
       "id": "l4266ihjvup",
@@ -3770,7 +3779,7 @@
       "ruleId": "15m:2",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "WIN",
       "entryPrice": 64249.6,
       "slPrice": 65534.592,
       "tpPrice": 62322.111999999994,
@@ -3779,7 +3788,10 @@
       "stopPct": 2,
       "maxHoldBars": 100,
       "openedMs": 1780530367061,
-      "deadlineMs": 1780620300000
+      "deadlineMs": 1780620300000,
+      "exitPrice": 62322.111999999994,
+      "leveragedPnlPct": 300,
+      "closedMs": 1780538371667
     }
   ]
 }
