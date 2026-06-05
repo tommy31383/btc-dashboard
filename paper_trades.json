@@ -1,45 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1780669987785,
+  "updatedAt": 1780671727783,
   "trades": [
-    {
-      "id": "j04tc43m4gs",
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 76858.2,
-      "slPrice": 78395.364,
-      "tpPrice": 74552.454,
-      "leverage": 100,
-      "targetPct": 3,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1779373427484,
-      "deadlineMs": 1779462900000,
-      "exitPrice": 76903.11,
-      "leveragedPnlPct": -5.84,
-      "closedMs": 1779466866703
-    },
-    {
-      "id": "nk0s6awux5",
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "side": "LONG",
-      "status": "TIMEOUT",
-      "entryPrice": 77086.3,
-      "slPrice": 69377.67,
-      "tpPrice": 78242.59449999999,
-      "leverage": 100,
-      "targetPct": 1.5,
-      "stopPct": 10,
-      "maxHoldBars": 100,
-      "openedMs": 1779370092854,
-      "deadlineMs": 1779455700000,
-      "exitPrice": 76839.15,
-      "leveragedPnlPct": -32.06,
-      "closedMs": 1779461213797
-    },
     {
       "id": "543icqjt50s",
       "ruleId": "15m:8",
@@ -3783,6 +3745,38 @@
       "maxHoldBars": 100,
       "openedMs": 1780669966893,
       "deadlineMs": 1780759800000
+    },
+    {
+      "id": "wa4kpa8iorm",
+      "ruleId": "1h:7",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 60783.3,
+      "slPrice": 66861.63,
+      "tpPrice": 51665.805,
+      "leverage": 100,
+      "targetPct": 15,
+      "stopPct": 10,
+      "maxHoldBars": 100,
+      "openedMs": 1780671706893,
+      "deadlineMs": 1781031600000
+    },
+    {
+      "id": "y7s0nt1dga",
+      "ruleId": "1h:4",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 60783.3,
+      "slPrice": 65645.964,
+      "tpPrice": 51665.805,
+      "leverage": 100,
+      "targetPct": 15,
+      "stopPct": 8,
+      "maxHoldBars": 100,
+      "openedMs": 1780671706894,
+      "deadlineMs": 1781031600000
     }
   ]
 }
