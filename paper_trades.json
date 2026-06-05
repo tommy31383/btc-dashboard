@@ -1,45 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1780637420920,
+  "updatedAt": 1780638429923,
   "trades": [
-    {
-      "id": "lyctnq4k0a9",
-      "ruleId": "1h:4",
-      "tfKey": "1h",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 76780,
-      "slPrice": 82922.40000000001,
-      "tpPrice": 65263,
-      "leverage": 100,
-      "targetPct": 15,
-      "stopPct": 8,
-      "maxHoldBars": 100,
-      "openedMs": 1779475865690,
-      "deadlineMs": 1779829200000,
-      "exitPrice": 76044,
-      "leveragedPnlPct": 95.86,
-      "closedMs": 1779831996833
-    },
-    {
-      "id": "ll629xf0ub8",
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 76780,
-      "slPrice": 78315.6,
-      "tpPrice": 74476.59999999999,
-      "leverage": 100,
-      "targetPct": 3,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1779475865689,
-      "deadlineMs": 1779561900000,
-      "exitPrice": 75882.59,
-      "leveragedPnlPct": 116.88,
-      "closedMs": 1779562598842
-    },
     {
       "id": "4u8e8gig5sb",
       "ruleId": "15m:16",
@@ -3783,6 +3745,38 @@
       "maxHoldBars": 100,
       "openedMs": 1780606187903,
       "deadlineMs": 1780692300000
+    },
+    {
+      "id": "bxvz1ae8gzn",
+      "ruleId": "15m:8",
+      "tfKey": "15m",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 62852.9,
+      "slPrice": 64109.958000000006,
+      "tpPrice": 59710.255,
+      "leverage": 100,
+      "targetPct": 5,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1780638408999,
+      "deadlineMs": 1780728300000
+    },
+    {
+      "id": "3230e0zgksg",
+      "ruleId": "15m:22",
+      "tfKey": "15m",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 62852.9,
+      "slPrice": 64109.958000000006,
+      "tpPrice": 59710.255,
+      "leverage": 100,
+      "targetPct": 5,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1780638409000,
+      "deadlineMs": 1780728300000
     }
   ]
 }
