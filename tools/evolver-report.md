@@ -22,3 +22,10 @@ Seed: seed-G16. 3-gate promote: honest constraint + OOS walk-forward + robustnes
 - Robustness: 4% fragile - BTC1h/4h corr +0.64 - stability 8/8 yrs+
 - Per-year: 2019:n768/+297% 2020:n909/+708% 2021:n564/+123% 2022:n384/+17% 2023:n1090/+161% 2024:n1039/+54% 2025:n840/+9% 2026:n364/+13%
 - Params: `{"adx4": 16, "di4": 0.9, "sl4": 1.6, "tp4": 12, "hold4": 40, "cool4": 2, "pos4": 7, "adx1": 16, "di1": 1.05, "sl1": 1.8, "tp1": 10, "hold1": 36, "cool1": 1, "pos1": 5, "adxe": 18, "die": 1.3, "sle": 1.4, "tpe": 12, "eblo": 0.8, "ebhi": 1.05, "bg": 0.8, "risk": 0.04, "cap": 1.0}`
+
+## Champion #4 - gen 1220 - 2026-06-03 18:40 UTC  [pushed]
+- **CAGR 129.6%** - MaxDD 23.2% - min_n 381 - n2026 361
+- TRAIN CAGR 193.7% - **TEST(OOS) CAGR 31.5%** - equity $42,780,812
+- Robustness: 4% fragile - BTC1h/4h corr +0.63 - stability 8/8 yrs+
+- Per-year: 2019:n767/+298% 2020:n901/+722% 2021:n563/+123% 2022:n381/+16% 2023:n1087/+158% 2024:n1035/+57% 2025:n834/+9% 2026:n361/+13%
+- Params: `{"adx4": 16, "di4": 0.9, "sl4": 1.6, "tp4": 12, "hold4": 40, "cool4": 2, "pos4": 7, "adx1": 16, "di1": 1.05, "sl1": 2.0, "tp1": 10, "hold1": 36, "cool1": 1, "pos1": 5, "adxe": 18, "die": 1.3, "sle": 1.4, "tpe": 12, "eblo": 0.8, "ebhi": 1.05, "bg": 0.8, "risk": 0.04, "cap": 1.0}`

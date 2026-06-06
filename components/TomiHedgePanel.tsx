@@ -169,10 +169,16 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
 
   const longNet = th.longNet || { qty: 0, avgEntry: 0, totalAdds: 0 };
   const shortNet = th.shortNet || { qty: 0, avgEntry: 0, totalAdds: 0 };
-  const wallet: number = th.wallet ?? 0;
+  // v0.4.87: WALLET ưu tiên binanceSnapshot (fresh Binance API) > th.wallet (stale server state)
+  // th.wallet được update khi tomiHedge eval chạy — có thể stale vài giờ nếu scheduler bận.
+  // binanceSnapshot.account.totalWalletBalance = fresh từ Binance poll (30s interval).
+  const binanceWallet = parseFloat(state?.binanceSnapshot?.account?.totalWalletBalance ?? "0");
+  const wallet: number = isPaper
+    ? (th.wallet ?? 0)
+    : (binanceWallet > 0 ? binanceWallet : (th.wallet ?? 0));
   // v0.4.22+ server: engineWallet = initial + Σpnl − Σfees (ROI thuần từ trade, loại funding fee + manual deposit).
   // Fallback `wallet` cho state cũ (chưa có field). REAL engine có field này, PAPER share = wallet.
-  const engineWallet: number = (th as any).engineWallet ?? wallet;
+  const engineWallet: number = (th as any).engineWallet ?? th.wallet ?? 0;
   const initialCap: number = th.initialCapital ?? 1000;
 
   // Trend buckets (S12/S13/S14 — active khi V040_ENABLE_AGGREGATE=false)
