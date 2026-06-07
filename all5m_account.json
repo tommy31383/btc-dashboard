@@ -1,7 +1,43 @@
 {
   "version": 1,
-  "capital": 78117.50000000001,
+  "capital": 78113.00000000001,
   "positions": [
+    {
+      "id": "bar5m-1780841700000",
+      "bar5mTime": 1780841700000,
+      "status": "OPEN",
+      "side": "SHORT",
+      "source": "stoch_short",
+      "entryPrice": 61899.6,
+      "entryMs": 1780844691599,
+      "tpPrice": 58185.623999999996,
+      "slPrice": 65613.576,
+      "entryFeeUsd": 1.5
+    },
+    {
+      "id": "bar5m-1780839900000",
+      "bar5mTime": 1780839900000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "sr_long",
+      "entryPrice": 61675.8,
+      "entryMs": 1780842260941,
+      "tpPrice": 65376.348000000005,
+      "slPrice": 57975.252,
+      "entryFeeUsd": 1.5
+    },
+    {
+      "id": "bar5m-1780837800000",
+      "bar5mTime": 1780837800000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "sr_long",
+      "entryPrice": 61747.4,
+      "entryMs": 1780839547590,
+      "tpPrice": 65452.244000000006,
+      "slPrice": 58042.556,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1780834200000",
       "bar5mTime": 1780834200000,
@@ -21535,18 +21571,6 @@
   "equityHistory": [
     {
       "t": 1780316100439,
-      "equity": 45386.00000000001
-    },
-    {
-      "t": 1780316100439,
-      "equity": 45354.50000000001
-    },
-    {
-      "t": 1780316100439,
-      "equity": 45323.00000000001
-    },
-    {
-      "t": 1780316100439,
       "equity": 45291.50000000001
     },
     {
@@ -25532,6 +25556,18 @@
     {
       "t": 1780838300520,
       "equity": 78117.50000000001
+    },
+    {
+      "t": 1780839547590,
+      "equity": 78116.00000000001
+    },
+    {
+      "t": 1780842260941,
+      "equity": 78114.50000000001
+    },
+    {
+      "t": 1780844691599,
+      "equity": 78113.00000000001
     }
   ],
   "stats": {
@@ -25539,10 +25575,10 @@
     "wins": 535,
     "losses": 598,
     "totalPnlUsd": 73401.00000000001,
-    "totalFeeUsd": 3682.5,
-    "lastEntryMs": 1780838300520,
+    "totalFeeUsd": 3687,
+    "lastEntryMs": 1780844691599,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780838300520,
+  "updatedAt": 1780844691599,
   "capitalVersion": 2
 }
