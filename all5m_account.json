@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 78240.50000000001,
+  "capital": 78417.50000000001,
   "positions": [
+    {
+      "id": "bar5m-1780917300000",
+      "bar5mTime": 1780917300000,
+      "status": "OPEN",
+      "side": "SHORT",
+      "source": "stoch_short",
+      "entryPrice": 63527.8,
+      "entryMs": 1780917741922,
+      "tpPrice": 59716.132,
+      "slPrice": 67339.46800000001,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1780917000000",
       "bar5mTime": 1780917000000,
@@ -2086,14 +2098,19 @@
     {
       "id": "bar5m-1780675500000",
       "bar5mTime": 1780675500000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "LONG",
       "source": "sr_long",
       "entryPrice": 60024.9,
       "entryMs": 1780675906840,
       "tpPrice": 63626.39400000001,
       "slPrice": 56423.405999999995,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 63626.39400000001,
+      "exitMs": 1780917735131,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000028,
+      "pnlNetUsd": 177.00000000000028
     },
     {
       "id": "bar5m-1780675200000",
@@ -21984,14 +22001,6 @@
   "equityHistory": [
     {
       "t": 1780316100439,
-      "equity": 46079.00000000001
-    },
-    {
-      "t": 1780316100439,
-      "equity": 46047.50000000001
-    },
-    {
-      "t": 1780316100439,
       "equity": 46016.00000000001
     },
     {
@@ -25981,17 +25990,25 @@
     {
       "t": 1780917441919,
       "equity": 78240.50000000001
+    },
+    {
+      "t": 1780917735131,
+      "equity": 78419.00000000001
+    },
+    {
+      "t": 1780917741922,
+      "equity": 78417.50000000001
     }
   ],
   "stats": {
-    "totalClosed": 1134,
-    "wins": 536,
+    "totalClosed": 1135,
+    "wins": 537,
     "losses": 598,
-    "totalPnlUsd": 73578.00000000001,
-    "totalFeeUsd": 3739.5,
-    "lastEntryMs": 1780917441919,
+    "totalPnlUsd": 73755.00000000001,
+    "totalFeeUsd": 3742.5,
+    "lastEntryMs": 1780917741922,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780917441919,
+  "updatedAt": 1780917741924,
   "capitalVersion": 2
 }
