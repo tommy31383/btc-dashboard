@@ -249,7 +249,7 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
         </View>
         <Text style={styles.dim}>
           Initial: ${initialCap} · Realized: ${th.totalRealizedPnl?.toFixed(2) ?? "0.00"} · Fees: ${th.totalFeesPaid?.toFixed(2) ?? "0.00"}
-          {Math.abs(walletDiff) > 0.01 ? ` · Δ wallet vs engine: ${walletDiff >= 0 ? "+" : ""}$${walletDiff.toFixed(2)} (funding/deposit)` : ""}
+          {Math.abs(walletDiff) > 0.01 ? ` · Δ wallet vs engine: ${walletDiff >= 0 ? "+" : ""}$${walletDiff.toFixed(2)} (funding/deposit/other-engines: champion+stochbreak share net)` : ""}
         </Text>
         <Text style={styles.dim}>
           Total ADDs: LONG {th.totalAddsLong ?? 0} · SHORT {th.totalAddsShort ?? 0} · Closes: {th.totalCloses ?? 0}
