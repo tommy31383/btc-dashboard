@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "capital": 78113.00000000001,
+  "capital": 78290.00000000001,
   "positions": [
+    {
+      "id": "bar5m-1780845300000",
+      "bar5mTime": 1780845300000,
+      "status": "OPEN",
+      "side": "LONG",
+      "source": "stoch_long",
+      "entryPrice": 61737.1,
+      "entryMs": 1780847462662,
+      "tpPrice": 65441.326,
+      "slPrice": 58032.873999999996,
+      "entryFeeUsd": 1.5
+    },
     {
       "id": "bar5m-1780841700000",
       "bar5mTime": 1780841700000,
@@ -1481,14 +1493,19 @@
     {
       "id": "bar5m-1780720200000",
       "bar5mTime": 1780720200000,
-      "status": "OPEN",
+      "status": "WIN",
       "side": "LONG",
       "source": "stoch_long",
       "entryPrice": 59481.5,
       "entryMs": 1780720636587,
       "tpPrice": 63050.39000000001,
       "slPrice": 55912.60999999999,
-      "entryFeeUsd": 1.5
+      "entryFeeUsd": 1.5,
+      "exitPrice": 63050.39000000001,
+      "exitMs": 1780881296385,
+      "exitFeeUsd": 1.5,
+      "pnlUsd": 180.00000000000034,
+      "pnlNetUsd": 177.00000000000034
     },
     {
       "id": "bar5m-1780719600000",
@@ -21571,10 +21588,6 @@
   "equityHistory": [
     {
       "t": 1780316100439,
-      "equity": 45291.50000000001
-    },
-    {
-      "t": 1780316100439,
       "equity": 45260.00000000001
     },
     {
@@ -25568,17 +25581,25 @@
     {
       "t": 1780844691599,
       "equity": 78113.00000000001
+    },
+    {
+      "t": 1780847462662,
+      "equity": 78111.50000000001
+    },
+    {
+      "t": 1780881296385,
+      "equity": 78290.00000000001
     }
   ],
   "stats": {
-    "totalClosed": 1133,
-    "wins": 535,
+    "totalClosed": 1134,
+    "wins": 536,
     "losses": 598,
-    "totalPnlUsd": 73401.00000000001,
-    "totalFeeUsd": 3687,
-    "lastEntryMs": 1780844691599,
+    "totalPnlUsd": 73578.00000000001,
+    "totalFeeUsd": 3690,
+    "lastEntryMs": 1780847462662,
     "lastResetMs": 1777051576196
   },
-  "updatedAt": 1780844691599,
+  "updatedAt": 1780881296387,
   "capitalVersion": 2
 }
