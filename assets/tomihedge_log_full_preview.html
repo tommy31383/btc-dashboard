@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
+<title>TomiHedge REAL Log — Full preview v4.11.4</title>
+<style>
+ body{background:#0d0d0d;color:#e6e6e6;font-family:monospace;padding:20px;max-width:760px;margin:auto}
+ .card{background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:10px;margin-bottom:14px}
+ .hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+ .h2{font-size:13px;font-weight:700;color:#e6e6e6}
+ .count{color:#888;font-size:11px;font-weight:400}
+ .filters{display:flex;gap:4px}
+ .fbtn{padding:3px 8px;border:1px solid #333;border-radius:3px;color:#888;font-size:9px;font-weight:700}
+ .fbtn.active{border-color:#f7931a;background:#f7931a22;color:#f7931a}
+ .row{display:flex;padding:5px 0;border-bottom:1px solid #222}
+ .head{border-bottom:2px solid #2a2a2a}
+ .cell{font-size:10px;color:#888}
+ .scroll{max-height:600px;overflow:auto}
+ .dim{color:#777;font-size:10px;margin-top:6px}
+ .green{color:#2ebd85}.red{color:#e5484d}.orange{color:#f7931a}.t2{color:#bbb}
+ .note{background:#1a2030;border-left:3px solid #f7931a;padding:8px 12px;border-radius:4px;font-size:12px;margin-bottom:14px;color:#bcd}
+</style></head><body>
+<div class="note"><b>Preview v4.11.4 — phương án A:</b> bỏ cap 20, hiện TOÀN BỘ event (7/7) · badge đếm cạnh tiêu đề · maxHeight 420→600 · footer mới. Data = REAL eventLog thật từ VPS (giờ local).</div>
+<div class="card">
+ <div class="hrow">
+  <div class="h2">📜 TomiHedge REAL Log <span class="count">· 7 event</span></div>
+  <div class="filters"><span class="fbtn active">ALL</span><span class="fbtn">ADD</span><span class="fbtn">CLOSE</span></div>
+ </div>
+ <div class="row head">
+  <div class="cell" style="flex:2">TIME</div><div class="cell" style="flex:1">KIND</div>
+  <div class="cell" style="flex:1">SIDE</div><div class="cell" style="flex:1.4">QTY</div>
+  <div class="cell" style="flex:1.4">PRICE</div><div class="cell" style="flex:1.4">AVG/PnL</div>
+ </div>
+ <div class="scroll">
+  <div class="row"><div class="cell" style="flex:2">02/06 14:04:15</div><div class="cell t2" style="flex:1;font-weight:700">✕ CLOSE</div><div class="cell red" style="flex:1;font-weight:700">SHORT</div><div class="cell t2" style="flex:1.4">0.0030</div><div class="cell t2" style="flex:1.4">$69813</div><div class="cell green" style="flex:1.4;font-weight:700">+$4.60</div></div>
+  <div class="row"><div class="cell" style="flex:2">01/06 22:35:34</div><div class="cell orange" style="flex:1;font-weight:700">▲ ADD</div><div class="cell red" style="flex:1;font-weight:700">SHORT</div><div class="cell t2" style="flex:1.4">0.0030</div><div class="cell t2" style="flex:1.4">$71381</div><div class="cell t2" style="flex:1.4;font-weight:700">$71381</div></div>
+  <div class="row"><div class="cell" style="flex:2">29/05 15:27:39</div><div class="cell t2" style="flex:1;font-weight:700">✕ CLOSE</div><div class="cell red" style="flex:1;font-weight:700">SHORT</div><div class="cell t2" style="flex:1.4">0.0010</div><div class="cell t2" style="flex:1.4">$73775</div><div class="cell green" style="flex:1.4;font-weight:700">+$3.50</div></div>
+  <div class="row"><div class="cell" style="flex:2">29/05 11:22:47</div><div class="cell t2" style="flex:1;font-weight:700">✕ CLOSE</div><div class="cell green" style="flex:1;font-weight:700">LONG</div><div class="cell t2" style="flex:1.4">0.0020</div><div class="cell t2" style="flex:1.4">$73235</div><div class="cell red" style="flex:1.4;font-weight:700">$-13.87</div></div>
+  <div class="row"><div class="cell" style="flex:2">24/05 04:02:00</div><div class="cell orange" style="flex:1;font-weight:700">▲ ADD</div><div class="cell red" style="flex:1;font-weight:700">SHORT</div><div class="cell t2" style="flex:1.4">0.0010</div><div class="cell t2" style="flex:1.4">$77279</div><div class="cell t2" style="flex:1.4;font-weight:700">$77279</div></div>
+  <div class="row"><div class="cell" style="flex:2">13/05 19:38:06</div><div class="cell orange" style="flex:1;font-weight:700">▲ ADD</div><div class="cell green" style="flex:1;font-weight:700">LONG</div><div class="cell t2" style="flex:1.4">0.0010</div><div class="cell t2" style="flex:1.4">$79866</div><div class="cell t2" style="flex:1.4;font-weight:700">$80131</div></div>
+  <div class="row"><div class="cell" style="flex:2">11/05 03:49:32</div><div class="cell orange" style="flex:1;font-weight:700">▲ ADD</div><div class="cell green" style="flex:1;font-weight:700">LONG</div><div class="cell t2" style="flex:1.4">0.0010</div><div class="cell t2" style="flex:1.4">$80395</div><div class="cell t2" style="flex:1.4;font-weight:700">$80395</div></div>
+ </div>
+ <div class="dim">💡 Hiển thị TOÀN BỘ 7 event đang có · server lưu cap 500 trong state · reset state → log mất.</div>
+</div>
+</body></html>

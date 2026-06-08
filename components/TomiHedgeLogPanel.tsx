@@ -30,8 +30,8 @@ export default function TomiHedgeLogPanel({ eventLog, title }: Props) {
   const rows = useMemo(() => {
     const all = eventLog || [];
     const filtered = filter === "ALL" ? all : all.filter((e) => e.kind === filter);
-    // Mới nhất trên cùng, lấy 20
-    return [...filtered].reverse().slice(0, 20);
+    // v4.11.4: hiện TOÀN BỘ log (bỏ cap 20) — mới nhất trên cùng.
+    return [...filtered].reverse();
   }, [eventLog, filter]);
 
   const fmtTime = (ts: number) => {
@@ -47,7 +47,7 @@ export default function TomiHedgeLogPanel({ eventLog, title }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
-        <Text style={styles.h2}>📜 {title || "TomiHedge Log"}</Text>
+        <Text style={styles.h2}>📜 {title || "TomiHedge Log"} <Text style={styles.count}>· {rows.length} event</Text></Text>
         <View style={styles.filterRow}>
           {(["ALL", "ADD", "CLOSE"] as Filter[]).map((f) => (
             <TouchableOpacity
@@ -71,7 +71,7 @@ export default function TomiHedgeLogPanel({ eventLog, title }: Props) {
         <Text style={[styles.cell, { flex: 1.4 }]}>AVG/PnL</Text>
       </View>
 
-      <ScrollView style={{ maxHeight: 420 }}>
+      <ScrollView style={{ maxHeight: 600 }}>
         {rows.length === 0 ? (
           <Text style={styles.empty}>Chưa có event nào.</Text>
         ) : (
@@ -103,7 +103,7 @@ export default function TomiHedgeLogPanel({ eventLog, title }: Props) {
       </ScrollView>
 
       <Text style={styles.dim}>
-        💡 Hiển thị 20 entries mới nhất · server lưu cap 500 trong state · reset state → log mất.
+        💡 Hiển thị TOÀN BỘ {rows.length} event đang có · server lưu cap 500 trong state · reset state → log mất.
       </Text>
     </View>
   );
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: P.surface, borderRadius: 6, padding: 10, marginBottom: 14, borderWidth: 1, borderColor: P.border },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
   h2: { color: P.text, fontSize: 13, fontWeight: "700" },
+  count: { color: P.dim, fontSize: 11, fontWeight: "400", fontFamily: "monospace" },
   filterRow: { flexDirection: "row", gap: 4 },
   filterBtn: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 3, borderWidth: 1, borderColor: P.borderSoft },
   filterBtnActive: { borderColor: P.bitcoinOrange, backgroundColor: P.bitcoinOrange + "22" },
