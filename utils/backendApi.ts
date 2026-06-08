@@ -104,7 +104,9 @@ export const api = {
   setAuto: (value: boolean) => request<any>("/api/live/auto", "POST", { value }),
   setDryRun: (value: boolean, password?: string) =>
     request<any>("/api/live/dry-run", "POST", { value, confirmPassword: password }),
-  setSettings: (settings: any) => request<any>("/api/live/settings", "POST", { settings }),
+  // v4.x (audit pre-deploy): risk fields (leverage/loss-cap/qty/symbol) cần confirmPassword
+  setSettings: (settings: any, password?: string) =>
+    request<any>("/api/live/settings", "POST", { settings, confirmPassword: password }),
   closePosition: (positionId: string, password: string) =>
     request<any>("/api/live/close", "POST", { positionId, confirmPassword: password }),
   editTpSl: (positionId: string, newTp?: number, newSl?: number, password?: string) =>
@@ -122,7 +124,8 @@ export const api = {
 
   // v0.3.0 PRESET ENGINE (anh Tommy: server replica của 5m ALL)
   presets: () => request<any>("/api/live/presets"),
-  setPresetConfig: (config: any) => request<any>("/api/live/preset-config", "POST", { config }),
+  setPresetConfig: (config: any, password?: string) =>
+    request<any>("/api/live/preset-config", "POST", { config, confirmPassword: password }),
   paperReset: (password: string) => request<any>("/api/live/paper/reset", "POST", { confirmPassword: password }),
   paperClear: (password: string) => request<any>("/api/live/paper/clear", "POST", { confirmPassword: password }),
   paperClose: (id: string) => request<any>("/api/live/paper/close", "POST", { id }),

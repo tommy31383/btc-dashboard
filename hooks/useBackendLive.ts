@@ -238,8 +238,8 @@ export function useBackendLive(): BackendLiveState & BackendLiveActions {
     try { await api.setDryRun(value, password); await refresh(); } catch (e: any) { setLastError(e?.message); }
   }, [refresh]);
 
-  const setSettings = useCallback(async (partial: any) => {
-    try { await api.setSettings(partial); await refresh(); } catch (e: any) { setLastError(e?.message); }
+  const setSettings = useCallback(async (partial: any, password?: string) => {
+    try { await api.setSettings(partial, password); await refresh(); } catch (e: any) { setLastError(e?.message); }
   }, [refresh]);
 
   const closePosition = useCallback(async (id: string, password: string) => {

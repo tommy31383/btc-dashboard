@@ -59,8 +59,8 @@ export interface UseBinanceLiveResult {
   recheckPat: () => Promise<void>;       // re-run election để pick up PAT mới nhập (manual)
   setCredentials: (apiKey: string, apiSecret: string) => Promise<void>;
   setAutoEnabled: (on: boolean) => Promise<void>;
-  setDryRun: (on: boolean) => Promise<void>;
-  setSettings: (partial: Partial<LiveSettings>) => Promise<void>;
+  setDryRun: (on: boolean, password?: string) => Promise<void>;
+  setSettings: (partial: Partial<LiveSettings>, password?: string) => Promise<void>;
   resetSettings: () => Promise<void>;
   resetCooldown: () => Promise<void>;
   clearJournal: () => Promise<void>;

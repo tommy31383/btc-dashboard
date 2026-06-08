@@ -21,6 +21,7 @@ import { P } from "../utils/v2Theme";
 import { MaterialIcon } from "./v2/MaterialIcon";
 import { UseBinanceLiveResult } from "../hooks/useBinanceLive";
 import { LiveSettings } from "../utils/liveTraderEngine";
+import { DESTRUCTIVE_PWD as DESTRUCTIVE_PASSWORD } from "../utils/serverSecrets";
 
 /** Hard-roll password để force claim leader — v4.9.27 (anh Tommy): rotate "3031". */
 const CLAIM_LEADER_PASSWORD = "3031";
@@ -407,7 +408,12 @@ function ControlsCard({ live }: Props) {
           color={P.green}
           solidWhenOn
           disabled={!canControl}
-          onPress={() => live.setDryRun(!live.state.dryRun)}
+          onPress={() => {
+            const next = !live.state.dryRun;
+            // next === false = arming REAL ORDERS (tiền thật) → confirm trước.
+            if (next === false && !requireDestructivePassword("CHUYỂN SANG REAL ORDERS (tiền thật)")) return;
+            live.setDryRun(next, DESTRUCTIVE_PASSWORD);
+          }}
         />
       </View>
       <Text style={styles.note}>
@@ -546,7 +552,10 @@ function SettingsCard({ live }: Props) {
   }
 
   function commit() {
-    live.setSettings(draft);
+    // v4.x (audit pre-deploy): settings chứa risk fields (leverage/loss-cap/qty/symbol)
+    // → backend gate confirmPassword. Confirm yes/no + gửi password tự động.
+    if (!requireDestructivePassword("LƯU settings (leverage/loss-cap/qty/symbol)")) return;
+    live.setSettings(draft, DESTRUCTIVE_PASSWORD);
     setDirty(false);
   }
 
@@ -829,7 +838,7 @@ function NumField({
 // ── TRACKED (Plan B virtual lệnh, mỗi lệnh TP/SL riêng) ──────────────────────
 
 // v4.9.27 (anh Tommy): KHÔNG prompt password user nữa — chỉ confirm yes/no.
-import { DESTRUCTIVE_PWD as DESTRUCTIVE_PASSWORD } from "../utils/serverSecrets";
+// (DESTRUCTIVE_PASSWORD import đã move lên đầu file để dùng cho settings/dry-run gate.)
 
 /** Confirm yes/no trước destructive action. Password gửi tự động trong API. */
 function requireDestructivePassword(actionLabel: string): boolean {
