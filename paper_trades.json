@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1780912962899,
+  "updatedAt": 1780917320906,
   "trades": [
     {
       "id": "i3ifkzz46sn",
@@ -3722,7 +3722,7 @@
       "ruleId": "15m:8",
       "tfKey": "15m",
       "side": "SHORT",
-      "status": "OPEN",
+      "status": "TIMEOUT",
       "entryPrice": 62408.73,
       "slPrice": 63656.9046,
       "tpPrice": 59288.2935,
@@ -3731,7 +3731,10 @@
       "stopPct": 2,
       "maxHoldBars": 100,
       "openedMs": 1780827385291,
-      "deadlineMs": 1780917300000
+      "deadlineMs": 1780917300000,
+      "exitPrice": 63445.99,
+      "leveragedPnlPct": -166.2,
+      "closedMs": 1780917300141
     },
     {
       "id": "5adhd2hbowp",
