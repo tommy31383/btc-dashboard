@@ -1,45 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1780827406246,
+  "updatedAt": 1780885302751,
   "trades": [
-    {
-      "id": "pu7q1i4uxim",
-      "ruleId": "15m:16",
-      "tfKey": "15m",
-      "side": "LONG",
-      "status": "TIMEOUT",
-      "entryPrice": 78152.1,
-      "slPrice": 70336.89000000001,
-      "tpPrice": 79324.3815,
-      "leverage": 100,
-      "targetPct": 1.5,
-      "stopPct": 10,
-      "maxHoldBars": 100,
-      "openedMs": 1779004943233,
-      "deadlineMs": 1779093000000,
-      "exitPrice": 76298.02,
-      "leveragedPnlPct": -237.24,
-      "closedMs": 1779117191225
-    },
-    {
-      "id": "ukk58zdb71",
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "TIMEOUT",
-      "entryPrice": 78228.9,
-      "slPrice": 79793.47799999999,
-      "tpPrice": 75882.033,
-      "leverage": 100,
-      "targetPct": 3,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1778950914143,
-      "deadlineMs": 1779039000000,
-      "exitPrice": 78133.02,
-      "leveragedPnlPct": 12.26,
-      "closedMs": 1779041512725
-    },
     {
       "id": "09r8zgohl7ql",
       "ruleId": "15m:8",
@@ -3786,6 +3748,38 @@
       "maxHoldBars": 100,
       "openedMs": 1780827385291,
       "deadlineMs": 1780917300000
+    },
+    {
+      "id": "5adhd2hbowp",
+      "ruleId": "1h:32",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 62950,
+      "slPrice": 64838.5,
+      "tpPrice": 57914,
+      "leverage": 100,
+      "targetPct": 8,
+      "stopPct": 3,
+      "maxHoldBars": 100,
+      "openedMs": 1780885282302,
+      "deadlineMs": 1781240400000
+    },
+    {
+      "id": "i5jf57bsca",
+      "ruleId": "1h:18",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 62950,
+      "slPrice": 64209,
+      "tpPrice": 57914,
+      "leverage": 100,
+      "targetPct": 8,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1780885282303,
+      "deadlineMs": 1781240400000
     }
   ]
 }
