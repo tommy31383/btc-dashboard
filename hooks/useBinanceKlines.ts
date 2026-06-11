@@ -16,11 +16,23 @@ import {
 
 export interface Kline {
   time: number;
+  closeTime?: number;
+  isClosed?: boolean;
   open: number;
   high: number;
   low: number;
   close: number;
   volume: number;
+}
+
+export function isKlineClosed(kline: Kline, now = Date.now()): boolean {
+  if (typeof kline.isClosed === "boolean") return kline.isClosed;
+  if (typeof kline.closeTime === "number") return kline.closeTime < now;
+  return false;
+}
+
+export function closedKlines(klines: Kline[], now = Date.now()): Kline[] {
+  return klines.filter((kline) => isKlineClosed(kline, now));
 }
 
 export interface TFAnalysis {
@@ -58,10 +70,14 @@ function klineFingerprint(kline: Kline | undefined): string {
   return [kline.time, kline.open, kline.high, kline.low, kline.close, kline.volume].join(":");
 }
 
-function analyzeKlines(klines: Kline[], tfKey: TimeframeKey, tfLabel: string): TFAnalysis {
-  const closes = klines.map((k) => k.close);
-  const volumes = klines.map((k) => k.volume);
-  const lastClose = closes[closes.length - 1] || 0;
+export function analyzeKlines(klines: Kline[], tfKey: TimeframeKey, tfLabel: string): TFAnalysis {
+  // v4.x (Chart V2 #3A): indicator scalars tính trên CLOSED bars (drop cây đang hình thành) để
+  // KHÔNG repaint trước khi nến đóng — khớp engine live (slice(0,-1)). `lastClose` vẫn lấy giá
+  // cây hiện tại để hiển thị giá realtime.
+  const closed = closedKlines(klines);
+  const closes = closed.map((k) => k.close);
+  const volumes = closed.map((k) => k.volume);
+  const lastClose = klines[klines.length - 1]?.close || 0;
 
   const rsi = calcRSI(closes);
   const stoch = calcStochRSI(closes);
@@ -70,7 +86,7 @@ function analyzeKlines(klines: Kline[], tfKey: TimeframeKey, tfLabel: string): T
   const volAnalysis = calcVolumeAnalysis(volumes);
   const divergence = detectDivergence(closes);
   const ema50Value = calcEMA(closes, 50);
-  const atrPct = klines.length >= 15 ? calcATRPct(klines, 14) : null;
+  const atrPct = closed.length >= 15 ? calcATRPct(closed, 14) : null;
   const emaDistPct = ema50Value !== null && ema50Value > 0
     ? ((lastClose - ema50Value) / ema50Value) * 100
     : null;
@@ -156,7 +172,9 @@ export function useBinanceKlines(): {
               const j = await r.json();
               if (Array.isArray(j.bars) && j.bars.length > 0) {
                 // Server bars format: { time, open, high, low, close, volume } → map vào kline tuple
-                const data = j.bars.map((b: any) => [b.time, b.open, b.high, b.low, b.close, b.volume]);
+                const data = j.bars.map((b: any) => [
+                  b.time, b.open, b.high, b.low, b.close, b.volume, b.closeTime, b.isClosed,
+                ]);
                 return { tf, data };
               }
             }
@@ -178,6 +196,10 @@ export function useBinanceKlines(): {
       for (const { tf, data } of results) {
         const klines: Kline[] = data.map((k: any[]) => ({
           time: k[0],
+          closeTime: typeof k[6] === "number" ? k[6] : undefined,
+          isClosed: typeof k[7] === "boolean"
+            ? k[7]
+            : (typeof k[6] === "number" ? k[6] < Date.now() : false),
           open: parseFloat(k[1]),
           high: parseFloat(k[2]),
           low: parseFloat(k[3]),

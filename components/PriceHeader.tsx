@@ -7,7 +7,7 @@
  *   Sparkline bar-style (emerald bars gradient) dưới price
  *   3-col stats grid (High / Low / Vol) trong surface-container-lowest cells
  */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Polyline, Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { P } from "../utils/v2Theme";
@@ -95,6 +95,18 @@ function PriceHeaderInner({ priceData, priceHistory, connectionStatus }: Props) 
   const statusLabel =
     connectionStatus === "LIVE" ? "LIVE" : connectionStatus === "ERROR" ? "ERR" : "POLL 3s";
 
+  // v4.x (Chart V2 #3B): tick mỗi 1s để hiển thị DATA AGE chính xác kể cả khi giá ngừng cập nhật.
+  const [nowTick, setNowTick] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  // Nguồn giá: MARK (futures, server WS) hay SPOT (Binance ticker). KHÔNG còn ghi cứng "SPOT".
+  const source = priceData?.source ?? "SPOT";
+  const sourceLabel = source === "MARK" ? "FUT · MARK" : "SPOT · LAST";
+  const ageSec = priceData ? Math.max(0, Math.round((nowTick - priceData.priceTs) / 1000)) : null;
+  const ageStale = ageSec != null && ageSec > 10;
+
   return (
     <View style={styles.card}>
       <DebugLabel name="PriceHeader" />
@@ -103,7 +115,7 @@ function PriceHeaderInner({ priceData, priceHistory, connectionStatus }: Props) 
       {/* Top row: symbol + status */}
       <View style={styles.topRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.microLabel}>BTC / USDT · SPOT</Text>
+          <Text style={styles.microLabel}>BTC/USDT · {sourceLabel}</Text>
           <Text style={styles.price}>
             {priceData
               ? "$" +
@@ -130,6 +142,9 @@ function PriceHeaderInner({ priceData, priceHistory, connectionStatus }: Props) 
           <View style={[styles.statusDot, { backgroundColor: statusColor }]}>
             <Text style={styles.statusText}>{statusLabel}</Text>
           </View>
+          {ageSec != null && (
+            <Text style={[styles.ageText, ageStale && { color: P.error }]}>{ageSec}s ago</Text>
+          )}
         </View>
       </View>
 
@@ -215,6 +230,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1,
     fontFamily: "SpaceGrotesk_700Bold",
+  },
+  ageText: {
+    color: P.dim,
+    fontSize: 9,
+    fontWeight: "600",
+    marginTop: 3,
+    fontFamily: "JetBrainsMono_500Medium",
   },
   barSpark: {
     flexDirection: "row",

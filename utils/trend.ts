@@ -17,9 +17,23 @@
 import { calcEMA, calcEMASeries } from "./indicators";
 
 export interface TrendInput {
-  closes4h: number[];
-  closes1h: number[];
-  klines4h: { high: number; low: number; close: number }[];
+  klines4h: TrendKline[];
+  klines1h: TrendKline[];
+}
+
+interface TrendKline {
+  high: number;
+  low: number;
+  close: number;
+  time?: number;
+  closeTime?: number;
+  isClosed?: boolean;
+}
+
+function isClosed(kline: TrendKline, now = Date.now()): boolean {
+  if (typeof kline.isClosed === "boolean") return kline.isClosed;
+  if (typeof kline.closeTime === "number") return kline.closeTime < now;
+  return false;
 }
 
 export type TrendZone = "STRONG_DOWN" | "DOWN" | "RANGE" | "UP" | "STRONG_UP";
@@ -37,6 +51,11 @@ export interface TrendResult {
     slope: number;      // EMA50 slope 4h
     confirm1h: number;  // 1h EMA confirm
   };
+  // v4.x (Chart V2 #3A): closed-bar-only confirmed state + provisional (forming-bar) preview.
+  // `zone`/`value` above = CONFIRMED (closed bars, khớp hedge01 live, KHÔNG repaint).
+  confirmedBarTime: number | null;   // time (ms) của cây 4h đã ĐÓNG cuối cùng
+  provisionalZone: TrendZone;        // zone tính kèm cây partial (hiển thị mờ, có thể đổi)
+  provisionalValue: number | null;
 }
 
 /** Wilder ADX + DI+/DI- (4h). Trả ADX hiện tại + DI cuối. */
@@ -81,9 +100,35 @@ function calcADXDI(
   return { adx, diPlus: lastPDI, diMinus: lastNDI };
 }
 
-/** Compute Trend Direction Index từ market state. */
+type TrendScore = Omit<TrendResult, "confirmedBarTime" | "provisionalZone" | "provisionalValue">;
+
+/**
+ * Compute Trend Direction Index từ market state — CONFIRMED trên CLOSED bars + PROVISIONAL kèm
+ * cây partial. v4.x (#3A): trước đây dùng nguyên mảng (gồm cây đang hình thành) → score/zone
+ * repaint trước khi nến đóng, lệch hedge01 live (dùng closed bars). Nay: `zone`/`value` = closed
+ * bars (ổn định), `provisionalZone`/`provisionalValue` = kèm cây partial (hiển thị mờ).
+ */
 export function computeTrend(input: TrendInput): TrendResult {
-  const { closes4h, closes1h, klines4h } = input;
+  // Drop cây 4h/1h đang hình thành để có CONFIRMED state (khớp slice(0,-1) của live engine).
+  const closedK4 = input.klines4h.filter((bar) => isClosed(bar));
+  const closedK1 = input.klines1h.filter((bar) => isClosed(bar));
+  const confirmed = scoreTrend({ klines4h: closedK4, klines1h: closedK1 });
+  // Provisional = kèm cây partial (nguyên mảng) — để UI hiển thị điểm cuối mờ/tạm.
+  const provisional = scoreTrend(input);
+  const lastClosed = closedK4.length > 0 ? closedK4[closedK4.length - 1] : null;
+  return {
+    ...confirmed,
+    confirmedBarTime: lastClosed?.time ?? null,
+    provisionalZone: provisional.zone,
+    provisionalValue: provisional.value,
+  };
+}
+
+/** Inner scorer — chạy trên bất kỳ mảng nào (closed hoặc full). */
+function scoreTrend(input: TrendInput): TrendScore {
+  const { klines4h, klines1h } = input;
+  const closes4h = klines4h.map((bar) => bar.close);
+  const closes1h = klines1h.map((bar) => bar.close);
   const comp = { emaStack: 0, priceVsEma: 0, di: 0, slope: 0, confirm1h: 0 };
 
   if (closes4h.length < 200 || klines4h.length < 50) {

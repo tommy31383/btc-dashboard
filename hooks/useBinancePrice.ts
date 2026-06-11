@@ -11,6 +11,11 @@ export interface PriceData {
   high24h: number;
   low24h: number;
   volume24h: number;
+  // v4.x (Chart V2 #3B): `price` có thể đến từ 2 nguồn KHÁC NHAU về bản chất → ghi rõ để không
+  // trộn. "MARK" = futures mark price (server WS, hợp liquidation/UPnL). "SPOT" = spot last price
+  // (Binance ticker REST/WS fallback). 24h stats (high/low/vol/%) LUÔN là SPOT ticker.
+  source: "MARK" | "SPOT";
+  priceTs: number;   // ms timestamp của lần cập nhật `price` gần nhất (cho DATA AGE)
 }
 
 export interface UseBinancePriceResult {
@@ -89,6 +94,8 @@ export function useBinancePrice(): UseBinancePriceResult {
         high24h: parseFloat(d.highPrice),
         low24h: parseFloat(d.lowPrice),
         volume24h: parseFloat(d.volume),
+        source: "SPOT",
+        priceTs: Date.now(),
       });
     } catch (e: any) {
       if (mountedRef.current) setError(`Lỗi kết nối REST: ${e.message || "Không rõ"}`);
@@ -114,8 +121,8 @@ export function useBinancePrice(): UseBinancePriceResult {
           lastServerWsTsRef.current = Date.now(); // mark health timestamp
           setConnectionStatus("LIVE");
           setPriceData((prev) => prev
-            ? { ...prev, price: msg.price }
-            : { price: msg.price, change24h: 0, changePct24h: 0, high24h: 0, low24h: 0, volume24h: 0 });
+            ? { ...prev, price: msg.price, source: "MARK", priceTs: Date.now() }
+            : { price: msg.price, change24h: 0, changePct24h: 0, high24h: 0, low24h: 0, volume24h: 0, source: "MARK", priceTs: Date.now() });
           setPriceHistory((prevH) => {
             const next = [...prevH, msg.price];
             return next.length > MAX_HISTORY ? next.slice(-MAX_HISTORY) : next;
@@ -166,6 +173,8 @@ export function useBinancePrice(): UseBinancePriceResult {
             high24h: parseFloat(d.h),
             low24h: parseFloat(d.l),
             volume24h: parseFloat(d.v),
+            source: "SPOT",
+            priceTs: Date.now(),
           });
         } catch {
           // Skip malformed message

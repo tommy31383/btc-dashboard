@@ -8,9 +8,8 @@ export function useTrend(rawKlines: RawKlinesMap): TrendResult {
     const k4 = rawKlines["4h"] ?? [];
     const k1 = rawKlines["1h"] ?? [];
     return computeTrend({
-      closes4h: k4.map((k) => k.close),
-      closes1h: k1.map((k) => k.close),
       klines4h: k4,
+      klines1h: k1,
     });
   }, [rawKlines]);
 }

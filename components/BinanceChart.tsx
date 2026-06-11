@@ -17,7 +17,7 @@ import Svg, {
 } from "react-native-svg";
 import { COLORS, TIMEFRAMES, TimeframeKey } from "../utils/constants";
 import { P } from "../utils/v2Theme";
-import { Kline, RawKlinesMap } from "../hooks/useBinanceKlines";
+import { Kline, RawKlinesMap, closedKlines as getClosedKlines } from "../hooks/useBinanceKlines";
 import {
   calcRSISeriesAligned,
   calcStochRSISeries,
@@ -75,8 +75,10 @@ function BinanceChartInner({ rawKlines, selectedTF, onSelectTF }: Props) {
   // Support / Resistance levels — auto-tune params per TF
   const srLevels = useMemo<SRLevel[]>(() => {
     if (!showSR || klines.length < 30) return [];
-    const last = klines[klines.length - 1];
-    const currentPrice = last.close;
+    // v4.x (Chart V2 #3A): S/R chỉ tính từ CLOSED bars. Cây đang hình thành chưa đủ `rightBars`
+    // để xác nhận pivot → nếu tính kèm sẽ tạo level "ma" xuất hiện rồi biến mất mỗi tick.
+    const closedKlines = getClosedKlines(klines);
+    const currentPrice = klines[klines.length - 1].close;
     // Tighter tolerance for shorter TFs (micro structure), looser for longer (macro)
     const tfTune: Record<string, { left: number; right: number; tol: number; minTouches: number }> = {
       "5m":  { left: 3, right: 3, tol: 0.15, minTouches: 2 },
@@ -88,7 +90,7 @@ function BinanceChartInner({ rawKlines, selectedTF, onSelectTF }: Props) {
       "1M":  { left: 3, right: 3, tol: 2.50, minTouches: 2 },
     };
     const t = tfTune[selectedTF] || tfTune["1h"];
-    return detectSRLevels(klines, currentPrice, {
+    return detectSRLevels(closedKlines, currentPrice, {
       leftBars: t.left,
       rightBars: t.right,
       tolerancePct: t.tol,
