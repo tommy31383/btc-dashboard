@@ -1,0 +1,67 @@
+{
+  "audit_of": "PV_EVOLVER_v2 frozen champion",
+  "champion": {
+    "tf": "4h",
+    "L": 3,
+    "volMult": 1.899,
+    "minRiskPct": 1.353,
+    "dir": "LS",
+    "exitMode": "flip",
+    "tpR": 0.0
+  },
+  "plateau": {
+    "n_neighbors": 105,
+    "median": -25.0,
+    "q25_worst": -48.05,
+    "min": -1020.12,
+    "max": 37.75,
+    "passRate_gates": 0.05
+  },
+  "cluster": {
+    "largest_cluster": 35,
+    "n_clusters": 3,
+    "champion_cluster_size": 35,
+    "champion_cluster_frac": 0.33,
+    "champion_cluster_scores_median": 22.47
+  },
+  "bootstrap": {
+    "trade_CI": {
+      "lo": 0.053,
+      "med": 0.386,
+      "hi": 0.797
+    },
+    "block_CI": {
+      "lo": 0.082,
+      "med": 0.364,
+      "hi": 0.717
+    },
+    "n_val_trades": 89
+  },
+  "fee_slippage_stress": [
+    {
+      "mult": 1.0,
+      "n": 89,
+      "mean": 0.393,
+      "PF": 2.06
+    },
+    {
+      "mult": 1.5,
+      "n": 89,
+      "mean": 0.38,
+      "PF": 2.0
+    },
+    {
+      "mult": 2.0,
+      "n": 89,
+      "mean": 0.368,
+      "PF": 1.95
+    }
+  ],
+  "verdict": "RESEARCH_ONLY_FRAGILE",
+  "reject_reasons": [
+    "ch\u1ec9 5% h\u00e0ng x\u00f3m pass gates (<70%)",
+    "q25 plateau -48.0 < 0 (s\u01b0\u1eddn d\u1ed1c)",
+    "champion cluster ch\u1ec9 33% (<50% \u2014 s\u1ed1ng 1 \u0111i\u1ec3m)"
+  ],
+  "note": "Audit c\u1ee7a v2 \u0111\u00e3 freeze; KH\u00d4NG \u0111\u1ed5i search space. PLATEAU_ROBUST m\u1edbi \u0111\u1ee7 \u0111i\u1ec1u ki\u1ec7n t\u1ea1o paper logger."
+}

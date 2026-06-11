@@ -123,5 +123,14 @@
         "score": 1.96
       }
     ]
-  }
+  },
+  "status": "RESEARCH_ONLY_FRAGILE",
+  "robustness_verdict": "RESEARCH_ONLY_FRAGILE",
+  "robustness_reject_reasons": [
+    "ch\u1ec9 5% h\u00e0ng x\u00f3m pass gates (<70%)",
+    "q25 plateau -48.0 < 0 (s\u01b0\u1eddn d\u1ed1c)",
+    "champion cluster ch\u1ec9 33% (<50% \u2014 s\u1ed1ng 1 \u0111i\u1ec3m)"
+  ],
+  "robustness_audit_file": "robustness-audit.json",
+  "paper_logger": "NOT created \u2014 requires PLATEAU_ROBUST (parameter cliff: only 5% neighbors pass, q25 score -48)"
 }
