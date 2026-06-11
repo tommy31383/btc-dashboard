@@ -1,11 +1,22 @@
 ---
 name: btc-predict
-description: Dự báo BTC khung ngày — tổng hợp median OHLC từng cây nến tương lai từ 15 kịch bản lịch sử tương tự, vẽ thành "predicted candles" với Q25-Q75 band. Dùng khi Tommy hỏi "BTC sẽ đi đâu?", "dự báo giá", "predict path", "forecast candles".
+description: Phân phối kết quả lịch sử BTC khung ngày — tổng hợp median OHLC từng cây nến tương lai từ 15 cửa sổ lịch sử giống hình dạng, vẽ kèm Q25-Q75 band. KHÔNG phải dự báo có edge (đã falsify OOS + R1). Dùng khi Tommy hỏi "lịch sử sau tình huống này thường đi đâu?", "phân phối analog". KHÔNG dùng làm tín hiệu vào lệnh.
 ---
 
-# BTC Predict — Composite Candle Forecast
+# BTC Predict — Historical Analog Distribution (NOT a forecast)
 
-Chạy script dự báo:
+> ⚠️ **KHÔNG PHẢI DỰ BÁO CÓ EDGE.** Phương pháp này (tìm cửa sổ lịch sử giống → median forward)
+> đã được kiểm chứng và **KHÔNG vượt base-rate**:
+> - Backtest OOS: median không beat base-rate.
+> - Nghiên cứu R1 (analog-retrieval, 2026-06, pre-registered): CRPS **tệ hơn** climatology
+>   (skill −0.0533, CI [−0.061, −0.045]); Spearman IC ≈ 0 (CI băng qua 0).
+> - Band Q25–Q75 **hẹp giả tạo** (analog chồng lấn forward → không độc lập); analog **trộn regime**.
+>
+> Output chỉ là **context lịch sử qualitative**. **Context-only — KHÔNG dùng cho entry, sizing, TP/SL,
+> hay bất kỳ quyết định trading nào.** Số "+30D median / endpoint" luôn phải đọc kèm Q25/Q75 + số mẫu +
+> effective independent sample; không bao giờ coi là price target.
+
+Chạy script:
 
 ```bash
 python3 $HOME/.claude/skills/btc-predict/btc_predict.py

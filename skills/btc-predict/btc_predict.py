@@ -5,25 +5,61 @@ Tổng hợp OHLC trung bình từng cây nến tương lai của các kịch b�
 Output: /tmp/btc_predict.html
 """
 
-import json, urllib.request, ssl, os, base64, subprocess
+import json, urllib.request, ssl, os, base64, subprocess, time, sys
 from datetime import datetime, timezone, timedelta
 import statistics
 
-_SSL_CTX = ssl.create_default_context()
-_SSL_CTX.check_hostname = False
-_SSL_CTX.verify_mode   = ssl.CERT_NONE
+# Console may be cp1252 (Windows) → force UTF-8 so unicode in logs never crashes.
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 
+# TLS verification ON (default verified context). Never CERT_NONE.
+_SSL_CTX = ssl.create_default_context()
+
+import tempfile
 CACHE_PATH   = os.environ.get("BTC_5M_CACHE") or os.path.expanduser("~/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json")
 BINANCE_BASE = "https://api.binance.com/api/v3"
-CHART_PATH   = "/tmp/btc_predict_chart.png"
-HTML_PATH    = "/tmp/btc_predict.html"
-RESULT_PATH  = "/tmp/btc_predict_result.json"
+_TMP         = tempfile.gettempdir()  # cross-platform temp dir (not hardcoded /tmp)
+CHART_PATH   = os.path.join(_TMP, "btc_predict_chart.png")
+HTML_PATH    = os.path.join(_TMP, "btc_predict.html")
+RESULT_PATH  = os.path.join(_TMP, "btc_predict_result.json")
 
 LOOK_BACK    = 14   # days of context for matching
-LOOK_FWD     = 30   # days of prediction forward
+LOOK_FWD     = 30   # days of forward continuation collected
 CONTEXT_DAYS = 30   # days of current candles to show on left
 MAX_MATCHES  = 15
-DEDUP_DAYS   = 14
+# Dedup gap >= LOOK_FWD so the FORWARD windows of kept analogs do NOT overlap
+# → each kept analog is a block-independent sample (no double counting).
+DEDUP_DAYS   = LOOK_FWD
+# Future RSI line is illustrative only (derived from the median path) → hidden by default.
+SHOW_PRED_RSI = os.environ.get("BTC_SHOW_PRED_RSI") == "1"
+
+# Required disclaimer text (asserted by regression tests). Do NOT weaken.
+DISCLAIMER_LINES = [
+    "NOT A FORECAST / NOT A TRADING SIGNAL",
+    "R1 primary result: CRPS skill -0.0533, IC 0.0101",
+    "Analog method did not beat climatology.",
+]
+
+def disclaimer_banner(n_eff):
+    """Red HTML disclaimer banner. Embeds the required DISCLAIMER_LINES verbatim
+    plus the effective-independent-sample count. Pure + testable."""
+    return f"""<div class="section" style="background:#2a0f12;border:1px solid #b03030">
+  <h3 style="color:#ef5350">⚠️ {DISCLAIMER_LINES[0]}</h3>
+  <p style="color:#e0b0b0;font-size:12px;line-height:1.6;margin:0">
+    Đây là <strong>historical analog distribution</strong> — phân phối kết quả lịch sử của các cửa sổ 14D
+    giống hiện tại về hình dạng. <strong>{DISCLAIMER_LINES[0]}.</strong>
+    <br>• <strong>{DISCLAIMER_LINES[1]}</strong> — {DISCLAIMER_LINES[2]}
+    <br>• Backtest OOS: median historical continuation không beat base-rate.
+    <br>• Band Q25–Q75 phản ánh <strong>{n_eff} effective independent samples</strong> (forward windows
+    không overlap sau dedup); ít mẫu → band rộng và kém tin cậy.
+    <br>• Các analog <strong>trộn nhiều regime</strong> (bull/bear) — không tách.
+    <br><strong>Không dùng cho entry / sizing / TP / SL.</strong>
+  </p>
+</div>"""
 
 
 # ─── helpers ──────────────────────────────────────────────────────────────────
@@ -37,6 +73,31 @@ def fetch_binance(interval, limit):
 
 def parse_kline(k):
     return [int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])]
+
+def drop_partial_daily(raw_klines, now_ms, interval_ms=86_400_000):
+    """Drop the still-forming (not yet closed) trailing daily candle.
+    Binance kline[6] is close time; a bar is closed only if now_ms >= close_time.
+    Pure + testable; no network."""
+    closed = []
+    for k in raw_klines:
+        open_ms = int(k[0])
+        close_ms = int(k[6]) if len(k) > 6 else open_ms + interval_ms - 1
+        if now_ms >= close_ms:
+            closed.append(k)
+    return closed
+
+def dedup_nonoverlap(matches, min_gap, max_n):
+    """Keep highest-score analogs whose indices are >= min_gap apart so their
+    FORWARD windows do not overlap (block-independent). Pure + testable.
+    `matches` must each have 'hist_index' and 'score'. Returns kept list."""
+    ordered = sorted(matches, key=lambda x: -x['score'])
+    kept = []
+    for m in ordered:
+        if not any(abs(m['hist_index'] - p['hist_index']) < min_gap for p in kept):
+            kept.append(m)
+        if len(kept) >= max_n:
+            break
+    return kept
 
 def aggregate(bars_list, interval_hours):
     ms = interval_hours * 3600 * 1000
@@ -302,7 +363,12 @@ def draw_prediction_chart(live_bars, predicted, matches_summary, cur_close, cur_
     # ── 4. RSI panel ─────────────────────────────────────────────────────────
     live_x = list(range(n_live))
     ax2.plot(live_x, rsi_live, color='#9c27b0', linewidth=1.2)
-    ax2.plot(pred_xs, pred_rsi, color='#9c27b0', linewidth=1, linestyle=':', alpha=0.6)
+    # Future RSI is derived from the median illustrative path → hidden by default.
+    if SHOW_PRED_RSI:
+        ax2.plot(pred_xs, pred_rsi, color='#9c27b0', linewidth=1, linestyle=':', alpha=0.6,
+                 label='RSI (derived from median illustrative path)')
+        ax2.legend(loc='upper right', fontsize=6, framealpha=0.2,
+                   facecolor='#111', edgecolor='#333', labelcolor=FG)
     ax2.axhline(70, color='#ef5350', linewidth=0.5, linestyle='--', alpha=0.5)
     ax2.axhline(30, color='#26a69a', linewidth=0.5, linestyle='--', alpha=0.5)
     ax2.set_ylim(0, 100)
@@ -348,9 +414,9 @@ def draw_prediction_chart(live_bars, predicted, matches_summary, cur_close, cur_
     legend_elements = [
         mpatches.Patch(facecolor=BULL, label='Nến thực (tăng)'),
         mpatches.Patch(facecolor=BEAR, label='Nến thực (giảm)'),
-        mpatches.Patch(facecolor=PRED_BULL, alpha=0.5, label='Predicted (tăng)'),
-        mpatches.Patch(facecolor=PRED_BEAR, alpha=0.5, label='Predicted (giảm)'),
-        Line2D([0], [0], color=BAND_COL, linestyle=':', label='Median close'),
+        mpatches.Patch(facecolor=PRED_BULL, alpha=0.5, label='Analog median (up)'),
+        mpatches.Patch(facecolor=PRED_BEAR, alpha=0.5, label='Analog median (down)'),
+        Line2D([0], [0], color=BAND_COL, linestyle=':', label='Median historical continuation'),
         mpatches.Patch(facecolor=BAND_COL, alpha=0.2, label='Q25-Q75 band'),
     ]
     ax1.legend(handles=legend_elements, loc='upper left', fontsize=8,
@@ -364,15 +430,15 @@ def draw_prediction_chart(live_bars, predicted, matches_summary, cur_close, cur_
     col30 = '#26a69a' if med30 >= 0 else '#ef5350'
 
     fig.suptitle(
-        f'BTC Predicted Path — {cur_date} · '
-        f'{n_match} kịch bản tương tự · '
-        f'+30D median: {med30:+.1f}% · '
-        f'Win30D: {win30}/{n_match}',
+        f'BTC Historical Analog Distribution (NOT a forecast) — {cur_date} · '
+        f'{n_match} kịch bản giống hình dạng · '
+        f'+30D analog median: {med30:+.1f}% · '
+        f'Up30D: {win30}/{n_match}',
         color=TITLE_COL, fontsize=13, fontweight='bold', y=0.98
     )
 
     ax1.text(div_x + 0.5, ymax * 0.9995,
-             f'  ▶ Predicted path\n  ({n_match} analogs)',
+             f'  ▶ Analog median path — NO proven edge\n  ({n_match} analogs, overlapping → band too tight)',
              color='#ffa726', fontsize=9, va='top')
 
     plt.savefig(CHART_PATH, dpi=150, bbox_inches='tight',
@@ -385,6 +451,12 @@ def draw_prediction_chart(live_bars, predicted, matches_summary, cur_close, cur_
 
 def main():
     print("Loading 7y cache...")
+    if not os.path.exists(CACHE_PATH):
+        raise SystemExit(
+            f"ERROR: cache not found: {CACHE_PATH}\n"
+            f"Set BTC_5M_CACHE to the binance 5m/1h 7y json, e.g.:\n"
+            f"  export BTC_5M_CACHE=/path/to/binance-5m-7y.json"
+        )
     with open(CACHE_PATH) as f:
         raw = json.load(f)
 
@@ -392,6 +464,9 @@ def main():
 
     print("Fetching live 1D from Binance...")
     live_raw = fetch_binance('1d', 90)  # extra warmup for RSI
+    # Exclude the still-forming daily candle (close-time gating) → no partial bar.
+    now_ms = int(time.time() * 1000)
+    live_raw = drop_partial_daily(live_raw, now_ms)
     live_1d  = [parse_kline(k) for k in live_raw]
 
     # Current structure (last LOOK_BACK bars)
@@ -545,17 +620,13 @@ def main():
             'future_bars': future_bars,
         })
 
-    # Dedup + take top MAX_MATCHES
-    matches.sort(key=lambda x: -x['score'])
-    deduped = []
-    for m in matches:
-        if not any(abs(m['hist_index'] - p['hist_index']) < DEDUP_DAYS for p in deduped):
-            deduped.append(m)
-        if len(deduped) >= MAX_MATCHES:
-            break
-
+    # Dedup so kept analogs' FORWARD windows do not overlap (block-independent).
+    deduped = dedup_nonoverlap(matches, DEDUP_DAYS, MAX_MATCHES)
     top = sorted(deduped, key=lambda x: x['hist_index'])
-    print(f"Found {len(matches)} matches → top {len(top)} after dedup")
+    # Effective independent sample: with non-overlapping forward windows each kept
+    # analog is one block → n_eff == number of kept analogs (no double counting).
+    n_eff = len(top)
+    print(f"Found {len(matches)} raw matches → {len(top)} non-overlapping analogs (n_eff={n_eff})")
 
     # ── Aggregate future OHLC — weighted by similarity score ────────────────
     def weighted_median(vals_weights):
@@ -629,6 +700,7 @@ def main():
         'drop_from_peak': round(drop_from_peak, 1),
         'pos_in_range': round(pos_in_range, 1),
         'n_matches': len(top),
+        'n_effective_independent': n_eff,
         'matches': [{k: v for k, v in m.items() if k != 'future_bars'} for m in top],
         'predicted': predicted,
     }
@@ -690,6 +762,17 @@ def main():
         </tr>"""
 
     med30_col = '#26a69a' if med30 >= 0 else '#ef5350'
+    # +30D illustrative endpoint — NEVER shown alone: always with Q25/Q75 + n.
+    p30 = predicted[-1] if predicted else None
+    if p30:
+        endpoint_html = (
+            f"${p30['median_c']:,.0f} "
+            f"<span style='font-size:11px;color:#777'>"
+            f"(Q25–Q75 {p30['q25_c_pct']:+.1f}%~{p30['q75_c_pct']:+.1f}%, "
+            f"n={p30['n']}, n_eff={n_eff})</span>"
+        )
+    else:
+        endpoint_html = "—"
     html = f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -719,28 +802,30 @@ def main():
 <body>
 <div class="container">
 
-<h1>🔮 BTC Predicted Path</h1>
-<h2>Generated {result['generated_at']} · {len(result['matches'])} analog scenarios · {LOOK_FWD}D composite forecast</h2>
+<h1>📊 BTC Historical Analog Distribution</h1>
+<h2>Generated {result['generated_at']} · {len(result['matches'])} analog scenarios · {LOOK_FWD}D — context only, NOT a forecast</h2>
+
+{disclaimer_banner(n_eff)}
 
 <div class="section">
   <h3>Summary</h3>
   <div class="badges">
     <div class="badge"><div class="badge-label">Current Price</div><div class="badge-value">${cur_close:,.0f}</div></div>
     <div class="badge"><div class="badge-label">14D Drop</div><div class="badge-value">{drop_from_peak:+.1f}%</div></div>
-    <div class="badge"><div class="badge-label">Analogs Found</div><div class="badge-value">{len(result['matches'])}</div></div>
-    <div class="badge"><div class="badge-label">+30D Median</div><div class="badge-value" style="color:{med30_col}">{med30:+.1f}%</div></div>
-    <div class="badge"><div class="badge-label">Win Rate +30D</div><div class="badge-value">{win30}/{len(d30s)}</div></div>
-    <div class="badge"><div class="badge-label">+30D Target</div><div class="badge-value">${cur_close*(1+med30/100):,.0f}</div></div>
+    <div class="badge"><div class="badge-label">Analogs (raw / effective indep.)</div><div class="badge-value">{len(result['matches'])} / {n_eff}</div></div>
+    <div class="badge"><div class="badge-label">+30D median continuation</div><div class="badge-value" style="color:{med30_col}">{med30:+.1f}%</div></div>
+    <div class="badge"><div class="badge-label">Up rate +30D (hist)</div><div class="badge-value">{win30}/{len(d30s)}</div></div>
+    <div class="badge"><div class="badge-label">+30D illustrative endpoint (NOT a target)</div><div class="badge-value" style="color:#888;font-size:14px">{endpoint_html}</div></div>
   </div>
 </div>
 
 <div class="section" style="padding:12px">
-  <h3 style="margin-bottom:10px">Composite Predicted Path ({len(result['matches'])} analogs)</h3>
+  <h3 style="margin-bottom:10px">Historical analog distribution ({len(result['matches'])} analogs · {n_eff} effective independent)</h3>
   <img src="data:image/png;base64,{chart_b64}" class="chart-img" alt="Prediction Chart">
 </div>
 
 <div class="section">
-  <h3>Predicted OHLC by Day</h3>
+  <h3>Median historical continuation by day</h3>
   <div style="overflow-x:auto">
   <table>
     <thead>
@@ -788,7 +873,17 @@ def main():
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html)
     print(f"HTML saved → {HTML_PATH}")
-    subprocess.Popen(['open', HTML_PATH])
+    # Cross-platform open (macOS `open`, Windows `start`, Linux `xdg-open`).
+    import sys
+    try:
+        if sys.platform == 'darwin':
+            subprocess.Popen(['open', HTML_PATH])
+        elif sys.platform.startswith('win'):
+            os.startfile(HTML_PATH)  # type: ignore[attr-defined]
+        else:
+            subprocess.Popen(['xdg-open', HTML_PATH])
+    except Exception as e:
+        print(f"(could not auto-open browser: {e})")
 
 
 if __name__ == '__main__':
