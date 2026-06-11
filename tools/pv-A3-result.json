@@ -1,0 +1,243 @@
+{
+  "tf": "4h",
+  "n": 14805,
+  "L_rightBars": 2,
+  "pivot_confirm_delay_bars": 2,
+  "n_hypotheses": 16,
+  "bonferroni_p": 0.00313,
+  "status": "DEVELOPMENT FEATURE TRIAGE \u2014 NOT OOS validation, NOT a strategy. All data <=2026-06 already seen.",
+  "conditional_layer": "SKIPPED \u2014 pre-specified dependency outcome (A1 & A2 both DROP, no KEEP-feature to condition on). NOT a post-hoc protocol change.",
+  "prereg": "prereg-A3-structure-context.md (locked)",
+  "events": {
+    "BOS_UP": {
+      "n_total": 388,
+      "mean_pivot_to_confirm_delay": 5.22,
+      "horizons": {
+        "1": {
+          "n": 388,
+          "mean": 0.0735,
+          "median": -0.0511,
+          "hitrate": 46.4,
+          "upMFE": 1.079,
+          "dnMAE": -0.87,
+          "rank_biserial": -0.029,
+          "p": 0.3334,
+          "bonferroni_pass": false,
+          "year_sign": "5/7"
+        },
+        "3": {
+          "n": 388,
+          "mean": 0.1568,
+          "median": -0.0626,
+          "hitrate": 47.9,
+          "upMFE": 1.795,
+          "dnMAE": -1.509,
+          "rank_biserial": -0.008,
+          "p": 0.79306,
+          "bonferroni_pass": false,
+          "year_sign": "5/7"
+        },
+        "6": {
+          "n": 388,
+          "mean": 0.3021,
+          "median": -0.1171,
+          "hitrate": 48.5,
+          "upMFE": 2.734,
+          "dnMAE": -2.212,
+          "rank_biserial": -0.012,
+          "p": 0.69407,
+          "bonferroni_pass": false,
+          "year_sign": "5/7"
+        },
+        "12": {
+          "n": 388,
+          "mean": 0.2843,
+          "median": -0.1823,
+          "hitrate": 47.7,
+          "upMFE": 3.647,
+          "dnMAE": -3.111,
+          "rank_biserial": -0.023,
+          "p": 0.43772,
+          "bonferroni_pass": false,
+          "year_sign": "4/7"
+        }
+      }
+    },
+    "BOS_DOWN": {
+      "n_total": 293,
+      "mean_pivot_to_confirm_delay": 5.25,
+      "horizons": {
+        "1": {
+          "n": 293,
+          "mean": -0.011,
+          "median": 0.0841,
+          "hitrate": 53.6,
+          "upMFE": 1.079,
+          "dnMAE": -1.563,
+          "rank_biserial": 0.013,
+          "p": 0.71098,
+          "bonferroni_pass": false,
+          "year_sign": "4/8"
+        },
+        "3": {
+          "n": 293,
+          "mean": -0.0139,
+          "median": 0.1831,
+          "hitrate": 53.6,
+          "upMFE": 1.788,
+          "dnMAE": -2.429,
+          "rank_biserial": 0.019,
+          "p": 0.57479,
+          "bonferroni_pass": false,
+          "year_sign": "4/8"
+        },
+        "6": {
+          "n": 293,
+          "mean": 0.1128,
+          "median": 0.3335,
+          "hitrate": 56.0,
+          "upMFE": 2.606,
+          "dnMAE": -3.351,
+          "rank_biserial": 0.042,
+          "p": 0.21366,
+          "bonferroni_pass": false,
+          "year_sign": "5/8"
+        },
+        "12": {
+          "n": 293,
+          "mean": 0.1122,
+          "median": 0.5364,
+          "hitrate": 55.6,
+          "upMFE": 3.632,
+          "dnMAE": -4.317,
+          "rank_biserial": 0.02,
+          "p": 0.55461,
+          "bonferroni_pass": false,
+          "year_sign": "3/8"
+        }
+      }
+    },
+    "CHOCH_UP": {
+      "n_total": 319,
+      "mean_pivot_to_confirm_delay": 5.91,
+      "horizons": {
+        "1": {
+          "n": 319,
+          "mean": 0.1536,
+          "median": -0.0409,
+          "hitrate": 47.0,
+          "upMFE": 1.054,
+          "dnMAE": -0.748,
+          "rank_biserial": -0.01,
+          "p": 0.76337,
+          "bonferroni_pass": false,
+          "year_sign": "5/7"
+        },
+        "3": {
+          "n": 319,
+          "mean": 0.2181,
+          "median": -0.0123,
+          "hitrate": 49.5,
+          "upMFE": 1.766,
+          "dnMAE": -1.411,
+          "rank_biserial": 0.011,
+          "p": 0.72954,
+          "bonferroni_pass": false,
+          "year_sign": "6/7"
+        },
+        "6": {
+          "n": 319,
+          "mean": 0.0836,
+          "median": -0.2774,
+          "hitrate": 46.4,
+          "upMFE": 2.461,
+          "dnMAE": -2.124,
+          "rank_biserial": -0.047,
+          "p": 0.1497,
+          "bonferroni_pass": false,
+          "year_sign": "3/7"
+        },
+        "12": {
+          "n": 319,
+          "mean": 0.3559,
+          "median": -0.1607,
+          "hitrate": 47.0,
+          "upMFE": 3.478,
+          "dnMAE": -3.024,
+          "rank_biserial": -0.023,
+          "p": 0.49039,
+          "bonferroni_pass": false,
+          "year_sign": "5/7"
+        }
+      }
+    },
+    "CHOCH_DOWN": {
+      "n_total": 320,
+      "mean_pivot_to_confirm_delay": 6.42,
+      "horizons": {
+        "1": {
+          "n": 320,
+          "mean": 0.0087,
+          "median": 0.1248,
+          "hitrate": 56.2,
+          "upMFE": 0.839,
+          "dnMAE": -1.122,
+          "rank_biserial": 0.049,
+          "p": 0.13036,
+          "bonferroni_pass": false,
+          "year_sign": "3/7"
+        },
+        "3": {
+          "n": 320,
+          "mean": 0.0366,
+          "median": 0.0861,
+          "hitrate": 54.1,
+          "upMFE": 1.517,
+          "dnMAE": -1.745,
+          "rank_biserial": 0.003,
+          "p": 0.9187,
+          "bonferroni_pass": false,
+          "year_sign": "3/7"
+        },
+        "6": {
+          "n": 320,
+          "mean": 0.1111,
+          "median": 0.1984,
+          "hitrate": 55.6,
+          "upMFE": 2.204,
+          "dnMAE": -2.457,
+          "rank_biserial": 0.008,
+          "p": 0.81693,
+          "bonferroni_pass": false,
+          "year_sign": "6/7"
+        },
+        "12": {
+          "n": 319,
+          "mean": 0.2942,
+          "median": 0.2211,
+          "hitrate": 53.9,
+          "upMFE": 3.188,
+          "dnMAE": -3.294,
+          "rank_biserial": 0.009,
+          "p": 0.77505,
+          "bonferroni_pass": false,
+          "year_sign": "5/6"
+        }
+      }
+    }
+  },
+  "neighborhood_h6_rb": {
+    "L2": {
+      "BOS_UP": -0.012,
+      "BOS_DOWN": 0.042,
+      "CHOCH_UP": -0.047,
+      "CHOCH_DOWN": 0.008
+    },
+    "L3": {
+      "BOS_UP": -0.012,
+      "BOS_DOWN": 0.073,
+      "CHOCH_UP": -0.066,
+      "CHOCH_DOWN": -0.035
+    }
+  }
+}
