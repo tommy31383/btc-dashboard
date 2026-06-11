@@ -11,6 +11,17 @@ Canonical registry cho mọi dataset backtest. Mỗi entry có **tên (key)** + 
 
 ## 🟢 ACTIVE — current canonical
 
+### `REGIME_CLASSIFIER_v1`
+- **Type:** Regime BEAR-definition A/B + persistBars sweep (train/OOS)
+- **Date:** 2026-06-11
+- **Tool:** `tools/regime-classifier-7y-local.py` (+ `tools/fetch-7y-local.py`, 3y variant `tools/regime-classifier-3y-local.py`)
+- **Report MD:** `docs/regime-classifier-2026-06-11.md`
+- **Data:** `.cache/binance-1h-7y.json` (sha256 `D7CF3C66FC438B69..`, 59,219×1h, 2019-09-08→2026-06-11) + `.cache/binance-funding-7y.json` (sha256 `89AC541F38568E7C..`, 7,398 recs). Source: `fapi.binance.com`. Fetched 2026-06-11.
+- **Engines:** hedge01 v0.4.79 + turtle (faithful), $100k, fee 0.05%/side. Split TRAIN 2019–2023 / OOS 2024–2026.
+- **#6 verdict:** **KEEP classifier A** (`close<MA200`, = `regime.ts` hiện tại). A robust train(Sh1.32)+OOS(Sh2.04), bảo vệ real-bear 2022/2026 = 0%. **C/D = REJECTED** (D overfit: train Sh1.41 cao nhất nhưng OOS 1.78<A; full-7y chỉ lời nhờ re-enter real-bear 2022 −15%). **E*/drawdown = RESEARCH-ONLY**, không đưa live.
+- **P0 verdict:** `persistBars=1` thắng train(Sh1.55)+OOS(Sh2.13)+full-7y(Sh1.70/+$279k) > pb2 > **pb3 (default hiện tại, tệ nhất Sh1.54/+$250k)**. Đề xuất đổi default 3→1 (validated OOS, chờ Tommy chốt). Áp dụng cùng Option B timestamp-guard (server `regime.ts` `stepRegimePersist`).
+- **Status:** active · server-side change (P0 persistence) ở `btc-trader-server`, chưa deploy.
+
 ### `TPSL_GRID_v1`
 - **Type:** TP × SL grid sweep
 - **Date:** 2026-04-28

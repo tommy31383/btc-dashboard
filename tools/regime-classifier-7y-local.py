@@ -92,7 +92,7 @@ def _persist(raw,pn=PERSIST):
         out[i]=cur
     return out
 
-def classify(b1d,mode):
+def classify(b1d,mode,persist=PERSIST):
     cs=[b["close"] for b in b1d]; n=len(b1d); raw=["RANGE"]*n; rh=[None]*n
     for i in range(n): rh[i]=max(cs[max(0,i-365):i+1])
     for i in range(200,n):
@@ -109,7 +109,7 @@ def classify(b1d,mode):
         else: raise ValueError(mode)
         if bear: raw[i]="BEAR"
         elif bull: raw[i]="BULL"
-    return _persist(raw)
+    return _persist(raw,persist)
 
 print("Loading 1h 7y -> 4h/1h/1d...")
 RAW=json.load(open(CACHE)); RAW.sort(key=lambda x:x["time"])
@@ -301,3 +301,49 @@ for m in CLASSIFIERS:
     print(f"  {m:>4} | {h['sharpe']-hA['sharpe']:>+8.2f} | {h['dollars']-hA['dollars']:>+10,.0f} | {t['total']-tA['total']:>+8.0f} | "
           f"{h['by_yr'].get(2022,0)*100:>+6.0f}% | {h['by_yr'].get(2026,0)*100:>+6.0f}% | {t['by_yr'].get(2022,0):>+8.0f} | {t['by_yr'].get(2026,0):>+8.0f}")
 print("\n  GUARD: 2022 & 2026 must stay near A. Pumping them => re-entering real bear => REJECT.")
+
+print("\n"+"="*84); print("TASK D — persistBars sweep (classifier A): 1 vs 2 vs 3 daily-bar debounce"); print("="*84)
+print("  Cảnh báo Tommy: ĐỪNG mặc định 3 ngày tốt hơn — đo thực tế. (persistBars = số daily-close")
+print("  liên tiếp cần để LẬT regime. 1 = lật ngay; 3 = chậm ~3 ngày.)\n")
+print(f"  {'pBars':>5} | {'h01 n':>5} | {'h01 Sh':>7} | {'h01 $':>10} | {'h01 MaxDD%':>10} | {'turt $':>7} | {'turt Sh':>7}")
+for pb in (1, 2, 3):
+    key = f"Apb{pb}"
+    LABELS[key] = classify(bars1d, "A", pb)
+    REGMAP[key] = {BD[i]["time"]//DAY: LABELS[key][i] for i in range(nd)}
+    h = h1_stats(run_h01(key)); pt, W = run_turtle(key); t = t_stats(pt, W)
+    print(f"  {pb:>5} | {h['n']:>5} | {h['sharpe']:>7.2f} | {h['dollars']:>+10,.0f} | {h['mdd']:>9.0f}% | {t['total']:>+7.0f} | {t['sharpe']:>7.2f}")
+print("\n  hedge01 per-year ROI% theo persistBars:")
+for pb in (1, 2, 3):
+    h = h1_stats(run_h01(f"Apb{pb}"))
+    print(f"   pb={pb}: " + " ".join(f"{y}:{h['by_yr'].get(y,0)*100:+.0f}" for y in sorted(h['by_yr'])))
+
+# ===================== TASK E: TRAIN/OOS split =====================
+# Tommy: "chốt tham số bằng TRAIN rồi mới mở OOS; không tune trên toàn 7y."
+TRAIN_LO, TRAIN_HI = 2019, 2023
+OOS_LO, OOS_HI = 2024, 2026
+def h1_range(trades, lo, hi):
+    return h1_stats([t for t in trades if lo <= t["yr"] <= hi])
+def t_range(pnl, lo, hi):
+    W = max(T_DON_ENTRY, 200)
+    idx = [i for i in range(W, nd) if lo <= datetime.datetime.utcfromtimestamp(BD[i]["time"]/1000).year <= hi]
+    series = [pnl[i] for i in idx]
+    if not series: return dict(total=0, sharpe=0)
+    s = sum(series); mean = s/len(series); sd = (sum((x-mean)**2 for x in series)/len(series))**0.5 or 1e-9
+    return dict(total=s, sharpe=mean/sd*math.sqrt(365))
+
+print("\n"+"="*84); print(f"TASK E — TRAIN ({TRAIN_LO}-{TRAIN_HI}) vs OOS ({OOS_LO}-{OOS_HI})"); print("="*84)
+print("  Chọn tham số trên TRAIN, xác nhận trên OOS. Không chốt bằng full-7y in-sample.\n")
+print("  persistBars (classifier A) — h01 Sharpe & $ :")
+print(f"  {'pBars':>5} | {'TRAIN Sh':>8} | {'TRAIN $':>9} | {'OOS Sh':>7} | {'OOS $':>9}")
+for pb in (1, 2, 3):
+    tr = run_h01(f"Apb{pb}")
+    htr = h1_range(tr, TRAIN_LO, TRAIN_HI); hoos = h1_range(tr, OOS_LO, OOS_HI)
+    print(f"  {pb:>5} | {htr['sharpe']:>8.2f} | {htr['dollars']:>+9,.0f} | {hoos['sharpe']:>7.2f} | {hoos['dollars']:>+9,.0f}")
+
+print("\n  classifier A-E (persistBars=3) — h01 Sharpe & $ :")
+print(f"  {'cls':>4} | {'TRAIN Sh':>8} | {'TRAIN $':>9} | {'OOS Sh':>7} | {'OOS $':>9}")
+for m in ["A", "B", "C", "D", "E", "E15", "E25", "E30"]:
+    tr = run_h01(m)
+    htr = h1_range(tr, TRAIN_LO, TRAIN_HI); hoos = h1_range(tr, OOS_LO, OOS_HI)
+    print(f"  {m:>4} | {htr['sharpe']:>8.2f} | {htr['dollars']:>+9,.0f} | {hoos['sharpe']:>7.2f} | {hoos['dollars']:>+9,.0f}")
+print("\n  (E* = drawdown variants = RESEARCH-ONLY, không đưa live. C/D = rejected.)")
