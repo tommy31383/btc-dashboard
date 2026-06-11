@@ -1,0 +1,70 @@
+{
+  "version": "PV_EVOLVER_v2",
+  "seed": 20260611,
+  "started": "2026-06-11T05:43:42Z",
+  "data_file": "binance-1h-7y.json",
+  "data_sha256_16": "d7cf3c66fc438b69",
+  "round_cap": 30000,
+  "hof_size": 12,
+  "fee_per_side": 0.0005,
+  "shrink_K": 10.0,
+  "windows": [
+    {
+      "train": [
+        2019,
+        2021
+      ],
+      "val": 2022
+    },
+    {
+      "train": [
+        2019,
+        2022
+      ],
+      "val": 2023
+    },
+    {
+      "train": [
+        2019,
+        2023
+      ],
+      "val": 2024
+    },
+    {
+      "train": [
+        2019,
+        2024
+      ],
+      "val": 2025
+    },
+    {
+      "train": [
+        2019,
+        2025
+      ],
+      "val": 2026
+    }
+  ],
+  "year_cover": {
+    "2026": 0.45
+  },
+  "dev_data": "2019..2026-06 ALL (no OOS; 2026 already seen)",
+  "freeze_gates": {
+    "min_val_trades": 40,
+    "min_per_window": 5,
+    "min_per_year": 8,
+    "no_zero_year": true,
+    "max_concentration": 0.3
+  },
+  "score": {
+    "shrinkage": "mean*n/(n+K)",
+    "posWinRatio": 12,
+    "logPF": 4,
+    "ddPen": 0.3,
+    "degrPen": 6.0,
+    "concPen": 60.0,
+    "freqPen": 25.0
+  },
+  "diversity": "behavior (Jaccard of validation trade timestamps >0.6 = near-dup)",
+  "true_validation": "LIVE-FORWARD PAPER after freeze (>=6mo or >=30 trades). NO REAL deploy. No production writes."
+}

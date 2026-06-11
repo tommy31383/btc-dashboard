@@ -1,0 +1,127 @@
+{
+  "version": "PV_EVOLVER_v2",
+  "frozen_at": "2026-06-11T05:47:26Z",
+  "true_validation": "LIVE-FORWARD PAPER starting AFTER freeze date; \u22656 months or \u226530 trades; NO REAL.",
+  "development_data": "2019-01..2026-06 (all seen \u2192 dev only, NOT OOS)",
+  "params": {
+    "tf": "4h",
+    "L": 3,
+    "volMult": 1.899,
+    "minRiskPct": 1.353,
+    "dir": "LS",
+    "exitMode": "flip",
+    "tpR": 0.0
+  },
+  "development_metrics": {
+    "params": {
+      "tf": "4h",
+      "L": 3,
+      "volMult": 1.899,
+      "minRiskPct": 1.353,
+      "dir": "LS",
+      "exitMode": "flip",
+      "tpR": 0.0
+    },
+    "score": 37.75,
+    "aggShrunk": 0.273,
+    "posWinRatio": 0.8,
+    "valN": 89,
+    "medR": -0.234,
+    "profitFactor": 2.06,
+    "valMaxDD": 4.8,
+    "concentration": 0.279,
+    "trainValDegr": 0.096,
+    "zeroYears": [],
+    "freezeEligible": true,
+    "freqPass": {
+      "totalN>=40": true,
+      "perWindow>=5": true,
+      "annualized>=8": true,
+      "noZeroYear": true,
+      "conc<=0.30": true
+    },
+    "windows": [
+      {
+        "val": 2022,
+        "n": 22,
+        "ann": 22.0,
+        "mean": -0.168,
+        "med": -0.286,
+        "tot": -3.7,
+        "win": 31.8,
+        "mdd": 4.45,
+        "trainMean": 0.31,
+        "shrunk": -0.116
+      },
+      {
+        "val": 2023,
+        "n": 19,
+        "ann": 19.0,
+        "mean": 0.516,
+        "med": -0.345,
+        "tot": 9.8,
+        "win": 36.8,
+        "mdd": 3.14,
+        "trainMean": 0.138,
+        "shrunk": 0.338
+      },
+      {
+        "val": 2024,
+        "n": 18,
+        "ann": 18.0,
+        "mean": 0.738,
+        "med": 0.325,
+        "tot": 13.28,
+        "win": 55.6,
+        "mdd": 1.86,
+        "trainMean": 0.228,
+        "shrunk": 0.474
+      },
+      {
+        "val": 2025,
+        "n": 21,
+        "ann": 21.0,
+        "mean": 0.356,
+        "med": -0.077,
+        "tot": 7.48,
+        "win": 47.6,
+        "mdd": 3.21,
+        "trainMean": 0.321,
+        "shrunk": 0.241
+      },
+      {
+        "val": 2026,
+        "n": 9,
+        "ann": 20.0,
+        "mean": 0.899,
+        "med": 0.393,
+        "tot": 8.09,
+        "win": 55.6,
+        "mdd": 2.14,
+        "trainMean": 0.327,
+        "shrunk": 0.426
+      }
+    ]
+  },
+  "sensitivity": {
+    "base": 37.75,
+    "neighbors": [
+      {
+        "perturb": "volMult-0.2",
+        "score": 31.58
+      },
+      {
+        "perturb": "volMult+0.2",
+        "score": -45.17
+      },
+      {
+        "perturb": "L-1",
+        "score": 16.89
+      },
+      {
+        "perturb": "L+1",
+        "score": 1.96
+      }
+    ]
+  }
+}

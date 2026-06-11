@@ -1,0 +1,1099 @@
+{
+  "version": "PV_EVOLVER_v2",
+  "selection": "development walk-forward ONLY (no held-out OOS \u2014 2026 already seen)",
+  "rounds": 30000,
+  "hof": [
+    {
+      "params": {
+        "tf": "4h",
+        "L": 5,
+        "volMult": 1.53,
+        "minRiskPct": 0.718,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 56.87,
+      "aggShrunk": 0.551,
+      "posWinRatio": 0.6,
+      "valN": 61,
+      "medR": -0.233,
+      "profitFactor": 3.73,
+      "valMaxDD": 7.68,
+      "concentration": 0.346,
+      "trainValDegr": 0.939,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 15,
+          "ann": 15.0,
+          "mean": -0.38,
+          "med": -0.86,
+          "tot": -5.71,
+          "win": 13.3,
+          "mdd": 7.68,
+          "trainMean": 1.748,
+          "shrunk": -0.228
+        },
+        {
+          "val": 2023,
+          "n": 19,
+          "ann": 19.0,
+          "mean": 2.432,
+          "med": -0.039,
+          "tot": 46.21,
+          "win": 47.4,
+          "mdd": 4.78,
+          "trainMean": 0.861,
+          "shrunk": 1.593
+        },
+        {
+          "val": 2024,
+          "n": 10,
+          "ann": 10.0,
+          "mean": 2.238,
+          "med": 0.28,
+          "tot": 22.38,
+          "win": 60.0,
+          "mdd": 1.79,
+          "trainMean": 1.404,
+          "shrunk": 1.119
+        },
+        {
+          "val": 2025,
+          "n": 12,
+          "ann": 12.0,
+          "mean": 0.705,
+          "med": 0.133,
+          "tot": 8.46,
+          "win": 50.0,
+          "mdd": 3.01,
+          "trainMean": 1.532,
+          "shrunk": 0.385
+        },
+        {
+          "val": 2026,
+          "n": 5,
+          "ann": 11.1,
+          "mean": -0.337,
+          "med": -0.475,
+          "tot": -1.69,
+          "win": 40.0,
+          "mdd": 1.69,
+          "trainMean": 1.403,
+          "shrunk": -0.112
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "2h",
+        "L": 6,
+        "volMult": 2.19,
+        "minRiskPct": 0.462,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 56.54,
+      "aggShrunk": 0.552,
+      "posWinRatio": 0.6,
+      "valN": 84,
+      "medR": -0.394,
+      "profitFactor": 3.42,
+      "valMaxDD": 6.12,
+      "concentration": 0.379,
+      "trainValDegr": 0.707,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 17,
+          "ann": 17.0,
+          "mean": -0.23,
+          "med": -0.363,
+          "tot": -3.9,
+          "win": 29.4,
+          "mdd": 6.12,
+          "trainMean": 1.155,
+          "shrunk": -0.145
+        },
+        {
+          "val": 2023,
+          "n": 24,
+          "ann": 24.0,
+          "mean": 2.608,
+          "med": -0.466,
+          "tot": 62.58,
+          "win": 29.2,
+          "mdd": 6.11,
+          "trainMean": 0.632,
+          "shrunk": 1.841
+        },
+        {
+          "val": 2024,
+          "n": 18,
+          "ann": 18.0,
+          "mean": 1.19,
+          "med": -0.053,
+          "tot": 21.42,
+          "win": 50.0,
+          "mdd": 2.96,
+          "trainMean": 1.319,
+          "shrunk": 0.765
+        },
+        {
+          "val": 2025,
+          "n": 17,
+          "ann": 17.0,
+          "mean": 0.565,
+          "med": -0.448,
+          "tot": 9.6,
+          "win": 41.2,
+          "mdd": 3.59,
+          "trainMean": 1.292,
+          "shrunk": 0.356
+        },
+        {
+          "val": 2026,
+          "n": 8,
+          "ann": 17.8,
+          "mean": -0.122,
+          "med": -0.429,
+          "tot": -0.98,
+          "win": 37.5,
+          "mdd": 1.56,
+          "trainMean": 1.173,
+          "shrunk": -0.054
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 6,
+        "volMult": 0.293,
+        "minRiskPct": 1.089,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 55.17,
+      "aggShrunk": 0.5,
+      "posWinRatio": 0.8,
+      "valN": 95,
+      "medR": -0.25,
+      "profitFactor": 2.72,
+      "valMaxDD": 9.37,
+      "concentration": 0.362,
+      "trainValDegr": 0.313,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 25,
+          "ann": 25.0,
+          "mean": -0.315,
+          "med": -0.746,
+          "tot": -7.89,
+          "win": 20.0,
+          "mdd": 9.37,
+          "trainMean": 0.754,
+          "shrunk": -0.225
+        },
+        {
+          "val": 2023,
+          "n": 21,
+          "ann": 21.0,
+          "mean": 2.236,
+          "med": 0.169,
+          "tot": 46.96,
+          "win": 52.4,
+          "mdd": 3.31,
+          "trainMean": 0.397,
+          "shrunk": 1.515
+        },
+        {
+          "val": 2024,
+          "n": 21,
+          "ann": 21.0,
+          "mean": 0.792,
+          "med": -0.233,
+          "tot": 16.64,
+          "win": 38.1,
+          "mdd": 1.92,
+          "trainMean": 0.8,
+          "shrunk": 0.537
+        },
+        {
+          "val": 2025,
+          "n": 21,
+          "ann": 21.0,
+          "mean": 0.31,
+          "med": -0.088,
+          "tot": 6.52,
+          "win": 42.9,
+          "mdd": 2.4,
+          "trainMean": 0.798,
+          "shrunk": 0.21
+        },
+        {
+          "val": 2026,
+          "n": 7,
+          "ann": 15.6,
+          "mean": 1.123,
+          "med": -0.202,
+          "tot": 7.86,
+          "win": 42.9,
+          "mdd": 2.34,
+          "trainMean": 0.724,
+          "shrunk": 0.462
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 6,
+        "volMult": 0.842,
+        "minRiskPct": 1.359,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 49.61,
+      "aggShrunk": 0.484,
+      "posWinRatio": 0.8,
+      "valN": 81,
+      "medR": -0.394,
+      "profitFactor": 2.74,
+      "valMaxDD": 13.68,
+      "concentration": 0.391,
+      "trainValDegr": 0.467,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 23,
+          "ann": 23.0,
+          "mean": -0.53,
+          "med": -0.86,
+          "tot": -12.19,
+          "win": 8.7,
+          "mdd": 13.68,
+          "trainMean": 1.028,
+          "shrunk": -0.369
+        },
+        {
+          "val": 2023,
+          "n": 20,
+          "ann": 20.0,
+          "mean": 2.203,
+          "med": 0.038,
+          "tot": 44.05,
+          "win": 50.0,
+          "mdd": 6.21,
+          "trainMean": 0.485,
+          "shrunk": 1.468
+        },
+        {
+          "val": 2024,
+          "n": 17,
+          "ann": 17.0,
+          "mean": 1.301,
+          "med": -0.216,
+          "tot": 22.13,
+          "win": 41.2,
+          "mdd": 1.45,
+          "trainMean": 0.885,
+          "shrunk": 0.819
+        },
+        {
+          "val": 2025,
+          "n": 16,
+          "ann": 16.0,
+          "mean": 0.502,
+          "med": -0.218,
+          "tot": 8.04,
+          "win": 37.5,
+          "mdd": 2.87,
+          "trainMean": 0.953,
+          "shrunk": 0.309
+        },
+        {
+          "val": 2026,
+          "n": 5,
+          "ann": 11.1,
+          "mean": 0.57,
+          "med": 0.091,
+          "tot": 2.85,
+          "win": 60.0,
+          "mdd": 1.03,
+          "trainMean": 0.893,
+          "shrunk": 0.19
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 6,
+        "volMult": 1.003,
+        "minRiskPct": 1.375,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 43.55,
+      "aggShrunk": 0.435,
+      "posWinRatio": 0.6,
+      "valN": 92,
+      "medR": -0.243,
+      "profitFactor": 2.51,
+      "valMaxDD": 7.95,
+      "concentration": 0.418,
+      "trainValDegr": 0.226,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 24,
+          "ann": 24.0,
+          "mean": -0.269,
+          "med": -0.637,
+          "tot": -6.46,
+          "win": 20.8,
+          "mdd": 7.95,
+          "trainMean": 0.165,
+          "shrunk": -0.19
+        },
+        {
+          "val": 2023,
+          "n": 21,
+          "ann": 21.0,
+          "mean": 2.236,
+          "med": 0.169,
+          "tot": 46.96,
+          "win": 52.4,
+          "mdd": 3.31,
+          "trainMean": 0.016,
+          "shrunk": 1.515
+        },
+        {
+          "val": 2024,
+          "n": 21,
+          "ann": 21.0,
+          "mean": 0.765,
+          "med": -0.216,
+          "tot": 16.06,
+          "win": 42.9,
+          "mdd": 2.39,
+          "trainMean": 0.528,
+          "shrunk": 0.518
+        },
+        {
+          "val": 2025,
+          "n": 20,
+          "ann": 20.0,
+          "mean": -0.122,
+          "med": -0.153,
+          "tot": -2.44,
+          "win": 40.0,
+          "mdd": 6.26,
+          "trainMean": 0.573,
+          "shrunk": -0.081
+        },
+        {
+          "val": 2026,
+          "n": 6,
+          "ann": 13.3,
+          "mean": 1.101,
+          "med": -0.055,
+          "tot": 6.61,
+          "win": 50.0,
+          "mdd": 1.22,
+          "trainMean": 0.467,
+          "shrunk": 0.413
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 3,
+        "volMult": 1.211,
+        "minRiskPct": 0.77,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 42.13,
+      "aggShrunk": 0.456,
+      "posWinRatio": 0.4,
+      "valN": 101,
+      "medR": -0.339,
+      "profitFactor": 2.89,
+      "valMaxDD": 8.97,
+      "concentration": 0.395,
+      "trainValDegr": 0.691,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 24,
+          "ann": 24.0,
+          "mean": -0.364,
+          "med": -0.5,
+          "tot": -8.74,
+          "win": 25.0,
+          "mdd": 8.97,
+          "trainMean": 1.0,
+          "shrunk": -0.257
+        },
+        {
+          "val": 2023,
+          "n": 26,
+          "ann": 26.0,
+          "mean": 2.452,
+          "med": -0.342,
+          "tot": 63.76,
+          "win": 42.3,
+          "mdd": 6.49,
+          "trainMean": 0.518,
+          "shrunk": 1.771
+        },
+        {
+          "val": 2024,
+          "n": 22,
+          "ann": 22.0,
+          "mean": 1.187,
+          "med": 0.118,
+          "tot": 26.11,
+          "win": 54.5,
+          "mdd": 4.84,
+          "trainMean": 1.053,
+          "shrunk": 0.816
+        },
+        {
+          "val": 2025,
+          "n": 20,
+          "ann": 20.0,
+          "mean": -0.012,
+          "med": -0.26,
+          "tot": -0.25,
+          "win": 40.0,
+          "mdd": 3.23,
+          "trainMean": 1.079,
+          "shrunk": -0.008
+        },
+        {
+          "val": 2026,
+          "n": 9,
+          "ann": 20.0,
+          "mean": -0.082,
+          "med": -0.34,
+          "tot": -0.74,
+          "win": 44.4,
+          "mdd": 2.62,
+          "trainMean": 0.918,
+          "shrunk": -0.039
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "2h",
+        "L": 6,
+        "volMult": 2.209,
+        "minRiskPct": 0.5,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 41.72,
+      "aggShrunk": 0.388,
+      "posWinRatio": 1.0,
+      "valN": 128,
+      "medR": -0.405,
+      "profitFactor": 2.28,
+      "valMaxDD": 7.36,
+      "concentration": 0.432,
+      "trainValDegr": 0.377,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 24,
+          "ann": 24.0,
+          "mean": 0.043,
+          "med": -0.397,
+          "tot": 1.04,
+          "win": 41.7,
+          "mdd": 3.07,
+          "trainMean": 0.602,
+          "shrunk": 0.031
+        },
+        {
+          "val": 2023,
+          "n": 34,
+          "ann": 34.0,
+          "mean": 1.713,
+          "med": -0.612,
+          "tot": 58.23,
+          "win": 26.5,
+          "mdd": 7.06,
+          "trainMean": 0.432,
+          "shrunk": 1.323
+        },
+        {
+          "val": 2024,
+          "n": 25,
+          "ann": 25.0,
+          "mean": 0.539,
+          "med": -0.122,
+          "tot": 13.47,
+          "win": 48.0,
+          "mdd": 4.84,
+          "trainMean": 0.818,
+          "shrunk": 0.385
+        },
+        {
+          "val": 2025,
+          "n": 32,
+          "ann": 32.0,
+          "mean": 0.033,
+          "med": -0.349,
+          "tot": 1.05,
+          "win": 43.8,
+          "mdd": 7.36,
+          "trainMean": 0.767,
+          "shrunk": 0.025
+        },
+        {
+          "val": 2026,
+          "n": 13,
+          "ann": 28.9,
+          "mean": 0.314,
+          "med": -0.329,
+          "tot": 4.08,
+          "win": 46.2,
+          "mdd": 4.18,
+          "trainMean": 0.629,
+          "shrunk": 0.177
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 3,
+        "volMult": 1.036,
+        "minRiskPct": 0.243,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 40.31,
+      "aggShrunk": 0.377,
+      "posWinRatio": 0.8,
+      "valN": 154,
+      "medR": -0.32,
+      "profitFactor": 2.14,
+      "valMaxDD": 9.12,
+      "concentration": 0.408,
+      "trainValDegr": 0.13,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 34,
+          "ann": 34.0,
+          "mean": -0.023,
+          "med": -0.286,
+          "tot": -0.77,
+          "win": 38.2,
+          "mdd": 2.58,
+          "trainMean": 0.229,
+          "shrunk": -0.018
+        },
+        {
+          "val": 2023,
+          "n": 37,
+          "ann": 37.0,
+          "mean": 1.32,
+          "med": -0.538,
+          "tot": 48.83,
+          "win": 24.3,
+          "mdd": 9.12,
+          "trainMean": 0.152,
+          "shrunk": 1.039
+        },
+        {
+          "val": 2024,
+          "n": 32,
+          "ann": 32.0,
+          "mean": 0.545,
+          "med": -0.169,
+          "tot": 17.44,
+          "win": 50.0,
+          "mdd": 6.1,
+          "trainMean": 0.442,
+          "shrunk": 0.415
+        },
+        {
+          "val": 2025,
+          "n": 36,
+          "ann": 36.0,
+          "mean": 0.06,
+          "med": -0.179,
+          "tot": 2.16,
+          "win": 41.7,
+          "mdd": 6.24,
+          "trainMean": 0.46,
+          "shrunk": 0.047
+        },
+        {
+          "val": 2026,
+          "n": 15,
+          "ann": 33.3,
+          "mean": 0.666,
+          "med": 0.393,
+          "tot": 9.99,
+          "win": 60.0,
+          "mdd": 3.16,
+          "trainMean": 0.394,
+          "shrunk": 0.4
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "2h",
+        "L": 4,
+        "volMult": 1.959,
+        "minRiskPct": 0.875,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 38.59,
+      "aggShrunk": 0.33,
+      "posWinRatio": 0.8,
+      "valN": 114,
+      "medR": -0.435,
+      "profitFactor": 2.19,
+      "valMaxDD": 6.54,
+      "concentration": 0.342,
+      "trainValDegr": 0.436,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 22,
+          "ann": 22.0,
+          "mean": 0.063,
+          "med": -0.625,
+          "tot": 1.38,
+          "win": 36.4,
+          "mdd": 5.71,
+          "trainMean": 0.648,
+          "shrunk": 0.043
+        },
+        {
+          "val": 2023,
+          "n": 32,
+          "ann": 32.0,
+          "mean": 1.36,
+          "med": -0.573,
+          "tot": 43.53,
+          "win": 31.2,
+          "mdd": 6.54,
+          "trainMean": 0.461,
+          "shrunk": 1.036
+        },
+        {
+          "val": 2024,
+          "n": 20,
+          "ann": 20.0,
+          "mean": 0.927,
+          "med": 0.343,
+          "tot": 18.54,
+          "win": 70.0,
+          "mdd": 4.05,
+          "trainMean": 0.746,
+          "shrunk": 0.618
+        },
+        {
+          "val": 2025,
+          "n": 30,
+          "ann": 30.0,
+          "mean": 0.143,
+          "med": -0.463,
+          "tot": 4.28,
+          "win": 26.7,
+          "mdd": 5.84,
+          "trainMean": 0.776,
+          "shrunk": 0.107
+        },
+        {
+          "val": 2026,
+          "n": 10,
+          "ann": 22.2,
+          "mean": -0.312,
+          "med": -0.294,
+          "tot": -3.12,
+          "win": 30.0,
+          "mdd": 3.12,
+          "trainMean": 0.65,
+          "shrunk": -0.156
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "6h",
+        "L": 3,
+        "volMult": 0.903,
+        "minRiskPct": 1.233,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 38.12,
+      "aggShrunk": 0.37,
+      "posWinRatio": 0.8,
+      "valN": 88,
+      "medR": -0.436,
+      "profitFactor": 2.35,
+      "valMaxDD": 10.58,
+      "concentration": 0.388,
+      "trainValDegr": 0.573,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 19,
+          "ann": 19.0,
+          "mean": -0.432,
+          "med": -1.012,
+          "tot": -8.22,
+          "win": 15.8,
+          "mdd": 10.58,
+          "trainMean": 1.236,
+          "shrunk": -0.283
+        },
+        {
+          "val": 2023,
+          "n": 26,
+          "ann": 26.0,
+          "mean": 1.666,
+          "med": -0.385,
+          "tot": 43.31,
+          "win": 38.5,
+          "mdd": 7.24,
+          "trainMean": 0.708,
+          "shrunk": 1.203
+        },
+        {
+          "val": 2024,
+          "n": 17,
+          "ann": 17.0,
+          "mean": 0.892,
+          "med": -0.404,
+          "tot": 15.16,
+          "win": 41.2,
+          "mdd": 3.94,
+          "trainMean": 0.997,
+          "shrunk": 0.562
+        },
+        {
+          "val": 2025,
+          "n": 20,
+          "ann": 20.0,
+          "mean": 0.282,
+          "med": -0.301,
+          "tot": 5.64,
+          "win": 45.0,
+          "mdd": 3.52,
+          "trainMean": 0.98,
+          "shrunk": 0.188
+        },
+        {
+          "val": 2026,
+          "n": 6,
+          "ann": 13.3,
+          "mean": 0.476,
+          "med": -0.217,
+          "tot": 2.86,
+          "win": 50.0,
+          "mdd": 1.47,
+          "trainMean": 0.867,
+          "shrunk": 0.179
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 3,
+        "volMult": 1.899,
+        "minRiskPct": 1.353,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 37.75,
+      "aggShrunk": 0.273,
+      "posWinRatio": 0.8,
+      "valN": 89,
+      "medR": -0.234,
+      "profitFactor": 2.06,
+      "valMaxDD": 4.8,
+      "concentration": 0.279,
+      "trainValDegr": 0.096,
+      "zeroYears": [],
+      "freezeEligible": true,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": true
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 22,
+          "ann": 22.0,
+          "mean": -0.168,
+          "med": -0.286,
+          "tot": -3.7,
+          "win": 31.8,
+          "mdd": 4.45,
+          "trainMean": 0.31,
+          "shrunk": -0.116
+        },
+        {
+          "val": 2023,
+          "n": 19,
+          "ann": 19.0,
+          "mean": 0.516,
+          "med": -0.345,
+          "tot": 9.8,
+          "win": 36.8,
+          "mdd": 3.14,
+          "trainMean": 0.138,
+          "shrunk": 0.338
+        },
+        {
+          "val": 2024,
+          "n": 18,
+          "ann": 18.0,
+          "mean": 0.738,
+          "med": 0.325,
+          "tot": 13.28,
+          "win": 55.6,
+          "mdd": 1.86,
+          "trainMean": 0.228,
+          "shrunk": 0.474
+        },
+        {
+          "val": 2025,
+          "n": 21,
+          "ann": 21.0,
+          "mean": 0.356,
+          "med": -0.077,
+          "tot": 7.48,
+          "win": 47.6,
+          "mdd": 3.21,
+          "trainMean": 0.321,
+          "shrunk": 0.241
+        },
+        {
+          "val": 2026,
+          "n": 9,
+          "ann": 20.0,
+          "mean": 0.899,
+          "med": 0.393,
+          "tot": 8.09,
+          "win": 55.6,
+          "mdd": 2.14,
+          "trainMean": 0.327,
+          "shrunk": 0.426
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "6h",
+        "L": 3,
+        "volMult": 0.899,
+        "minRiskPct": 1.37,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 37.18,
+      "aggShrunk": 0.371,
+      "posWinRatio": 0.8,
+      "valN": 110,
+      "medR": -0.364,
+      "profitFactor": 2.08,
+      "valMaxDD": 9.83,
+      "concentration": 0.448,
+      "trainValDegr": 0.107,
+      "zeroYears": [],
+      "freezeEligible": false,
+      "freqPass": {
+        "totalN>=40": true,
+        "perWindow>=5": true,
+        "annualized>=8": true,
+        "noZeroYear": true,
+        "conc<=0.30": false
+      },
+      "windows": [
+        {
+          "val": 2022,
+          "n": 25,
+          "ann": 25.0,
+          "mean": 0.039,
+          "med": -0.35,
+          "tot": 0.98,
+          "win": 28.0,
+          "mdd": 5.46,
+          "trainMean": -0.024,
+          "shrunk": 0.028
+        },
+        {
+          "val": 2023,
+          "n": 27,
+          "ann": 27.0,
+          "mean": 1.061,
+          "med": -0.394,
+          "tot": 28.65,
+          "win": 33.3,
+          "mdd": 4.34,
+          "trainMean": -0.004,
+          "shrunk": 0.774
+        },
+        {
+          "val": 2024,
+          "n": 24,
+          "ann": 24.0,
+          "mean": 0.381,
+          "med": 0.156,
+          "tot": 9.16,
+          "win": 50.0,
+          "mdd": 2.61,
+          "trainMean": 0.27,
+          "shrunk": 0.269
+        },
+        {
+          "val": 2025,
+          "n": 25,
+          "ann": 25.0,
+          "mean": -0.245,
+          "med": -0.417,
+          "tot": -6.12,
+          "win": 32.0,
+          "mdd": 8.12,
+          "trainMean": 0.291,
+          "shrunk": -0.175
+        },
+        {
+          "val": 2026,
+          "n": 9,
+          "ann": 20.0,
+          "mean": 2.022,
+          "med": 0.242,
+          "tot": 18.2,
+          "win": 55.6,
+          "mdd": 2.37,
+          "trainMean": 0.204,
+          "shrunk": 0.958
+        }
+      ]
+    }
+  ]
+}
