@@ -1,11 +1,11 @@
 {
   "version": "PV_EVOLVER_v1",
-  "frozen_at": "2026-06-11T04:47:02Z",
+  "frozen_at": "2026-06-11T05:20:03Z",
   "params": {
     "tf": "4h",
     "L": 5,
-    "volMult": 2.468,
-    "minRiskPct": 0.666,
+    "volMult": 2.371,
+    "minRiskPct": 1.245,
     "dir": "L",
     "exitMode": "flip",
     "tpR": 0.0
@@ -14,23 +14,23 @@
     "params": {
       "tf": "4h",
       "L": 5,
-      "volMult": 2.468,
-      "minRiskPct": 0.666,
+      "volMult": 2.371,
+      "minRiskPct": 1.245,
       "dir": "L",
       "exitMode": "flip",
       "tpR": 0.0
     },
-    "score": 104.3,
-    "valMeanAvg": 1.789,
-    "valMeanMed": 0.523,
+    "score": 109.92,
+    "valMeanAvg": 1.834,
+    "valMeanMed": 0.655,
     "posWinRatio": 0.75,
-    "valTotN": 25,
+    "valTotN": 26,
     "valMaxDD": 4.96,
-    "trainValDegr": 0.796,
+    "trainValDegr": 0.929,
     "windows": [
       {
         "val": 2022,
-        "trainAvg": 2.164,
+        "trainAvg": 2.723,
         "valAvg": -0.585,
         "valMed": -1.013,
         "valN": 7,
@@ -40,7 +40,7 @@
       },
       {
         "val": 2023,
-        "trainAvg": 0.561,
+        "trainAvg": 0.942,
         "valAvg": 1.84,
         "valMed": -0.538,
         "valN": 9,
@@ -50,7 +50,7 @@
       },
       {
         "val": 2024,
-        "trainAvg": 1.109,
+        "trainAvg": 1.309,
         "valAvg": 4.662,
         "valMed": 3.71,
         "valN": 4,
@@ -60,12 +60,12 @@
       },
       {
         "val": 2025,
-        "trainAvg": 1.677,
-        "valAvg": 1.241,
-        "valMed": -0.069,
-        "valN": 5,
-        "valTot": 6.2,
-        "valWin": 40.0,
+        "trainAvg": 1.825,
+        "valAvg": 1.418,
+        "valMed": 0.46,
+        "valN": 6,
+        "valTot": 8.51,
+        "valWin": 50.0,
         "valMdd": 1.53
       }
     ]
