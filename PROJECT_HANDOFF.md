@@ -1,9 +1,16 @@
 # PROJECT HANDOFF — BTC Trading Bot
 
-**Date written:** 2026-04-28 (last sync v4.9.27 + v0.4.5)
-**Frontend:** v4.9.27 (`tommy31383/btc-dashboard`, public, master branch)
-**Server:** v0.4.5 (`tommy31383/btc-trader-server`, private, main branch)
+**Date written:** 2026-04-28 · **header refreshed 2026-06-11**
+**Frontend:** **v4.11.4** (`tommy31383/btc-dashboard`, public, master) — handoff body below is from v4.9.27, treat older sections as historical
+**Server:** **v0.4.101** (`tommy31383/btc-trader-server`, private, main) — body references v0.4.5; current architecture: see `btc-trader-server/CLAUDE.md`
 **Owner:** Tommy (tuantommy83@gmail.com) — speaks Vietnamese, prefers terse Việt-Anh mix
+
+> ⚠️ **Stale-version note (2026-06-11):** This handoff body was written at v4.9.27 / v0.4.5.
+> Current = dashboard **v4.11.4**, server **v0.4.101**. Key changes since: server is now the
+> SOLE live engine (`SERVER_OWNS_TRADING=true`, browser exec disabled); PM2 runs **fork-mode**
+> (not cluster) 2 instances; champion/stochBreak engines + per-engine sub-accounts; regime
+> persistence pb=1 (deployed-in-code). Trust `btc-trader-server/CLAUDE.md` + `BACKTEST_REGISTRY.md`
+> over version-specific claims here.
 
 > **🆕 What's new since v4.8.25 / v0.2.2:**
 > - **Frontend v4.8.x line:**
@@ -58,7 +65,7 @@
 │ Deployed on DigitalOcean Singapore                          │
 │ https://tommybtc.duckdns.org → nginx → :3000                │
 │                                                             │
-│ PM2: btc-trader-server (cluster mode)                       │
+│ PM2: btc-trader-server (fork mode (instances:1))                       │
 │ SQLite: /var/lib/btc-trader/state.db (WAL)                  │
 │ Env: /etc/btc-trader/env                                    │
 │                                                             │
@@ -333,12 +340,12 @@ getServerUrl() / setServerUrl()  // override for dev
 
 ### Auth flow
 ```
-POST /api/auth/login {password: "30318384"} → {token: JWT}
+POST /api/auth/login {password: "<REDACTED — see /etc/btc-trader/env, rotate if exposed>"} → {token: JWT}
 Subsequent: Authorization: Bearer <token>
 WS upgrade: connect with ?token=<JWT>
 ```
 
-Single-user system, password = `30318384` (bcrypt hashed in `/etc/btc-trader/env`).
+Single-user system, password = `<REDACTED — see /etc/btc-trader/env, rotate if exposed>` (bcrypt hashed in `/etc/btc-trader/env`).
 
 ### Cache architecture (instant tab switch)
 
@@ -424,7 +431,7 @@ Layers:
            → DuckDNS A record → 159.223.90.60
            → nginx :443 (Let's Encrypt cert via certbot, auto-renew)
            → proxy_pass http://127.0.0.1:3000
-           → btc-trader-server (Node.js, PM2 cluster mode)
+           → btc-trader-server (Node.js, PM2 fork mode (instances:1))
            → SQLite /var/lib/btc-trader/state.db (WAL)
            → Binance Futures REST + WS (HMAC-SHA256 signed)
 
@@ -548,7 +555,7 @@ Every per-rule backtest MUST emit:
 - SYNC CHECK card (inline trong TRACKED): app virtual vs Binance actual, warn on mismatch
 - Chart with entry/exit markers, auto-height
 - TRACKED list split LONG/SHORT, sortable, with STT + uPnL$ + uPnL% + sizeUSDT + datetime
-- Action buttons: AUTO ON/OFF, DRY RUN toggle, edit TP/SL inline, manual close, bulk close (PROFIT/LOSS/OLD/ALL — password gate "30318384")
+- Action buttons: AUTO ON/OFF, DRY RUN toggle, edit TP/SL inline, manual close, bulk close (PROFIT/LOSS/OLD/ALL — password gate "<REDACTED — see /etc/btc-trader/env, rotate if exposed>")
 
 ---
 
@@ -572,7 +579,7 @@ Every per-rule backtest MUST emit:
 
 ### Force-close everything
 - UI: SERVER tab → bulk close ALL with password
-- API: `POST /api/live/bulk-close {filter: "ALL", password: "30318384"}`
+- API: `POST /api/live/bulk-close {filter: "ALL", password: "<REDACTED — see /etc/btc-trader/env, rotate if exposed>"}`
 - Manual: SSH + sqlite3 edit (last resort, NOT recommended)
 
 ---
@@ -640,12 +647,12 @@ Server repo:    github.com/tommy31383/btc-trader-server (private, main)
 Frontend URL:   tommy31383.github.io/btc-dashboard/app/
 Server URL:     https://tommybtc.duckdns.org/
 SSH:            ssh root@159.223.90.60
-PM2 process:    btc-trader-server (id 0, cluster mode)
+PM2 process:    btc-trader-server (id 0, fork mode (instances:1))
 SQLite:         /var/lib/btc-trader/state.db (WAL)
 Env file:       /etc/btc-trader/env
 Symbol:         BTCUSDT only
 Mode:           Hedge (LONG + SHORT independent)
-Password:       30318384 (single user, both UI gate + bulk-close confirm)
+Password:       <REDACTED — see /etc/btc-trader/env, rotate if exposed> (single user, both UI gate + bulk-close confirm)
 
 Production rule set: Mode E (disable 5m:1 baseline) + E-T15-NoTP S50 step trail (15m)
 Production preset:   B (maxStack 50, dist 0%, spacing 0, cap $200k notional)

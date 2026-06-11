@@ -1,7 +1,15 @@
 # LIVE TRADING ENGINE — Rule vào lệnh & Flow đầy đủ
 
-**Version:** v4.8.19 (last updated 2026-04-28)
-**Server engine:** btc-trader-server v0.2.0 (E-T15-NoTP S50 step trail)
+> ## 🗄️ ARCHIVED (2026-06-11) — historical snapshot, KHÔNG còn phản ánh kiến trúc live
+> Tài liệu này mô tả **browser-side execution** (`useBinanceLive`, `utils/liveTraderEngine.ts`,
+> leader election, gist sync, browser MARKET order). Toàn bộ path đó **đã bị khoá** từ khi
+> `SERVER_OWNS_TRADING=true` (`hooks/useBinanceLive.ts:312`). **Live trading thật hiện do
+> `btc-trader-server` (scheduler + SQLite) sở hữu hoàn toàn** — xem `btc-trader-server/CLAUDE.md`.
+> Giữ file làm tham chiếu lịch sử; **đừng dùng làm spec cho live hiện tại** và **đừng tái kích hoạt**
+> browser execution (sẽ tạo money-path thứ 2 cạnh tranh với server).
+
+**Version:** v4.8.19 (last updated 2026-04-28) · **ARCHIVED 2026-06-11**
+**Server engine (lúc viết):** btc-trader-server v0.2.0 — **hiện tại v0.4.101** (khác hoàn toàn)
 
 ---
 
@@ -255,7 +263,7 @@ if (currentStep > lastTrailStep && currentStep ≥ 1):
   AUTO ON  → all gates active           AUTO OFF → block all entries
   DRY RUN  → chỉ log (no Binance)       REAL    → POST /fapi/v1/order MARKET
 
-  PASSWORD 30318384 cho:
+  PASSWORD <REDACTED — see /etc/btc-trader/env> cho:
     ✕ CLOSE 1 lệnh
     ✏ EDIT TP/SL
     🚀 BULK CLOSE (PROFIT/LOSS/OLD/ALL)
@@ -615,7 +623,7 @@ Mỗi 60s poll Binance, so sum qty per side với trackedPositions:
 | Verify after claim | 12s | đợi gist propagate rồi verify |
 
 ### Hard-roll claim:
-- Bấm `🔒 CLAIM LEADER` → prompt password `30318384` → confirm → push leader file
+- Bấm `🔒 CLAIM LEADER` → prompt password `<REDACTED — see /etc/btc-trader/env>` → confirm → push leader file
 - Device cũ tự demote trong tối đa 80s
 
 ### State sync (mọi device CONNECT):

@@ -151,33 +151,28 @@ App có **3 engine song song**, mỗi cái có nguồn trigger + account riêng.
 - **STATUS:** Legacy — đã được LIVE engine thay thế cho production.
   Giữ lại để compare paper vs live nếu cần. Tab HISTORY (xem paper closed trades) **đã xoá v4.7.2**.
 
-### 3. `useBinanceLive` — Tab LIVE (Binance real) — production
-- File: `hooks/useBinanceLive.ts` + `utils/liveTraderEngine.ts` + `utils/binanceLive.ts`
-- Storage: AsyncStorage `@live_trader_v2` (settings + journal — sync git via `live_trading.json`) + `@live_trader_secret_v1` (API key/secret — LOCAL ONLY, KHÔNG sync)
-- Trigger: subscribe `activeAlerts` từ `useRuleAlerts` (cùng nguồn AutoTrader)
-- Filter: `state.settings.excludedTfs` (default `["5m"]`)
-- 2 mode: **DRY RUN** (chỉ log) hoặc **REAL ORDERS** (POST /fapi/v1/order MARKET — Plan B self-monitor TP/SL, KHÔNG dùng STOP_MARKET)
-- Hedge mode + ledger 2 lớp (Binance gộp 1 net LONG + 1 net SHORT, app maintain N tracked entries với TP/SL riêng, partial close reduceOnly khi hit)
-- Circuit breakers: `maxOpen`, `dailyLossCapUsd` → `cooldownMinutes` pause; **Equity DD Protection** (`equityDdPausePct` / `equityDdPauseHours`)
-- PRESET B mặc định: stack max 50/side, dist 0%, spacing 0m, notional cap $200k
-- "Apply Best" button trong SETTINGS card → 1-click optimal config
-- Render trong `LiveTab` (BottomNav → LIVE)
-- Doc đầy đủ: `LIVE_TRADING_RULES.md`
+### 3. `useBinanceLive` — Tab LIVE — ⚠️ EXECUTION DISABLED (server-owned)
+- **`SERVER_OWNS_TRADING = true`** (`hooks/useBinanceLive.ts:312`): the browser engine is **HARD-KILLED** as a money path. Entry (`:316`), Plan B TP/SL monitor (`:455`), and any order send (`:495`) all `return` early. The frontend does NOT place REAL orders, does NOT connect Binance for trading, and does NOT run leader election for execution. **`btc-trader-server` (scheduler + SQLite) is the sole authoritative live engine.**
+- LiveTab is now **display-only**: it reads server state/journal (via `/api/live/*`) and renders positions/PnL. No browser-side execution.
+- Legacy code still present but inert: `utils/liveTraderEngine.ts`, gist sync, leader election, browser MARKET send — kept behind the `SERVER_OWNS_TRADING` kill switch. **Do NOT re-enable** (would create a second competing money path against the server). Full legacy detail: `LIVE_TRADING_RULES.md` (marked archived).
+- API key/secret: still `@live_trader_secret_v1` LOCAL-ONLY (never synced) — but unused for execution now.
 
 ### Bảng trigger summary
 
-| Source event | 5m ALL | AutoTrader (paper, legacy) | LIVE (Binance) |
+| Source event | 5m ALL | AutoTrader (paper, legacy) | LIVE (browser) |
 |---|---|---|---|
 | Cây 5m close + Stoch theo preset | ✅ paper | ❌ | ❌ |
-| Rule `1h:rank3` FIRE | ❌ | ✅ paper | ✅ real (nếu AUTO ON, qua Phase 2 LTF confirm) |
-| Rule `5m:1` baseline FIRE | ❌ | ✅ paper | ❌ (TF 5m excluded mặc định) |
+| Rule `1h:rank3` FIRE | ❌ | ✅ paper | ❌ **browser execution disabled** (`SERVER_OWNS_TRADING`) — REAL trading owned by `btc-trader-server` |
+| Rule `5m:1` baseline FIRE | ❌ | ✅ paper | ❌ |
+
+> LIVE REAL execution is **server-side only** (btc-trader-server scheduler). The "LIVE" tab/browser engine no longer sends orders.
 
 ### BottomNav tabs hiện tại (v4.7.2)
 
 | Tab | Component | Mô tả |
 |---|---|---|
 | **RULE** (default) | `App.tsx` dashboard | Rule list + chart + AutoTraderPanel |
-| **LIVE** | `LiveTab` | Binance Futures real |
+| **LIVE** | `LiveTab` | Display-only (server-owned trading; browser exec disabled) |
 | **5m ALL** (PC only) | `All5mPanel` | Paper engine với 3 preset switch |
 
 Tab HISTORY đã xoá v4.7.2 (HistoryScreen render AutoTrader closed — paper legacy redundant với Rule backtest stats + LIVE journal).

@@ -20,7 +20,8 @@ Canonical registry cho mọi dataset backtest. Mỗi entry có **tên (key)** + 
 - **Engines:** hedge01 v0.4.79 + turtle (faithful), $100k, fee 0.05%/side. Split TRAIN 2019–2023 / OOS 2024–2026.
 - **#6 verdict:** **KEEP classifier A** (`close<MA200`, = `regime.ts` hiện tại). A robust train(Sh1.32)+OOS(Sh2.04), bảo vệ real-bear 2022/2026 = 0%. **C/D = REJECTED** (D overfit: train Sh1.41 cao nhất nhưng OOS 1.78<A; full-7y chỉ lời nhờ re-enter real-bear 2022 −15%). **E*/drawdown = RESEARCH-ONLY**, không đưa live.
 - **P0 verdict:** **CHỐT `persistBars=1`** (2026-06-11). Walk-forward Codex 2-split (TASK F): cả 2 split train chọn pb=1; Split1 OOS pb=1 thắng (Sh2.59 vs 2.36, +$18k), Split2 OOS pb=1=pb2=pb3. Full-7y Sh1.70/+$279k. **Trade-off (Split1 OOS): maxDD 14% (vs 11% ở pb=2/3) + BEAR-exposure 4% (vs 0%)**, đổi lại Sharpe 2.59 (vs 2.36) + ~+$18k. Áp cùng Option B timestamp-guard.
-- **Status:** active · **pb=1 DEPLOYED-IN-CODE** (`btc-trader-server` HEAD `db372fa`, hedge01.ts:810) — npm test 6/6 + build PASS — **NHƯNG CHƯA deploy lên VPS** (server đang chạy code cũ pb=3 cho tới khi `./deploy.sh`). Timestamp-guard (Option B) cũng deployed-in-code, chưa lên VPS.
+- **Status:** active · **pb=1 DEPLOYED-IN-CODE** (`btc-trader-server` main, hedge01.ts:810) — npm test 6/6 + build PASS — **CHƯA chạy `./deploy.sh`**. Timestamp-guard (Option B) cũng deployed-in-code.
+- **VPS runtime: UNKNOWN (chưa verify bằng runtime).** Suy luận "VPS vẫn pb=3" chỉ đúng NẾU chưa ai deploy — KHÔNG phải bằng chứng runtime. Để xác nhận: `curl https://tommybtc.duckdns.org/` (version) + kiểm tra commit đã build trên VPS, hoặc log regime tick. Đừng coi giá trị active là chắc chắn cho tới khi verify.
 
 ### `TPSL_GRID_v1`
 - **Type:** TP × SL grid sweep
