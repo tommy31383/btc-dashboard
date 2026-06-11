@@ -249,6 +249,20 @@ def parse_kline(k):
     return [int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])]
 
 
+# ── Dynamic Relaxation decision (reviewer directive v1-SHADOW, 2026-06-12) ──────
+# Khi Volatility Compression (sideway nghẹt thở) → ATR teo → gate ATR-ratio over-filter
+# → số analog strict tụt dưới ý nghĩa thống kê. Nới biên độ MỘT lần để không mất sạch tín hiệu.
+# NOTE: floor mặc định = 30 (KHÔNG phải 150 — 150 là cận-TRÊN của vùng "tốt" n<150, không phải
+# ngưỡng đói tín hiệu; relax ở 150 sẽ over-trigger gần như luôn). Chỉnh: env BTC_RELAX_FLOOR.
+RELAXED_PARAMS = {"drop_tol": 12.0, "atr_lo": 0.35, "atr_hi": 3.0}
+def relax_decision(strict_n, floor):
+    """Trả (do_relax: bool, params: dict). Pure — test_dynamic_relaxation.py canh.
+    do_relax=True khi strict_n < floor (over-filtered) → dùng RELAXED_PARAMS."""
+    if strict_n < floor:
+        return True, dict(RELAXED_PARAMS)
+    return False, {"drop_tol": 8.0, "atr_lo": 0.5, "atr_hi": 2.0}
+
+
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -426,127 +440,144 @@ def main():
     # (LOOK_BACK 42/96) lệch độ dài vector returns → Pearson crash. Window có WINDOW+1
     # nến để ATR14 đủ dữ liệu; hist_returns dài WINDOW = khớp cur_returns14.
     WINDOW = LOOK_BACK
-    matches = []
+    def run_scan(drop_tol, atr_lo, atr_hi):
+        _matches = []
+        for i in range(WINDOW, len(bars_1d_hist) - 32):
+            window = bars_1d_hist[i-WINDOW:i+1]  # WINDOW+1 nến (đủ cho ATR14)
+            h14 = [b[2] for b in window]
+            l14 = [b[3] for b in window]
+            c14 = [b[4] for b in window]
 
-    for i in range(WINDOW, len(bars_1d_hist) - 32):
-        window = bars_1d_hist[i-WINDOW:i+1]  # WINDOW+1 nến (đủ cho ATR14)
-        h14 = [b[2] for b in window]
-        l14 = [b[3] for b in window]
-        c14 = [b[4] for b in window]
+            peak   = max(h14)
+            trough = min(l14)
+            close  = c14[-1]
 
-        peak   = max(h14)
-        trough = min(l14)
-        close  = c14[-1]
+            drop   = (close - peak) / peak * 100
+            vs_low = (close - trough) / trough * 100
+            pos    = (close - trough) / (peak - trough) * 100 if peak != trough else 50
 
-        drop   = (close - peak) / peak * 100
-        vs_low = (close - trough) / trough * 100
-        pos    = (close - trough) / (peak - trough) * 100 if peak != trough else 50
+            st_cnt, st_col = consec_streak(window)
 
-        st_cnt, st_col = consec_streak(window)
+            # ── Similarity scoring — MAGNITUDE-ANCHORED + SHAPE ────────────────
+            # (2026-06-10 rev2: shape_only thuần Pearson SAI cho context — vô tỷ-lệ
+            #  nên kéo nến drop −1% so với crash −18%, biên độ lệch hẳn. Phải neo
+            #  ĐỘ SÂU DROP + ATR-volatility để analog GIỐNG THẬT về biên độ, shape
+            #  chỉ rank tinh. Accuracy DỰ BÁO vẫn null base-rate → disclaimer giữ.)
+            atr14_h     = atr(window, 14) or 1
+            atr_pct_h_v = atr14_h / close * 100  # volatility của window lịch sử
+            cur_atr_pct = atr_pct or 0           # ATR% ngày hiện tại (đã tính đúng ở trên)
 
-        # ── Similarity scoring — MAGNITUDE-ANCHORED + SHAPE ────────────────
-        # (2026-06-10 rev2: shape_only thuần Pearson SAI cho context — vô tỷ-lệ
-        #  nên kéo nến drop −1% so với crash −18%, biên độ lệch hẳn. Phải neo
-        #  ĐỘ SÂU DROP + ATR-volatility để analog GIỐNG THẬT về biên độ, shape
-        #  chỉ rank tinh. Accuracy DỰ BÁO vẫn null base-rate → disclaimer giữ.)
-        atr14_h     = atr(window, 14) or 1
-        atr_pct_h_v = atr14_h / close * 100  # volatility của window lịch sử
-        cur_atr_pct = atr_pct or 0           # ATR% ngày hiện tại (đã tính đúng ở trên)
+            # GATE độ sâu drop — bắt buộc biên độ giảm tương đương (±8%)
+            if abs(drop - drop_from_peak) > drop_tol:
+                continue
+            # GATE biên độ volatility ATR% tương đương (±50% tỷ lệ) — "độ biến thiên" khớp
+            if cur_atr_pct > 0 and not (atr_lo <= atr_pct_h_v / cur_atr_pct <= atr_hi):
+                continue
 
-        # GATE độ sâu drop — bắt buộc biên độ giảm tương đương (±8%)
-        if abs(drop - drop_from_peak) > 8:
-            continue
-        # GATE biên độ volatility ATR% tương đương (±50% tỷ lệ) — "độ biến thiên" khớp
-        if cur_atr_pct > 0 and not (0.5 <= atr_pct_h_v / cur_atr_pct <= 2.0):
-            continue
+            score = 0.0
+            # Drop magnitude khớp (càng sát càng cao, max ~2pt)
+            score += 2.0 * max(0.0, 1 - abs(drop - drop_from_peak) / 8)
+            # Position-in-range khớp (±20%)
+            if abs(pos - pos_in_range) <= 20:
+                score += 1.0 * max(0.0, 1 - abs(pos - pos_in_range) / 20)
+            # ATR-volatility khớp (tỷ lệ gần 1)
+            score += 1.0 * max(0.0, 1 - abs(atr_pct_h_v / cur_atr_pct - 1)) if cur_atr_pct > 0 else 0
 
-        score = 0.0
-        # Drop magnitude khớp (càng sát càng cao, max ~2pt)
-        score += 2.0 * max(0.0, 1 - abs(drop - drop_from_peak) / 8)
-        # Position-in-range khớp (±20%)
-        if abs(pos - pos_in_range) <= 20:
-            score += 1.0 * max(0.0, 1 - abs(pos - pos_in_range) / 20)
-        # ATR-volatility khớp (tỷ lệ gần 1)
-        score += 1.0 * max(0.0, 1 - abs(atr_pct_h_v / cur_atr_pct - 1)) if cur_atr_pct > 0 else 0
+            # Shape correlation (Pearson 14D % returns) — rank tinh giữa các analog cùng biên độ
+            hist_returns = [(window[j][4] - window[j-1][4]) / window[j-1][4]
+                            for j in range(1, len(window))]
+            corr = pearson_corr(cur_returns14, hist_returns)
+            if corr > 0.5:
+                score += 1.5
+            elif corr > 0.25:
+                score += 0.75
+            elif corr > 0:
+                score += 0.3
 
-        # Shape correlation (Pearson 14D % returns) — rank tinh giữa các analog cùng biên độ
-        hist_returns = [(window[j][4] - window[j-1][4]) / window[j-1][4]
-                        for j in range(1, len(window))]
-        corr = pearson_corr(cur_returns14, hist_returns)
-        if corr > 0.5:
-            score += 1.5
-        elif corr > 0.25:
-            score += 0.75
-        elif corr > 0:
-            score += 0.3
+            # ATR-normalized drop ratio (shape của cú giảm so với vol)
+            hist_drop_atr_ratio = drop / atr_pct_h_v if atr_pct_h_v else 0
+            if abs(hist_drop_atr_ratio - cur_drop_atr_ratio) <= 1.5:
+                score += 0.5
 
-        # ATR-normalized drop ratio (shape của cú giảm so với vol)
-        hist_drop_atr_ratio = drop / atr_pct_h_v if atr_pct_h_v else 0
-        if abs(hist_drop_atr_ratio - cur_drop_atr_ratio) <= 1.5:
-            score += 0.5
+            # ── Tương đồng tín hiệu oscillator (rank tinh sau khi biên độ đã khớp) ──
+            # RSI gần nhau (tối đa +1.0 khi |Δ|≤25) — cùng vùng quá-mua/quá-bán
+            rsi_h_pre = rsi_hist_series[i] if i < len(rsi_hist_series) else None
+            if rsi_h_pre is not None and rsi_1d is not None:
+                score += 1.0 * max(0.0, 1 - abs(rsi_h_pre - rsi_1d) / 25)
+            # StochRSI K gần nhau (tối đa +0.75 khi |Δ|≤30) — tính 1 lần, tái dùng ở dưới
+            stk_k_h, stk_d_h = stk_at(i)
+            if stk_k_h is not None and stk_k is not None:
+                score += 0.75 * max(0.0, 1 - abs(stk_k_h - stk_k) / 30)
 
-        # ── Tương đồng tín hiệu oscillator (rank tinh sau khi biên độ đã khớp) ──
-        # RSI gần nhau (tối đa +1.0 khi |Δ|≤25) — cùng vùng quá-mua/quá-bán
-        rsi_h_pre = rsi_hist_series[i] if i < len(rsi_hist_series) else None
-        if rsi_h_pre is not None and rsi_1d is not None:
-            score += 1.0 * max(0.0, 1 - abs(rsi_h_pre - rsi_1d) / 25)
-        # StochRSI K gần nhau (tối đa +0.75 khi |Δ|≤30) — tính 1 lần, tái dùng ở dưới
-        stk_k_h, stk_d_h = stk_at(i)
-        if stk_k_h is not None and stk_k is not None:
-            score += 0.75 * max(0.0, 1 - abs(stk_k_h - stk_k) / 30)
+            def pct_after(days):
+                t = i + days
+                if t < len(bars_1d_hist):
+                    return round((bars_1d_hist[t][4] - close) / close * 100, 1)
+                return None
 
-        def pct_after(days):
-            t = i + days
-            if t < len(bars_1d_hist):
-                return round((bars_1d_hist[t][4] - close) / close * 100, 1)
-            return None
+            ema200_h = ema([b[4] for b in bars_1d_hist[max(0,i-200):i+1]], min(200, i+1))[-1]
+            above_ema200 = close > ema200_h if ema200_h else None
 
-        ema200_h = ema([b[4] for b in bars_1d_hist[max(0,i-200):i+1]], min(200, i+1))[-1]
-        above_ema200 = close > ema200_h if ema200_h else None
+            rsi_h   = rsi_at(i)
+            # stk_k_h, stk_d_h đã tính ở phần scoring (tránh tính lại)
+            bb_pb_h, bb_bw_h = bb_at(i)
+            atr_h   = atr_at(i)
+            atr_pct_h = round(atr_h / close * 100, 2) if atr_h else None
 
-        rsi_h   = rsi_at(i)
-        # stk_k_h, stk_d_h đã tính ở phần scoring (tránh tính lại)
-        bb_pb_h, bb_bw_h = bb_at(i)
-        atr_h   = atr_at(i)
-        atr_pct_h = round(atr_h / close * 100, 2) if atr_h else None
+            next_bar = bars_1d_hist[i+1]
+            bounce = next_bar[4] > next_bar[1]
 
-        next_bar = bars_1d_hist[i+1]
-        bounce = next_bar[4] > next_bar[1]
+            ts = bars_1d_hist[i][0]
+            dt = datetime.fromtimestamp(ts/1000, tz=timezone.utc)
 
-        ts = bars_1d_hist[i][0]
-        dt = datetime.fromtimestamp(ts/1000, tz=timezone.utc)
+            # Weekly pct from hist
+            w7 = [b for b in bars_7d_hist if b[0] <= ts]
+            w7_pct = round((w7[-1][4]-w7[-1][1])/w7[-1][1]*100, 1) if w7 else None
 
-        # Weekly pct from hist
-        w7 = [b for b in bars_7d_hist if b[0] <= ts]
-        w7_pct = round((w7[-1][4]-w7[-1][1])/w7[-1][1]*100, 1) if w7 else None
+            _matches.append({
+                "date": dt.strftime('%Y-%m-%d'),
+                "year": dt.year,
+                "hist_index": i,
+                "event": event_label(dt.year, dt.month),
+                "drop_from_peak_pct": round(drop, 1),
+                "close_vs_low_pct": round(vs_low, 1),
+                "position_in_range_pct": round(pos, 1),
+                "streak": {"count": st_cnt, "color": st_col},
+                "trend_14d": classify_trend(swing_structure(window)),
+                "similarity_score": round(score, 2),
+                "above_ema200": above_ema200,
+                "rsi": rsi_h,
+                "stoch_rsi_k": stk_k_h,
+                "stoch_rsi_d": stk_d_h,
+                "bb_pct_b": bb_pb_h,
+                "atr_pct": atr_pct_h,
+                "weekly_pct": w7_pct,
+                "next_bar_bounce": bounce,
+                "outcomes": {
+                    "d1":  pct_after(1),
+                    "d3":  pct_after(3),
+                    "d7":  pct_after(7),
+                    "d14": pct_after(14),
+                    "d30": pct_after(30),
+                }
+            })
 
-        matches.append({
-            "date": dt.strftime('%Y-%m-%d'),
-            "year": dt.year,
-            "hist_index": i,
-            "event": event_label(dt.year, dt.month),
-            "drop_from_peak_pct": round(drop, 1),
-            "close_vs_low_pct": round(vs_low, 1),
-            "position_in_range_pct": round(pos, 1),
-            "streak": {"count": st_cnt, "color": st_col},
-            "trend_14d": classify_trend(swing_structure(window)),
-            "similarity_score": round(score, 2),
-            "above_ema200": above_ema200,
-            "rsi": rsi_h,
-            "stoch_rsi_k": stk_k_h,
-            "stoch_rsi_d": stk_d_h,
-            "bb_pct_b": bb_pb_h,
-            "atr_pct": atr_pct_h,
-            "weekly_pct": w7_pct,
-            "next_bar_bounce": bounce,
-            "outcomes": {
-                "d1":  pct_after(1),
-                "d3":  pct_after(3),
-                "d7":  pct_after(7),
-                "d14": pct_after(14),
-                "d30": pct_after(30),
-            }
-        })
+        return _matches
+
+    DROP_TOL, ATR_LO, ATR_HI = 8.0, 0.5, 2.0
+    RELAX_FLOOR = int(os.environ.get("BTC_RELAX_FLOOR", "30"))
+    matches = run_scan(DROP_TOL, ATR_LO, ATR_HI)
+    # ── Dynamic Relaxation (reviewer directive v1-SHADOW): vol-compression → ATR teo →
+    #    gate over-filter → n tụt dưới ý nghĩa thống kê. Nới biên độ 1 lần để KHÔNG mất
+    #    sạch tín hiệu analog. Strict path KHÔNG đổi (default 8.0/0.5/2.0).
+    do_relax, relax_p = relax_decision(len(matches), RELAX_FLOOR)
+    relaxation = {"triggered": do_relax, "strict_n": len(matches), "floor": RELAX_FLOOR}
+    if do_relax:
+        relaxation["relaxed_params"] = relax_p
+        matches = run_scan(relax_p["drop_tol"], relax_p["atr_lo"], relax_p["atr_hi"])
+        relaxation["relaxed_n"] = len(matches)
+        print(f"[relax] strict n={relaxation['strict_n']} < {RELAX_FLOOR} → Dynamic Relaxation "
+              f"(drop±{relax_p['drop_tol']}, atr {relax_p['atr_lo']}-{relax_p['atr_hi']}) → n={len(matches)}")
 
     matches.sort(key=lambda x: -x['similarity_score'])
 
@@ -632,6 +663,7 @@ def main():
         "matches": top,
         "stats": {
             "total_matches": len(matches),
+            "relaxation": relaxation,   # Dynamic Relaxation: triggered khi strict n < floor (vol-compression)
             "bounce_next_bar": f"{sum(1 for m in top if m['next_bar_bounce'])}/{len(top)}",
             "outcomes": {k: stats([m['outcomes'][k] for m in top]) for k in ['d1','d3','d7','d14','d30']},
             "current_regime": cur_reg_label,
