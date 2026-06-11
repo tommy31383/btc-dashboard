@@ -1,0 +1,36 @@
+{
+  "version": "PV_EVOLVER_v1",
+  "opened_at": "2026-06-11T05:21:02Z",
+  "champion_params": {
+    "tf": "4h",
+    "L": 5,
+    "volMult": 2.371,
+    "minRiskPct": 1.245,
+    "dir": "L",
+    "exitMode": "flip",
+    "tpR": 0.0
+  },
+  "oos_window": [
+    2026,
+    2026
+  ],
+  "oos": {
+    "n": 1,
+    "avg": 0.09091822588875757,
+    "med": 0.09091822588875757,
+    "tot": 0.09091822588875757,
+    "mdd": 0,
+    "win": 100.0
+  },
+  "ref_2019_2025": {
+    "n": 32,
+    "avg": 1.7488251631745466,
+    "med": -0.22698961961775588,
+    "tot": 55.96240522158549,
+    "mdd": 7.761871259687592,
+    "win": 43.75
+  },
+  "valMeanAvg_at_freeze": 1.834,
+  "degradation_val_to_oos": 1.743,
+  "note": "OOS opened ONCE. Sample nh\u1ecf (window ~6 th\u00e1ng) \u2192 k\u1ebft lu\u1eadn \u0111\u1ed9 tin c\u1eady TH\u1ea4P; kh\u00f4ng tinh ch\u1ec9nh theo OOS."
+}
