@@ -207,8 +207,9 @@ def run_h01(mode):
             if not filt(i,mode): continue
             r=h1_sim(i)
             if r is None: continue
-            ret,h,_=r
-            tr.append({"ret":ret,"yr":datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year,"t_in":bars4h[i]["time"]}); last[sn]=i
+            ret,h,xj=r
+            tr.append({"ret":ret,"yr":datetime.datetime.utcfromtimestamp(bars4h[i]["time"]/1000).year,
+                       "t_in":bars4h[i]["time"],"i":i,"xj":xj}); last[sn]=i
     return tr
 def h1_stats(t):
     r=[x["ret"] for x in t]; nn=len(r)
@@ -347,3 +348,39 @@ for m in ["A", "B", "C", "D", "E", "E15", "E25", "E30"]:
     htr = h1_range(tr, TRAIN_LO, TRAIN_HI); hoos = h1_range(tr, OOS_LO, OOS_HI)
     print(f"  {m:>4} | {htr['sharpe']:>8.2f} | {htr['dollars']:>+9,.0f} | {hoos['sharpe']:>7.2f} | {hoos['dollars']:>+9,.0f}")
 print("\n  (E* = drawdown variants = RESEARCH-ONLY, không đưa live. C/D = rejected.)")
+
+# ===================== TASK F: WALK-FORWARD (Codex 2-split) =====================
+# Chọn persistBars CHỈ bằng train, mở OOS đúng 1 lần. Metric: Sharpe, net$, maxDD, #trades, BEAR-exposure.
+def ms_of(y, m): return int(datetime.datetime(y, m, 1, tzinfo=datetime.timezone.utc).timestamp() * 1000)
+def sub_ts(trades, lo, hi): return [t for t in trades if lo <= t["t_in"] < hi]
+def bear_exposure(trades, mode):
+    if not trades: return 0.0
+    cnt = 0
+    for t in trades:
+        for j in range(t["i"], min(t["xj"], n - 1) + 1):
+            if get_reg(mode, bars4h[j]["time"]) == "BEAR": cnt += 1; break
+    return cnt / len(trades) * 100
+def metrics(trades, mode):
+    st = h1_stats(trades)
+    return dict(n=st["n"], sh=st["sharpe"], usd=st["dollars"], mdd=st["mdd"], bear=bear_exposure(trades, mode))
+
+SPLITS = [
+    ("Split1", ms_of(2019, 9), ms_of(2023, 1), ms_of(2025, 1)),   # train→2022-12, OOS 2023-01..2024-12
+    ("Split2", ms_of(2019, 9), ms_of(2025, 1), ms_of(2026, 7)),   # train→2024-12, OOS 2025-01..2026-06
+]
+print("\n"+"="*84); print("TASK F — WALK-FORWARD (Codex): chọn pb bằng TRAIN, mở OOS 1 lần"); print("="*84)
+allTrades = {pb: run_h01(f"Apb{pb}") for pb in (1, 2, 3)}
+for name, tr0, oos0, oos1 in SPLITS:
+    tlabel = f"{datetime.datetime.utcfromtimestamp(tr0/1000):%Y-%m}→{datetime.datetime.utcfromtimestamp((oos0-1)/1000):%Y-%m}"
+    olabel = f"{datetime.datetime.utcfromtimestamp(oos0/1000):%Y-%m}→{datetime.datetime.utcfromtimestamp((oos1-1)/1000):%Y-%m}"
+    print(f"\n  ── {name}: TRAIN {tlabel} | OOS {olabel} ──")
+    print(f"  {'pb':>2} | {'TR Sh':>6} {'TR $':>9} {'TR DD%':>6} {'TR n':>4} {'TR bear%':>8} | {'OOS Sh':>6} {'OOS $':>9} {'OOS DD%':>7} {'OOS n':>5} {'OOS bear%':>9}")
+    trainPick = None; bestSh = -9
+    for pb in (1, 2, 3):
+        mode = f"Apb{pb}"
+        tr = metrics(sub_ts(allTrades[pb], tr0, oos0), mode)
+        oo = metrics(sub_ts(allTrades[pb], oos0, oos1), mode)
+        if tr["sh"] > bestSh: bestSh = tr["sh"]; trainPick = pb
+        print(f"  {pb:>2} | {tr['sh']:>6.2f} {tr['usd']:>+9,.0f} {tr['mdd']:>5.0f}% {tr['n']:>4} {tr['bear']:>7.0f}% | "
+              f"{oo['sh']:>6.2f} {oo['usd']:>+9,.0f} {oo['mdd']:>6.0f}% {oo['n']:>5} {oo['bear']:>8.0f}%")
+    print(f"  → TRAIN chọn pb={trainPick} (Sharpe cao nhất trên train). OOS của pb={trainPick} ở dòng tương ứng.")

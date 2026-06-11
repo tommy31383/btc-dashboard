@@ -54,8 +54,33 @@ turtle full-7y: pb1 $258 / pb2 $208 / pb3 $221. MaxDD 35% cả ba. Bảo vệ 20
 tốt hơn 3 phút" của Tommy được data xác nhận.
 
 **Lưu ý kiến trúc:** P0-rework dùng **Option B (timestamp-guard)** — chỉ áp persistence-step 1 lần
-mỗi daily close (loại jitter intraday do bug đếm-theo-tick). persistBars=1 + Option B = phản ứng
-đúng 1 lần/daily close, sạch và tối ưu. Đổi default 3→1 có cơ sở train+OOS (chờ Tommy chốt).
+mỗi daily close (loại jitter intraday do bug đếm-theo-tick). Timestamp-guard giữ BẤT KỂ chốt pb nào
+(correctness fix độc lập). persistBars=1 + Option B = phản ứng đúng 1 lần/daily close.
+
+## Walk-forward (Codex 2-split) — chọn pb bằng TRAIN, mở OOS đúng 1 lần
+
+Metric: Sharpe, net$, maxDD, #trades, BEAR-exposure (trade có ≥1 bar giữ rơi vào ngày BEAR).
+
+**Split 1 — TRAIN 2019-09→2022-12 / OOS 2023-01→2024-12:**
+
+| pb | TRAIN Sh | OOS Sh | OOS $ | OOS DD% | OOS n | OOS bear% |
+|---|---|---|---|---|---|---|
+| **1** (train chọn) | 1.55 | **2.59** | **+183,527** | 14% | 56 | 4% |
+| 2 | 1.36 | 2.54 | +179,674 | 11% | 52 | 0% |
+| 3 | 1.36 | 2.36 | +165,338 | 11% | 50 | 0% |
+
+**Split 2 — TRAIN 2019-09→2024-12 / OOS 2025-01→2026-06:**
+
+| pb | TRAIN Sh | OOS Sh | OOS $ | OOS DD% | OOS n | OOS bear% |
+|---|---|---|---|---|---|---|
+| **1** (train chọn) | 1.84 | 0.73 | +11,656 | 17% | 18 | 0% |
+| 2 | 1.74 | 0.73 | +11,656 | 17% | 18 | 0% |
+| 3 | 1.65 | 0.73 | +11,656 | 17% | 18 | 0% |
+
+**Kết luận walk-forward:** cả 2 split train đều chọn pb=1. Split1 OOS pb=1 thắng (+$18k, Sh 2.59);
+Split2 OOS pb=1/2/3 giống hệt (pb không tác động giai đoạn 2025-26). Theo luật Codex ("pb=1 thắng
+hoặc không kém đáng kể trên cả hai OOS → dùng 1") → **đề xuất pb=1**, ổn định qua 2 walk-forward.
+Live default vẫn = **3** cho tới khi Tommy chốt flip.
 
 ## Giới hạn
 
