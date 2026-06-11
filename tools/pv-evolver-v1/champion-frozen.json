@@ -1,0 +1,80 @@
+{
+  "version": "PV_EVOLVER_v1",
+  "frozen_at": "2026-06-11T04:47:02Z",
+  "params": {
+    "tf": "4h",
+    "L": 5,
+    "volMult": 2.468,
+    "minRiskPct": 0.666,
+    "dir": "L",
+    "exitMode": "flip",
+    "tpR": 0.0
+  },
+  "train_validation": {
+    "params": {
+      "tf": "4h",
+      "L": 5,
+      "volMult": 2.468,
+      "minRiskPct": 0.666,
+      "dir": "L",
+      "exitMode": "flip",
+      "tpR": 0.0
+    },
+    "score": 104.3,
+    "valMeanAvg": 1.789,
+    "valMeanMed": 0.523,
+    "posWinRatio": 0.75,
+    "valTotN": 25,
+    "valMaxDD": 4.96,
+    "trainValDegr": 0.796,
+    "windows": [
+      {
+        "val": 2022,
+        "trainAvg": 2.164,
+        "valAvg": -0.585,
+        "valMed": -1.013,
+        "valN": 7,
+        "valTot": -4.09,
+        "valWin": 14.3,
+        "valMdd": 4.96
+      },
+      {
+        "val": 2023,
+        "trainAvg": 0.561,
+        "valAvg": 1.84,
+        "valMed": -0.538,
+        "valN": 9,
+        "valTot": 16.56,
+        "valWin": 33.3,
+        "valMdd": 3.95
+      },
+      {
+        "val": 2024,
+        "trainAvg": 1.109,
+        "valAvg": 4.662,
+        "valMed": 3.71,
+        "valN": 4,
+        "valTot": 18.65,
+        "valWin": 75.0,
+        "valMdd": 0.53
+      },
+      {
+        "val": 2025,
+        "trainAvg": 1.677,
+        "valAvg": 1.241,
+        "valMed": -0.069,
+        "valN": 5,
+        "valTot": 6.2,
+        "valWin": 40.0,
+        "valMdd": 1.53
+      }
+    ]
+  },
+  "oos": {
+    "window": [
+      2026,
+      2026
+    ],
+    "status": "FROZEN \u2014 NOT evaluated (open once, separately)"
+  }
+}

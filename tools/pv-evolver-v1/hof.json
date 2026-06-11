@@ -1,0 +1,727 @@
+{
+  "version": "PV_EVOLVER_v1",
+  "selection": "train+validation ONLY (OOS untouched)",
+  "rounds": 1500,
+  "hof": [
+    {
+      "params": {
+        "tf": "4h",
+        "L": 5,
+        "volMult": 2.468,
+        "minRiskPct": 0.666,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 104.3,
+      "valMeanAvg": 1.789,
+      "valMeanMed": 0.523,
+      "posWinRatio": 0.75,
+      "valTotN": 25,
+      "valMaxDD": 4.96,
+      "trainValDegr": 0.796,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 2.164,
+          "valAvg": -0.585,
+          "valMed": -1.013,
+          "valN": 7,
+          "valTot": -4.09,
+          "valWin": 14.3,
+          "valMdd": 4.96
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.561,
+          "valAvg": 1.84,
+          "valMed": -0.538,
+          "valN": 9,
+          "valTot": 16.56,
+          "valWin": 33.3,
+          "valMdd": 3.95
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.109,
+          "valAvg": 4.662,
+          "valMed": 3.71,
+          "valN": 4,
+          "valTot": 18.65,
+          "valWin": 75.0,
+          "valMdd": 0.53
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.677,
+          "valAvg": 1.241,
+          "valMed": -0.069,
+          "valN": 5,
+          "valTot": 6.2,
+          "valWin": 40.0,
+          "valMdd": 1.53
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 5,
+        "volMult": 1.871,
+        "minRiskPct": 0.365,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 89.88,
+      "valMeanAvg": 1.38,
+      "valMeanMed": 0.555,
+      "posWinRatio": 0.75,
+      "valTotN": 41,
+      "valMaxDD": 6.8,
+      "trainValDegr": 1.007,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 2.597,
+          "valAvg": -0.619,
+          "valMed": -1.013,
+          "valN": 11,
+          "valTot": -6.8,
+          "valWin": 9.1,
+          "valMdd": 6.8
+        },
+        {
+          "val": 2023,
+          "trainAvg": 1.123,
+          "valAvg": 1.491,
+          "valMed": -0.085,
+          "valN": 14,
+          "valTot": 20.88,
+          "valWin": 50.0,
+          "valMdd": 4.78
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.259,
+          "valAvg": 3.846,
+          "valMed": 3.187,
+          "valN": 6,
+          "valTot": 23.08,
+          "valWin": 66.7,
+          "valMdd": 1.02
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.612,
+          "valAvg": 0.8,
+          "valMed": 0.133,
+          "valN": 10,
+          "valTot": 8.0,
+          "valWin": 50.0,
+          "valMdd": 2.48
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "12h",
+        "L": 4,
+        "volMult": 1.06,
+        "minRiskPct": 0.59,
+        "dir": "LS",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 76.02,
+      "valMeanAvg": 1.303,
+      "valMeanMed": -0.078,
+      "posWinRatio": 1.0,
+      "valTotN": 34,
+      "valMaxDD": 4.2,
+      "trainValDegr": 0.263,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 0.412,
+          "valAvg": 0.393,
+          "valMed": 0.134,
+          "valN": 9,
+          "valTot": 3.54,
+          "valWin": 55.6,
+          "valMdd": 0.83
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.406,
+          "valAvg": 3.739,
+          "valMed": 0.278,
+          "valN": 8,
+          "valTot": 29.91,
+          "valWin": 50.0,
+          "valMdd": 2.05
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.09,
+          "valAvg": 0.694,
+          "valMed": -0.416,
+          "valN": 8,
+          "valTot": 5.55,
+          "valWin": 12.5,
+          "valMdd": 4.2
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.023,
+          "valAvg": 0.384,
+          "valMed": -0.308,
+          "valN": 9,
+          "valTot": 3.46,
+          "valWin": 44.4,
+          "valMdd": 2.47
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "12h",
+        "L": 3,
+        "volMult": 2.34,
+        "minRiskPct": 0.06,
+        "dir": "LS",
+        "exitMode": "tp",
+        "tpR": 3.48
+      },
+      "score": 74.07,
+      "valMeanAvg": 1.078,
+      "valMeanMed": 1.023,
+      "posWinRatio": 0.5,
+      "valTotN": 10,
+      "valMaxDD": 2.34,
+      "trainValDegr": 0.571,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 0.585,
+          "valAvg": 3.468,
+          "valMed": 3.468,
+          "valN": 1,
+          "valTot": 3.47,
+          "valWin": 100.0,
+          "valMdd": 0
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.997,
+          "valAvg": -0.415,
+          "valMed": -0.658,
+          "valN": 4,
+          "valTot": -1.66,
+          "valWin": 25.0,
+          "valMdd": 2.34
+        },
+        {
+          "val": 2024,
+          "trainAvg": 0.483,
+          "valAvg": -0.388,
+          "valMed": -0.366,
+          "valN": 3,
+          "valTot": -1.16,
+          "valWin": 33.3,
+          "valMdd": 1.38
+        },
+        {
+          "val": 2025,
+          "trainAvg": 0.297,
+          "valAvg": 1.647,
+          "valMed": 1.647,
+          "valN": 2,
+          "valTot": 3.29,
+          "valWin": 50.0,
+          "valMdd": 0.14
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 5,
+        "volMult": 2.149,
+        "minRiskPct": 0.983,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 71.88,
+      "valMeanAvg": 1.393,
+      "valMeanMed": -0.074,
+      "posWinRatio": 0.75,
+      "valTotN": 33,
+      "valMaxDD": 6.46,
+      "trainValDegr": 0.562,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 1.602,
+          "valAvg": -0.646,
+          "valMed": -1.015,
+          "valN": 10,
+          "valTot": -6.46,
+          "valWin": 10.0,
+          "valMdd": 6.46
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.478,
+          "valAvg": 1.43,
+          "valMed": -0.538,
+          "valN": 11,
+          "valTot": 15.73,
+          "valWin": 36.4,
+          "valMdd": 4.78
+        },
+        {
+          "val": 2024,
+          "trainAvg": 0.816,
+          "valAvg": 3.525,
+          "valMed": 0.923,
+          "valN": 5,
+          "valTot": 17.63,
+          "valWin": 60.0,
+          "valMdd": 1.02
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.192,
+          "valAvg": 1.263,
+          "valMed": 0.335,
+          "valN": 7,
+          "valTot": 8.84,
+          "valWin": 57.1,
+          "valMdd": 1.53
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 5,
+        "volMult": 1.79,
+        "minRiskPct": 1.045,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 65.86,
+      "valMeanAvg": 1.207,
+      "valMeanMed": -0.011,
+      "posWinRatio": 0.75,
+      "valTotN": 44,
+      "valMaxDD": 7.98,
+      "trainValDegr": 0.747,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 1.868,
+          "valAvg": -0.614,
+          "valMed": -1.013,
+          "valN": 13,
+          "valTot": -7.98,
+          "valWin": 7.7,
+          "valMdd": 7.98
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.792,
+          "valAvg": 1.491,
+          "valMed": -0.085,
+          "valN": 14,
+          "valTot": 20.88,
+          "valWin": 50.0,
+          "valMdd": 4.78
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.015,
+          "valAvg": 3.151,
+          "valMed": 0.923,
+          "valN": 7,
+          "valTot": 22.06,
+          "valWin": 57.1,
+          "valMdd": 1.55
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.308,
+          "valAvg": 0.8,
+          "valMed": 0.133,
+          "valN": 10,
+          "valTot": 8.0,
+          "valWin": 50.0,
+          "valMdd": 2.48
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 5,
+        "volMult": 1.431,
+        "minRiskPct": 0.126,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 61.62,
+      "valMeanAvg": 1.199,
+      "valMeanMed": -0.146,
+      "posWinRatio": 0.75,
+      "valTotN": 60,
+      "valMaxDD": 8.7,
+      "trainValDegr": 0.679,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 1.403,
+          "valAvg": -0.42,
+          "valMed": -0.936,
+          "valN": 16,
+          "valTot": -6.73,
+          "valWin": 12.5,
+          "valMdd": 8.7
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.674,
+          "valAvg": 2.432,
+          "valMed": -0.039,
+          "valN": 19,
+          "valTot": 46.21,
+          "valWin": 47.4,
+          "valMdd": 4.78
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.24,
+          "valAvg": 2.273,
+          "valMed": 0.559,
+          "valN": 11,
+          "valTot": 25.0,
+          "valWin": 63.6,
+          "valMdd": 1.79
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.402,
+          "valAvg": 0.51,
+          "valMed": -0.17,
+          "valN": 14,
+          "valTot": 7.13,
+          "valWin": 42.9,
+          "valMdd": 4.07
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "4h",
+        "L": 6,
+        "volMult": 2.426,
+        "minRiskPct": 1.108,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 57.03,
+      "valMeanAvg": 1.457,
+      "valMeanMed": -0.303,
+      "posWinRatio": 0.75,
+      "valTotN": 26,
+      "valMaxDD": 4.83,
+      "trainValDegr": 1.599,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 5.022,
+          "valAvg": -0.566,
+          "valMed": -1.013,
+          "valN": 7,
+          "valTot": -3.96,
+          "valWin": 14.3,
+          "valMdd": 4.83
+        },
+        {
+          "val": 2023,
+          "trainAvg": 1.466,
+          "valAvg": 1.555,
+          "valMed": -1.017,
+          "valN": 9,
+          "valTot": 13.99,
+          "valWin": 44.4,
+          "valMdd": 4.12
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.506,
+          "valAvg": 3.701,
+          "valMed": 0.888,
+          "valN": 5,
+          "valTot": 18.5,
+          "valWin": 60.0,
+          "valMdd": 0.42
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.945,
+          "valAvg": 1.138,
+          "valMed": -0.069,
+          "valN": 5,
+          "valTot": 5.69,
+          "valWin": 40.0,
+          "valMdd": 2.04
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "12h",
+        "L": 4,
+        "volMult": 0.896,
+        "minRiskPct": 0.098,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 56.51,
+      "valMeanAvg": 1.216,
+      "valMeanMed": -0.32,
+      "posWinRatio": 0.75,
+      "valTotN": 33,
+      "valMaxDD": 3.71,
+      "trainValDegr": 0.587,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 0.854,
+          "valAvg": -0.464,
+          "valMed": -0.434,
+          "valN": 8,
+          "valTot": -3.71,
+          "valWin": 0.0,
+          "valMdd": 3.71
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.491,
+          "valAvg": 3.456,
+          "valMed": -0.192,
+          "valN": 8,
+          "valTot": 27.65,
+          "valWin": 37.5,
+          "valMdd": 3.25
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.132,
+          "valAvg": 1.683,
+          "valMed": -0.216,
+          "valN": 7,
+          "valTot": 11.78,
+          "valWin": 42.9,
+          "valMdd": 2.63
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.219,
+          "valAvg": 0.189,
+          "valMed": -0.44,
+          "valN": 10,
+          "valTot": 1.89,
+          "valWin": 20.0,
+          "valMdd": 2.12
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "12h",
+        "L": 4,
+        "volMult": 0.605,
+        "minRiskPct": 0.881,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 56.36,
+      "valMeanAvg": 1.169,
+      "valMeanMed": -0.316,
+      "posWinRatio": 0.75,
+      "valTotN": 37,
+      "valMaxDD": 4.52,
+      "trainValDegr": 0.535,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 0.748,
+          "valAvg": -0.452,
+          "valMed": -0.434,
+          "valN": 10,
+          "valTot": -4.52,
+          "valWin": 10.0,
+          "valMdd": 4.52
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.395,
+          "valAvg": 3.288,
+          "valMed": -0.188,
+          "valN": 9,
+          "valTot": 29.59,
+          "valWin": 44.4,
+          "valMdd": 2.23
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.001,
+          "valAvg": 1.683,
+          "valMed": -0.216,
+          "valN": 7,
+          "valTot": 11.78,
+          "valWin": 42.9,
+          "valMdd": 2.63
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.096,
+          "valAvg": 0.156,
+          "valMed": -0.428,
+          "valN": 11,
+          "valTot": 1.71,
+          "valWin": 18.2,
+          "valMdd": 2.12
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "12h",
+        "L": 4,
+        "volMult": 0.253,
+        "minRiskPct": 0.041,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 56.36,
+      "valMeanAvg": 1.169,
+      "valMeanMed": -0.316,
+      "posWinRatio": 0.75,
+      "valTotN": 37,
+      "valMaxDD": 4.52,
+      "trainValDegr": 0.535,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 0.748,
+          "valAvg": -0.452,
+          "valMed": -0.434,
+          "valN": 10,
+          "valTot": -4.52,
+          "valWin": 10.0,
+          "valMdd": 4.52
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.395,
+          "valAvg": 3.288,
+          "valMed": -0.188,
+          "valN": 9,
+          "valTot": 29.59,
+          "valWin": 44.4,
+          "valMdd": 2.23
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.001,
+          "valAvg": 1.683,
+          "valMed": -0.216,
+          "valN": 7,
+          "valTot": 11.78,
+          "valWin": 42.9,
+          "valMdd": 2.63
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.096,
+          "valAvg": 0.156,
+          "valMed": -0.428,
+          "valN": 11,
+          "valTot": 1.71,
+          "valWin": 18.2,
+          "valMdd": 2.12
+        }
+      ]
+    },
+    {
+      "params": {
+        "tf": "12h",
+        "L": 4,
+        "volMult": 0.207,
+        "minRiskPct": 1.082,
+        "dir": "L",
+        "exitMode": "flip",
+        "tpR": 0.0
+      },
+      "score": 56.36,
+      "valMeanAvg": 1.169,
+      "valMeanMed": -0.316,
+      "posWinRatio": 0.75,
+      "valTotN": 37,
+      "valMaxDD": 4.52,
+      "trainValDegr": 0.535,
+      "windows": [
+        {
+          "val": 2022,
+          "trainAvg": 0.748,
+          "valAvg": -0.452,
+          "valMed": -0.434,
+          "valN": 10,
+          "valTot": -4.52,
+          "valWin": 10.0,
+          "valMdd": 4.52
+        },
+        {
+          "val": 2023,
+          "trainAvg": 0.395,
+          "valAvg": 3.288,
+          "valMed": -0.188,
+          "valN": 9,
+          "valTot": 29.59,
+          "valWin": 44.4,
+          "valMdd": 2.23
+        },
+        {
+          "val": 2024,
+          "trainAvg": 1.001,
+          "valAvg": 1.683,
+          "valMed": -0.216,
+          "valN": 7,
+          "valTot": 11.78,
+          "valWin": 42.9,
+          "valMdd": 2.63
+        },
+        {
+          "val": 2025,
+          "trainAvg": 1.096,
+          "valAvg": 0.156,
+          "valMed": -0.428,
+          "valN": 11,
+          "valTot": 1.71,
+          "valWin": 18.2,
+          "valMdd": 2.12
+        }
+      ]
+    }
+  ]
+}
