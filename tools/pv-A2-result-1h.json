@@ -1,0 +1,163 @@
+{
+  "tf": "1h",
+  "n": 59219,
+  "n_hypotheses": 16,
+  "bonferroni_p": 0.00313,
+  "status": "DEVELOPMENT FEATURE TRIAGE \u2014 NOT OOS validation, NOT a strategy. All data <=2026-06 already seen.",
+  "prereg": "prereg-A2-auction-acceptance.md (locked before run)",
+  "params": {
+    "W": 20,
+    "X": 4.0,
+    "K": 2
+  },
+  "counts": {
+    "up": {
+      "ACCEPT": 380,
+      "REJECT": 250
+    },
+    "dn": {
+      "ACCEPT": 335,
+      "REJECT": 225
+    }
+  },
+  "by_direction": {
+    "up": {
+      "1": {
+        "nAcc": 380,
+        "nRej": 250,
+        "acc_mean": 0.0041,
+        "acc_med": -0.0198,
+        "acc_hit": 48.4,
+        "rej_mean": -0.0051,
+        "rej_hit": 49.6,
+        "rank_biserial": -0.039,
+        "p": 0.40707,
+        "bonferroni_pass": false
+      },
+      "3": {
+        "nAcc": 380,
+        "nRej": 250,
+        "acc_mean": -0.0232,
+        "acc_med": -0.0615,
+        "acc_hit": 45.5,
+        "rej_mean": -0.1109,
+        "rej_hit": 43.2,
+        "rank_biserial": 0.007,
+        "p": 0.8805,
+        "bonferroni_pass": false
+      },
+      "6": {
+        "nAcc": 380,
+        "nRej": 250,
+        "acc_mean": 0.0238,
+        "acc_med": -0.0622,
+        "acc_hit": 46.6,
+        "rej_mean": -0.0787,
+        "rej_hit": 43.2,
+        "rank_biserial": 0.025,
+        "p": 0.59226,
+        "bonferroni_pass": false
+      },
+      "12": {
+        "nAcc": 380,
+        "nRej": 250,
+        "acc_mean": 0.1332,
+        "acc_med": -0.0986,
+        "acc_hit": 45.0,
+        "rej_mean": -0.1051,
+        "rej_hit": 47.2,
+        "rank_biserial": 0.006,
+        "p": 0.9042,
+        "bonferroni_pass": false
+      }
+    },
+    "dn": {
+      "1": {
+        "nAcc": 335,
+        "nRej": 225,
+        "acc_mean": -0.0448,
+        "acc_med": 0.0038,
+        "acc_hit": 50.1,
+        "rej_mean": 0.0073,
+        "rej_hit": 50.7,
+        "rank_biserial": -0.031,
+        "p": 0.53784,
+        "bonferroni_pass": false
+      },
+      "3": {
+        "nAcc": 335,
+        "nRej": 225,
+        "acc_mean": -0.0087,
+        "acc_med": 0.0773,
+        "acc_hit": 55.2,
+        "rej_mean": -0.0061,
+        "rej_hit": 56.4,
+        "rank_biserial": -0.047,
+        "p": 0.34696,
+        "bonferroni_pass": false
+      },
+      "6": {
+        "nAcc": 335,
+        "nRej": 225,
+        "acc_mean": 0.0339,
+        "acc_med": 0.131,
+        "acc_hit": 56.1,
+        "rej_mean": 0.0644,
+        "rej_hit": 60.0,
+        "rank_biserial": -0.032,
+        "p": 0.51695,
+        "bonferroni_pass": false
+      },
+      "12": {
+        "nAcc": 335,
+        "nRej": 225,
+        "acc_mean": -0.0343,
+        "acc_med": 0.0289,
+        "acc_hit": 50.7,
+        "rej_mean": 0.2297,
+        "rej_hit": 63.1,
+        "rank_biserial": -0.105,
+        "p": 0.03455,
+        "bonferroni_pass": false
+      }
+    }
+  },
+  "vol_tier_dist": {
+    "lo": 30,
+    "mid": 256,
+    "hi": 904
+  },
+  "total_events": 1190,
+  "neighborhood_up_h6": {
+    "W15": {
+      "rb_up_h6": 0.007,
+      "nAcc": 699,
+      "nRej": 439
+    },
+    "W30": {
+      "rb_up_h6": 0.15,
+      "nAcc": 118,
+      "nRej": 63
+    },
+    "X3": {
+      "rb_up_h6": -0.023,
+      "nAcc": 141,
+      "nRej": 96
+    },
+    "X5": {
+      "rb_up_h6": 0.032,
+      "nAcc": 621,
+      "nRej": 380
+    },
+    "K1": {
+      "rb_up_h6": -0.004,
+      "nAcc": 475,
+      "nRej": 184
+    },
+    "K3": {
+      "rb_up_h6": 0.042,
+      "nAcc": 317,
+      "nRej": 297
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "tf": "4h",
+  "n": 14805,
+  "n_hypotheses": 16,
+  "bonferroni_p": 0.00313,
+  "status": "DEVELOPMENT FEATURE TRIAGE \u2014 NOT OOS validation, NOT a strategy. All data <=2026-06 already seen.",
+  "prereg": "prereg-A2-auction-acceptance.md (locked before run)",
+  "params": {
+    "W": 20,
+    "X": 4.0,
+    "K": 2
+  },
+  "counts": {
+    "up": {
+      "ACCEPT": 102,
+      "REJECT": 56
+    },
+    "dn": {
+      "ACCEPT": 90,
+      "REJECT": 54
+    }
+  },
+  "by_direction": {
+    "up": {
+      "1": {
+        "nAcc": 102,
+        "nRej": 56,
+        "note": "group<150 (acc102/rej56) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      },
+      "3": {
+        "nAcc": 102,
+        "nRej": 56,
+        "note": "group<150 (acc102/rej56) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      },
+      "6": {
+        "nAcc": 102,
+        "nRej": 56,
+        "note": "group<150 (acc102/rej56) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      },
+      "12": {
+        "nAcc": 102,
+        "nRej": 56,
+        "note": "group<150 (acc102/rej56) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      }
+    },
+    "dn": {
+      "1": {
+        "nAcc": 90,
+        "nRej": 54,
+        "note": "group<150 (acc90/rej54) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      },
+      "3": {
+        "nAcc": 90,
+        "nRej": 54,
+        "note": "group<150 (acc90/rej54) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      },
+      "6": {
+        "nAcc": 90,
+        "nRej": 54,
+        "note": "group<150 (acc90/rej54) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      },
+      "12": {
+        "nAcc": 90,
+        "nRej": 54,
+        "note": "group<150 (acc90/rej54) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+      }
+    }
+  },
+  "vol_tier_dist": {
+    "lo": 4,
+    "mid": 80,
+    "hi": 218
+  },
+  "total_events": 302,
+  "neighborhood_up_h6": {
+    "W15": {
+      "rb_up_h6": -0.144,
+      "nAcc": 193,
+      "nRej": 106
+    },
+    "W30": {
+      "rb_up_h6": null,
+      "nAcc": 27,
+      "nRej": 10
+    },
+    "X3": {
+      "rb_up_h6": null,
+      "nAcc": 24,
+      "nRej": 22
+    },
+    "X5": {
+      "rb_up_h6": -0.16,
+      "nAcc": 192,
+      "nRej": 100
+    },
+    "K1": {
+      "rb_up_h6": null,
+      "nAcc": 121,
+      "nRej": 42
+    },
+    "K3": {
+      "rb_up_h6": -0.175,
+      "nAcc": 90,
+      "nRej": 64
+    }
+  }
+}
