@@ -70,7 +70,9 @@ def run(tf):
     for st in STATES+["NEUTRAL"]:
         idxs=[i for i in range(n) if states[i]==st]
         res[st]={"n":len(idxs),"idxs":idxs}
-    report={"tf":tf,"n":n,"bonferroni_p":round(BONF,5),"states":{}}
+    report={"tf":tf,"n":n,"bonferroni_p":round(BONF,5),"n_hypotheses":N_TESTS,
+            "status":"DEVELOPMENT FEATURE TRIAGE — NOT OOS validation, NOT a strategy. All data <=2026-06 already seen.",
+            "prereg":"prereg-A1-effort-result.md (locked before run)","states":{}}
     neutral_idx=res["NEUTRAL"]["idxs"]
     for st in STATES:
         idxs=res[st]["idxs"]; report["states"][st]={"n_total":len(idxs),"horizons":{}}
