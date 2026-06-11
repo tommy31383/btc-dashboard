@@ -1,0 +1,273 @@
+{
+  "tf": "4h",
+  "n": 14805,
+  "bonferroni_p": 0.00313,
+  "states": {
+    "EXHAUSTION": {
+      "n_total": 1721,
+      "horizons": {
+        "1": {
+          "n": 1721,
+          "mean": 0.0276,
+          "median": 0.0384,
+          "hitrate": 52.4,
+          "upMFE": 1.219,
+          "dnMAE": -1.354,
+          "rangeExp": 1.997,
+          "rank_biserial": 0.008,
+          "p": 0.58326,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "4/8"
+        },
+        "3": {
+          "n": 1721,
+          "mean": 0.0276,
+          "median": 0.0108,
+          "hitrate": 50.4,
+          "upMFE": 1.933,
+          "dnMAE": -2.153,
+          "rangeExp": 3.173,
+          "rank_biserial": -0.003,
+          "p": 0.83246,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "5/8"
+        },
+        "6": {
+          "n": 1721,
+          "mean": 0.116,
+          "median": 0.1391,
+          "hitrate": 52.8,
+          "upMFE": 2.645,
+          "dnMAE": -2.907,
+          "rangeExp": 4.413,
+          "rank_biserial": 0.005,
+          "p": 0.73482,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "5/8"
+        },
+        "12": {
+          "n": 1721,
+          "mean": 0.1645,
+          "median": 0.192,
+          "hitrate": 53.3,
+          "upMFE": 3.505,
+          "dnMAE": -3.758,
+          "rangeExp": 5.879,
+          "rank_biserial": -0.003,
+          "p": 0.84886,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "5/8"
+        }
+      }
+    },
+    "ABSORPTION": {
+      "n_total": 16,
+      "horizons": {
+        "1": {
+          "n": 16,
+          "note": "<MIN_FULL(200) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+        },
+        "3": {
+          "n": 16,
+          "note": "<MIN_FULL(200) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+        },
+        "6": {
+          "n": 16,
+          "note": "<MIN_FULL(200) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+        },
+        "12": {
+          "n": 16,
+          "note": "<MIN_FULL(200) \u2014 kh\u00f4ng b\u00e1o c\u00e1o ch\u00ednh"
+        }
+      }
+    },
+    "DEMAND": {
+      "n_total": 730,
+      "horizons": {
+        "1": {
+          "n": 730,
+          "mean": -0.0369,
+          "median": -0.1051,
+          "hitrate": 44.5,
+          "upMFE": 1.035,
+          "dnMAE": -1.053,
+          "rangeExp": 1.416,
+          "rank_biserial": -0.061,
+          "p": 0.00578,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "4/7"
+        },
+        "3": {
+          "n": 730,
+          "mean": 0.0438,
+          "median": -0.0252,
+          "hitrate": 48.9,
+          "upMFE": 1.711,
+          "dnMAE": -1.811,
+          "rangeExp": 2.396,
+          "rank_biserial": -0.026,
+          "p": 0.24224,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "3/7"
+        },
+        "6": {
+          "n": 729,
+          "mean": 0.0439,
+          "median": -0.0661,
+          "hitrate": 48.6,
+          "upMFE": 2.396,
+          "dnMAE": -2.544,
+          "rangeExp": 3.368,
+          "rank_biserial": -0.028,
+          "p": 0.20167,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "3/7"
+        },
+        "12": {
+          "n": 729,
+          "mean": 0.143,
+          "median": 0.0797,
+          "hitrate": 51.0,
+          "upMFE": 3.32,
+          "dnMAE": -3.541,
+          "rangeExp": 4.661,
+          "rank_biserial": -0.019,
+          "p": 0.38021,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "4/7"
+        }
+      }
+    },
+    "SUPPLY": {
+      "n_total": 685,
+      "horizons": {
+        "1": {
+          "n": 685,
+          "mean": 0.0666,
+          "median": 0.1402,
+          "hitrate": 55.8,
+          "upMFE": 0.997,
+          "dnMAE": -1.14,
+          "rangeExp": 1.449,
+          "rank_biserial": 0.061,
+          "p": 0.00741,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "5/7"
+        },
+        "3": {
+          "n": 685,
+          "mean": 0.0432,
+          "median": 0.139,
+          "hitrate": 54.3,
+          "upMFE": 1.656,
+          "dnMAE": -1.89,
+          "rangeExp": 2.442,
+          "rank_biserial": 0.029,
+          "p": 0.20829,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "4/7"
+        },
+        "6": {
+          "n": 685,
+          "mean": 0.1939,
+          "median": 0.2671,
+          "hitrate": 54.3,
+          "upMFE": 2.378,
+          "dnMAE": -2.562,
+          "rangeExp": 3.471,
+          "rank_biserial": 0.031,
+          "p": 0.17846,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "5/7"
+        },
+        "12": {
+          "n": 684,
+          "mean": 0.0086,
+          "median": 0.0868,
+          "hitrate": 50.7,
+          "upMFE": 3.297,
+          "dnMAE": -3.657,
+          "rangeExp": 4.978,
+          "rank_biserial": -0.017,
+          "p": 0.45641,
+          "bonferroni_pass": false,
+          "year_sign_consistency": "4/7"
+        }
+      }
+    }
+  },
+  "neighborhood_h6_rankbiserial": {
+    "EXHAUSTION": [
+      [
+        "LB40",
+        0.012
+      ],
+      [
+        "LB60",
+        0.007
+      ],
+      [
+        "vol+.2",
+        0.016
+      ],
+      [
+        "vol-.2",
+        0.006
+      ],
+      [
+        "rng\u00b1.2",
+        0.014
+      ]
+    ],
+    "ABSORPTION": [
+      [
+        "rng\u00b1.2",
+        -0.005
+      ]
+    ],
+    "DEMAND": [
+      [
+        "LB40",
+        -0.034
+      ],
+      [
+        "LB60",
+        -0.017
+      ],
+      [
+        "vol+.2",
+        -0.007
+      ],
+      [
+        "vol-.2",
+        -0.038
+      ],
+      [
+        "rng\u00b1.2",
+        -0.043
+      ]
+    ],
+    "SUPPLY": [
+      [
+        "LB40",
+        0.048
+      ],
+      [
+        "LB60",
+        0.058
+      ],
+      [
+        "vol+.2",
+        0.035
+      ],
+      [
+        "vol-.2",
+        0.038
+      ],
+      [
+        "rng\u00b1.2",
+        0.014
+      ]
+    ]
+  }
+}
