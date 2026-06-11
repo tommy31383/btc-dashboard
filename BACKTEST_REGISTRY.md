@@ -19,8 +19,8 @@ Canonical registry cho mọi dataset backtest. Mỗi entry có **tên (key)** + 
 - **Data:** `.cache/binance-1h-7y.json` (sha256 `D7CF3C66FC438B69..`, 59,219×1h, 2019-09-08→2026-06-11) + `.cache/binance-funding-7y.json` (sha256 `89AC541F38568E7C..`, 7,398 recs). Source: `fapi.binance.com`. Fetched 2026-06-11.
 - **Engines:** hedge01 v0.4.79 + turtle (faithful), $100k, fee 0.05%/side. Split TRAIN 2019–2023 / OOS 2024–2026.
 - **#6 verdict:** **KEEP classifier A** (`close<MA200`, = `regime.ts` hiện tại). A robust train(Sh1.32)+OOS(Sh2.04), bảo vệ real-bear 2022/2026 = 0%. **C/D = REJECTED** (D overfit: train Sh1.41 cao nhất nhưng OOS 1.78<A; full-7y chỉ lời nhờ re-enter real-bear 2022 −15%). **E*/drawdown = RESEARCH-ONLY**, không đưa live.
-- **P0 verdict:** `persistBars=1` thắng train(Sh1.55)+OOS(Sh2.13)+full-7y(Sh1.70/+$279k) > pb2 > **pb3 (default hiện tại, tệ nhất Sh1.54/+$250k)**. Đề xuất đổi default 3→1 (validated OOS, chờ Tommy chốt). Áp dụng cùng Option B timestamp-guard (server `regime.ts` `stepRegimePersist`).
-- **Status:** active · server-side change (P0 persistence) ở `btc-trader-server`, chưa deploy.
+- **P0 verdict:** **CHỐT `persistBars=1`** (2026-06-11). Walk-forward Codex 2-split (TASK F): cả 2 split train chọn pb=1; Split1 OOS pb=1 thắng (Sh2.59 vs 2.36, +$18k), Split2 OOS pb=1=pb2=pb3. Full-7y Sh1.70/+$279k. **Trade-off (Split1 OOS): maxDD 14% (vs 11% ở pb=2/3) + BEAR-exposure 4% (vs 0%)**, đổi lại Sharpe 2.59 (vs 2.36) + ~+$18k. Áp cùng Option B timestamp-guard.
+- **Status:** active · **pb=1 DEPLOYED-IN-CODE** (`btc-trader-server` HEAD `db372fa`, hedge01.ts:810) — npm test 6/6 + build PASS — **NHƯNG CHƯA deploy lên VPS** (server đang chạy code cũ pb=3 cho tới khi `./deploy.sh`). Timestamp-guard (Option B) cũng deployed-in-code, chưa lên VPS.
 
 ### `TPSL_GRID_v1`
 - **Type:** TP × SL grid sweep
