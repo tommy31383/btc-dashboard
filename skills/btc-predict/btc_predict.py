@@ -1,23 +1,53 @@
 #!/usr/bin/env python3
 """
-BTC Predict — Composite Candle Forecast
-Tổng hợp OHLC trung bình từng cây nến tương lai của các kịch bản tương tự
-Output: /tmp/btc_predict.html
+BTC Predict — Historical Analog Distribution (NOT a forecast)
+Tổng hợp OHLC trung bình từng cây nến tương lai của các kịch bản tương tự (context-only).
+Output: btc_predict.html trong thư mục tạm hệ thống (tempfile.gettempdir()).
 """
 
-import json, urllib.request, ssl, os, base64, subprocess
+import json, urllib.request, ssl, os, base64, subprocess, sys, tempfile
 from datetime import datetime, timezone, timedelta
 import statistics
 
+# TLS verification ON (default verified context). Never CERT_NONE.
 _SSL_CTX = ssl.create_default_context()
-_SSL_CTX.check_hostname = False
-_SSL_CTX.verify_mode   = ssl.CERT_NONE
+
+# Console may be cp1252 (Windows) → force UTF-8 so unicode in logs never crashes.
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 
 CACHE_PATH   = os.environ.get("BTC_5M_CACHE") or os.path.expanduser("~/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json")
 BINANCE_BASE = "https://api.binance.com/api/v3"
-CHART_PATH   = "/tmp/btc_predict_chart.png"
-HTML_PATH    = "/tmp/btc_predict.html"
-RESULT_PATH  = "/tmp/btc_predict_result.json"
+_TMP         = tempfile.gettempdir()  # cross-platform temp dir (not hardcoded /tmp)
+CHART_PATH   = os.path.join(_TMP, "btc_predict_chart.png")
+HTML_PATH    = os.path.join(_TMP, "btc_predict.html")
+RESULT_PATH  = os.path.join(_TMP, "btc_predict_result.json")
+
+# Required disclaimer text (asserted by test_btc_predict.py). Do NOT weaken.
+DISCLAIMER_LINES = [
+    "NOT A FORECAST / NOT A TRADING SIGNAL",
+    "Backtest OOS: median historical continuation does not beat base-rate (~coin-flip).",
+    "Analog method did not beat climatology.",
+]
+
+def disclaimer_banner():
+    """Red HTML disclaimer banner. Embeds the required DISCLAIMER_LINES verbatim.
+    Pure + testable. Framing = historical analog distribution, NOT a forecast."""
+    return f"""<div class="section" style="background:#2a0f12;border:1px solid #b03030">
+  <h3 style="color:#ef5350">⚠️ {DISCLAIMER_LINES[0]}</h3>
+  <p style="color:#e0b0b0;font-size:12px;line-height:1.6;margin:0">
+    Đây là <strong>historical analog distribution</strong> — phân phối kết quả lịch sử của các cửa sổ 14D
+    giống hiện tại về hình dạng. <strong>{DISCLAIMER_LINES[0]}.</strong>
+    <br>• <strong>{DISCLAIMER_LINES[1]}</strong>
+    <br>• {DISCLAIMER_LINES[2]}
+    <br>• Band Q25–Q75 phản ánh các analog chồng lấn (không độc lập) → đọc như dải RỘNG, kém tin cậy.
+    <br>• Các analog trộn nhiều regime (bull/bear) — không tách.
+    <br><strong>Context-only — KHÔNG dùng cho entry / sizing / TP / SL.</strong>
+  </p>
+</div>"""
 
 LOOK_BACK    = 14   # days of context for matching
 LOOK_FWD     = 30   # days of prediction forward
@@ -364,15 +394,15 @@ def draw_prediction_chart(live_bars, predicted, matches_summary, cur_close, cur_
     col30 = '#26a69a' if med30 >= 0 else '#ef5350'
 
     fig.suptitle(
-        f'BTC Predicted Path — {cur_date} · '
-        f'{n_match} kịch bản tương tự · '
-        f'+30D median: {med30:+.1f}% · '
-        f'Win30D: {win30}/{n_match}',
+        f'BTC Historical Analog Distribution (NOT a forecast) — {cur_date} · '
+        f'{n_match} kịch bản giống hình dạng · '
+        f'+30D analog median: {med30:+.1f}% · '
+        f'Up30D: {win30}/{n_match}',
         color=TITLE_COL, fontsize=13, fontweight='bold', y=0.98
     )
 
     ax1.text(div_x + 0.5, ymax * 0.9995,
-             f'  ▶ Predicted path\n  ({n_match} analogs)',
+             f'  ▶ Analog median path — NO proven edge\n  ({n_match} analogs)',
              color='#ffa726', fontsize=9, va='top')
 
     plt.savefig(CHART_PATH, dpi=150, bbox_inches='tight',
@@ -732,8 +762,10 @@ def main():
 <body>
 <div class="container">
 
-<h1>🔮 BTC Predicted Path</h1>
-<h2>Generated {result['generated_at']} · {len(result['matches'])} analog scenarios · {LOOK_FWD}D composite forecast</h2>
+<h1>📊 BTC Historical Analog Distribution</h1>
+<h2>Generated {result['generated_at']} · {len(result['matches'])} analog scenarios · {LOOK_FWD}D — context only, NOT a forecast</h2>
+
+{disclaimer_banner()}
 
 <div class="section">
   <h3>Summary</h3>
@@ -741,19 +773,19 @@ def main():
     <div class="badge"><div class="badge-label">Current Price</div><div class="badge-value">${cur_close:,.0f}</div></div>
     <div class="badge"><div class="badge-label">14D Drop</div><div class="badge-value">{drop_from_peak:+.1f}%</div></div>
     <div class="badge"><div class="badge-label">Analogs Found</div><div class="badge-value">{len(result['matches'])}</div></div>
-    <div class="badge"><div class="badge-label">+30D Median</div><div class="badge-value" style="color:{med30_col}">{med30:+.1f}%</div></div>
-    <div class="badge"><div class="badge-label">Win Rate +30D</div><div class="badge-value">{win30}/{len(d30s)}</div></div>
-    <div class="badge"><div class="badge-label">+30D Target</div><div class="badge-value">${cur_close*(1+med30/100):,.0f}</div></div>
+    <div class="badge"><div class="badge-label">+30D median continuation</div><div class="badge-value" style="color:{med30_col}">{med30:+.1f}%</div></div>
+    <div class="badge"><div class="badge-label">Up rate +30D (hist)</div><div class="badge-value">{win30}/{len(d30s)}</div></div>
+    <div class="badge"><div class="badge-label">+30D illustrative endpoint (NOT a target)</div><div class="badge-value" style="color:#888">${cur_close*(1+med30/100):,.0f}</div></div>
   </div>
 </div>
 
 <div class="section" style="padding:12px">
-  <h3 style="margin-bottom:10px">Composite Predicted Path ({len(result['matches'])} analogs)</h3>
+  <h3 style="margin-bottom:10px">Historical analog distribution ({len(result['matches'])} analogs)</h3>
   <img src="data:image/png;base64,{chart_b64}" class="chart-img" alt="Prediction Chart">
 </div>
 
 <div class="section">
-  <h3>Predicted OHLC by Day</h3>
+  <h3>Median historical continuation by day</h3>
   <div style="overflow-x:auto">
   <table>
     <thead>
@@ -801,7 +833,16 @@ def main():
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html)
     print(f"HTML saved → {HTML_PATH}")
-    subprocess.Popen(['open', HTML_PATH])
+    # Cross-platform open (macOS `open`, Windows `os.startfile`, Linux `xdg-open`).
+    try:
+        if sys.platform == 'darwin':
+            subprocess.Popen(['open', HTML_PATH])
+        elif sys.platform.startswith('win'):
+            os.startfile(HTML_PATH)  # type: ignore[attr-defined]
+        else:
+            subprocess.Popen(['xdg-open', HTML_PATH])
+    except Exception as e:
+        print(f"(could not auto-open browser: {e})")
 
 
 if __name__ == '__main__':
