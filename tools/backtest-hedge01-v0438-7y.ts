@@ -190,7 +190,9 @@ const ALL_ENABLED: ScenarioMask = {
 };
 
 interface S11Trade { id: string; entryPx: number; qty: number; tpPx: number; slPx: number; }
-interface TrendTrade { id: string; kind: string; side: "LONG" | "SHORT"; entryPx: number; qty: number; hwm: number; lwm: number; slPx: number; atrEntry: number; }
+interface TrendTrade { id: string; kind: string; side: "LONG" | "SHORT"; entryPx: number; qty: number; hwm: number; lwm: number; slPx: number; atrEntry: number; entryTs: number; }
+// capture for sizing/random-null analysis (2026-06-09) — only filled when non-null
+let TREND_CAPTURE: { kind: string; entryPx: number; exitPx: number; entryTs: number; exitTs: number; qty: number }[] | null = null;
 interface SimpleTrade { id: string; kind: string; side: "LONG" | "SHORT"; entryPx: number; qty: number; tpPx: number; slPx: number; expireTs: number; }
 
 function runBacktest(
@@ -269,6 +271,7 @@ function runBacktest(
         const rq = Math.max(0, net.qty - t.qty);
         if (t.side === "LONG") trendLongNet = { qty: rq, avg: rq > 0 ? net.avg : 0 };
         else trendShortNet = { qty: rq, avg: rq > 0 ? net.avg : 0 };
+        if (TREND_CAPTURE) TREND_CAPTURE.push({ kind: t.kind, entryPx: t.entryPx, exitPx: mark, entryTs: t.entryTs, exitTs: ts, qty: t.qty });
       } else newTrend.push(t);
     }
     trendTrades = newTrend;
@@ -538,7 +541,7 @@ function runBacktest(
         const nq = net.qty + qty;
         const newNet = { qty: nq, avg: (net.qty * net.avg + qty * mark) / nq };
         if (side === "LONG") trendLongNet = newNet; else trendShortNet = newNet;
-        trendTrades.push({ id: `${kind}_${side}_${ts}`, kind, side, entryPx: mark, qty, hwm: mark, lwm: mark, slPx, atrEntry: atrVal4h });
+        trendTrades.push({ id: `${kind}_${side}_${ts}`, kind, side, entryPx: mark, qty, hwm: mark, lwm: mark, slPx, atrEntry: atrVal4h, entryTs: ts });
         lastTs.v = ts;
         entries++;
         setupCounts[`${kind}${side[0]}`] = (setupCounts[`${kind}${side[0]}`] ?? 0) + 1;
@@ -866,6 +869,49 @@ function main() {
   };
   writeFileSync(join(__dirname, "..", "assets", "backtest_h01_v0438_7y_audit.json"), JSON.stringify(output, null, 2));
   console.log(`\nWritten assets/backtest_h01_v0438_7y_audit.json`);
+
+  // ── PROFIT-SOURCE breakdown: trend-only entries — random-null + asymmetry (2026-06-09) ──
+  // NOTE: v0438 trend logic (S12/S13/S14, ATR×3 trailing) — NOT current live v0.4.86 (missing
+  // RANGE-only + funding-block). Conclusion on entry-edge is DIRECTIONAL, not a deploy decision.
+  TREND_CAPTURE = [];
+  runBacktest(c5, c15, c1h, c4h, c1d, c1w, funding, ind,
+    { enableAggregate: false, enableSetup11: false, enableTrend: true, enableS15: false, enableS16: false, enableS17: false, enableShort: false },
+    0, c5.length, "trend_capture");
+  const caps = TREND_CAPTURE; TREND_CAPTURE = null;
+  const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); const n = s.length; return n ? (n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2) : 0; };
+  const rets = caps.map(t => (t.exitPx - t.entryPx) / t.entryPx * 100);   // LONG raw return %
+  const wins = rets.filter(r => r > 0), losses = rets.filter(r => r <= 0);
+  // random-null: random 5m entry, hold = same bar-duration (5m bars), x3 null per trade
+  let seed = 98765; const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const randRets: number[] = [];
+  for (const t of caps) {
+    const hb = Math.max(1, Math.round((t.exitTs - t.entryTs) / 300000)); // 5m bars
+    for (let k = 0; k < 3; k++) { const s = 300 + Math.floor(rnd() * (c5.length - 300 - hb - 1)); randRets.push((c5[s + hb].close - c5[s].close) / c5[s].close * 100); }
+  }
+  console.log("\n=== HEDGE01 trend-only — PROFIT SOURCE (v0438 directional) ===");
+  console.log(`  n trades=${caps.length}  WR=${(100 * wins.length / caps.length).toFixed(0)}%`);
+  console.log(`  median trade return = ${median(rets).toFixed(3)}%  | median WIN +${median(wins).toFixed(2)}%  median LOSS ${median(losses).toFixed(2)}%`);
+  console.log(`  ASYMMETRY R = ${(Math.abs(median(wins) / median(losses))).toFixed(2)} : 1 (win:loss median)`);
+  console.log(`  median RANDOM-entry (matched hold, x3) = ${median(randRets).toFixed(3)}%`);
+  console.log(`  medAlpha (entry - random) = ${(median(rets) - median(randRets)).toFixed(3)}%  (⚠️ confound: trailing-exit duration-bias trong bull)`);
+
+  // TẦNG: drop-top-20% (chống fat-tail/concentration) — bỏ 20% lệnh lãi nhất, edge còn không?
+  const sorted = [...rets].sort((a, b) => b - a);
+  const cut = Math.floor(sorted.length * 0.2);
+  const trimmed = sorted.slice(cut);
+  const sumAll = rets.reduce((a, b) => a + b, 0), sumTrim = trimmed.reduce((a, b) => a + b, 0);
+  console.log(`\n  [drop-top-20%] sumRet all=${sumAll.toFixed(0)}%  after-drop-top20%=${sumTrim.toFixed(0)}%  medTrim=${median(trimmed).toFixed(3)}% -> ${sumTrim > 0 && median(trimmed) > 0 ? "SỐNG (broad edge)" : "CHẾT (fat-tail/concentration)"}`);
+
+  // TẦNG: vs-HOLD continuous (chiến lược có hơn ôm BTC cả kỳ?)
+  const bh = (c5[c5.length - 1].close - c5[0].close) / c5[0].close * 100;
+  console.log(`  [vs-HOLD] buy&hold BTC cả kỳ = +${bh.toFixed(0)}%  (so equity-curve trend-only ở Stage B trend_S12_S13_S14_only ROI)`);
+
+  // TẦNG: per-year ≥3 lệnh + dấu (không né năm xấu)
+  const yr: Record<string, { n: number; sum: number; w: number }> = {};
+  for (const t of caps) { const y = new Date(t.exitTs).toISOString().slice(0, 4); const r = (t.exitPx - t.entryPx) / t.entryPx * 100; (yr[y] ??= { n: 0, sum: 0, w: 0 }); yr[y].n++; yr[y].sum += r; if (r > 0) yr[y].w++; }
+  console.log(`  [per-year] year | n | sumRet% | WR%`);
+  let pos = 0, tot = 0; for (const y of Object.keys(yr).sort()) { const o = yr[y]; tot++; if (o.sum > 0) pos++; console.log(`    ${y} | ${String(o.n).padStart(4)} | ${(o.sum >= 0 ? "+" : "") + o.sum.toFixed(1)} | ${(100 * o.w / o.n).toFixed(0)}%`); }
+  console.log(`  -> ${pos}/${tot} năm dương (median trade dương cần ổn định mọi năm)`);
 }
 
 main();
