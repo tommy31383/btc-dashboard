@@ -13,8 +13,7 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 
 import { P } from "../utils/v2Theme";
 import DebugLabel from "./DebugLabel";
 import { useBackendLive } from "../hooks/useBackendLive";
-import { SERVER_URL, api } from "../utils/backendApi";
-import { DESTRUCTIVE_PWD } from "../utils/serverSecrets";
+import { SERVER_URL } from "../utils/backendApi";
 import TomiHedgePanel, { TomiHedgeView } from "./TomiHedgePanel";
 
 interface ServerTabProps {
@@ -24,7 +23,7 @@ interface ServerTabProps {
 export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = {}) {
   const live = useBackendLive();
   const [pwInput, setPwInput] = useState("");
-  const [tomiView, setTomiView] = useState<TomiHedgeView>("paper");
+  const [tomiView, setTomiView] = useState<TomiHedgeView>("real");
 
   const s = live.state;
   const allPos = s?.binanceSnapshot?.positions ?? [];
@@ -78,25 +77,6 @@ export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = 
   const ruleKey = s?.settings?.activeRuleKey ?? "hedge01";
   const mode = s?.settings?.serverEngineMode ?? "tomihedge";
 
-  const handleReset = async () => {
-    if (typeof window === "undefined") return;
-    const cap = window.prompt("Reset paper với capital USDT (default 1000):", "1000");
-    if (!cap) return;
-    const capNum = parseFloat(cap);
-    if (!Number.isFinite(capNum) || capNum < 100) {
-      window.alert("Capital phải >= 100");
-      return;
-    }
-    if (!window.confirm(`Anh có chắc reset paper với capital $${capNum}?`)) return;
-    try {
-      await api.tomihedgePaperReset(DESTRUCTIVE_PWD, capNum);
-      await live.refresh();
-      window.alert("✅ Reset paper xong, capital = $" + capNum);
-    } catch (e: any) {
-      window.alert("❌ " + (e?.message ?? String(e)));
-    }
-  };
-
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={{ padding: 8 }}>
       <DebugLabel name="ServerTab" />
@@ -130,22 +110,8 @@ export default function ServerTab({ klinesByTf: _klinesByTf }: ServerTabProps = 
         </View>
       </View>
 
-      {/* TomiHedge PANEL — toggle Real/Paper */}
+      {/* TomiHedge LIVE panel */}
       <TomiHedgePanel state={s} markPrice={markPrice} view={tomiView} onViewChange={setTomiView} />
-
-      {/* ACTIONS */}
-      <View style={styles.card}>
-        <Text style={styles.h2}>⚙️ ACTIONS</Text>
-        <View style={styles.actionRow}>
-          <TouchableOpacity style={[styles.btnGhost, { borderColor: P.bitcoinOrange }]} onPress={handleReset}>
-            <Text style={[styles.btnGhostText, { color: P.bitcoinOrange }]}>🔄 RESET PAPER</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.dim}>
-          💡 RESET sẽ đóng paper state hiện tại (LONG + SHORT) và start fresh với capital mới.
-          Real engine vẫn chạy độc lập (chưa migrate sang TomiHedge).
-        </Text>
-      </View>
 
       {live.lastError && (
         <View style={[styles.card, { borderColor: P.error, borderWidth: 1 }]}>

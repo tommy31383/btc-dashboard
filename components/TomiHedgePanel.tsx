@@ -17,7 +17,7 @@ import ConsolidatedPositions from "./ConsolidatedPositions";
 import TomiHedgeChart from "./TomiHedgeChart";
 import TomiHedgeLogPanel from "./TomiHedgeLogPanel";
 
-export type TomiHedgeView = "paper" | "real";
+export type TomiHedgeView = "real"; // v0.4.108 LIVE-ONLY — paper removed
 
 interface Props {
   state: any;
@@ -28,11 +28,8 @@ interface Props {
 
 export default function TomiHedgePanel({ state, markPrice, view, onViewChange }: Props) {
   const cfg = state?.settings || {};
-  const isPaper = view === "paper";
-  const th = isPaper ? state?.tomiHedgePaper : state?.tomiHedgeReal;
-  const enabled = isPaper
-    ? (cfg.tomiHedgePaperEnabled !== false)
-    : (cfg.tomiHedgeRealEnabled === true);
+  const th = state?.tomiHedgeReal;
+  const enabled = cfg.tomiHedgeRealEnabled === true;
   const [busy, setBusy] = React.useState(false);
   const [rules, setRules] = React.useState<{ key: string; name: string; description: string }[]>([]);
   const [showRuleDetail, setShowRuleDetail] = React.useState(false);
@@ -117,18 +114,9 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
 
   const toggle = (
     <View style={styles.toggleRow}>
-      <TouchableOpacity
-        style={[styles.toggleBtn, view === "real" && { borderColor: P.error, backgroundColor: P.error + "22" }]}
-        onPress={() => onViewChange("real")}
-      >
-        <Text style={[styles.toggleText, view === "real" && { color: P.error }]}>🔴 REAL</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.toggleBtn, view === "paper" && { borderColor: "#3b82f6", backgroundColor: "#3b82f622" }]}
-        onPress={() => onViewChange("paper")}
-      >
-        <Text style={[styles.toggleText, view === "paper" && { color: "#3b82f6" }]}>📋 PAPER</Text>
-      </TouchableOpacity>
+      <View style={[styles.toggleBtn, { borderColor: P.error, backgroundColor: P.error + "22" }]}>
+        <Text style={[styles.toggleText, { color: P.error }]}>🔴 LIVE</Text>
+      </View>
       <TouchableOpacity
         style={[styles.toggleBtn, {
           borderColor: enabled ? P.green : P.dim,
@@ -150,19 +138,15 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
       <View>
         <View style={styles.card}>
           <View style={styles.headerRow}>
-            <Text style={styles.h2}>🌊 TomiHedge ({isPaper ? "PAPER" : "REAL"})</Text>
+            <Text style={styles.h2}>🌊 TomiHedge (LIVE)</Text>
             {toggle}
           </View>
           {ruleSelector}
-          {isPaper ? (
-            <Text style={styles.empty}>State chưa init. Cần POST /api/live/tomihedge/paper/reset</Text>
-          ) : (
-            <Text style={styles.empty}>
-              🔴 REAL engine state chưa init. {enabled ? "Engine đang ON, chờ entry signal." : "Engine OFF — bấm ▶ START để activate."}
-            </Text>
-          )}
+          <Text style={styles.empty}>
+            🔴 LIVE engine state chưa init. {enabled ? "Engine đang ON, chờ entry signal." : "Engine OFF — bấm ▶ START để activate."}
+          </Text>
         </View>
-        {!isPaper && <BinancePositionsCard positions={binancePositions} markPrice={markPrice} symbol={symbol} />}
+        <BinancePositionsCard positions={binancePositions} markPrice={markPrice} symbol={symbol} />
       </View>
     );
   }
@@ -173,9 +157,7 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
   // th.wallet được update khi tomiHedge eval chạy — có thể stale vài giờ nếu scheduler bận.
   // binanceSnapshot.account.totalWalletBalance = fresh từ Binance poll (30s interval).
   const binanceWallet = parseFloat(state?.binanceSnapshot?.account?.totalWalletBalance ?? "0");
-  const wallet: number = isPaper
-    ? (th.wallet ?? 0)
-    : (binanceWallet > 0 ? binanceWallet : (th.wallet ?? 0));
+  const wallet: number = binanceWallet > 0 ? binanceWallet : (th.wallet ?? 0);
   // v0.4.22+ server: engineWallet = initial + Σpnl − Σfees (ROI thuần từ trade, loại funding fee + manual deposit).
   // Fallback `wallet` cho state cũ (chưa có field). REAL engine có field này, PAPER share = wallet.
   const engineWallet: number = (th as any).engineWallet ?? th.wallet ?? 0;
@@ -206,9 +188,7 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
         <View style={styles.headerRow}>
           <Text style={styles.h2}>
             🌊 TomiHedge — <Text style={{ color: P.bitcoinOrange }}>{th.activeRuleKey?.toUpperCase() || "?"}</Text>{" "}
-            <Text style={{ color: isPaper ? "#3b82f6" : P.error, fontSize: 12 }}>
-              · {isPaper ? "📋 PAPER" : "🔴 REAL"}
-            </Text>
+            <Text style={{ color: P.error, fontSize: 12 }}>· 🔴 LIVE</Text>
           </Text>
           {toggle}
         </View>
@@ -261,27 +241,24 @@ export default function TomiHedgePanel({ state, markPrice, view, onViewChange }:
         positions={consolidatedPositions}
         markPrice={markPrice}
         walletUsd={wallet}
-        marginUsd={cfg.paperMarginUsd ?? 1}
-        leverage={cfg.paperLeverage ?? 125}
-        title={isPaper ? "🌊 TomiHedge PAPER NET POSITIONS" : "🌊 TomiHedge REAL NET POSITIONS"}
+        marginUsd={cfg.marginUsd ?? 1}
+        leverage={cfg.leverage ?? 20}
+        title="🌊 TomiHedge LIVE NET POSITIONS"
       />
 
-      {/* v0.4.4: BINANCE LIVE POSITIONS — chỉ show khi REAL view */}
-      {!isPaper && (
-        <BinancePositionsCard positions={binancePositions} markPrice={markPrice} symbol={symbol} />
-      )}
+      <BinancePositionsCard positions={binancePositions} markPrice={markPrice} symbol={symbol} />
 
       {/* CHART — entry/close markers + weekly bias */}
       <TomiHedgeChart
         eventLog={(th.eventLog ?? []).filter((e: any) => (e.qty ?? 0) >= 0.001)}
         weeklyTrend={th.lastWeeklyTrend}
-        title={isPaper ? "TomiHedge PAPER — Entry/Close Markers" : "TomiHedge REAL — Entry/Close Markers"}
+        title="TomiHedge LIVE — Entry/Close Markers"
       />
 
       {/* v0.4.5: LOG ADD/CLOSE — 20 entries mới nhất */}
       <TomiHedgeLogPanel
         eventLog={(th.eventLog ?? []).filter((e: any) => (e.qty ?? 0) >= 0.001)}
-        title={isPaper ? "TomiHedge PAPER Log" : "TomiHedge REAL Log"}
+        title="TomiHedge LIVE Log"
       />
     </View>
   );
