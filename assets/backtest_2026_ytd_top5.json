@@ -1,0 +1,72 @@
+{
+  "generated": "2026-06-18T04:55:04.293171Z",
+  "capital": 100000,
+  "period": "2026 YTD entry",
+  "regime_2026_4h_bars": {
+    "BEAR": 949
+  },
+  "note": "Faithful RANGE-only rules blocked when classifier A = BEAR (2026 slow grind)",
+  "audit_ref_trend_only_2026": {
+    "entries": 69,
+    "pnl_usd": 232,
+    "source": "backtest_h01_v0438_7y_audit.json trend-only scenario"
+  },
+  "results": [
+    {
+      "name": "hedge01 S13/S14 RANGE",
+      "entry": "4h ATR breakout / Donchian18 + RANGE+ADX+EMA200",
+      "n2026": 0,
+      "wr": 0,
+      "pnl_usd": 0,
+      "pnl_pct": 0,
+      "note": "no 2026 entries"
+    },
+    {
+      "name": "hedge04 triple",
+      "entry": "RANGE+ADX: BB lower / RSI40 cross / Stoch20 cross (1h)",
+      "n2026": 0,
+      "wr": 0,
+      "pnl_usd": 0,
+      "pnl_pct": 0,
+      "note": "no 2026 entries"
+    },
+    {
+      "name": "GOLD SILENT 1h",
+      "entry": "atrLow<0.3% + HTF RANGE flat (4h EMA20)",
+      "n2026": 0,
+      "wr": 0,
+      "pnl_usd": 0,
+      "pnl_pct": 0,
+      "note": "no 2026 entries"
+    },
+    {
+      "name": "turtle Donchian20",
+      "entry": "daily close > DC20 + skip BEAR",
+      "n2026": 0,
+      "wr": 0,
+      "pnl_usd": 0,
+      "pnl_pct": 0,
+      "note": "no 2026 entries"
+    },
+    {
+      "name": "hedge04 BB only (no gate)",
+      "entry": "S04B only, no RANGE/ADX gate \u2014 diagnostic",
+      "n2026": 478,
+      "wins": 275,
+      "wr": 57.5,
+      "pnl_pct": -90.76,
+      "pnl_usd": -90762.0,
+      "avg_ret_pct": -0.19
+    },
+    {
+      "name": "hedge06 evolver",
+      "entry": "StochK(10)<10 LONG / >97 SHORT + ADX>20 (1h)",
+      "n2026": 1129,
+      "wins": 285,
+      "wr": 25.2,
+      "pnl_pct": -167.23,
+      "pnl_usd": -167226.0,
+      "avg_ret_pct": -0.148
+    }
+  ]
+}
