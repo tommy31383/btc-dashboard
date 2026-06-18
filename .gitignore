@@ -4,6 +4,11 @@
 !docs/app/assets/node_modules/
 .cache/
 
+# secrets (LỆNH 3, 2026-06-18) — never commit env/keys
+.env
+.env.*
+*.pem
+
 # evolver runtime artifacts (champion+report ARE tracked)
 tools/evolver-log.jsonl
 tools/evolver-heartbeat.txt

@@ -8,9 +8,8 @@ Output: /tmp/btc_context_result.json
 import json, urllib.request, ssl, os
 from datetime import datetime, timezone
 
+# TLS verification ON (match btc_predict.py). Never CERT_NONE.
 _SSL_CTX = ssl.create_default_context()
-_SSL_CTX.check_hostname = False
-_SSL_CTX.verify_mode = ssl.CERT_NONE
 
 import sys, argparse
 
