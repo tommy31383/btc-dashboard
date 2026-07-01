@@ -542,8 +542,9 @@ function ruleMatchesSmart(
   // Priority order matches the FAST PATH chain — later stages = more progress.
   const reasonPriority: Record<string, number> = {
     "candleReversal": 1, "emaPos": 2, "zeroCond": 3, "htfTrend": 4,
-    "atr": 5, "macdHist": 6, "emaDist": 7, "multiTfScore": 8,
-    "htfRsi": 9, "htfFilters": 10, "required": 11, "score": 12,
+    "atr": 5, "rsi": 6, "body": 7, "bbPct": 8, "rev": 9,
+    "macdHist": 10, "emaDist": 11, "multiTfScore": 12,
+    "htfRsi": 13, "htfFilters": 14, "required": 15, "score": 16,
   };
   type ReasonRec = { code: string; detail: string; side: "LONG" | "SHORT" };
   const reasonBox: { cur: ReasonRec | null } = { cur: null };
@@ -758,6 +759,14 @@ export function useRuleAlerts(
   const trackedIdsArr = useMemo(() => Array.from(trackedIds), [trackedIds]);
 
   useEffect(() => {
+    // 2026-07-01 P2 fix: drop fire-timestamps for rules no longer tracked, so
+    // re-tracking a rule on the same candle can re-fire its notification
+    // instead of silently treating it as "already fired".
+    const trackedSet = new Set(trackedIdsArr);
+    for (const id of Object.keys(lastFireCandleTimeRef.current)) {
+      if (!trackedSet.has(id as TrackedRuleId)) delete lastFireCandleTimeRef.current[id as TrackedRuleId];
+    }
+
     if (!rawKlines || trackedIdsArr.length === 0) {
       setActiveAlerts([]);
       setRuleStatus({});
@@ -773,6 +782,7 @@ export function useRuleAlerts(
     /** HTF keys that need an EMA-trend computed (from htfFilters[].type="trend"). */
     const htfTrendKeys = new Set<string>();
     const rulesByTF: Record<string, ReturnType<typeof getHardRulesForTF>> = {};
+    let needMultiTfScore = false;
 
     for (const id of trackedIdsArr) {
       const { tfKey, rank } = parseRuleId(id);
@@ -783,6 +793,7 @@ export function useRuleAlerts(
         const cfg = rule.config as any;
         if (cfg.htfTrendFilter) htfNeededTFs.add(tfKey);
         if (cfg.htfRsiFilter && cfg.htfRsiFilter.tf) htfRsiKeys.add(cfg.htfRsiFilter.tf);
+        if (cfg.multiTfScoreFilter) needMultiTfScore = true;
         // Extensible htfFilters[] — collect every referenced TF + required history
         if (Array.isArray(cfg.htfFilters)) {
           const [nearTF] = HTF_MAP[tfKey] || ["1h", "4h"];
@@ -801,6 +812,22 @@ export function useRuleAlerts(
       }
     }
 
+    // 2026-07-01 P1 fix: every HTF-referenced TF must be in `neededTFs` BEFORE the
+    // throttle fingerprint check below — otherwise a new HTF candle (trend/RSI/
+    // htfFilters/multiTfScore inputs) never triggers re-eval and the banner can
+    // show a stale FIRED/ARMED status.
+    for (const entryTF of htfNeededTFs) {
+      const [nearTF, farTF] = HTF_MAP[entryTF] || ["1h", "4h"];
+      neededTFs.add(nearTF);
+      neededTFs.add(farTF);
+    }
+    for (const tf of htfRsiKeys) neededTFs.add(tf);
+    for (const tf of Object.keys(htfIndNeeds)) neededTFs.add(tf);
+    for (const tf of htfTrendKeys) neededTFs.add(tf);
+    if (needMultiTfScore) {
+      for (const t of ["4h", "1d", "1w"]) neededTFs.add(t);
+    }
+
     // ── Phase 2: Throttle — skip only if live candle content is unchanged ──
     let advanced = false;
     for (const tfKey of neededTFs) {
@@ -815,18 +842,6 @@ export function useRuleAlerts(
     for (const tfKey of neededTFs) {
       const klines = rawKlines[tfKey] || [];
       if (klines.length > 0) lastEvalFingerprintsRef.current[tfKey] = klineFingerprint(klines[klines.length - 1]);
-    }
-
-    // Detect whether any rule needs multi-TF score → pre-fetch 4h/1d/1w data
-    let needMultiTfScore = false;
-    for (const id of trackedIdsArr) {
-      const { tfKey, rank } = parseRuleId(id);
-      const rule = rulesByTF[tfKey]?.find((r) => r.rank === rank);
-      if (rule && (rule.config as any).multiTfScoreFilter) { needMultiTfScore = true; break; }
-    }
-    if (needMultiTfScore) {
-      // Ensure raw klines for 4h, 1d, 1w are available
-      for (const t of ["4h", "1d", "1w"]) neededTFs.add(t);
     }
 
     // ── Phase 3: Compute raw indicators ONCE per TF (most expensive step) ──

@@ -19,7 +19,12 @@ function getTfDays(tfKey: string): number {
     if (!tfData) return 0;
     const min = INTERVAL_MIN[tfData.interval] || 60;
     return (tfData.candles_used * min) / 60 / 24;
-  } catch { return 0; }
+  } catch (err) {
+    // 2026-07-01 P2 fix: was a silent catch — log once so a broken hard_rules.json
+    // doesn't just quietly show "0 ngày" with no trace.
+    console.warn(`[RuleAlertBanner] getTfDays(${tfKey}) failed:`, err);
+    return 0;
+  }
 }
 
 interface Props {

@@ -388,6 +388,12 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
               if (matchDetail.htfFiltersStatus) {
                 for (const f of matchDetail.htfFiltersStatus) htfChecks.push(f.match);
               }
+              // 2026-07-01 P1 fix: featFiltersStatus (atr/macdHist/emaDist/...) also gates
+              // whether the rule can actually fire — must count toward allPass, otherwise
+              // "SẴN SÀNG VÀO LỆNH" shows even while a feature filter is blocking.
+              if (matchDetail.featFiltersStatus) {
+                for (const f of matchDetail.featFiltersStatus) htfChecks.push(f.match);
+              }
               const hasHtf = htfChecks.length > 0;
               const htfPass = htfChecks.filter(Boolean).length;
               const htfAllPass = hasHtf && htfPass === htfChecks.length;
@@ -402,7 +408,7 @@ const RuleCard = React.memo(function RuleCardInner({ rule, tfKey, days, isTracke
               const statusText = allPass
                 ? "SẴN SÀNG VÀO LỆNH"
                 : blocked
-                  ? `HTF CHẶN (${htfPass}/${htfChecks.length} filter pass)`
+                  ? `FILTER CHẶN (${htfPass}/${htfChecks.length} filter pass)`
                   : matchDetail.skipReason
                     ? `CHẶN: ${matchDetail.skipReason}`
                     : `${totalMatched}/${totalRequired} điều kiện khớp`;
