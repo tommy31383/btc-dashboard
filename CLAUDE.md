@@ -2,6 +2,16 @@
 
 **Skill bắt buộc load đầu tiên:** `anthropic-skills:tommy-workflow`
 
+## 🤖 Codex auto-audit — BẮT BUỘC, không chờ Tommy nhắc
+
+Mỗi khi Claude sửa code logic ảnh hưởng tín hiệu/rule live (`hooks/useRuleAlerts.ts`,
+`components/RuleAlertBanner.tsx`, `components/TradingRulesPanel.tsx`, `assets/hard_rules.json`,
+hoặc bất kỳ engine trading nào trong 3 engine ở mục ARCHITECTURE) HOẶC sửa
+`btc-trader-server/src/` — **PHẢI tự động** gọi `scripts/codex/ask.sh` (read-only) audit
+NGAY sau khi sửa, KHÔNG chờ Tommy gõ "codex audit". Dán nguyên finding (kể cả P1) vào báo
+cáo cho Tommy. Nếu Codex fail/timeout → nói rõ "Codex FAIL", không im lặng coi là pass.
+Áp dụng cho mọi turn trong phiên chat trực tiếp (không chỉ AI Relay watcher).
+
 ---
 
 ## 📊 BACKTEST DATASETS REGISTRY
