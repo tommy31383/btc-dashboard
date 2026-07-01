@@ -21,10 +21,12 @@ the app's own rule-signal overlay — something a plain TradingView widget embed
   Engine Mode" reference on the LIVE tab all go away. AsyncStorage keys
   (`@all5m_data_v1`, `@all5m_preset_v1`, `@all5m_rule_open`) are left alone on-device
   (no migration needed) — the app just stops reading/writing them.
-  - **`UnifiedTradesPanel.tsx`** currently merges LIVE real trades + 5m ALL paper
-    trades into one view. Per Tommy's decision, this panel drops the 5m ALL column
-    entirely and shows LIVE real trades only — it does NOT keep `all5mAccount` around
-    just to feed this display.
+  - **Correction after re-checking the code:** `components/UnifiedTradesPanel.tsx`
+    is NOT actually mounted anywhere (`App.tsx` only has a stale comment referencing
+    it — no import, no JSX usage; confirmed via repo-wide grep). It's dead code. Per
+    Tommy's decision (drop the 5m ALL merged view, keep only LIVE real), the simplest
+    correct action is to **delete `components/UnifiedTradesPanel.tsx` outright**
+    rather than edit an unmounted file to "remove a column" nobody sees.
   - `hooks/useBinanceLive.ts` and `utils/liveTraderEngine.ts` both import
     `getActivePreset` from `all5mAccount.ts` inside already-inert legacy code (dead
     behind the `SERVER_OWNS_TRADING` kill switch — see project CLAUDE.md). Deleting
@@ -86,12 +88,21 @@ the app's own rule-signal overlay — something a plain TradingView widget embed
   display line.
 - `components/v2/BottomNavBar.tsx`: replace the `5m ALL` nav entry with the new chart
   tab's key/label/icon.
-- `components/UnifiedTradesPanel.tsx`: remove the `all5mAccount` prop, the 5m ALL
-  paper-trade rows/column, and `onGoToAll5m` — panel shows LIVE real trades only.
+- Delete `components/UnifiedTradesPanel.tsx` entirely (dead/unmounted, imports
+  `all5mAccount.ts` — see correction note above).
 - `hooks/useBinanceLive.ts` and `utils/liveTraderEngine.ts`: remove the
   `getActivePreset` import from `all5mAccount.ts` and the dead code path using it
   (both files are already inert behind `SERVER_OWNS_TRADING`, so this is a compile-fix,
   not a behavior change).
+- **Further discovery:** `components/LiveTab.tsx` has its own `use5mAllEngineMode`
+  settings toggle (banner, on/off switch, confirmation warning text, `useActivePreset()`
+  hook reading `all5mAccount.ts`) that's larger than initially scoped. Confirmed dead:
+  in `useBinanceLive.ts` the block gated by `settings.use5mAllEngineMode` (line ~496)
+  sits *after* the `if (SERVER_OWNS_TRADING) return;` hard-kill (line 495) — the toggle
+  has had zero effect on real trading since that kill switch landed. Safe to remove as
+  a UI/settings cleanup: delete the `use5mAllEngineMode` banner/toggle/warning JSX and
+  the `useActivePreset()`/`PRESETS`/`all5mAccount` imports from `LiveTab.tsx`, and drop
+  the `use5mAllEngineMode` field from the `LiveSettings` type + its default value.
 - Delete `components/BinanceChart.tsx` once the new tab covers its functionality
   (candlestick + EMA/BB/RSI/Stoch/MACD/S-R — confirmed superset in the design above).
 
