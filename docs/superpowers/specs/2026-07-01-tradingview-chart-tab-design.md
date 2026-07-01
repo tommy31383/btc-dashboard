@@ -17,36 +17,59 @@ the app's own rule-signal overlay — something a plain TradingView widget embed
   `BinanceChart.tsx` panel currently embedded inside the RULE tab (avoid having two
   divergent chart implementations).
 - **5m ALL removal:** full removal, not just hiding the tab — the background paper
-  engine (`use5mAllTrader`), its 10 presets, and the "5m ALL Engine Mode" reference on
-  the LIVE tab all go away. AsyncStorage keys (`@all5m_data_v1`, `@all5m_preset_v1`)
-  are left alone on-device (no migration needed) — the app just stops reading/writing
-  them.
+  engine (`use5mAllTrader`), its 10 presets, `utils/all5mAccount.ts`, and the "5m ALL
+  Engine Mode" reference on the LIVE tab all go away. AsyncStorage keys
+  (`@all5m_data_v1`, `@all5m_preset_v1`, `@all5m_rule_open`) are left alone on-device
+  (no migration needed) — the app just stops reading/writing them.
+  - **`UnifiedTradesPanel.tsx`** currently merges LIVE real trades + 5m ALL paper
+    trades into one view. Per Tommy's decision, this panel drops the 5m ALL column
+    entirely and shows LIVE real trades only — it does NOT keep `all5mAccount` around
+    just to feed this display.
+  - `hooks/useBinanceLive.ts` and `utils/liveTraderEngine.ts` both import
+    `getActivePreset` from `all5mAccount.ts` inside already-inert legacy code (dead
+    behind the `SERVER_OWNS_TRADING` kill switch — see project CLAUDE.md). Deleting
+    `all5mAccount.ts` breaks their imports at compile time even though the code never
+    runs. Fix: remove the `getActivePreset` import/call from both files (they're inert,
+    so this is a mechanical cleanup, not a behavior change) rather than leave a stub.
 - **Drawing tools:** out of scope for v1 (no trendline/fib/etc — `lightweight-charts`
   doesn't ship these, they'd need custom primitives work).
 - **Platform:** web-first. `lightweight-charts` is a DOM/canvas library; on native
   (APK/iOS) it would need `react-native-webview` (not currently a dependency). v1 shows
   a "chưa hỗ trợ trên app" fallback on native instead of crashing or shipping WebView
-  integration risk in the same pass.
+  integration risk in the same pass. Implemented as a real platform split —
+  `TradingChartTab.web.tsx` (imports `lightweight-charts`) +
+  `TradingChartTab.native.tsx` (fallback message, no import of the DOM-only library) —
+  not a single file with a runtime `Platform.OS` branch, so Metro never has to resolve
+  `lightweight-charts` when bundling for native.
 
 ## Architecture
 
-- New component: `components/TradingChartTab.tsx`.
-  - On `Platform.OS === "web"`: mounts a `<div>` ref, calls `lightweight-charts`
+- New components (real platform split, see above): `components/TradingChartTab.web.tsx`
+  + `components/TradingChartTab.native.tsx`, imported from callers as
+  `components/TradingChartTab` (Metro/Expo resolves the platform-specific file
+  automatically).
+  - `TradingChartTab.web.tsx`: mounts a `<div>` ref, calls `lightweight-charts`
     `createChart()` once, adds a candlestick series + volume histogram + EMA9/EMA21
-    line series + Bollinger Band lines, plus separate panes for RSI / StochRSI / MACD
-    (lightweight-charts v5 multi-pane).
-  - On native: renders a simple "chart chưa hỗ trợ trên app, dùng bản web" message —
-    no `lightweight-charts` import attempted (guard at the top so Metro doesn't even
-    need to resolve the DOM-only library on native bundles).
+    line series + Bollinger Band lines, plus separate panes for RSI / StochRSI / MACD.
+    **Multi-pane and `addPriceLine()` placement (chart-level vs series-level) are
+    unverified assumptions** — confirm against the installed `lightweight-charts`
+    version's docs once the dependency is added, before relying on this shape in the
+    implementation plan.
+  - `TradingChartTab.native.tsx`: renders a simple "chart chưa hỗ trợ trên app, dùng
+    bản web" message — no `lightweight-charts` import anywhere in this file.
+  - **Time unit:** `Kline.time` from `useBinanceKlines` is milliseconds;
+    `lightweight-charts` expects seconds (`UTCTimestamp`) or `BusinessDay`. The mapper
+    below must divide by 1000, not pass `Kline.time` through directly.
 - Data source: reuse `RawKlinesMap` from `useBinanceKlines` (already fetched app-wide,
   no new network calls). A small pure mapper converts `Kline[] → CandlestickData[]`
-  (`{time, open, high, low, close}` + separate volume array).
+  (`{time: seconds, open, high, low, close}` + separate volume array).
 - Indicators: reuse existing pure functions from `utils/indicators.ts`
   (`calcEMASeries`, `calcBollingerSeries`, `calcRSISeriesAligned`, `calcStochRSISeries`,
   `calcMACDSeries`) — same source of truth as the RULE tab's live evaluator, so chart
   and rule-fire numbers can't drift.
 - S/R levels: `utils/supportResistance.ts` `detectSRLevels()` (already used by
-  `BinanceChart.tsx`) → rendered via `chart.addPriceLine()` per series.
+  `BinanceChart.tsx`) → rendered as price lines (exact API TBD-at-implementation, see
+  unverified-assumption note above).
 - Rule overlay: consume `activeAlerts` (already computed by `useRuleAlerts`, passed down
   from `App.tsx` the same way `RuleAlertBanner` receives it today) → for each active
   alert draw an entry price-line + TP price-line (green) + SL price-line (red), labeled
@@ -63,6 +86,12 @@ the app's own rule-signal overlay — something a plain TradingView widget embed
   display line.
 - `components/v2/BottomNavBar.tsx`: replace the `5m ALL` nav entry with the new chart
   tab's key/label/icon.
+- `components/UnifiedTradesPanel.tsx`: remove the `all5mAccount` prop, the 5m ALL
+  paper-trade rows/column, and `onGoToAll5m` — panel shows LIVE real trades only.
+- `hooks/useBinanceLive.ts` and `utils/liveTraderEngine.ts`: remove the
+  `getActivePreset` import from `all5mAccount.ts` and the dead code path using it
+  (both files are already inert behind `SERVER_OWNS_TRADING`, so this is a compile-fix,
+  not a behavior change).
 - Delete `components/BinanceChart.tsx` once the new tab covers its functionality
   (candlestick + EMA/BB/RSI/Stoch/MACD/S-R — confirmed superset in the design above).
 
