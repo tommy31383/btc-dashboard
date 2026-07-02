@@ -28,3 +28,7 @@ test("parseStoredIndicators: valid subset passes through unchanged (order preser
   const raw = JSON.stringify(["adx", "ema"]);
   assert.deepEqual(parseStoredIndicators(raw), ["adx", "ema"]);
 });
+
+test("parseStoredIndicators: genuinely empty array is preserved (user disabled everything)", () => {
+  assert.deepEqual(parseStoredIndicators(JSON.stringify([])), []);
+});

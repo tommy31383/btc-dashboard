@@ -51,7 +51,13 @@ export function parseStoredIndicators(raw: string | null): IndicatorKey[] {
     return DEFAULT_ENABLED_INDICATORS;
   }
   if (!Array.isArray(parsed)) return DEFAULT_ENABLED_INDICATORS;
+  // A genuinely empty stored array means the user deliberately disabled
+  // every indicator — that's a valid preference, not corrupted data, so
+  // it must round-trip as [] rather than snapping back to the default set.
+  if (parsed.length === 0) return [];
   const filtered = Array.from(new Set(parsed)).filter((k): k is IndicatorKey => VALID_KEYS.has(k as IndicatorKey));
+  // Only fall back to default when the array had content but NONE of it
+  // matched a known key (e.g. all-stale keys from a removed prior version).
   return filtered.length > 0 ? filtered : DEFAULT_ENABLED_INDICATORS;
 }
 

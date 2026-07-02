@@ -9,24 +9,32 @@ interface Props {
   enabled: IndicatorKey[];
   onToggle: (key: IndicatorKey) => void;
   onReset: () => void;
+  // The trigger button's DOM node, so the outside-click listener can
+  // exclude it — without this, clicking the trigger to CLOSE an open
+  // popover fires `mousedown` (closes it here) then `click` (the trigger's
+  // own onPress toggles it back open), so it never actually closes.
+  triggerNode?: HTMLElement | null;
 }
 
 // Absolutely-positioned popover anchored under the trigger button, with a
 // dismiss-on-outside-click listener (web-only — uses DOM APIs directly,
 // which is why this lives in the .web.tsx split rather than the shared
 // content component).
-export default function ChartIndicatorPanelWeb({ visible, onClose, enabled, onToggle, onReset }: Props) {
+export default function ChartIndicatorPanelWeb({ visible, onClose, enabled, onToggle, onReset, triggerNode }: Props) {
   const wrapperRef = useRef<View>(null);
 
   useEffect(() => {
     if (!visible) return;
     const handleClickOutside = (e: MouseEvent) => {
       const node = wrapperRef.current as unknown as HTMLElement | null;
-      if (node && !node.contains(e.target as Node)) onClose();
+      const target = e.target as Node;
+      if (node && node.contains(target)) return;
+      if (triggerNode && triggerNode.contains(target)) return;
+      onClose();
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [visible, onClose]);
+  }, [visible, onClose, triggerNode]);
 
   if (!visible) return null;
 

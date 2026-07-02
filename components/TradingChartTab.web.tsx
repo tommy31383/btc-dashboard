@@ -44,6 +44,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const [oscillatorReconcileTick, setOscillatorReconcileTick] = useState(0);
   const { enabled: enabledIndicators, toggle: toggleIndicator, reset: resetIndicators } = useChartIndicators();
   const [panelOpen, setPanelOpen] = useState(false);
+  const indicatorBtnRef = useRef<View>(null);
 
   // Mount chart once — only candlestick + volume. All indicator series are
   // managed reactively by the effects below, keyed on enabledIndicators.
@@ -266,7 +267,9 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       const showVwap = !["1d", "1w", "1M"].includes(selectedTF);
       const vwapVals = showVwap ? calcVWAPSeries(klines) : [];
       vwapSeriesRef.current?.setData(
-        times.map((t, i) => ({ time: t, value: vwapVals[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+        showVwap
+          ? times.map((t, i) => ({ time: t, value: vwapVals[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+          : []
       );
     }
 
@@ -363,12 +366,13 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
         {/* Floating trigger, top-right of the chart area itself (not the TF
             row) — minimal footprint over the candlesticks rather than
             competing for space in the timeframe row. */}
-        <Pressable onPress={() => setPanelOpen((v) => !v)} style={styles.indicatorBtn}>
+        <Pressable ref={indicatorBtnRef} onPress={() => setPanelOpen((v) => !v)} style={styles.indicatorBtn}>
           <Text style={styles.indicatorBtnLabel}>⚙ Indicators</Text>
         </Pressable>
         <ChartIndicatorPanelWeb
           visible={panelOpen}
           onClose={() => setPanelOpen(false)}
+          triggerNode={indicatorBtnRef.current as unknown as HTMLElement | null}
           enabled={enabledIndicators}
           onToggle={toggleIndicator}
           onReset={resetIndicators}
