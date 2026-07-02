@@ -10,8 +10,6 @@ const DOCS_APP_DIR = path.join(ROOT, "docs", "app");
 const DEPLOY_STAGE_PATHS = [
   "App.tsx",
   "app.json",
-  "components/All5mPanel.tsx",
-  "utils/all5mAccount.ts",
   "package.json",
   "tools/build-web-deploy.js",
   "tsconfig.json",
