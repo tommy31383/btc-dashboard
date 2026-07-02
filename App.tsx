@@ -25,7 +25,7 @@ import { hydrateDebugLabels } from "./components/DebugLabel";
 import PanelBoundary from "./components/PanelBoundary";
 
 import PriceHeader from "./components/PriceHeader";
-import BinanceChart from "./components/BinanceChart";
+import TradingChartTab from "./components/TradingChartTab";
 import SettingsPanel from "./components/SettingsPanel";
 import AlertBanner from "./components/AlertBanner";
 import TimeframeTable from "./components/TimeframeTable";
@@ -48,10 +48,8 @@ import { useTrend } from "./hooks/useTrend";
 import ServerTab from "./components/ServerTab";
 // LiveTradingPanel moved to dedicated LiveTab
 import LiveTab from "./components/LiveTab";
-import All5mPanel from "./components/All5mPanel";
 import { useBinanceLive } from "./hooks/useBinanceLive";
 // import { use15mAllTrader } from "./hooks/use15mAllTrader"; // disabled — replaced by LIVE tab
-import { use5mAllTrader } from "./hooks/use5mAllTrader";
 import { pullFromGist, mergeTrades } from "./utils/gistSync";
 import { loadTrades, replaceTrades } from "./utils/paperTrader";
 import { TopAppBar } from "./components/v2/TopAppBar";
@@ -131,7 +129,7 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "live" | "all5m" | "server">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "risk" | "gptRule" | "live" | "chart" | "server">("dashboard");
   const [navTab, setNavTab] = useState<NavTab>("radar");
   const [selectedTF, setSelectedTF] = useState<TimeframeKey>("1h");
 
@@ -201,10 +199,6 @@ export default function App() {
   // 15m All trader disabled — replaced by LIVE tab
   // const all15m = use15mAllTrader(rawKlines, tfData, priceData?.price ?? null, activeTab === "all15m");
 
-  // v4.3.47 — 5m All trader: chạy nền liên tục để tích luỹ history (không gate theo tab)
-  // v4.8.31: removed leader/follower mode — server owns trading, front-end is display only
-  const all5m = use5mAllTrader(rawKlines, tfData, priceData?.price ?? null, true);
-
   // v4.3.37 — Auto-pull paper trades từ Gist khi app mount (best-effort).
   useEffect(() => {
     (async () => {
@@ -249,7 +243,7 @@ export default function App() {
     if (t === "trades") setActiveTab("risk");
     else if (t === "gptRule") setActiveTab("gptRule");
     else if (t === "live") setActiveTab("live");
-    else if (t === "all5m") setActiveTab("all5m");
+    else if (t === "chart") setActiveTab("chart");
     else if (t === "server") setActiveTab("server");
     else setActiveTab("dashboard");
   }, []);
@@ -333,7 +327,7 @@ export default function App() {
     );
   }
 
-  if (activeTab === "all5m") {
+  if (activeTab === "chart") {
     return (
       <ErrorBoundary>
         <SafeAreaView style={styles.safe}>
@@ -346,19 +340,14 @@ export default function App() {
             onNotifications={() => {}}
             onSettings={() => setShowSettings(true)}
           />
-          <All5mPanel
-            account={all5m.account}
-            summary={all5m.summary}
-            currentPrice={priceData?.price ?? null}
-            stoch5mK={tfData.find((t) => t.key === "5m")?.stochK ?? null}
-            onReset={all5m.reset}
-            onCloseManual={all5m.closeManual}
-            presetKey={all5m.presetKey}
-            onSetPreset={all5m.setPreset}
-            price5mBars={(rawKlines["5m"] ?? []).map((k) => ({ time: k.time, close: k.close }))}
-            support15m={ltfCtx.support15m}
-            resistance15m={ltfCtx.resistance15m}
-          />
+          <PanelBoundary name="TradingChartTab">
+            <TradingChartTab
+              rawKlines={rawKlines}
+              selectedTF={selectedTF}
+              onSelectTF={setSelectedTF}
+              activeAlerts={activeAlerts}
+            />
+          </PanelBoundary>
           <SettingsPanel visible={showSettings} settings={settings} onUpdate={updateSettings} />
           <BottomNavBar
             active={navTab}
@@ -538,19 +527,11 @@ export default function App() {
         </View>
 
         {/* Loading */}
-        {loading ? (
+        {loading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.bitcoin} />
             <Text style={styles.loadingText}>Đang tải dữ liệu...</Text>
           </View>
-        ) : (
-          <>
-            {/* Chart */}
-            <PanelBoundary name="BinanceChart">
-              <BinanceChart rawKlines={rawKlines} selectedTF={selectedTF} onSelectTF={setSelectedTF} />
-            </PanelBoundary>
-
-          </>
         )}
 
         {/* Footer */}

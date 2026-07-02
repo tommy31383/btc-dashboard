@@ -3,7 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleSuffixes": [".ios", ".android", ".native", ".web", ""]
   },
   "exclude": [
     "dist",
