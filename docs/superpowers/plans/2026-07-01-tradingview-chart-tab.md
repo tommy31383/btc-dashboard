@@ -46,18 +46,28 @@ git commit -m "chore: add lightweight-charts dependency for new chart tab"
 
 **Files:**
 - Create: `utils/chartDataMapper.ts`
-- Test: `utils/__tests__/chartDataMapper.test.ts` (check whether the repo uses `test/*.test.mjs` node:test convention instead — see Note below)
+- Test: `utils/chartDataMapper.test.ts`
 
-**Note on test runner:** this repo's existing tests live in `test/*.test.mjs` using Node's built-in `node:test` + `assert` (no Jest). Follow that convention: create `test/chart-data-mapper.test.mjs` instead of a `__tests__` folder, and run it the same way the project runs its other tests (check `package.json` `"scripts"` — if there's no `"test"` script, run directly with `node --test test/chart-data-mapper.test.mjs`).
+**Corrected note on test runner (2026-07-02, after Task 2 dispatch hit NEEDS_CONTEXT):**
+this repo (`btc-dashboard`) has **no test runner set up at all** — no `"test"` script,
+no Jest, no `tsx`/`ts-node` installed. The `test/*.test.mjs` convention referenced in
+an earlier draft of this plan was copied from the *sibling* `btc-trader-server`
+project by mistake — it does not apply here. The only existing precedent in this repo
+is `tools/chart-v2-closed-bars.test.ts`: a `.ts` file, sibling to the code it tests
+(not a separate `test/`/`__tests__` folder), using `node:assert/strict` + `node:test`.
+Follow that precedent: create `utils/chartDataMapper.test.ts` next to
+`utils/chartDataMapper.ts`, and run it via `npx tsx --test utils/chartDataMapper.test.ts`
+(`tsx` downloads on-demand via `npx`, do NOT add it as a project devDependency — this
+plan doesn't establish new test infra project-wide, just verifies this one file).
 
 - [ ] **Step 1: Write the failing test**
 
-Create `test/chart-data-mapper.test.mjs`:
+Create `utils/chartDataMapper.test.ts`:
 
-```js
+```ts
 import test from "node:test";
 import assert from "node:assert/strict";
-import { klinesToCandlestickData, klinesToVolumeData } from "../utils/chartDataMapper.ts";
+import { klinesToCandlestickData, klinesToVolumeData } from "./chartDataMapper";
 
 test("klinesToCandlestickData converts ms time to seconds and maps OHLC", () => {
   const klines = [
@@ -90,8 +100,8 @@ test("klinesToCandlestickData returns empty array for empty input", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `node --test test/chart-data-mapper.test.mjs`
-Expected: FAIL — `Cannot find module '../utils/chartDataMapper.ts'` (file doesn't exist yet).
+Run: `npx tsx --test utils/chartDataMapper.test.ts`
+Expected: FAIL — `Cannot find module './chartDataMapper'` (file doesn't exist yet).
 
 - [ ] **Step 3: Write the implementation**
 
@@ -140,13 +150,13 @@ export function klinesToVolumeData(
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `node --test test/chart-data-mapper.test.mjs`
+Run: `npx tsx --test utils/chartDataMapper.test.ts`
 Expected: all 3 tests PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add utils/chartDataMapper.ts test/chart-data-mapper.test.mjs
+git add utils/chartDataMapper.ts utils/chartDataMapper.test.ts
 git commit -m "feat: add Kline→lightweight-charts data mapper with ms→s time conversion"
 ```
 
@@ -734,7 +744,7 @@ Expected: no errors outside of `tools/` (pre-existing unrelated errors in `tools
 - [ ] **Step 2: Run the full test suite**
 
 Run: `node --test test/*.test.mjs` (or whatever the project's actual test-running convention is — check `package.json` scripts first)
-Expected: all pass, including the new `chart-data-mapper.test.mjs`.
+Expected: all pass, including the new `utils/chartDataMapper.test.ts` (run via `npx tsx --test`).
 
 - [ ] **Step 3: Start the dev server and manually verify in browser**
 
