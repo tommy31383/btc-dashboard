@@ -144,18 +144,17 @@ import {
 
 export function useChartIndicators() {
   const [enabled, setEnabled] = useState<IndicatorKey[]>(DEFAULT_ENABLED_INDICATORS);
-  const hydrated = useRef(false);
+  // Guards against the AsyncStorage read resolving AFTER the user has
+  // already toggled something (Codex-caught P2): if the user interacts
+  // before hydration finishes, the late-arriving stored value must NOT
+  // clobber their in-flight change.
+  const userInteracted = useRef(false);
 
-  // One-time load on mount. State starts as the default set synchronously
-  // (declared above) so the chart never renders an undefined/empty state
-  // before this resolves — this effect only replaces it if storage has a
-  // valid override, and runs before any user interaction is possible.
   useEffect(() => {
     let cancelled = false;
     AsyncStorage.getItem(CHART_INDICATORS_STORAGE_KEY).then((raw) => {
-      if (cancelled) return;
+      if (cancelled || userInteracted.current) return;
       setEnabled(parseStoredIndicators(raw));
-      hydrated.current = true;
     });
     return () => {
       cancelled = true;
@@ -168,6 +167,7 @@ export function useChartIndicators() {
 
   const toggle = useCallback(
     (key: IndicatorKey) => {
+      userInteracted.current = true;
       setEnabled((prev) => {
         const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
         persist(next);
@@ -178,6 +178,7 @@ export function useChartIndicators() {
   );
 
   const reset = useCallback(() => {
+    userInteracted.current = true;
     setEnabled(DEFAULT_ENABLED_INDICATORS);
     persist(DEFAULT_ENABLED_INDICATORS);
   }, [persist]);
@@ -374,12 +375,15 @@ Modify the returned JSX (replace the existing `return (...)` block at lines 242-
             {tf.label}
           </Text>
         ))}
-        <Pressable onPress={() => setPanelOpen((v) => !v)} style={styles.indicatorBtn}>
-          <Text style={styles.indicatorBtnLabel}>Indicators</Text>
-        </Pressable>
       </View>
       <View style={{ flex: 1, width: "100%" }}>
         <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+        {/* Floating trigger, top-right of the chart area itself (not the TF
+            row) — per spec, minimal footprint over the candlesticks rather
+            than competing for space in the timeframe row. */}
+        <Pressable onPress={() => setPanelOpen((v) => !v)} style={styles.indicatorBtn}>
+          <Text style={styles.indicatorBtnLabel}>⚙ Indicators</Text>
+        </Pressable>
         <ChartIndicatorPanelWeb
           visible={panelOpen}
           onClose={() => setPanelOpen(false)}
@@ -400,12 +404,27 @@ Add `Pressable` to the react-native import at line 2:
 import { View, StyleSheet, Text, Pressable } from "react-native";
 ```
 
-Add two new styles to the `StyleSheet.create` call at the bottom of the file:
+Add two new styles to the `StyleSheet.create` call at the bottom of the file
+(`indicatorBtn` is `position: "absolute"` so it floats over the chart
+without taking layout space):
 
 ```tsx
-  indicatorBtn: { marginLeft: "auto", paddingHorizontal: 10, paddingVertical: 4, backgroundColor: P.card, borderRadius: 8 },
+  indicatorBtn: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 40,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: P.card,
+    borderRadius: 8,
+  },
   indicatorBtnLabel: { color: P.text, fontSize: 11, fontWeight: "600" },
 ```
+
+`ChartIndicatorPanel.web.tsx`'s popover `top: 40` offset (Task 3 Step 1)
+already anchors correctly below this repositioned button since both are
+relative to the same `View style={{ flex: 1, width: "100%" }}` wrapper.
 
 - [ ] **Step 3: Typecheck**
 
@@ -556,38 +575,43 @@ never an incremental add/remove that could land a series in the wrong pane.
   // whenever the oscillator subset of enabledIndicators changes, remove
   // ALL currently-mounted oscillator series and re-add the enabled ones
   // fresh, in fixed order (rsi, stochRsi, macd, adx), pane 1..N sequential.
-  const oscillatorKey = ["rsi", "stochRsi", "macd", "adx"]
-    .filter((k) => enabledIndicators.includes(k as IndicatorKey))
-    .join(",");
+  // Boolean deps (not the enabledIndicators array reference, and not a
+  // joined string) so this satisfies react-hooks/exhaustive-deps cleanly —
+  // Codex flagged a joined-string dep as functionally fine but lint-unclean
+  // since the effect body still reads `enabledIndicators` as a whole.
+  const rsiEnabled = enabledIndicators.includes("rsi");
+  const stochRsiEnabled = enabledIndicators.includes("stochRsi");
+  const macdEnabled = enabledIndicators.includes("macd");
+  const adxEnabled = enabledIndicators.includes("adx");
 
   useEffect(() => {
     if (!ready || !chartRef.current) return;
     const chart = chartRef.current;
 
-    [rsiSeriesRef, stochKSeriesRef, stochDSeriesRef, macdHistSeriesRef, plusDISeriesRef, minusDISeriesRef, adxSeriesRef].forEach(
+    ([rsiSeriesRef, stochKSeriesRef, stochDSeriesRef, macdHistSeriesRef, plusDISeriesRef, minusDISeriesRef, adxSeriesRef] as const).forEach(
       (ref) => {
         if (ref.current) {
-          chart.removeSeries(ref.current as ISeriesApi<"Line"> & ISeriesApi<"Histogram">);
+          chart.removeSeries(ref.current);
           ref.current = null;
         }
       }
     );
 
     let paneIndex = 1;
-    if (enabledIndicators.includes("rsi")) {
+    if (rsiEnabled) {
       rsiSeriesRef.current = chart.addSeries(LineSeries, { color: "#e91e63", lineWidth: 1, title: "RSI" }, paneIndex);
       paneIndex++;
     }
-    if (enabledIndicators.includes("stochRsi")) {
+    if (stochRsiEnabled) {
       stochKSeriesRef.current = chart.addSeries(LineSeries, { color: "#4caf50", lineWidth: 1, title: "StochK" }, paneIndex);
       stochDSeriesRef.current = chart.addSeries(LineSeries, { color: "#ff9800", lineWidth: 1, title: "StochD" }, paneIndex);
       paneIndex++;
     }
-    if (enabledIndicators.includes("macd")) {
+    if (macdEnabled) {
       macdHistSeriesRef.current = chart.addSeries(HistogramSeries, { title: "MACD" }, paneIndex);
       paneIndex++;
     }
-    if (enabledIndicators.includes("adx")) {
+    if (adxEnabled) {
       plusDISeriesRef.current = chart.addSeries(LineSeries, { color: COLORS.bull, lineWidth: 1, title: "+DI" }, paneIndex);
       minusDISeriesRef.current = chart.addSeries(LineSeries, { color: COLORS.bear, lineWidth: 1, title: "-DI" }, paneIndex);
       adxSeriesRef.current = chart.addSeries(LineSeries, { color: "#9e9e9e", lineWidth: 1, title: "ADX" }, paneIndex);
@@ -597,14 +621,39 @@ never an incremental add/remove that could land a series in the wrong pane.
     // series — bump a counter so its dependency array sees a change even
     // when rawKlines/selectedTF haven't changed.
     setOscillatorReconcileTick((t) => t + 1);
-  }, [ready, oscillatorKey]);
+  }, [ready, rsiEnabled, stochRsiEnabled, macdEnabled, adxEnabled]);
 ```
+
+Note: the `removeSeries` calls no longer need the awkward intersection-type
+cast Codex flagged as unnecessary — each ref's own type
+(`ISeriesApi<"Line"> | null` or `ISeriesApi<"Histogram"> | null`) already
+satisfies `removeSeries(series: ISeriesApi<SeriesType>)` directly.
 
 Add the new `oscillatorReconcileTick` state near the top with the other
 `useState` calls:
 
 ```tsx
   const [oscillatorReconcileTick, setOscillatorReconcileTick] = useState(0);
+```
+
+- [ ] **Step 3b: Fix a pre-existing stale-price-line edge case surfaced by the new toggle (Codex-caught P2)**
+
+The data-feed effect currently has `if (klines.length === 0) return;` right
+after computing `klines` — before any S/R/price-line clearing runs. That was
+harmless before (S/R was always on, so "no data" just meant "nothing to
+draw yet"). Now that `sr` can be toggled OFF by the user while a TF happens
+to have no data loaded, that early return would skip clearing existing S/R
+lines, leaving stale lines on screen. Fix: move the price-line clear
+(`priceLinesRef.current.forEach(...)`) to run unconditionally before the
+`klines.length === 0` guard:
+
+```tsx
+    const klines = getClosedKlines(rawKlines[selectedTF] ?? []);
+    if (klines.length === 0) {
+      priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+      priceLinesRef.current = [];
+      return;
+    }
 ```
 
 - [ ] **Step 4: Gate the existing data-feed effect on `enabledIndicators` + the reconcile tick, and only set data for mounted series**
@@ -861,3 +910,14 @@ committed, typechecked, manually-verified, Codex-audited state.)
 - Default set chart-space-first (Task 1's `DEFAULT_ENABLED_INDICATORS`) ✓.
 - Out-of-scope items from spec (status-line, per-indicator settings) —
   correctly not present in any task.
+- **Post-plan-audit fixes (2nd Codex pass on this plan, all P2, no P1):**
+  hydration race guarded via `userInteracted` ref (Task 1); oscillator
+  reconcile effect deps switched from a joined string to individual boolean
+  deps for clean `exhaustive-deps` (Task 4 Step 3); removed an unnecessary
+  type-cast on `removeSeries` calls (Task 4 Step 3); trigger button moved
+  from the TF row into an absolutely-positioned floating button over the
+  chart area, matching the spec's "floating, top-right of chart" wording
+  (Task 3 Step 2); added Step 3b to fix a stale-price-line edge case when
+  toggling `sr` off on a TF with no loaded data. Version bump number and
+  `npx tsx --test` invocation both confirmed correct against current repo
+  state.
