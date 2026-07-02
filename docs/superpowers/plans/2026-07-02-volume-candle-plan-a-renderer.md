@@ -108,6 +108,7 @@ import {
   ICustomSeriesPaneRenderer,
   ICustomSeriesPaneView,
   PaneRendererCustomData,
+  PriceToCoordinateConverter,
   Time,
   customSeriesDefaultOptions,
 } from "lightweight-charts";
@@ -143,13 +144,16 @@ class VolumeCandleRenderer implements ICustomSeriesPaneRenderer {
     this._options = options;
   }
 
-  draw(target: CanvasRenderingTarget2D, priceConverter: (price: number) => number): void {
+  draw(target: CanvasRenderingTarget2D, priceConverter: PriceToCoordinateConverter, _isHovered: boolean, _hitTestData?: unknown): void {
     if (!this._data || !this._data.visibleRange) return;
     const { bars, barSpacing, visibleRange, conflationFactor } = this._data;
 
+    // Codex-caught P1: under conflation (zoomed way out), a bar slot can
+    // have no originalData — must optional-chain the WHOLE bar, not just
+    // index into bars[i], before touching .originalData.volume.
     let visibleMaxVolume = 0;
     for (let i = visibleRange.from; i < visibleRange.to; i++) {
-      const vol = bars[i]?.originalData.volume ?? 0;
+      const vol = bars[i]?.originalData?.volume ?? 0;
       if (vol > visibleMaxVolume) visibleMaxVolume = vol;
     }
     if (visibleMaxVolume <= 0) return;
@@ -160,32 +164,42 @@ class VolumeCandleRenderer implements ICustomSeriesPaneRenderer {
       const { context, horizontalPixelRatio, verticalPixelRatio } = scope;
       for (let i = visibleRange.from; i < visibleRange.to; i++) {
         const bar = bars[i];
-        if (!bar) continue;
-        const row = bar.originalData;
+        const row = bar?.originalData;
+        if (!bar || !row) continue;
         const isUp = row.close >= row.open;
         const color = isUp ? this._options.upColor : this._options.downColor;
 
         const rawWidth = effectiveBarSpacing * (row.volume / visibleMaxVolume);
         const bodyWidthMedia = Math.max(1, Math.min(rawWidth, effectiveBarSpacing * 0.9));
-        const bodyWidthBitmap = bodyWidthMedia * horizontalPixelRatio;
-        const xBitmap = bar.x * horizontalPixelRatio;
+        const bodyWidthBitmap = Math.round(bodyWidthMedia * horizontalPixelRatio);
+        const xBitmap = Math.round(bar.x * horizontalPixelRatio);
 
-        const highY = priceConverter(row.high) * verticalPixelRatio;
-        const lowY = priceConverter(row.low) * verticalPixelRatio;
-        const openY = priceConverter(row.open) * verticalPixelRatio;
-        const closeY = priceConverter(row.close) * verticalPixelRatio;
-        const bodyTop = Math.min(openY, closeY);
-        const bodyBottom = Math.max(openY, closeY);
+        // priceConverter returns Coordinate | null (media/CSS coordinate) —
+        // Codex-caught P1: must null-guard, and the return type is NOT a
+        // plain number per PriceToCoordinateConverter's real signature.
+        const highY = priceConverter(row.high);
+        const lowY = priceConverter(row.low);
+        const openY = priceConverter(row.open);
+        const closeY = priceConverter(row.close);
+        if (highY === null || lowY === null || openY === null || closeY === null) continue;
 
-        // Wick — fixed 1px width regardless of volume
+        const highYBitmap = Math.round(highY * verticalPixelRatio);
+        const lowYBitmap = Math.round(lowY * verticalPixelRatio);
+        const openYBitmap = Math.round(openY * verticalPixelRatio);
+        const closeYBitmap = Math.round(closeY * verticalPixelRatio);
+        const bodyTop = Math.min(openYBitmap, closeYBitmap);
+        const bodyBottom = Math.max(openYBitmap, closeYBitmap);
+
+        // Wick — fixed 1px (device-independent) width regardless of volume
         context.fillStyle = color;
-        context.fillRect(Math.round(xBitmap - horizontalPixelRatio / 2), highY, horizontalPixelRatio, lowY - highY);
+        const wickWidthBitmap = Math.max(1, Math.round(horizontalPixelRatio));
+        context.fillRect(xBitmap - Math.floor(wickWidthBitmap / 2), highYBitmap, wickWidthBitmap, lowYBitmap - highYBitmap);
 
         // Body — width varies with volume
         context.fillRect(
-          Math.round(xBitmap - bodyWidthBitmap / 2),
+          xBitmap - Math.floor(bodyWidthBitmap / 2),
           bodyTop,
-          Math.round(bodyWidthBitmap),
+          bodyWidthBitmap,
           Math.max(1, bodyBottom - bodyTop)
         );
       }
@@ -220,15 +234,20 @@ export class VolumeCandleSeries implements ICustomSeriesPaneView<Time, VolumeCan
 
 Notes for the implementer:
 - `ICustomSeriesPaneRenderer.draw`'s real signature is `draw(target,
-  priceConverter, isHovered, hitTestData?)` — the 3rd/4th params are unused
-  here so they're omitted from the local override (TypeScript allows
-  implementing an interface method with fewer params as long as the ones
-  present match positionally — verify this compiles in Step 2 below; if
-  `tsc` complains, add `_isHovered: boolean` as an explicit unused param
-  instead of omitting it).
-- `bars[i]?.originalData` — `bars` is indexed 0..N-1 matching all data
-  points, NOT just the visible ones; `visibleRange.from`/`.to` are the
-  indices to iterate.
+  priceConverter, isHovered, hitTestData?)` where `priceConverter` is a
+  `PriceToCoordinateConverter = (price: number) => Coordinate | null` — NOT
+  a plain `(price: number) => number`. The code above declares
+  `_isHovered`/`_hitTestData` as explicit unused params (matching real
+  positional signature) and null-guards every `priceConverter(...)` call
+  before using the result — both were real gaps Codex caught in an earlier
+  draft of this code.
+- `bars[i]?.originalData` can be `undefined` even for an in-range index
+  under conflation (zoomed far out, multiple data points combined) — the
+  code above optional-chains `bar?.originalData` and `continue`s if either
+  is missing, not just `bars[i]?.originalData.volume` which would throw if
+  `bar` exists but `originalData` doesn't.
+- `bars` is indexed 0..N-1 matching all data points, NOT just the visible
+  ones; `visibleRange.from`/`.to` are the indices to iterate.
 - Do not call `window.devicePixelRatio` anywhere — `horizontalPixelRatio`/
   `verticalPixelRatio` from `useBitmapCoordinateSpace`'s scope are the
   correct source per `fancy-canvas`'s real API
@@ -268,7 +287,13 @@ In the chart-mount effect in `TradingChartTab.web.tsx`, temporarily add
 import { VolumeCandleSeries } from "./volumeCandleSeries";
 import { klinesToVolumeCandleData } from "../utils/chartDataMapper";
 // ...
-const volumeCandleTestSeries = chart.addCustomSeries(new VolumeCandleSeries(), {}, 5); // temp pane 5, well clear of existing panes
+// Codex confirmed: an out-of-range paneIndex is clamped to panes.length,
+// NOT inserted with empty panes in between — passing e.g. 5 here on a
+// chart with only pane 0 existing creates pane 1 (the next available
+// slot), not literal pane index 5. Pass a large number as a simple way to
+// mean "put this after whatever panes already exist" for this throwaway
+// verification mount; the exact resulting pane number doesn't matter here.
+const volumeCandleTestSeries = chart.addCustomSeries(new VolumeCandleSeries(), {}, 99);
 ```
 
 And in the data-feed effect, temporarily add:
@@ -285,7 +310,7 @@ this properly as part of the `candleSeriesRef` union.)
 
 Use `preview_start` with the `btc-dashboard-dev` launch config, navigate to
 the CHART tab. Confirm:
-1. A new pane (pane index 5) appears showing candle-like shapes whose body
+1. A new pane (the last one, after all existing panes) appears showing candle-like shapes whose body
    width visibly varies bar-to-bar in proportion to volume (compare against
    the existing volume histogram pane — high-volume bars in the histogram
    should correspond to wider bodies in the new pane).
