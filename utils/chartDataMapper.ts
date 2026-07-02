@@ -36,3 +36,23 @@ export function klinesToVolumeData(
     color: k.close >= k.open ? colors.upColor : colors.downColor,
   }));
 }
+
+export interface VolumeCandleDataPoint {
+  time: number; // seconds
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export function klinesToVolumeCandleData(klines: Kline[]): VolumeCandleDataPoint[] {
+  return klines.map((k) => ({
+    time: Math.floor(k.time / 1000),
+    open: k.open,
+    high: k.high,
+    low: k.low,
+    close: k.close,
+    volume: k.volume,
+  }));
+}

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { klinesToCandlestickData, klinesToVolumeData } from "./chartDataMapper";
+import { klinesToCandlestickData, klinesToVolumeData, klinesToVolumeCandleData } from "./chartDataMapper";
 
 test("klinesToCandlestickData converts ms time to seconds and maps OHLC", () => {
   const klines = [
@@ -28,4 +28,16 @@ test("klinesToVolumeData converts time to seconds and colors by direction", () =
 
 test("klinesToCandlestickData returns empty array for empty input", () => {
   assert.deepEqual(klinesToCandlestickData([]), []);
+});
+
+test("klinesToVolumeCandleData: converts time to seconds and keeps volume", () => {
+  const klines = [
+    { time: 1700000000000, open: 100, high: 110, low: 90, close: 105, volume: 42 },
+    { time: 1700000300000, open: 105, high: 108, low: 103, close: 104, volume: 17 },
+  ];
+  const result = klinesToVolumeCandleData(klines);
+  assert.deepEqual(result, [
+    { time: 1700000000, open: 100, high: 110, low: 90, close: 105, volume: 42 },
+    { time: 1700000300, open: 105, high: 108, low: 103, close: 104, volume: 17 },
+  ]);
 });
