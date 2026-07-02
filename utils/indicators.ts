@@ -459,3 +459,164 @@ export function detectCandleReversal(
   if (prevBull === currBull) return null;
   return !prevBull && currBull ? "UP_REVERSAL" : "DOWN_REVERSAL";
 }
+
+type OHLC = { high: number; low: number; close: number };
+
+// ATR Series — Wilder RMA, aligned with candles (null-padded warmup)
+export function calcATRSeries(candles: OHLC[], period = 14): (number | null)[] {
+  const n = candles.length;
+  const result: (number | null)[] = new Array(n).fill(null);
+  if (n < period + 1) return result;
+  let sum = 0;
+  for (let j = 1; j <= period; j++) {
+    const c = candles[j], prev = candles[j - 1];
+    sum += Math.max(c.high - c.low, Math.abs(c.high - prev.close), Math.abs(c.low - prev.close));
+  }
+  let atr = sum / period;
+  result[period] = atr;
+  for (let j = period + 1; j < n; j++) {
+    const c = candles[j], prev = candles[j - 1];
+    const tr = Math.max(c.high - c.low, Math.abs(c.high - prev.close), Math.abs(c.low - prev.close));
+    atr = (atr * (period - 1) + tr) / period;
+    result[j] = atr;
+  }
+  return result;
+}
+
+// ADX/DMI Series (Wilder) — +DI/-DI/ADX aligned with candles (null-padded warmup)
+export function calcADXSeries(
+  candles: OHLC[],
+  period = 14
+): { plusDI: (number | null)[]; minusDI: (number | null)[]; adx: (number | null)[] } {
+  const n = candles.length;
+  const plusDI: (number | null)[] = new Array(n).fill(null);
+  const minusDI: (number | null)[] = new Array(n).fill(null);
+  const adx: (number | null)[] = new Array(n).fill(null);
+  if (n < period * 2) return { plusDI, minusDI, adx };
+
+  const tr: number[] = new Array(n).fill(0);
+  const plusDM: number[] = new Array(n).fill(0);
+  const minusDM: number[] = new Array(n).fill(0);
+  for (let i = 1; i < n; i++) {
+    const c = candles[i], prev = candles[i - 1];
+    tr[i] = Math.max(c.high - c.low, Math.abs(c.high - prev.close), Math.abs(c.low - prev.close));
+    const up = c.high - prev.high;
+    const down = prev.low - c.low;
+    plusDM[i] = up > down && up > 0 ? up : 0;
+    minusDM[i] = down > up && down > 0 ? down : 0;
+  }
+
+  // Wilder RMA seed (SMA of first `period` values starting at index 1)
+  let trR = tr.slice(1, period + 1).reduce((a, b) => a + b, 0);
+  let plusDMR = plusDM.slice(1, period + 1).reduce((a, b) => a + b, 0);
+  let minusDMR = minusDM.slice(1, period + 1).reduce((a, b) => a + b, 0);
+
+  const dx: (number | null)[] = new Array(n).fill(null);
+  const writeDI = (idx: number) => {
+    const pDI = trR === 0 ? 0 : (100 * plusDMR) / trR;
+    const mDI = trR === 0 ? 0 : (100 * minusDMR) / trR;
+    plusDI[idx] = pDI;
+    minusDI[idx] = mDI;
+    const sum = pDI + mDI;
+    dx[idx] = sum === 0 ? 0 : (100 * Math.abs(pDI - mDI)) / sum;
+  };
+  writeDI(period);
+
+  for (let i = period + 1; i < n; i++) {
+    trR = trR - trR / period + tr[i];
+    plusDMR = plusDMR - plusDMR / period + plusDM[i];
+    minusDMR = minusDMR - minusDMR / period + minusDM[i];
+    writeDI(i);
+  }
+
+  // ADX = Wilder RMA of DX, seeded once enough DX values exist (2*period)
+  const dxStart = period;
+  const dxSeedEnd = dxStart + period - 1;
+  if (dxSeedEnd < n && dx[dxSeedEnd] !== null) {
+    let adxVal = 0;
+    let cnt = 0;
+    for (let i = dxStart; i <= dxSeedEnd; i++) {
+      const v = dx[i];
+      if (v !== null) {
+        adxVal += v;
+        cnt++;
+      }
+    }
+    adxVal = cnt > 0 ? adxVal / cnt : 0;
+    adx[dxSeedEnd] = adxVal;
+    for (let i = dxSeedEnd + 1; i < n; i++) {
+      const v = dx[i] ?? 0;
+      adxVal = (adxVal * (period - 1) + v) / period;
+      adx[i] = adxVal;
+    }
+  }
+
+  return { plusDI, minusDI, adx };
+}
+
+// SuperTrend Series (ATR-band trend-follow) — value + direction ("up"|"down") aligned with candles
+export function calcSuperTrendSeries(
+  candles: OHLC[],
+  period = 10,
+  mult = 3
+): { value: (number | null)[]; trend: ("up" | "down" | null)[] } {
+  const n = candles.length;
+  const value: (number | null)[] = new Array(n).fill(null);
+  const trend: ("up" | "down" | null)[] = new Array(n).fill(null);
+  const atr = calcATRSeries(candles, period);
+
+  let finalUpper: number | null = null;
+  let finalLower: number | null = null;
+  let dir: "up" | "down" = "up";
+
+  for (let i = 0; i < n; i++) {
+    const a = atr[i];
+    if (a === null) continue;
+    const c = candles[i];
+    const hl2 = (c.high + c.low) / 2;
+    const basicUpper = hl2 + mult * a;
+    const basicLower = hl2 - mult * a;
+    const prevClose = i > 0 ? candles[i - 1].close : c.close;
+
+    if (finalUpper === null || finalLower === null) {
+      finalUpper = basicUpper;
+      finalLower = basicLower;
+      dir = c.close >= hl2 ? "up" : "down";
+    } else {
+      finalUpper = basicUpper < finalUpper || prevClose > finalUpper ? basicUpper : finalUpper;
+      finalLower = basicLower > finalLower || prevClose < finalLower ? basicLower : finalLower;
+      if (dir === "up" && c.close < finalLower) dir = "down";
+      else if (dir === "down" && c.close > finalUpper) dir = "up";
+    }
+
+    value[i] = dir === "up" ? finalLower : finalUpper;
+    trend[i] = dir;
+  }
+
+  return { value, trend };
+}
+
+// Anchored VWAP Series — resets at each new UTC calendar day, aligned with candles
+export function calcVWAPSeries(
+  candles: (OHLC & { time: number; volume: number })[]
+): (number | null)[] {
+  const n = candles.length;
+  const result: (number | null)[] = new Array(n).fill(null);
+  let cumPV = 0;
+  let cumV = 0;
+  let currentDay = -1;
+  for (let i = 0; i < n; i++) {
+    const c = candles[i];
+    const day = Math.floor(c.time / 86400000);
+    if (day !== currentDay) {
+      currentDay = day;
+      cumPV = 0;
+      cumV = 0;
+    }
+    const tp = (c.high + c.low + c.close) / 3;
+    cumPV += tp * c.volume;
+    cumV += c.volume;
+    result[i] = cumV > 0 ? cumPV / cumV : null;
+  }
+  return result;
+}
