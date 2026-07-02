@@ -167,9 +167,6 @@ export default function App() {
   // Learner + Paper Trader: log mỗi rule fire, resolve khi giá hit SL/TP/timeout
   const calib = useCalibration(activeAlerts, priceData?.price ?? null);
 
-  // v4.7.6 — AutoTrader (paper legacy) đã xoá. Tab Rule giờ show
-  // UnifiedTradesPanel gộp LIVE (real) + 5m ALL (paper) — đúng nguồn production.
-
   // v4.3.52 — Binance Live; v4.3.82 — pass LTF context (stoch5m + S/R 15m) cho confirm
   // v4.7.8 — thêm closedBar5m cho 5m ALL Engine Mode trong LIVE
   const ltfCtx = (() => {
