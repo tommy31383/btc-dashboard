@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { createChart, IChartApi, ISeriesApi, ColorType, CandlestickSeries, HistogramSeries, LineSeries, UTCTimestamp, CandlestickData, HistogramData, LineData } from "lightweight-charts";
+import { createChart, IChartApi, ISeriesApi, IPriceLine, ColorType, LineStyle, CandlestickSeries, HistogramSeries, LineSeries, UTCTimestamp, CandlestickData, HistogramData, LineData } from "lightweight-charts";
 import { COLORS, TIMEFRAMES, TimeframeKey } from "../utils/constants";
 import { P } from "../utils/v2Theme";
 import { RawKlinesMap, closedKlines as getClosedKlines } from "../hooks/useBinanceKlines";
-import { calcEMASeries, calcBollingerSeries } from "../utils/indicators";
+import { calcEMASeries, calcBollingerSeries, calcRSISeriesAligned, calcStochRSISeries, calcMACDSeries } from "../utils/indicators";
 import { klinesToCandlestickData, klinesToVolumeData } from "../utils/chartDataMapper";
+import { detectSRLevels } from "../utils/supportResistance";
 import { RuleAlert } from "../hooks/useRuleAlerts";
 import DebugLabel from "./DebugLabel";
 
@@ -25,6 +26,12 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const ema21SeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const bbUpperSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const bbLowerSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const rsiSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const stochKSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const stochDSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const macdHistSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
+  const priceLinesRef = useRef<IPriceLine[]>([]);
+  const alertLinesRef = useRef<IPriceLine[]>([]);
   const [ready, setReady] = useState(false);
 
   // Mount chart once
@@ -51,6 +58,10 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     const ema21 = chart.addSeries(LineSeries, { color: "#00bcd4", lineWidth: 1, title: "EMA21" });
     const bbUpper = chart.addSeries(LineSeries, { color: "#888", lineWidth: 1, title: "BB Upper" });
     const bbLower = chart.addSeries(LineSeries, { color: "#888", lineWidth: 1, title: "BB Lower" });
+    const rsi = chart.addSeries(LineSeries, { color: "#e91e63", lineWidth: 1, title: "RSI" }, 1);
+    const stochK = chart.addSeries(LineSeries, { color: "#4caf50", lineWidth: 1, title: "StochK" }, 2);
+    const stochD = chart.addSeries(LineSeries, { color: "#ff9800", lineWidth: 1, title: "StochD" }, 2);
+    const macdHist = chart.addSeries(HistogramSeries, { title: "MACD" }, 3);
 
     chartRef.current = chart;
     candleSeriesRef.current = candleSeries;
@@ -59,6 +70,10 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     ema21SeriesRef.current = ema21;
     bbUpperSeriesRef.current = bbUpper;
     bbLowerSeriesRef.current = bbLower;
+    rsiSeriesRef.current = rsi;
+    stochKSeriesRef.current = stochK;
+    stochDSeriesRef.current = stochD;
+    macdHistSeriesRef.current = macdHist;
     setReady(true);
 
     const handleResize = () => {
@@ -108,7 +123,81 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     bbLowerSeriesRef.current?.setData(
       times.map((t, i) => ({ time: t, value: bb.lower[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
     );
+
+    const rsiVals = calcRSISeriesAligned(closes);
+    const stoch = calcStochRSISeries(closes);
+    const macd = calcMACDSeries(closes);
+
+    rsiSeriesRef.current?.setData(
+      times.map((t, i) => ({ time: t, value: rsiVals[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+    );
+    stochKSeriesRef.current?.setData(
+      times.map((t, i) => ({ time: t, value: stoch.kSeries[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+    );
+    stochDSeriesRef.current?.setData(
+      times.map((t, i) => ({ time: t, value: stoch.dSeries[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+    );
+    macdHistSeriesRef.current?.setData(
+      times
+        .map((t, i) => ({ time: t, value: macd.histogram[i] }))
+        .filter((p): p is { time: UTCTimestamp; value: number } => p.value !== null)
+        .map((p) => ({ ...p, color: p.value >= 0 ? COLORS.bull : COLORS.bear } as HistogramData<UTCTimestamp>))
+    );
+
+    const currentPrice = klines[klines.length - 1].close;
+    const srLevels = detectSRLevels(klines, currentPrice);
+    priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    priceLinesRef.current = srLevels.map((lvl) =>
+      candleSeriesRef.current!.createPriceLine({
+        price: lvl.price,
+        color: lvl.kind === "support" ? COLORS.bull : COLORS.bear,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        title: lvl.kind === "support" ? "S" : "R",
+      })
+    );
   }, [ready, rawKlines, selectedTF]);
+
+  // Draw rule entry/TP/SL overlay for the active timeframe
+  useEffect(() => {
+    if (!ready || !candleSeriesRef.current) return;
+    alertLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    alertLinesRef.current = [];
+
+    const matching = activeAlerts.filter((a) => a.tfKey === selectedTF);
+    const newLines: IPriceLine[] = [];
+    for (const alert of matching) {
+      const rank = alert.id.split(":")[1] ?? alert.id;
+      newLines.push(
+        candleSeriesRef.current!.createPriceLine({
+          price: alert.entryPrice,
+          color: P.text,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          title: `#${rank} ENTRY`,
+        })
+      );
+      newLines.push(
+        candleSeriesRef.current!.createPriceLine({
+          price: alert.tpPrice,
+          color: COLORS.bull,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          title: `#${rank} TP`,
+        })
+      );
+      newLines.push(
+        candleSeriesRef.current!.createPriceLine({
+          price: alert.slPrice,
+          color: COLORS.bear,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          title: `#${rank} SL`,
+        })
+      );
+    }
+    alertLinesRef.current = newLines;
+  }, [ready, activeAlerts, selectedTF]);
 
   return (
     <View style={styles.container}>
