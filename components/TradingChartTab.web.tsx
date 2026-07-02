@@ -151,7 +151,29 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     return () => {
       window.removeEventListener("resize", handleResize);
       chart.remove();
+      // chart.remove() disposes ALL series on it — every ref pointing at a
+      // series on this chart must be cleared, not just chartRef/candleSeriesRef,
+      // or a later remount's reconcile effects will call removeSeries() on a
+      // stale series object from the disposed chart and throw ("Value is
+      // undefined" — lightweight-charts' internal assertion).
       chartRef.current = null;
+      candleSeriesRef.current = null;
+      volumeSeriesRef.current = null;
+      ema9SeriesRef.current = null;
+      ema21SeriesRef.current = null;
+      bbUpperSeriesRef.current = null;
+      bbLowerSeriesRef.current = null;
+      rsiSeriesRef.current = null;
+      stochKSeriesRef.current = null;
+      stochDSeriesRef.current = null;
+      macdHistSeriesRef.current = null;
+      superTrendSeriesRef.current = null;
+      vwapSeriesRef.current = null;
+      plusDISeriesRef.current = null;
+      minusDISeriesRef.current = null;
+      adxSeriesRef.current = null;
+      priceLinesRef.current = [];
+      alertLinesRef.current = [];
     };
   }, []);
 
