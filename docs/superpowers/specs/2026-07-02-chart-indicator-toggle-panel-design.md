@@ -110,13 +110,20 @@ whichever series refs are currently mounted.
 
 - A floating **"Indicators"** icon button anchored top-right of the chart
   area (small footprint, doesn't compete with candlesticks for space).
-- Tapping it opens a **bottom sheet** (works identically on Android APK and
-  web — avoids a desktop-only dropdown that would look broken on mobile).
-- Sheet content: one row per `IndicatorDef`, each with a toggle switch and
+- **Platform-adapted presentation** (per Codex/TradingView-layout research):
+  tapping the button opens a **bottom sheet on native/Android APK**, but on
+  **web** it opens a **popover/dropdown anchored to the button** instead —
+  closer to how TradingView's own desktop "Indicators" toolbar button
+  behaves. Both presentations render the exact same `ChartIndicatorPanel`
+  content component; only the wrapping/positioning differs
+  (`Platform.OS === "web"` branch chooses popover vs sheet — same pattern
+  already used for the `.web.tsx`/`.native.tsx` split elsewhere in this
+  component).
+- Panel content: one row per `IndicatorDef`, each with a toggle switch and
   label. Grouped into "Overlay" (ema/bb/supertrend/vwap/sr/rules) and
   "Oscillator panes" (rsi/stochRsi/macd/adx) sections.
-- "Reset mặc định" button at the bottom of the sheet.
-- Sheet dismiss = tap outside or a close button; no explicit "Apply" step —
+- "Reset mặc định" button at the bottom of the panel.
+- Dismiss = tap outside or a close button; no explicit "Apply" step —
   toggles take effect immediately (matches TradingView's live-toggle feel).
 
 ### Out of scope (explicitly deferred, per Codex's phase-2 suggestion)
@@ -145,9 +152,16 @@ whichever series refs are currently mounted.
 
 - `components/TradingChartTab.web.tsx` — main rework (registry, state,
   dynamic series lifecycle, control-panel trigger button).
-- New: `components/ChartIndicatorPanel.tsx` — the bottom-sheet UI itself
-  (kept separate from `TradingChartTab.web.tsx` so the sheet is a plain,
-  reusable, platform-agnostic RN component, not tied to `.web.tsx`).
+- New: `components/ChartIndicatorPanel.tsx` — the panel content itself
+  (checklist rows + reset button), platform-agnostic, reusable content
+  regardless of wrapper.
+- New: `components/ChartIndicatorPanel.web.tsx` (popover/dropdown wrapper,
+  absolutely-positioned `div` near the trigger button, dismiss-on-outside-
+  click) and `components/ChartIndicatorPanel.native.tsx` (a simple
+  `Modal` + slide-up `View` bottom sheet built from scratch — the app has no
+  existing bottom-sheet primitive to reuse, this is new). Both wrappers
+  render the same `ChartIndicatorPanel` content, only positioning/dismiss
+  chrome differs.
 - `components/TradingChartTab.native.tsx` — no change needed (still just
   shows the fallback message; toggle panel is irrelevant until native chart
   exists).
