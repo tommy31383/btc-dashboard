@@ -48,8 +48,8 @@ export default function ChartIndicatorPanelWeb({ visible, onClose, enabled, onTo
 const styles = StyleSheet.create({
   popover: {
     position: "absolute",
-    top: 40,
-    right: 8,
+    top: 44,
+    left: 8,
     zIndex: 50,
     boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
   },
