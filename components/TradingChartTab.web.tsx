@@ -20,6 +20,73 @@ interface Props {
   activeAlerts: RuleAlert[];
 }
 
+interface OverlaySeriesRefs {
+  ema9SeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  ema21SeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  bbUpperSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  bbLowerSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  superTrendSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  vwapSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+}
+
+// Add/remove overlay (main-pane) series to match enabledIndicators.
+// forceRecreate=true unconditionally removes+re-adds every currently-
+// enabled overlay series (used after a candle-series swap, to restore
+// correct z-order above the freshly-created candle series); forceRecreate
+// =false (the normal path) only add/removes what actually changed.
+function reconcileOverlaySeries(
+  chart: IChartApi,
+  enabledIndicators: IndicatorKey[],
+  refs: OverlaySeriesRefs,
+  forceRecreate: boolean
+): void {
+  const has = (k: IndicatorKey) => enabledIndicators.includes(k);
+  const { ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef, superTrendSeriesRef, vwapSeriesRef } = refs;
+
+  if (forceRecreate) {
+    ([ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef, superTrendSeriesRef, vwapSeriesRef] as const).forEach((ref) => {
+      if (ref.current) {
+        chart.removeSeries(ref.current);
+        ref.current = null;
+      }
+    });
+  }
+
+  if (has("ema") && !ema9SeriesRef.current) {
+    ema9SeriesRef.current = chart.addSeries(LineSeries, { color: "#f7931a", lineWidth: 1, title: "EMA9" });
+    ema21SeriesRef.current = chart.addSeries(LineSeries, { color: "#00bcd4", lineWidth: 1, title: "EMA21" });
+  } else if (!has("ema") && ema9SeriesRef.current) {
+    chart.removeSeries(ema9SeriesRef.current);
+    chart.removeSeries(ema21SeriesRef.current!);
+    ema9SeriesRef.current = null;
+    ema21SeriesRef.current = null;
+  }
+
+  if (has("bb") && !bbUpperSeriesRef.current) {
+    bbUpperSeriesRef.current = chart.addSeries(LineSeries, { color: "#888", lineWidth: 1, title: "BB Upper" });
+    bbLowerSeriesRef.current = chart.addSeries(LineSeries, { color: "#888", lineWidth: 1, title: "BB Lower" });
+  } else if (!has("bb") && bbUpperSeriesRef.current) {
+    chart.removeSeries(bbUpperSeriesRef.current);
+    chart.removeSeries(bbLowerSeriesRef.current!);
+    bbUpperSeriesRef.current = null;
+    bbLowerSeriesRef.current = null;
+  }
+
+  if (has("supertrend") && !superTrendSeriesRef.current) {
+    superTrendSeriesRef.current = chart.addSeries(LineSeries, { color: COLORS.bull, lineWidth: 2, title: "SuperTrend" });
+  } else if (!has("supertrend") && superTrendSeriesRef.current) {
+    chart.removeSeries(superTrendSeriesRef.current);
+    superTrendSeriesRef.current = null;
+  }
+
+  if (has("vwap") && !vwapSeriesRef.current) {
+    vwapSeriesRef.current = chart.addSeries(LineSeries, { color: "#ba68c8", lineWidth: 1, title: "VWAP" });
+  } else if (!has("vwap") && vwapSeriesRef.current) {
+    chart.removeSeries(vwapSeriesRef.current);
+    vwapSeriesRef.current = null;
+  }
+}
+
 export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, activeAlerts }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -91,42 +158,10 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   // add-if-missing / remove-if-present per key.
   useEffect(() => {
     if (!ready || !chartRef.current) return;
-    const chart = chartRef.current;
-    const has = (k: IndicatorKey) => enabledIndicators.includes(k);
-
-    if (has("ema") && !ema9SeriesRef.current) {
-      ema9SeriesRef.current = chart.addSeries(LineSeries, { color: "#f7931a", lineWidth: 1, title: "EMA9" });
-      ema21SeriesRef.current = chart.addSeries(LineSeries, { color: "#00bcd4", lineWidth: 1, title: "EMA21" });
-    } else if (!has("ema") && ema9SeriesRef.current) {
-      chart.removeSeries(ema9SeriesRef.current);
-      chart.removeSeries(ema21SeriesRef.current!);
-      ema9SeriesRef.current = null;
-      ema21SeriesRef.current = null;
-    }
-
-    if (has("bb") && !bbUpperSeriesRef.current) {
-      bbUpperSeriesRef.current = chart.addSeries(LineSeries, { color: "#888", lineWidth: 1, title: "BB Upper" });
-      bbLowerSeriesRef.current = chart.addSeries(LineSeries, { color: "#888", lineWidth: 1, title: "BB Lower" });
-    } else if (!has("bb") && bbUpperSeriesRef.current) {
-      chart.removeSeries(bbUpperSeriesRef.current);
-      chart.removeSeries(bbLowerSeriesRef.current!);
-      bbUpperSeriesRef.current = null;
-      bbLowerSeriesRef.current = null;
-    }
-
-    if (has("supertrend") && !superTrendSeriesRef.current) {
-      superTrendSeriesRef.current = chart.addSeries(LineSeries, { color: COLORS.bull, lineWidth: 2, title: "SuperTrend" });
-    } else if (!has("supertrend") && superTrendSeriesRef.current) {
-      chart.removeSeries(superTrendSeriesRef.current);
-      superTrendSeriesRef.current = null;
-    }
-
-    if (has("vwap") && !vwapSeriesRef.current) {
-      vwapSeriesRef.current = chart.addSeries(LineSeries, { color: "#ba68c8", lineWidth: 1, title: "VWAP" });
-    } else if (!has("vwap") && vwapSeriesRef.current) {
-      chart.removeSeries(vwapSeriesRef.current);
-      vwapSeriesRef.current = null;
-    }
+    reconcileOverlaySeries(chartRef.current, enabledIndicators, {
+      ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef,
+      superTrendSeriesRef, vwapSeriesRef,
+    }, false);
   }, [ready, enabledIndicators]);
 
   // Full reconcile for oscillator-pane indicators (rsi/stochRsi/macd/adx).
