@@ -5,7 +5,8 @@ import { COLORS, TIMEFRAMES, TimeframeKey } from "../utils/constants";
 import { P } from "../utils/v2Theme";
 import { RawKlinesMap, closedKlines as getClosedKlines } from "../hooks/useBinanceKlines";
 import { calcEMASeries, calcBollingerSeries, calcRSISeriesAligned, calcStochRSISeries, calcMACDSeries, calcADXSeries, calcSuperTrendSeries, calcVWAPSeries } from "../utils/indicators";
-import { klinesToCandlestickData, klinesToVolumeData } from "../utils/chartDataMapper";
+import { klinesToCandlestickData, klinesToVolumeData, klinesToVolumeCandleData } from "../utils/chartDataMapper";
+import { VolumeCandleSeries } from "./volumeCandleSeries";
 import { detectSRLevels } from "../utils/supportResistance";
 import { RuleAlert } from "../hooks/useRuleAlerts";
 import DebugLabel from "./DebugLabel";
@@ -90,7 +91,7 @@ function reconcileOverlaySeries(
 export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, activeAlerts }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | ISeriesApi<"Custom"> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
   const ema9SeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const ema21SeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
@@ -109,6 +110,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const alertLinesRef = useRef<IPriceLine[]>([]);
   const [ready, setReady] = useState(false);
   const [oscillatorReconcileTick, setOscillatorReconcileTick] = useState(0);
+  const [candleSwapTick, setCandleSwapTick] = useState(0);
   const { enabled: enabledIndicators, toggle: toggleIndicator, reset: resetIndicators } = useChartIndicators();
   const [panelOpen, setPanelOpen] = useState(false);
   const indicatorBtnRef = useRef<View>(null);
@@ -216,6 +218,45 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     setOscillatorReconcileTick((t) => t + 1);
   }, [ready, rsiEnabled, stochRsiEnabled, macdEnabled, adxEnabled]);
 
+  // Swap the main candle series between regular Candlestick and the custom
+  // variable-width Volume Candle renderer when the toggle changes. There is
+  // no API to change a series' type in place — must removeSeries (loses its
+  // price lines) then add a fresh one, then restore viewport + z-order.
+  const volumeCandleEnabled = enabledIndicators.includes("volumeCandle");
+
+  useEffect(() => {
+    if (!ready || !chartRef.current || !candleSeriesRef.current) return;
+    const chart = chartRef.current;
+    const isCurrentlyCustom = candleSeriesRef.current.seriesType() === "Custom";
+    const shouldBeCustom = volumeCandleEnabled;
+    if (isCurrentlyCustom === shouldBeCustom) return;
+
+    const savedRange = chart.timeScale().getVisibleLogicalRange();
+
+    priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    priceLinesRef.current = [];
+    alertLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    alertLinesRef.current = [];
+
+    chart.removeSeries(candleSeriesRef.current);
+    candleSeriesRef.current = shouldBeCustom
+      ? chart.addCustomSeries(new VolumeCandleSeries(), {})
+      : chart.addSeries(CandlestickSeries, {
+          upColor: COLORS.bull, downColor: COLORS.bear,
+          borderUpColor: COLORS.bull, borderDownColor: COLORS.bear,
+          wickUpColor: COLORS.bull, wickDownColor: COLORS.bear,
+        });
+
+    if (savedRange) chart.timeScale().setVisibleLogicalRange(savedRange);
+
+    reconcileOverlaySeries(chart, enabledIndicators, {
+      ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef,
+      superTrendSeriesRef, vwapSeriesRef,
+    }, true);
+
+    setCandleSwapTick((t) => t + 1);
+  }, [ready, volumeCandleEnabled]);
+
   // Feed data whenever TF or klines change
   useEffect(() => {
     if (!ready || !candleSeriesRef.current) return;
@@ -226,9 +267,15 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       return;
     }
 
-    candleSeriesRef.current.setData(
-      klinesToCandlestickData(klines).map((p) => ({ ...p, time: p.time as UTCTimestamp })) as CandlestickData<UTCTimestamp>[]
-    );
+    if (candleSeriesRef.current.seriesType() === "Custom") {
+      (candleSeriesRef.current as ISeriesApi<"Custom">).setData(
+        klinesToVolumeCandleData(klines).map((p) => ({ ...p, time: p.time as UTCTimestamp }))
+      );
+    } else {
+      (candleSeriesRef.current as ISeriesApi<"Candlestick">).setData(
+        klinesToCandlestickData(klines).map((p) => ({ ...p, time: p.time as UTCTimestamp })) as CandlestickData<UTCTimestamp>[]
+      );
+    }
     volumeSeriesRef.current?.setData(
       klinesToVolumeData(klines, { upColor: COLORS.bull + "80", downColor: COLORS.bear + "80" }).map((p) => ({
         ...p,
@@ -338,7 +385,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
       priceLinesRef.current = [];
     }
-  }, [ready, rawKlines, selectedTF, enabledIndicators, oscillatorReconcileTick]);
+  }, [ready, rawKlines, selectedTF, enabledIndicators, oscillatorReconcileTick, candleSwapTick]);
 
   // Draw rule entry/TP/SL overlay for the active timeframe
   useEffect(() => {
@@ -380,7 +427,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       );
     }
     alertLinesRef.current = newLines;
-  }, [ready, activeAlerts, selectedTF, enabledIndicators]);
+  }, [ready, activeAlerts, selectedTF, enabledIndicators, candleSwapTick]);
 
   return (
     <View style={styles.container}>
