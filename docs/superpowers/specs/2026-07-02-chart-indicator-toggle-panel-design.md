@@ -41,32 +41,60 @@ so toggling them just gates whether the existing price-line effect runs.
 - `enabledIndicators: Set<IndicatorKey>` (or array) is the single source of
   truth, held in `TradingChartTab.web.tsx` state.
 - Persisted to `AsyncStorage` under key `@chart_indicators_v1` (debounced
-  write on change, read once on mount before first chart paint).
+  write on change).
 - **Default set** (chart-space-first): `ema`, `supertrend`, `sr`, `rules`
   enabled. Everything else (`bb`, `vwap`, `rsi`, `stochRsi`, `macd`, `adx`)
   starts OFF.
 - Control panel has a "Reset mặc định" action that restores the default set.
+- **Load/validation (P2 fix per Codex audit):** state starts as the default
+  set synchronously (so the chart never flashes an undefined/empty state
+  before storage resolves). A mount effect reads AsyncStorage once; on
+  success, parse the stored JSON defensively — if it's not valid JSON, not
+  an array, or empty after filtering, keep the default set. Otherwise filter
+  the stored array down to keys that still exist in the current
+  `INDICATORS` registry (drops now-removed/renamed keys from old app
+  versions) and dedupe, then replace state with that filtered result. This
+  guards against stale cached keys from a prior build and against the async
+  load racing a user toggle (the effect only ever runs once on mount, before
+  any user interaction is possible, so no write-write race with user
+  toggles).
 
 ### Series lifecycle (no chart recreation)
 
 Chart mount effect (existing, unchanged) still only creates
-candlestick+volume. All indicator series/panes are created/destroyed by a
-new effect keyed on `[ready, enabledIndicators]`, using real lightweight-charts
-v5.2.0 API confirmed by Codex:
+candlestick+volume. Overlay indicators (main pane 0: ema/bb/supertrend/vwap)
+are added/removed independently and don't affect pane layout — straightforward
+`addSeries`/`removeSeries` per key.
+
+Oscillator-pane indicators (rsi/stochRsi/macd/adx) are handled differently,
+per a P1 correctness issue Codex caught: `addSeries(def, opts, paneIndex)`
+does **not** insert a pane in the middle — if `paneIndex` already exists it
+just adds the series to that existing pane. So an incremental "remove RSI,
+later re-add RSI at pane 1" can land RSI in whatever pane currently sits at
+index 1 (e.g. Stoch's pane after RSI was removed and everything shifted up),
+producing the wrong pane assignment.
+
+**Fix: full reconcile, not incremental diffing.** Whenever
+`enabledIndicators` changes in a way that touches any oscillator-pane
+indicator, remove ALL currently-mounted oscillator series (`removeSeries`
+each), then re-add the currently-enabled oscillator indicators fresh, in a
+fixed registry order (rsi → stochRsi → macd → adx), assigning pane index
+`1, 2, 3, ...` sequentially based only on what's enabled right now. This is
+cheap (at most 4 indicator groups, a handful of series) and sidesteps the
+incremental-pane-index bug entirely — no stale pane-index bookkeeping needed.
+Overlay-only toggles (ema/bb/supertrend/vwap/sr/rules) skip this reconcile
+entirely since they never touch pane 1+.
 
 - `chart.addSeries(SeriesDef, options, paneIndex?)` to add.
 - `chart.removeSeries(seriesApi)` to remove (irreversible — ref is dropped,
   a fresh series is created if re-enabled later; this is a deliberate
-  simplification, not a bug — recreating a single series is cheap and
-  avoids managing hide/show semantics).
-- Pane index for oscillator indicators is assigned **dynamically** based on
-  current enabled pane-indicators' order (not hard-coded to 1/2/3/4 like
-  today), so turning off RSI mid-session doesn't leave a gap where MACD used
-  to be at pane 3.
-- When an oscillator pane's last indicator is disabled, its series are
-  removed; lightweight-charts drops the now-empty pane automatically once no
-  series reference it (confirmed via `chart.panes()`/`removePane` semantics
-  — no series left in a pane means no visible row for it).
+  simplification, not a bug — recreating a series is cheap and avoids
+  managing hide/show semantics).
+- When the last oscillator indicator is disabled (0 oscillator panes left),
+  `removeSeries` on the final remaining series in a pane auto-drops that
+  now-empty pane — confirmed by Codex as real default behavior (as long as
+  `preserveEmptyPane` isn't set and more than one pane remains), no explicit
+  `chart.removePane(index)` call needed for this path.
 - `series.applyOptions({ visible: false })` is NOT used for the toggle path
   (Codex confirmed hide ≠ pane reclaim) — only real add/remove changes pane
   layout.
