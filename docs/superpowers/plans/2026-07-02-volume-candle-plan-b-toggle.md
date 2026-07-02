@@ -408,3 +408,20 @@ git commit -m "chore: bump version for Volume Candle feature"
   shouldn't be any beyond what Tasks 3/4 already touch) would now fail
   typecheck and surface immediately — that's a deliberate safety net, not a
   gap to fix.
+
+## Codex Audit Notes (Plan B, post-write)
+
+No P1s. Two P2s to keep in mind during Task 4 manual verification (not
+blocking implementation, but must be checked):
+- **Volume histogram z-order after swap:** mount order is candle then
+  volume (histogram added after candle at mount). The swap effect only
+  recreates candle + overlays, so the new candle series is added AFTER the
+  volume histogram in z-order — volume histogram should still render
+  correctly since it's a separate pane-0 series drawn as bars, not
+  overlapping the candle bodies, but verify visually in Task 4 Step 2 that
+  the histogram isn't visually obscured post-swap.
+- **`enabledIndicators` not in swap effect's deps array:** the effect only
+  lists `[ready, volumeCandleEnabled]`. This is intentional (avoids
+  re-running the swap on every unrelated indicator toggle) and is runtime-
+  correct since `enabledIndicators` is read fresh via closure each render,
+  but note it for anyone adding `react-hooks/exhaustive-deps` lint later.
