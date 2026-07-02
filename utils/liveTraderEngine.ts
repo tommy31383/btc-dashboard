@@ -13,7 +13,6 @@ import {
 } from "./binanceLive";
 import { pullFile, scheduleFilePush } from "./gistSync";
 import { notify, playSlHit, playTpHit, playEntry } from "./liveAlerts";
-import { getActivePreset } from "./all5mAccount";
 
 const STORAGE_KEY = "@live_trader_v2";
 const SECRET_KEY = "@live_trader_secret_v1";
@@ -728,15 +727,9 @@ export async function reconcileTrackedPositions(
   // v4.7.17: race guard 30s → 15s (Binance phản ánh order ~5-10s, 15s đủ buffer)
   const recentMutation = s.lastTrackedMutationMs && (now - s.lastTrackedMutationMs < 15_000);
   if ((longImportMismatch || shortImportMismatch) && !recentMutation) {
-    // FIX #2: Preset fallback
-    let presetTp = 4, presetSl = 2; // BALANCED defaults
-    try {
-      const preset = await getActivePreset();
-      presetTp = preset.tpPct;
-      presetSl = preset.slPct;
-    } catch {
-      // Use defaults
-    }
+    // FIX #2: Preset fallback (was: read from 5m ALL active preset, now removed —
+    // always use the BALANCED defaults this code already fell back to)
+    const presetTp = 4, presetSl = 2; // BALANCED defaults
     // Helper: derive TRUE manual entry price (FIX #1)
     const deriveManualEntry = (side: "LONG" | "SHORT", binanceQty: number, binanceAvg: number, appQty: number): number => {
       if (binanceAvg <= 0) return 0;
