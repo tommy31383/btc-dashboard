@@ -12,7 +12,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DebugLabel from "./DebugLabel";
-import { PRESETS, PresetKey, getActivePresetKey, DEFAULT_PRESET_KEY } from "../utils/all5mAccount";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions,
 } from "react-native";
@@ -79,46 +78,14 @@ function ChartTfPicker({ tf, onChange }: { tf: ChartTfKey; onChange: (k: ChartTf
   );
 }
 
-/** Shared hook — đọc active preset từ AsyncStorage (đồng bộ với tab 5m ALL).
- *  Poll 5s để detect khi user đổi preset bên tab 5m ALL → reflect trong LIVE. */
-function useActivePreset(): PresetKey {
-  const [key, setKey] = useState<PresetKey>(DEFAULT_PRESET_KEY);
-  useEffect(() => {
-    let alive = true;
-    const refresh = () => { getActivePresetKey().then((k) => { if (alive) setKey(k); }); };
-    refresh();
-    const id = setInterval(refresh, 5000);
-    return () => { alive = false; clearInterval(id); };
-  }, []);
-  return key;
-}
-
 export default function LiveTab({ live, klinesByTf }: Props) {
   const { width } = useWindowDimensions();
   const isWide = width >= 900;
-  const presetKey = useActivePreset();
-  const preset = PRESETS[presetKey];
-  const fiveMModeOn = live.state.settings.use5mAllEngineMode;
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
       <DebugLabel name="LiveTab" />
       <StatusBar live={live} />
-
-      {/* 5m ALL ENGINE MODE BANNER — nổi bật khi ON (anh Tommy v4.7.10) */}
-      {fiveMModeOn && (
-        <View style={[styles.fiveMBanner, { borderColor: preset.emoji === "🔴" ? P.error : preset.emoji === "🟡" ? P.bitcoinOrange : P.green }]}>
-          <Text style={styles.fiveMBannerTitle}>
-            ⚡ 5m ALL ENGINE: <Text style={{ color: preset.emoji === "🔴" ? P.error : preset.emoji === "🟡" ? P.bitcoinOrange : P.green, fontWeight: "900" }}>
-              {preset.emoji} {preset.label}
-            </Text>
-          </Text>
-          <Text style={styles.fiveMBannerSub}>
-            Stoch K&lt;{preset.stochLongLevel}/&gt;{preset.stochShortLevel} · S/R 15m ±{preset.srProximityPct}% · TP+{preset.tpPct}%/SL-{preset.slPct}% · cd {preset.cooldownMin}m
-            {"  "}· đồng bộ tab 5m ALL · expected 3y NET +${(preset.expectedNet3y / 1000).toFixed(0)}k · DD ${preset.expectedMaxDd3y}
-          </Text>
-        </View>
-      )}
 
       <View style={[styles.grid, isWide && styles.gridWide]}>
         <View style={[isWide && styles.col]}>
@@ -537,8 +504,6 @@ function CredentialsCard({ live }: Props) {
 function SettingsCard({ live }: Props) {
   const s = live.state.settings;
   const [draft, setDraft] = useState<LiveSettings>(s);
-  const livePresetKey = useActivePreset();
-  const livePreset = PRESETS[livePresetKey];
   // Track whether user has unsaved edits — if dirty, do NOT clobber with incoming `s`
   // (would overwrite their input when gist sync arrives mid-edit).
   const [dirty, setDirty] = useState(false);
@@ -562,43 +527,8 @@ function SettingsCard({ live }: Props) {
   function toggleTf(tf: string) {
     setDirty(true);
     setDraft((d) => {
-      const exists = d.excludedTfs.includes(tf);
-      const nextExcluded = exists ? d.excludedTfs.filter((x) => x !== tf) : [...d.excludedTfs, tf];
-      // MUTEX 1-chiều (anh Tommy v4.7.11): khi user enable 5m rule (remove "5m" khỏi excludedTfs),
-      // và 5m ALL Engine đang ON → auto OFF engine để tránh 2 nguồn signal cùng cây 5m.
-      const next = { ...d, excludedTfs: nextExcluded };
-      if (tf === "5m" && exists && d.use5mAllEngineMode) {
-        // Removed "5m" from excluded → 5m rule sẽ ON → tắt engine
-        next.use5mAllEngineMode = false;
-      }
-      return next;
-    });
-  }
-
-  /** Toggle 5m ALL Engine — MUTEX 1-chiều với 5m rule (excludedTfs). */
-  function toggle5mAllEngine() {
-    const turningOn = !draft.use5mAllEngineMode;
-    // Confirm dialog khi BẬT (do backtest 3y cho thấy giảm NET) — anh Tommy v4.7.25
-    if (turningOn && typeof window !== "undefined") {
-      const ok = window.confirm(
-        "⚠️ BẬT 5m ALL Engine cho LIVE?\n\n" +
-        "Backtest 3y v4.7.x cho thấy MỌI preset đều giảm hoặc âm NET vs rules-only:\n" +
-        "  • BALANCED: NET -28k% (vs baseline +295k%)\n" +
-        "  • WHALE: NET -13k%\n" +
-        "  • TURTLE: NET +39k% (chỉ 13% baseline)\n\n" +
-        "Khuyến nghị: dùng cho paper test (tab 5m ALL), KHÔNG ON ở LIVE production.\n\n" +
-        "Vẫn muốn bật?"
-      );
-      if (!ok) return;
-    }
-    setDirty(true);
-    setDraft((d) => {
-      const next: LiveSettings = { ...d, use5mAllEngineMode: turningOn };
-      // Khi bật engine → auto add "5m" vào excludedTfs (tắt 5m rule path)
-      if (turningOn && !d.excludedTfs.includes("5m")) {
-        next.excludedTfs = [...d.excludedTfs, "5m"];
-      }
-      return next;
+      const nextExcluded = d.excludedTfs.includes(tf) ? d.excludedTfs.filter((x) => x !== tf) : [...d.excludedTfs, tf];
+      return { ...d, excludedTfs: nextExcluded };
     });
   }
 
@@ -636,7 +566,6 @@ function SettingsCard({ live }: Props) {
       stackMaxNotionalUsd: 200000,
       equityDdPausePct: 30,
       equityDdPauseHours: 4,
-      use5mAllEngineMode: false,  // user phải bật rõ ràng (v4.7.8)
       stackBetterEntryMode: "off", // v4.7.29: backtest confirm OFF tốt nhất
     };
     setDirty(true);
@@ -701,66 +630,6 @@ function SettingsCard({ live }: Props) {
         💡 App track peak equity (wallet + uPnL). Khi current equity drop X% từ peak → auto pause auto-trade Y giờ.
         {"\n"}   Vd peak $100, drop 30% → equity $70 → pause 4h. Sau 4h auto resume.
         {"\n"}   0% = tắt protection (KHÔNG khuyến cáo — backtest 3y có 1 đợt DD -76k% trong 2.5 tháng đầu).
-      </Text>
-
-      <Text style={styles.subLabel}>⚡ 5m ALL ENGINE MODE (v4.7.8+)</Text>
-      <View style={{
-        backgroundColor: P.error + "12", borderWidth: 1, borderColor: P.error + "55",
-        padding: 8, borderRadius: 4, marginBottom: 8,
-      }}>
-        <Text style={{ color: P.error, fontFamily: "monospace", fontWeight: "800", fontSize: 11, marginBottom: 3 }}>
-          ⚠️ KHÔNG khuyến nghị ON cho LIVE production
-        </Text>
-        <Text style={{ color: P.text, fontFamily: "monospace", fontSize: 10, lineHeight: 14 }}>
-          Backtest 3y (v4.7.x): 5m ALL Engine ON cho LIVE → mọi preset đều
-          <Text style={{ color: P.error, fontWeight: "700" }}> giảm/lỗ NET vs rules-only</Text>:
-          {"\n"}  • BALANCED: NET -28k% (vs Mode A +295k%)
-          {"\n"}  • WHALE: NET -13k% (DD thấp nhất nhưng NET vẫn âm)
-          {"\n"}  • TURTLE: NET +39k% (chỉ 13% NET của Mode A)
-          {"\n"}Lý do: 149k-205k 5m candidates 3y → noisy, đẩy HTF rules ra khỏi stack/DD budget.
-          {"\n"}💡 Dùng cho <Text style={{ color: P.bitcoinOrange, fontWeight: "700" }}>paper test (tab 5m ALL)</Text> thôi — KHÔNG ON ở LIVE production.
-        </Text>
-      </View>
-      <View style={{ flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-        <TouchableOpacity
-          onPress={toggle5mAllEngine}
-          style={[
-            styles.tfChip,
-            {
-              borderColor: draft.use5mAllEngineMode ? P.green : P.dim,
-              backgroundColor: draft.use5mAllEngineMode ? P.green + "22" : P.surface,
-              paddingHorizontal: 14, paddingVertical: 8,
-            },
-          ]}
-        >
-          <Text style={{ color: draft.use5mAllEngineMode ? P.green : P.dim, fontFamily: "monospace", fontWeight: "800", fontSize: 11 }}>
-            {draft.use5mAllEngineMode ? "✓ 5m ALL ENGINE: ON" : "○ 5m ALL ENGINE: OFF"}
-          </Text>
-        </TouchableOpacity>
-        {draft.use5mAllEngineMode && (
-          <View style={[styles.tfChip, {
-            borderColor: livePreset.emoji === "🔴" ? P.error : livePreset.emoji === "🟡" ? P.bitcoinOrange : P.green,
-            backgroundColor: P.surface, paddingHorizontal: 12, paddingVertical: 8,
-          }]}>
-            <Text style={{
-              color: livePreset.emoji === "🔴" ? P.error : livePreset.emoji === "🟡" ? P.bitcoinOrange : P.green,
-              fontFamily: "monospace", fontWeight: "800", fontSize: 11,
-            }}>
-              ⇨ Active preset: {livePreset.emoji} {livePreset.label}
-            </Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.note}>
-        💡 ON: mỗi cây 5m close, LIVE evaluate signal giống engine 5m ALL — Stoch K (per active preset)
-        + S/R 15m fallback. Entry MARKET thật, tpPct/slPct/cooldown từ active preset
-        (đồng bộ tab 5m ALL via @all5m_preset_v1).
-        {"\n"}   ⇨ Đổi preset (WHALE/EAGLE/TURTLE) ở tab 5m ALL → cả paper + LIVE đều áp ngay.
-        {"\n"}   Margin/leverage dùng từ LIVE settings ({draft.marginUsd} × {draft.leverage}x = ${draft.marginUsd * draft.leverage} notional/lệnh).
-        {"\n"}   HTF rules (1h/4h/1d/1w) vẫn chạy SONG SONG.
-        {"\n"}   ⚠️ Stack gates LIVE settings vẫn áp (max {draft.stackMaxPerSide}/side, dist {draft.stackMinEntryDistPct}%).
-        {"\n"}   🔒 MUTEX 1-chiều với 5m rule (excludedTfs): bật cái này → tự động ADD "5m" vào excluded.
-        {"\n"}   Tắt cả 2 OK; bật 1 trong 2 OK; KHÔNG cho phép cùng ON (tránh 2 nguồn signal trùng cây 5m).
       </Text>
 
       <Text style={styles.subLabel}>Excluded TFs (bấm để toggle)</Text>
@@ -1666,19 +1535,6 @@ const styles = StyleSheet.create({
   btnGhostText: { color: P.text2, fontFamily: "monospace", fontWeight: "700", fontSize: 11, letterSpacing: 1 },
   btnDanger: { backgroundColor: P.errorContainer, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 3, marginLeft: 6 },
   btnDangerText: { color: P.onErrorContainer, fontFamily: "monospace", fontWeight: "800", fontSize: 10, letterSpacing: 0.5 },
-  // 5m ALL ENGINE MODE banner (v4.7.10)
-  fiveMBanner: {
-    marginHorizontal: 12, marginBottom: 8, marginTop: 4,
-    padding: 10, borderRadius: 4, borderWidth: 2,
-    backgroundColor: P.surface,
-  },
-  fiveMBannerTitle: {
-    color: P.text, fontSize: 12, fontFamily: "monospace", fontWeight: "800",
-    letterSpacing: 0.8, marginBottom: 3,
-  },
-  fiveMBannerSub: {
-    color: P.dim, fontSize: 10, fontFamily: "monospace", lineHeight: 14,
-  },
   // Stack summary + bulk actions (v4.7.5)
   stackSummaryWrap: { flexDirection: "row", gap: 8, marginTop: 8, marginBottom: 8, flexWrap: "wrap" },
   stackSummary: { flex: 1, minWidth: 280, padding: 8, borderRadius: 4, borderWidth: 1, backgroundColor: P.surface },

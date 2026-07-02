@@ -40,10 +40,6 @@ export interface LiveSettings {
   /** Equity drawdown protection (anh Tommy v4.6.9): drop X% từ peak equity → pause auto Y giờ */
   equityDdPausePct: number;         // default 30 — drop 30% từ peak → trigger pause
   equityDdPauseHours: number;       // default 4 — pause N giờ sau trigger
-  /** 5m ALL ENGINE MODE (anh Tommy v4.7.8): khi ON, LIVE evaluate signal mỗi cây 5m close
-   *  giống engine 5m ALL (Stoch + S/R 15m fallback per active preset từ @all5m_preset_v1).
-   *  HTF rules vẫn chạy song song. Margin/lev dùng từ LIVE settings. */
-  use5mAllEngineMode: boolean;      // default false
   /** Better entry only mode (anh Tommy v4.7.27): entry mới phải TỐT HƠN entry trước cùng side.
    *  - "off": tắt (default cũ)
    *  - "vs-last": tốt hơn entry GẦN NHẤT cùng side (LONG cần thấp hơn, SHORT cần cao hơn)
@@ -77,7 +73,6 @@ export const DEFAULT_SETTINGS: LiveSettings = {
   stackMaxNotionalUsd: 200000,   // 50k → 200k (cho phép stack 50 lệnh)
   equityDdPausePct: 30,          // drop 30% từ peak equity → pause
   equityDdPauseHours: 4,         // pause 4h
-  use5mAllEngineMode: false,     // default OFF — phải bật rõ ràng trong SETTINGS
   stackBetterEntryMode: "off", // v4.7.29: backtest 3y confirm better-entry HURTS LIVE — flip về OFF
 };
 
