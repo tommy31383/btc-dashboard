@@ -6,6 +6,7 @@ import { P } from "../utils/v2Theme";
 import { RawKlinesMap, closedKlines as getClosedKlines } from "../hooks/useBinanceKlines";
 import { calcEMASeries, calcBollingerSeries, calcRSISeriesAligned, calcStochRSISeries, calcMACDSeries, calcADXSeries, calcSuperTrendSeries, calcVWAPSeries } from "../utils/indicators";
 import { klinesToCandlestickData, klinesToVolumeData, klinesToVolumeCandleData } from "../utils/chartDataMapper";
+import { useSymbolKlines } from "../hooks/useSymbolKlines";
 import { VolumeCandleSeries } from "./volumeCandleSeries";
 import { detectSRLevels } from "../utils/supportResistance";
 import { RuleAlert } from "../hooks/useRuleAlerts";
@@ -88,6 +89,15 @@ function reconcileOverlaySeries(
   }
 }
 
+type ChartSymbol = "BTC" | "ETH" | "ETHFI" | "SOL";
+const CHART_SYMBOLS: ChartSymbol[] = ["BTC", "ETH", "ETHFI", "SOL"];
+const SYMBOL_TO_BINANCE: Record<ChartSymbol, string> = {
+  BTC: "BTCUSDT",
+  ETH: "ETHUSDT",
+  ETHFI: "ETHFIUSDT",
+  SOL: "SOLUSDT",
+};
+
 export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, activeAlerts }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -114,6 +124,21 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const { enabled: enabledIndicators, toggle: toggleIndicator, reset: resetIndicators } = useChartIndicators();
   const [panelOpen, setPanelOpen] = useState(false);
   const indicatorBtnRef = useRef<View>(null);
+
+  const [selectedSymbol, setSelectedSymbol] = useState<ChartSymbol>("BTC");
+  const {
+    rawKlines: fetchedKlines,
+    loading: symbolLoading,
+    error: symbolError,
+  } = useSymbolKlines(selectedSymbol === "BTC" ? null : SYMBOL_TO_BINANCE[selectedSymbol]);
+
+  // BTC reuses the rawKlines prop (already fetched app-wide for the rule
+  // engine) — no second fetch. Non-BTC symbols use the standalone hook.
+  // useSymbolKlines only returns non-empty rawKlines once they actually
+  // belong to the selected symbol, so non-empty fetchedKlines here already
+  // implies "matches selectedSymbol".
+  const activeKlines = selectedSymbol === "BTC" ? rawKlines : fetchedKlines;
+  const isSymbolDataReady = selectedSymbol === "BTC" || Object.keys(fetchedKlines).length > 0;
 
   // Mount chart once — only candlestick + volume. All indicator series are
   // managed reactively by the effects below, keyed on enabledIndicators.
