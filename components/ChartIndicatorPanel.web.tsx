@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     top: 44,
     left: 8,
     zIndex: 50,
-    maxHeight: "70vh",
+    maxHeight: "70vh" as unknown as number,
     overflow: "scroll",
     boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
   },

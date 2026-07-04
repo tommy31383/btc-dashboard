@@ -23,6 +23,16 @@ Canonical registry cho mọi dataset backtest. Mỗi entry có **tên (key)** + 
 - **Status:** active · **pb=1 DEPLOYED-IN-CODE** (`btc-trader-server` main, hedge01.ts:810) — npm test 6/6 + build PASS — **CHƯA chạy `./deploy.sh`**. Timestamp-guard (Option B) cũng deployed-in-code.
 - **VPS runtime: UNKNOWN (chưa verify bằng runtime).** Suy luận "VPS vẫn pb=3" chỉ đúng NẾU chưa ai deploy — KHÔNG phải bằng chứng runtime. Để xác nhận: `curl https://tommybtc.duckdns.org/` (version) + kiểm tra commit đã build trên VPS, hoặc log regime tick. Đừng coi giá trị active là chắc chắn cho tới khi verify.
 
+### `SIGNALFORGE_MULTITF_v1`
+- **Type:** Signal Forge composite multi-timeframe audit (research-only, chart overlay; NOT live rule)
+- **Date:** 2026-07-04
+- **Tool:** `tools/backtest-signalforge-7y.ts`
+- **Data JSON:** `assets/backtest_signalforge_7y.json` (43 MB)
+- **Data:** `.cache/binance-5m-7y.json` (781,136×5m, 2019-01-01T00:00:00Z → 2026-06-08T02:45:00Z)
+- **Setup:** Resample 5m → 15m/1h/4h/1d/1w/1mo. `runSignalForge()` with all 11 indicators enabled from `DEFAULT_SIGNAL_FORGE_CONFIG`; variants: AND(requireAll=true) vs OR(requireAll=false), signal-flip exit vs ATR risk (TP 2×ATR, SL 1.5×ATR, trailing 1×ATR). Fee 0.05%/side, no leverage. Per-year stats include n and reliability flag (`n<20` = not reliable).
+- **Verdict:** **NULL / research-only**. 5m and 15m are negative every year; ATR-risk variants are mostly negative. 1h flip is aggregate-positive but only 4/8 years positive and equityTrend=DOWN. 4h flip is the only candidate (OR-flip +317.68%, PF 1.37, 6/8 positive years) but failed 2025 and 2026, so no current cross-timeframe-consistent edge. 1d/1w/1mo are too low-n per year to trust.
+- **Status:** active registry record · **DO NOT promote to live/rule engine without a separate OOS/forward study**.
+
 ### `TPSL_GRID_v1`
 - **Type:** TP × SL grid sweep
 - **Date:** 2026-04-28

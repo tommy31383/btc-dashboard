@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Text, Pressable, ScrollView } from "react-native";
-import { createChart, createSeriesMarkers, IChartApi, ISeriesApi, IPriceLine, ISeriesMarkersPluginApi, SeriesMarker, ColorType, LineStyle, CandlestickSeries, HistogramSeries, LineSeries, UTCTimestamp, CandlestickData, HistogramData, LineData } from "lightweight-charts";
+import { createChart, createSeriesMarkers, IChartApi, ISeriesApi, IPriceLine, ISeriesMarkersPluginApi, SeriesMarker, ColorType, LineStyle, CandlestickSeries, HistogramSeries, LineSeries, UTCTimestamp, CandlestickData, HistogramData, LineData, WhitespaceData } from "lightweight-charts";
 import { COLORS, TIMEFRAMES, TimeframeKey } from "../utils/constants";
 import { P } from "../utils/v2Theme";
 import { RawKlinesMap, closedKlines as getClosedKlines } from "../hooks/useBinanceKlines";
@@ -25,6 +25,7 @@ import {
   SignalForgeState,
   SignalForgeStats,
 } from "../utils/signalForge";
+import { runMlRsi } from "../utils/mlRsi";
 
 interface Props {
   rawKlines: RawKlinesMap;
@@ -39,11 +40,14 @@ interface OverlaySeriesRefs {
   bbUpperSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
   bbLowerSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
   superTrendSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  mlSuperTrendUpSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
+  mlSuperTrendDownSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
   vwapSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
 }
 
 type SignalForgeRiskToggleKey = "enableTp" | "enableSl" | "enableTs";
 type SignalForgeRiskNumberKey = "tpMultiplier" | "slMultiplier" | "tsMultiplier";
+type LineOrWhitespace = LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 
 // Add/remove overlay (main-pane) series to match enabledIndicators.
 // forceRecreate=true unconditionally removes+re-adds every currently-
@@ -57,10 +61,30 @@ function reconcileOverlaySeries(
   forceRecreate: boolean
 ): void {
   const has = (k: IndicatorKey) => enabledIndicators.includes(k);
-  const { ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef, superTrendSeriesRef, vwapSeriesRef } = refs;
+  const {
+    ema9SeriesRef,
+    ema21SeriesRef,
+    bbUpperSeriesRef,
+    bbLowerSeriesRef,
+    superTrendSeriesRef,
+    mlSuperTrendUpSeriesRef,
+    mlSuperTrendDownSeriesRef,
+    vwapSeriesRef,
+  } = refs;
 
   if (forceRecreate) {
-    ([ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef, superTrendSeriesRef, vwapSeriesRef] as const).forEach((ref) => {
+    (
+      [
+        ema9SeriesRef,
+        ema21SeriesRef,
+        bbUpperSeriesRef,
+        bbLowerSeriesRef,
+        superTrendSeriesRef,
+        mlSuperTrendUpSeriesRef,
+        mlSuperTrendDownSeriesRef,
+        vwapSeriesRef,
+      ] as const
+    ).forEach((ref) => {
       if (ref.current) {
         chart.removeSeries(ref.current);
         ref.current = null;
@@ -93,6 +117,16 @@ function reconcileOverlaySeries(
   } else if (!has("supertrend") && superTrendSeriesRef.current) {
     chart.removeSeries(superTrendSeriesRef.current);
     superTrendSeriesRef.current = null;
+  }
+
+  if (has("mlRsi") && !mlSuperTrendUpSeriesRef.current) {
+    mlSuperTrendUpSeriesRef.current = chart.addSeries(LineSeries, { color: "#31d07f", lineWidth: 2, title: "ML ST Up" });
+    mlSuperTrendDownSeriesRef.current = chart.addSeries(LineSeries, { color: "#ff5d73", lineWidth: 2, title: "ML ST Down" });
+  } else if (!has("mlRsi") && mlSuperTrendUpSeriesRef.current) {
+    chart.removeSeries(mlSuperTrendUpSeriesRef.current);
+    chart.removeSeries(mlSuperTrendDownSeriesRef.current!);
+    mlSuperTrendUpSeriesRef.current = null;
+    mlSuperTrendDownSeriesRef.current = null;
   }
 
   if (has("vwap") && !vwapSeriesRef.current) {
@@ -271,10 +305,14 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const bbUpperSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const bbLowerSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const rsiSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const mlRsiSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const mlRsiSignalSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const stochKSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const stochDSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const macdHistSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
   const superTrendSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const mlSuperTrendUpSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const mlSuperTrendDownSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const vwapSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const plusDISeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const minusDISeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
@@ -283,6 +321,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const alertLinesRef = useRef<IPriceLine[]>([]);
   const signalForgeLinesRef = useRef<IPriceLine[]>([]);
   const signalForgeMarkersRef = useRef<ISeriesMarkersPluginApi<UTCTimestamp> | null>(null);
+  const mlRsiMarkersRef = useRef<ISeriesMarkersPluginApi<UTCTimestamp> | null>(null);
   const [ready, setReady] = useState(false);
   const [oscillatorReconcileTick, setOscillatorReconcileTick] = useState(0);
   const [candleSwapTick, setCandleSwapTick] = useState(0);
@@ -388,6 +427,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     return () => {
       window.removeEventListener("resize", handleResize);
       signalForgeMarkersRef.current?.detach();
+      mlRsiMarkersRef.current?.detach();
       chart.remove();
       // chart.remove() disposes ALL series on it — every ref pointing at a
       // series on this chart must be cleared, not just chartRef/candleSeriesRef,
@@ -402,10 +442,14 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       bbUpperSeriesRef.current = null;
       bbLowerSeriesRef.current = null;
       rsiSeriesRef.current = null;
+      mlRsiSeriesRef.current = null;
+      mlRsiSignalSeriesRef.current = null;
       stochKSeriesRef.current = null;
       stochDSeriesRef.current = null;
       macdHistSeriesRef.current = null;
       superTrendSeriesRef.current = null;
+      mlSuperTrendUpSeriesRef.current = null;
+      mlSuperTrendDownSeriesRef.current = null;
       vwapSeriesRef.current = null;
       plusDISeriesRef.current = null;
       minusDISeriesRef.current = null;
@@ -414,6 +458,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       alertLinesRef.current = [];
       signalForgeLinesRef.current = [];
       signalForgeMarkersRef.current = null;
+      mlRsiMarkersRef.current = null;
     };
   }, []);
 
@@ -424,19 +469,20 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     if (!ready || !chartRef.current) return;
     reconcileOverlaySeries(chartRef.current, enabledIndicators, {
       ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef,
-      superTrendSeriesRef, vwapSeriesRef,
+      superTrendSeriesRef, mlSuperTrendUpSeriesRef, mlSuperTrendDownSeriesRef, vwapSeriesRef,
     }, false);
   }, [ready, enabledIndicators]);
 
-  // Full reconcile for oscillator-pane indicators (rsi/stochRsi/macd/adx).
+  // Full reconcile for oscillator-pane indicators (rsi/mlRsi/stochRsi/macd/adx).
   // addSeries(..., paneIndex) does NOT insert a pane in the middle — if
   // paneIndex already exists it just adds the series to that existing pane.
   // Incrementally toggling one oscillator on/off while others stay enabled
   // can therefore land a re-enabled indicator in the wrong pane. Fix:
   // whenever the oscillator subset changes, remove ALL currently-mounted
   // oscillator series and re-add the enabled ones fresh, in fixed order
-  // (rsi, stochRsi, macd, adx), pane 1..N sequential.
+  // (rsi, mlRsi, stochRsi, macd, adx), pane 1..N sequential.
   const rsiEnabled = enabledIndicators.includes("rsi");
+  const mlRsiEnabled = enabledIndicators.includes("mlRsi");
   const stochRsiEnabled = enabledIndicators.includes("stochRsi");
   const macdEnabled = enabledIndicators.includes("macd");
   const adxEnabled = enabledIndicators.includes("adx");
@@ -445,7 +491,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     if (!ready || !chartRef.current) return;
     const chart = chartRef.current;
 
-    ([rsiSeriesRef, stochKSeriesRef, stochDSeriesRef, macdHistSeriesRef, plusDISeriesRef, minusDISeriesRef, adxSeriesRef] as const).forEach(
+    ([rsiSeriesRef, mlRsiSeriesRef, mlRsiSignalSeriesRef, stochKSeriesRef, stochDSeriesRef, macdHistSeriesRef, plusDISeriesRef, minusDISeriesRef, adxSeriesRef] as const).forEach(
       (ref) => {
         if (ref.current) {
           chart.removeSeries(ref.current);
@@ -457,6 +503,11 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     let paneIndex = 1;
     if (rsiEnabled) {
       rsiSeriesRef.current = chart.addSeries(LineSeries, { color: "#e91e63", lineWidth: 1, title: "RSI" }, paneIndex);
+      paneIndex++;
+    }
+    if (mlRsiEnabled) {
+      mlRsiSeriesRef.current = chart.addSeries(LineSeries, { color: "#64d2ff", lineWidth: 2, title: "ML RSI" }, paneIndex);
+      mlRsiSignalSeriesRef.current = chart.addSeries(LineSeries, { color: "#ffd166", lineWidth: 1, title: "ML RSI Signal" }, paneIndex);
       paneIndex++;
     }
     if (stochRsiEnabled) {
@@ -478,7 +529,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     // series — bump a counter so its dependency array sees a change even
     // when rawKlines/selectedTF haven't changed.
     setOscillatorReconcileTick((t) => t + 1);
-  }, [ready, rsiEnabled, stochRsiEnabled, macdEnabled, adxEnabled]);
+  }, [ready, rsiEnabled, mlRsiEnabled, stochRsiEnabled, macdEnabled, adxEnabled]);
 
   // Swap the main candle series between regular Candlestick and the custom
   // variable-width Volume Candle renderer when the toggle changes. There is
@@ -503,6 +554,8 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     signalForgeLinesRef.current = [];
     signalForgeMarkersRef.current?.detach();
     signalForgeMarkersRef.current = null;
+    mlRsiMarkersRef.current?.detach();
+    mlRsiMarkersRef.current = null;
 
     chart.removeSeries(candleSeriesRef.current);
     candleSeriesRef.current = shouldBeCustom
@@ -517,7 +570,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
 
     reconcileOverlaySeries(chart, enabledIndicators, {
       ema9SeriesRef, ema21SeriesRef, bbUpperSeriesRef, bbLowerSeriesRef,
-      superTrendSeriesRef, vwapSeriesRef,
+      superTrendSeriesRef, mlSuperTrendUpSeriesRef, mlSuperTrendDownSeriesRef, vwapSeriesRef,
     }, true);
 
     setCandleSwapTick((t) => t + 1);
@@ -534,6 +587,11 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
       signalForgeLinesRef.current = [];
       signalForgeMarkersRef.current?.setMarkers([]);
+      mlRsiSeriesRef.current?.setData([]);
+      mlRsiSignalSeriesRef.current?.setData([]);
+      mlSuperTrendUpSeriesRef.current?.setData([]);
+      mlSuperTrendDownSeriesRef.current?.setData([]);
+      mlRsiMarkersRef.current?.setMarkers([]);
       return;
     }
 
@@ -582,6 +640,42 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       rsiSeriesRef.current?.setData(
         times.map((t, i) => ({ time: t, value: rsiVals[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
       );
+    }
+
+    if (enabledIndicators.includes("mlRsi")) {
+      const mlRsi = runMlRsi(klines);
+      mlRsiSeriesRef.current?.setData(
+        times.map((t, i) => ({ time: t, value: mlRsi.mlRsiValue[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+      );
+      mlRsiSignalSeriesRef.current?.setData(
+        times.map((t, i) => ({ time: t, value: mlRsi.signalLine[i] })).filter((p): p is LineData<UTCTimestamp> => p.value !== null)
+      );
+      const mlStUp: LineOrWhitespace[] = times.map((t, i) =>
+        mlRsi.supertrend[i] !== null && mlRsi.supertrendDirection[i] === 1 ? { time: t, value: mlRsi.supertrend[i]! } : { time: t }
+      );
+      const mlStDown: LineOrWhitespace[] = times.map((t, i) =>
+        mlRsi.supertrend[i] !== null && mlRsi.supertrendDirection[i] === -1 ? { time: t, value: mlRsi.supertrend[i]! } : { time: t }
+      );
+      mlSuperTrendUpSeriesRef.current?.setData(mlStUp);
+      mlSuperTrendDownSeriesRef.current?.setData(mlStDown);
+
+      const markers: SeriesMarker<UTCTimestamp>[] = mlRsi.signals.map((signal) => ({
+        time: Math.floor(signal.time / 1000) as UTCTimestamp,
+        position: signal.side === "long" ? "belowBar" : "aboveBar",
+        shape: signal.side === "long" ? "arrowUp" : "arrowDown",
+        color: signal.side === "long" ? COLORS.bull : COLORS.bear,
+        text: signal.side === "long" ? "ML L" : "ML S",
+        size: 1.4,
+      }));
+      mlRsiMarkersRef.current?.detach();
+      mlRsiMarkersRef.current = createSeriesMarkers(
+        candleSeriesRef.current as unknown as ISeriesApi<"Candlestick", UTCTimestamp>,
+        markers,
+        { zOrder: "top" }
+      );
+    } else {
+      mlRsiMarkersRef.current?.detach();
+      mlRsiMarkersRef.current = null;
     }
 
     if (enabledIndicators.includes("stochRsi")) {
@@ -675,8 +769,12 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     bbUpperSeriesRef.current?.setData([]);
     bbLowerSeriesRef.current?.setData([]);
     superTrendSeriesRef.current?.setData([]);
+    mlSuperTrendUpSeriesRef.current?.setData([]);
+    mlSuperTrendDownSeriesRef.current?.setData([]);
     vwapSeriesRef.current?.setData([]);
     rsiSeriesRef.current?.setData([]);
+    mlRsiSeriesRef.current?.setData([]);
+    mlRsiSignalSeriesRef.current?.setData([]);
     stochKSeriesRef.current?.setData([]);
     stochDSeriesRef.current?.setData([]);
     macdHistSeriesRef.current?.setData([]);
@@ -688,6 +786,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
     signalForgeLinesRef.current = [];
     signalForgeMarkersRef.current?.setMarkers([]);
+    mlRsiMarkersRef.current?.setMarkers([]);
   }, [ready, isSymbolDataReady]);
 
   // Draw rule entry/TP/SL overlay for the active timeframe
