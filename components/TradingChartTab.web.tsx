@@ -497,6 +497,23 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   return (
     <View style={styles.container}>
       <DebugLabel name="TradingChartTab" />
+      <View style={styles.symbolRow}>
+        {CHART_SYMBOLS.map((sym) => (
+          <Text
+            key={sym}
+            onPress={() => setSelectedSymbol(sym)}
+            style={[styles.symbolBtn, selectedSymbol === sym && styles.symbolBtnActive]}
+          >
+            {sym}
+          </Text>
+        ))}
+        {selectedSymbol !== "BTC" && !isSymbolDataReady && !symbolError && (
+          <Text style={styles.symbolStatusText}>Đang tải {selectedSymbol}...</Text>
+        )}
+        {selectedSymbol !== "BTC" && symbolError && (
+          <Text style={styles.symbolErrorText}>{symbolError}</Text>
+        )}
+      </View>
       <View style={styles.tfRow}>
         {TIMEFRAMES.map((tf) => (
           <Text
@@ -535,6 +552,11 @@ const styles = StyleSheet.create({
   tfRow: { flexDirection: "row", gap: 8, padding: 8 },
   tfBtn: { color: P.dim, fontSize: 12, paddingHorizontal: 8, paddingVertical: 4 },
   tfBtnActive: { color: P.primaryContainer, fontWeight: "700" },
+  symbolRow: { flexDirection: "row", gap: 8, paddingHorizontal: 8, paddingTop: 8, alignItems: "center" },
+  symbolBtn: { color: P.dim, fontSize: 12, paddingHorizontal: 8, paddingVertical: 4, fontWeight: "700" },
+  symbolBtnActive: { color: P.primaryContainer },
+  symbolStatusText: { color: P.dim, fontSize: 10, fontFamily: "monospace", marginLeft: 4 },
+  symbolErrorText: { color: COLORS.bear, fontSize: 10, fontFamily: "monospace", marginLeft: 4 },
   attribution: { color: P.dim, fontSize: 9, textAlign: "center", padding: 4 },
   indicatorBtn: {
     position: "absolute",
