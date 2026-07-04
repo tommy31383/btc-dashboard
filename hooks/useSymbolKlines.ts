@@ -54,6 +54,7 @@ export function useSymbolKlines(symbol: string | null): UseSymbolKlinesResult {
 
     const fetchForSymbol = async () => {
       setLoading(true);
+      setError(null); // clear a previous symbol's error before this fetch resolves
       try {
         const results = await Promise.all(
           TIMEFRAMES.map(async (tf) => {

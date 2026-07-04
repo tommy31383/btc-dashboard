@@ -435,15 +435,34 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     }
   }, [ready, activeKlines, isSymbolDataReady, selectedTF, enabledIndicators, oscillatorReconcileTick, candleSwapTick]);
 
-  // Clear the candle/volume series while a symbol switch's fetch is still
-  // in flight — prevents briefly showing the PREVIOUS symbol's candles
-  // under the newly-selected symbol's label. Timeframe switches (symbol
-  // unchanged) are unaffected: this only fires when isSymbolDataReady flips
-  // to false, which happens on symbol change, not TF change.
+  // Clear the candle/volume series AND every indicator series/price-line
+  // while a symbol switch's fetch is still in flight — prevents briefly
+  // showing the PREVIOUS symbol's candles OR indicator values (EMA/BB/
+  // RSI/MACD/ADX/S-R) under the newly-selected symbol's label. Timeframe
+  // switches (symbol unchanged) are unaffected: this only fires when
+  // isSymbolDataReady flips to false, which happens on symbol change, not
+  // TF change. (Codex-caught P1: original version only cleared
+  // candle/volume, leaving indicator series showing the previous symbol's
+  // stale values during the fetch.)
   useEffect(() => {
     if (!ready || !candleSeriesRef.current || isSymbolDataReady) return;
     candleSeriesRef.current.setData([]);
     volumeSeriesRef.current?.setData([]);
+    ema9SeriesRef.current?.setData([]);
+    ema21SeriesRef.current?.setData([]);
+    bbUpperSeriesRef.current?.setData([]);
+    bbLowerSeriesRef.current?.setData([]);
+    superTrendSeriesRef.current?.setData([]);
+    vwapSeriesRef.current?.setData([]);
+    rsiSeriesRef.current?.setData([]);
+    stochKSeriesRef.current?.setData([]);
+    stochDSeriesRef.current?.setData([]);
+    macdHistSeriesRef.current?.setData([]);
+    plusDISeriesRef.current?.setData([]);
+    minusDISeriesRef.current?.setData([]);
+    adxSeriesRef.current?.setData([]);
+    priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    priceLinesRef.current = [];
   }, [ready, isSymbolDataReady]);
 
   // Draw rule entry/TP/SL overlay for the active timeframe
@@ -507,7 +526,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
             {sym}
           </Text>
         ))}
-        {selectedSymbol !== "BTC" && !isSymbolDataReady && !symbolError && (
+        {selectedSymbol !== "BTC" && !isSymbolDataReady && symbolLoading && !symbolError && (
           <Text style={styles.symbolStatusText}>Đang tải {selectedSymbol}...</Text>
         )}
         {selectedSymbol !== "BTC" && symbolError && (
