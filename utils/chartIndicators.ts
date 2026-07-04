@@ -9,6 +9,7 @@ export type IndicatorKey =
   | "adx"
   | "sr"
   | "rules"
+  | "signalForge"
   | "volumeCandle";
 
 export type IndicatorPlacement = "overlay" | "pane" | "priceLine";
@@ -30,6 +31,7 @@ export const INDICATORS: IndicatorDef[] = [
   { key: "vwap", label: "VWAP (daily anchor)", group: "overlay", placement: "overlay" },
   { key: "sr", label: "Support/Resistance", group: "overlay", placement: "priceLine" },
   { key: "rules", label: "Rule Entry/TP/SL", group: "overlay", placement: "priceLine" },
+  { key: "signalForge", label: "Signal Forge", group: "overlay", placement: "priceLine" },
   { key: "volumeCandle", label: "Volume Candle", group: "overlay", placement: "overlay" },
   { key: "rsi", label: "RSI (14)", group: "oscillator", placement: "pane" },
   { key: "stochRsi", label: "Stoch RSI (14,14,3,3)", group: "oscillator", placement: "pane" },

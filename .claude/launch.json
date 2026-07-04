@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "docs", "-l", "5599"],
       "port": 5599
+    },
+    {
+      "name": "btc-web-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start", "--web", "--port", "8090"],
+      "port": 8090
     }
   ]
 }

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Text, Pressable } from "react-native";
-import { createChart, IChartApi, ISeriesApi, IPriceLine, ColorType, LineStyle, CandlestickSeries, HistogramSeries, LineSeries, UTCTimestamp, CandlestickData, HistogramData, LineData } from "lightweight-charts";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { View, StyleSheet, Text, Pressable, ScrollView } from "react-native";
+import { createChart, createSeriesMarkers, IChartApi, ISeriesApi, IPriceLine, ISeriesMarkersPluginApi, SeriesMarker, ColorType, LineStyle, CandlestickSeries, HistogramSeries, LineSeries, UTCTimestamp, CandlestickData, HistogramData, LineData } from "lightweight-charts";
 import { COLORS, TIMEFRAMES, TimeframeKey } from "../utils/constants";
 import { P } from "../utils/v2Theme";
 import { RawKlinesMap, closedKlines as getClosedKlines } from "../hooks/useBinanceKlines";
@@ -14,6 +14,17 @@ import DebugLabel from "./DebugLabel";
 import ChartIndicatorPanelWeb from "./ChartIndicatorPanel.web";
 import { useChartIndicators } from "../hooks/useChartIndicators";
 import { IndicatorKey } from "../utils/chartIndicators";
+import {
+  cloneSignalForgeConfig,
+  DEFAULT_SIGNAL_FORGE_CONFIG,
+  runSignalForge,
+  SIGNAL_FORGE_INDICATOR_KEYS,
+  SignalForgeConfig,
+  SignalForgeIndicatorKey,
+  SignalForgeResult,
+  SignalForgeState,
+  SignalForgeStats,
+} from "../utils/signalForge";
 
 interface Props {
   rawKlines: RawKlinesMap;
@@ -30,6 +41,9 @@ interface OverlaySeriesRefs {
   superTrendSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
   vwapSeriesRef: React.MutableRefObject<ISeriesApi<"Line"> | null>;
 }
+
+type SignalForgeRiskToggleKey = "enableTp" | "enableSl" | "enableTs";
+type SignalForgeRiskNumberKey = "tpMultiplier" | "slMultiplier" | "tsMultiplier";
 
 // Add/remove overlay (main-pane) series to match enabledIndicators.
 // forceRecreate=true unconditionally removes+re-adds every currently-
@@ -98,6 +112,155 @@ const SYMBOL_TO_BINANCE: Record<ChartSymbol, string> = {
   SOL: "SOLUSDT",
 };
 
+function formatPct(value: number): string {
+  if (value === Infinity) return "∞";
+  if (!Number.isFinite(value)) return "--";
+  return `${value.toFixed(1)}%`;
+}
+
+function formatNum(value: number): string {
+  if (value === Infinity) return "∞";
+  if (!Number.isFinite(value)) return "--";
+  return value.toFixed(2);
+}
+
+function formatProfitFactor(value: number | null): string {
+  return value === null ? "∞" : formatNum(value);
+}
+
+function signalText(signal: SignalForgeState): string {
+  return signal;
+}
+
+function signalColor(signal: SignalForgeState): string {
+  if (signal === "Bullish") return COLORS.bull;
+  if (signal === "Bearish") return COLORS.bear;
+  return P.dim;
+}
+
+const signalForgeInputStyle: React.CSSProperties = {
+  width: 48,
+  height: 22,
+  border: `1px solid ${P.border}`,
+  borderRadius: 4,
+  background: P.bg,
+  color: P.text,
+  fontSize: 11,
+  padding: "0 4px",
+};
+
+function statCells(stats: SignalForgeStats) {
+  return [
+    ["Trades", String(stats.totalTrades)],
+    ["Wins", String(stats.wins)],
+    ["Losses", String(stats.losses)],
+    ["WR", formatPct(stats.winRate)],
+    ["PF", formatProfitFactor(stats.profitFactor)],
+    ["Net", formatPct(stats.netPnlPct)],
+  ] as const;
+}
+
+interface SignalForgeDashboardProps {
+  result: SignalForgeResult;
+  config: SignalForgeConfig;
+  summaryByKey: Map<SignalForgeIndicatorKey, SignalForgeResult["indicatorSummaries"][number]>;
+  onToggleRequireAll: () => void;
+  onToggleIndicator: (key: SignalForgeIndicatorKey) => void;
+  onToggleRisk: (key: SignalForgeRiskToggleKey) => void;
+  onRiskNumberChange: (key: SignalForgeRiskNumberKey, value: number) => void;
+}
+
+function SignalForgeDashboard({
+  result,
+  config,
+  summaryByKey,
+  onToggleRequireAll,
+  onToggleIndicator,
+  onToggleRisk,
+  onRiskNumberChange,
+}: SignalForgeDashboardProps) {
+  const riskControls = [
+    ["TP", "enableTp", "tpMultiplier", config.risk.tpMultiplier],
+    ["SL", "enableSl", "slMultiplier", config.risk.slMultiplier],
+    ["TS", "enableTs", "tsMultiplier", config.risk.tsMultiplier],
+  ] as const;
+
+  return (
+    <View style={styles.signalForgePanel}>
+      <View style={styles.signalForgeHeader}>
+        <Text style={styles.signalForgeTitle}>Signal Forge</Text>
+        <Pressable onPress={onToggleRequireAll} style={styles.signalForgeModeBtn}>
+          <Text style={styles.signalForgeModeText}>{config.logic.requireAll ? "Require All" : "Any"}</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.signalForgeStatsGrid}>
+        {statCells(result.compositeStats).map(([label, value]) => (
+          <View key={label} style={styles.signalForgeStatCell}>
+            <Text style={styles.signalForgeStatLabel}>{label}</Text>
+            <Text style={styles.signalForgeStatValue}>{value}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.signalForgeRiskRow}>
+        {riskControls.map(([label, toggleKey, numberKey, value]) => (
+          <View key={toggleKey} style={styles.signalForgeRiskControl}>
+            <Pressable
+              onPress={() => onToggleRisk(toggleKey)}
+              style={[styles.signalForgeMiniToggle, config.risk[toggleKey] && styles.signalForgeMiniToggleActive]}
+            >
+              <Text style={[styles.signalForgeMiniToggleText, config.risk[toggleKey] && styles.signalForgeMiniToggleTextActive]}>{label}</Text>
+            </Pressable>
+            <input
+              type="number"
+              min="0.1"
+              step="0.1"
+              value={String(value)}
+              onChange={(event) => onRiskNumberChange(numberKey, Number(event.currentTarget.value))}
+              style={signalForgeInputStyle}
+            />
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.signalForgeTableHeader}>
+        <Text style={[styles.signalForgeHeaderCell, styles.signalForgeNameCell]}>Indicator</Text>
+        <Text style={[styles.signalForgeHeaderCell, styles.signalForgeStatusCell]}>State</Text>
+        <Text style={[styles.signalForgeHeaderCell, styles.signalForgeNumCell]}>WR</Text>
+        <Text style={[styles.signalForgeHeaderCell, styles.signalForgeNumCell]}>N</Text>
+      </View>
+      <ScrollView style={styles.signalForgeRows}>
+        {SIGNAL_FORGE_INDICATOR_KEYS.map((key) => {
+          const summary = summaryByKey.get(key);
+          const enabled = config.indicators[key].enabled;
+          const state = summary?.state ?? "Neutral";
+          return (
+            <View key={key} style={styles.signalForgeIndicatorRow}>
+              <Pressable
+                onPress={() => onToggleIndicator(key)}
+                style={[styles.signalForgeMiniToggle, enabled && styles.signalForgeMiniToggleActive]}
+              >
+                <Text style={[styles.signalForgeMiniToggleText, enabled && styles.signalForgeMiniToggleTextActive]}>
+                  {enabled ? "ON" : "OFF"}
+                </Text>
+              </Pressable>
+              <Text style={[styles.signalForgeCellText, styles.signalForgeNameCell]} numberOfLines={1}>
+                {summary?.label ?? key}
+              </Text>
+              <Text style={[styles.signalForgeCellText, styles.signalForgeStatusCell, { color: signalColor(state) }]}>
+                {signalText(state)}
+              </Text>
+              <Text style={[styles.signalForgeCellText, styles.signalForgeNumCell]}>{formatPct(summary?.winRate ?? 0)}</Text>
+              <Text style={[styles.signalForgeCellText, styles.signalForgeNumCell]}>{summary?.totalTrades ?? 0}</Text>
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
 export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, activeAlerts }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -118,10 +281,13 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const adxSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const priceLinesRef = useRef<IPriceLine[]>([]);
   const alertLinesRef = useRef<IPriceLine[]>([]);
+  const signalForgeLinesRef = useRef<IPriceLine[]>([]);
+  const signalForgeMarkersRef = useRef<ISeriesMarkersPluginApi<UTCTimestamp> | null>(null);
   const [ready, setReady] = useState(false);
   const [oscillatorReconcileTick, setOscillatorReconcileTick] = useState(0);
   const [candleSwapTick, setCandleSwapTick] = useState(0);
   const { enabled: enabledIndicators, toggle: toggleIndicator, reset: resetIndicators } = useChartIndicators();
+  const [signalForgeConfig, setSignalForgeConfig] = useState<SignalForgeConfig>(() => cloneSignalForgeConfig(DEFAULT_SIGNAL_FORGE_CONFIG));
   const [panelOpen, setPanelOpen] = useState(false);
   const indicatorBtnRef = useRef<View>(null);
 
@@ -139,6 +305,52 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   // implies "matches selectedSymbol".
   const activeKlines = selectedSymbol === "BTC" ? rawKlines : fetchedKlines;
   const isSymbolDataReady = selectedSymbol === "BTC" || Object.keys(fetchedKlines).length > 0;
+  const signalForgeEnabled = enabledIndicators.includes("signalForge");
+  const signalForgeKlines = useMemo(
+    () => (isSymbolDataReady ? getClosedKlines(activeKlines[selectedTF] ?? []) : []),
+    [activeKlines, isSymbolDataReady, selectedTF]
+  );
+  const signalForgeAnalysis: SignalForgeResult | null = useMemo(
+    () => (signalForgeEnabled && signalForgeKlines.length > 0 ? runSignalForge(signalForgeKlines, signalForgeConfig) : null),
+    [signalForgeEnabled, signalForgeKlines, signalForgeConfig]
+  );
+  const signalForgeSummaryByKey = useMemo(
+    () => new Map(signalForgeAnalysis?.indicatorSummaries.map((summary) => [summary.key, summary]) ?? []),
+    [signalForgeAnalysis]
+  );
+
+  const toggleSignalForgeRequireAll = () => {
+    setSignalForgeConfig((prev) => {
+      const next = cloneSignalForgeConfig(prev);
+      next.logic.requireAll = !next.logic.requireAll;
+      return next;
+    });
+  };
+
+  const toggleSignalForgeRisk = (key: SignalForgeRiskToggleKey) => {
+    setSignalForgeConfig((prev) => {
+      const next = cloneSignalForgeConfig(prev);
+      next.risk[key] = !next.risk[key];
+      return next;
+    });
+  };
+
+  const toggleSignalForgeIndicator = (key: SignalForgeIndicatorKey) => {
+    setSignalForgeConfig((prev) => {
+      const next = cloneSignalForgeConfig(prev);
+      next.indicators[key].enabled = !next.indicators[key].enabled;
+      return next;
+    });
+  };
+
+  const updateSignalForgeRiskNumber = (key: SignalForgeRiskNumberKey, value: number) => {
+    if (!Number.isFinite(value) || value <= 0) return;
+    setSignalForgeConfig((prev) => {
+      const next = cloneSignalForgeConfig(prev);
+      next.risk[key] = value;
+      return next;
+    });
+  };
 
   // Mount chart once — only candlestick + volume. All indicator series are
   // managed reactively by the effects below, keyed on enabledIndicators.
@@ -175,6 +387,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
+      signalForgeMarkersRef.current?.detach();
       chart.remove();
       // chart.remove() disposes ALL series on it — every ref pointing at a
       // series on this chart must be cleared, not just chartRef/candleSeriesRef,
@@ -199,6 +412,8 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       adxSeriesRef.current = null;
       priceLinesRef.current = [];
       alertLinesRef.current = [];
+      signalForgeLinesRef.current = [];
+      signalForgeMarkersRef.current = null;
     };
   }, []);
 
@@ -284,6 +499,10 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     priceLinesRef.current = [];
     alertLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
     alertLinesRef.current = [];
+    signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    signalForgeLinesRef.current = [];
+    signalForgeMarkersRef.current?.detach();
+    signalForgeMarkersRef.current = null;
 
     chart.removeSeries(candleSeriesRef.current);
     candleSeriesRef.current = shouldBeCustom
@@ -312,6 +531,9 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     if (klines.length === 0) {
       priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
       priceLinesRef.current = [];
+      signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+      signalForgeLinesRef.current = [];
+      signalForgeMarkersRef.current?.setMarkers([]);
       return;
     }
 
@@ -463,6 +685,9 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     adxSeriesRef.current?.setData([]);
     priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
     priceLinesRef.current = [];
+    signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    signalForgeLinesRef.current = [];
+    signalForgeMarkersRef.current?.setMarkers([]);
   }, [ready, isSymbolDataReady]);
 
   // Draw rule entry/TP/SL overlay for the active timeframe
@@ -513,6 +738,82 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     alertLinesRef.current = newLines;
   }, [ready, activeAlerts, selectedTF, enabledIndicators, candleSwapTick, selectedSymbol]);
 
+  // Draw Signal Forge visual-only entries and active ATR risk levels. This
+  // never touches the live rule engine or alert state.
+  useEffect(() => {
+    if (!ready || !candleSeriesRef.current) return;
+
+    signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
+    signalForgeLinesRef.current = [];
+    signalForgeMarkersRef.current?.detach();
+    signalForgeMarkersRef.current = null;
+
+    if (!signalForgeEnabled || !signalForgeAnalysis || !isSymbolDataReady) return;
+
+    const markers: SeriesMarker<UTCTimestamp>[] = signalForgeAnalysis.markers.map((marker) => ({
+      time: Math.floor(marker.time / 1000) as UTCTimestamp,
+      position: marker.side === "long" ? "belowBar" : "aboveBar",
+      shape: "circle",
+      color: marker.side === "long" ? COLORS.bull : COLORS.bear,
+      text: marker.side === "long" ? "SF L" : "SF S",
+      size: 1.2,
+    }));
+    signalForgeMarkersRef.current = createSeriesMarkers(
+      candleSeriesRef.current as unknown as ISeriesApi<"Candlestick", UTCTimestamp>,
+      markers,
+      { zOrder: "top" }
+    );
+
+    const risk = signalForgeAnalysis.activeRisk;
+    if (!risk) return;
+
+    const newLines: IPriceLine[] = [
+      candleSeriesRef.current.createPriceLine({
+        price: risk.entryPrice,
+        color: P.text,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dotted,
+        title: `SF ${risk.side === "long" ? "LONG" : "SHORT"}`,
+      }),
+    ];
+
+    if (risk.tpPrice !== null) {
+      newLines.push(
+        candleSeriesRef.current.createPriceLine({
+          price: risk.tpPrice,
+          color: COLORS.bull,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          title: "SF TP",
+        })
+      );
+    }
+    if (risk.slPrice !== null) {
+      newLines.push(
+        candleSeriesRef.current.createPriceLine({
+          price: risk.slPrice,
+          color: COLORS.bear,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          title: "SF SL",
+        })
+      );
+    }
+    if (risk.trailingStop !== null) {
+      newLines.push(
+        candleSeriesRef.current.createPriceLine({
+          price: risk.trailingStop,
+          color: "#ffd166",
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          title: "SF TS",
+        })
+      );
+    }
+
+    signalForgeLinesRef.current = newLines;
+  }, [ready, signalForgeEnabled, signalForgeAnalysis, isSymbolDataReady, candleSwapTick]);
+
   return (
     <View style={styles.container}>
       <DebugLabel name="TradingChartTab" />
@@ -560,6 +861,17 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
           onToggle={toggleIndicator}
           onReset={resetIndicators}
         />
+        {signalForgeEnabled && signalForgeAnalysis && (
+          <SignalForgeDashboard
+            result={signalForgeAnalysis}
+            config={signalForgeConfig}
+            summaryByKey={signalForgeSummaryByKey}
+            onToggleRequireAll={toggleSignalForgeRequireAll}
+            onToggleIndicator={toggleSignalForgeIndicator}
+            onToggleRisk={toggleSignalForgeRisk}
+            onRiskNumberChange={updateSignalForgeRiskNumber}
+          />
+        )}
       </View>
       <Text style={styles.attribution}>Powered by TradingView Lightweight Charts</Text>
     </View>
@@ -591,4 +903,77 @@ const styles = StyleSheet.create({
     boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
   },
   indicatorBtnLabel: { color: P.primaryContainer, fontSize: 12, fontWeight: "700" },
+  signalForgePanel: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 35,
+    width: 360,
+    maxHeight: 470,
+    backgroundColor: P.elevated,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: P.border,
+    padding: 10,
+    boxShadow: "0 4px 16px rgba(0,0,0,0.45)",
+  },
+  signalForgeHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  signalForgeTitle: { color: P.text, fontSize: 13, fontWeight: "800" },
+  signalForgeModeBtn: {
+    borderWidth: 1,
+    borderColor: P.primaryContainer,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: P.bg,
+  },
+  signalForgeModeText: { color: P.primaryContainer, fontSize: 11, fontWeight: "800" },
+  signalForgeStatsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    borderWidth: 1,
+    borderColor: P.border,
+    borderRadius: 6,
+    overflow: "hidden",
+    marginBottom: 8,
+  },
+  signalForgeStatCell: { width: "33.333%", paddingVertical: 5, paddingHorizontal: 6, borderColor: P.border, borderWidth: 0.5 },
+  signalForgeStatLabel: { color: P.dim, fontSize: 9, fontWeight: "700" },
+  signalForgeStatValue: { color: P.text, fontSize: 11, fontWeight: "800", marginTop: 1 },
+  signalForgeRiskRow: { flexDirection: "row", gap: 8, alignItems: "center", marginBottom: 8 },
+  signalForgeRiskControl: { flexDirection: "row", gap: 4, alignItems: "center" },
+  signalForgeMiniToggle: {
+    width: 34,
+    height: 22,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: P.border,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: P.bg,
+  },
+  signalForgeMiniToggleActive: { borderColor: P.primaryContainer, backgroundColor: `${P.primaryContainer}22` },
+  signalForgeMiniToggleText: { color: P.dim, fontSize: 9, fontWeight: "800" },
+  signalForgeMiniToggleTextActive: { color: P.primaryContainer },
+  signalForgeTableHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: P.border,
+  },
+  signalForgeHeaderCell: { color: P.dim, fontSize: 9, fontWeight: "800" },
+  signalForgeRows: { maxHeight: 230 },
+  signalForgeIndicatorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    minHeight: 28,
+    borderBottomWidth: 1,
+    borderBottomColor: `${P.border}99`,
+  },
+  signalForgeCellText: { color: P.text, fontSize: 10.5, fontWeight: "700" },
+  signalForgeNameCell: { flex: 1, minWidth: 0 },
+  signalForgeStatusCell: { width: 62, textAlign: "right" },
+  signalForgeNumCell: { width: 42, textAlign: "right" },
 });
