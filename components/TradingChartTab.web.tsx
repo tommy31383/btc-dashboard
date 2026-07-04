@@ -452,6 +452,12 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     alertLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
     alertLinesRef.current = [];
     if (!enabledIndicators.includes("rules")) return;
+    // Rule Entry/TP/SL lines come from activeAlerts, which is always BTC
+    // rule data — suppress on non-BTC symbols rather than drawing BTC
+    // price levels on an ETH/ETHFI/SOL chart. The Indicators checkbox
+    // itself stays whatever the user left it (not auto-toggled off) — this
+    // is a display suppression, not a preference change.
+    if (selectedSymbol !== "BTC") return;
 
     const matching = activeAlerts.filter((a) => a.tfKey === selectedTF);
     const newLines: IPriceLine[] = [];
@@ -486,7 +492,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       );
     }
     alertLinesRef.current = newLines;
-  }, [ready, activeAlerts, selectedTF, enabledIndicators, candleSwapTick]);
+  }, [ready, activeAlerts, selectedTF, enabledIndicators, candleSwapTick, selectedSymbol]);
 
   return (
     <View style={styles.container}>
