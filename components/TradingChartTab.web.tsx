@@ -307,7 +307,8 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   // Feed data whenever TF or klines change
   useEffect(() => {
     if (!ready || !candleSeriesRef.current) return;
-    const klines = getClosedKlines(rawKlines[selectedTF] ?? []);
+    if (!isSymbolDataReady) return; // symbol switch in flight — chart clears via the loading overlay, not stale data
+    const klines = getClosedKlines(activeKlines[selectedTF] ?? []);
     if (klines.length === 0) {
       priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
       priceLinesRef.current = [];
@@ -432,7 +433,18 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       priceLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
       priceLinesRef.current = [];
     }
-  }, [ready, rawKlines, selectedTF, enabledIndicators, oscillatorReconcileTick, candleSwapTick]);
+  }, [ready, activeKlines, isSymbolDataReady, selectedTF, enabledIndicators, oscillatorReconcileTick, candleSwapTick]);
+
+  // Clear the candle/volume series while a symbol switch's fetch is still
+  // in flight — prevents briefly showing the PREVIOUS symbol's candles
+  // under the newly-selected symbol's label. Timeframe switches (symbol
+  // unchanged) are unaffected: this only fires when isSymbolDataReady flips
+  // to false, which happens on symbol change, not TF change.
+  useEffect(() => {
+    if (!ready || !candleSeriesRef.current || isSymbolDataReady) return;
+    candleSeriesRef.current.setData([]);
+    volumeSeriesRef.current?.setData([]);
+  }, [ready, isSymbolDataReady]);
 
   // Draw rule entry/TP/SL overlay for the active timeframe
   useEffect(() => {
