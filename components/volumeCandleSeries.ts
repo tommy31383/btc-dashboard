@@ -67,7 +67,7 @@ class VolumeCandleRenderer implements ICustomSeriesPaneRenderer {
         const color = isUp ? this._options.upColor : this._options.downColor;
 
         const rawWidth = effectiveBarSpacing * (row.volume / visibleMaxVolume);
-        const bodyWidthMedia = Math.max(1, Math.min(rawWidth, effectiveBarSpacing * 0.9));
+        const bodyWidthMedia = Math.max(1, Math.min(rawWidth, effectiveBarSpacing * 1.0));
         const bodyWidthBitmap = Math.round(bodyWidthMedia * horizontalPixelRatio);
         const xBitmap = Math.round(bar.x * horizontalPixelRatio);
 
