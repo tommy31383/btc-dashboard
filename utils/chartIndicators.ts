@@ -8,6 +8,7 @@ export type IndicatorKey =
   | "macd"
   | "adx"
   | "mlRsi"
+  | "smc"
   | "sr"
   | "rules"
   | "signalForge"
@@ -33,6 +34,7 @@ export const INDICATORS: IndicatorDef[] = [
   { key: "sr", label: "Support/Resistance", group: "overlay", placement: "priceLine" },
   { key: "rules", label: "Rule Entry/TP/SL", group: "overlay", placement: "priceLine" },
   { key: "signalForge", label: "Signal Forge", group: "overlay", placement: "priceLine" },
+  { key: "smc", label: "Smart Money Concepts", group: "overlay", placement: "priceLine" },
   { key: "volumeCandle", label: "Volume Candle", group: "overlay", placement: "overlay" },
   { key: "rsi", label: "RSI (14)", group: "oscillator", placement: "pane" },
   { key: "mlRsi", label: "ML RSI (Zeiierman)", group: "oscillator", placement: "pane" },

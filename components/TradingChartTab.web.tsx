@@ -26,6 +26,7 @@ import {
   SignalForgeStats,
 } from "../utils/signalForge";
 import { runMlRsi } from "../utils/mlRsi";
+import { runSmc } from "../utils/smc";
 
 interface Props {
   rawKlines: RawKlinesMap;
@@ -48,6 +49,26 @@ interface OverlaySeriesRefs {
 type SignalForgeRiskToggleKey = "enableTp" | "enableSl" | "enableTs";
 type SignalForgeRiskNumberKey = "tpMultiplier" | "slMultiplier" | "tsMultiplier";
 type LineOrWhitespace = LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
+type MainSeriesApi = ISeriesApi<"Candlestick"> | ISeriesApi<"Custom">;
+
+function clearSmcOverlay(
+  chart: IChartApi | null,
+  candleSeries: MainSeriesApi | null,
+  structureSeriesRef: React.MutableRefObject<ISeriesApi<"Line">[]>,
+  priceLinesRef: React.MutableRefObject<IPriceLine[]>,
+  markersRef: React.MutableRefObject<ISeriesMarkersPluginApi<UTCTimestamp> | null>
+): void {
+  if (chart) {
+    structureSeriesRef.current.forEach((series) => chart.removeSeries(series));
+  }
+  structureSeriesRef.current = [];
+  if (candleSeries) {
+    priceLinesRef.current.forEach((line) => candleSeries.removePriceLine(line));
+  }
+  priceLinesRef.current = [];
+  markersRef.current?.detach();
+  markersRef.current = null;
+}
 
 // Add/remove overlay (main-pane) series to match enabledIndicators.
 // forceRecreate=true unconditionally removes+re-adds every currently-
@@ -322,6 +343,9 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const signalForgeLinesRef = useRef<IPriceLine[]>([]);
   const signalForgeMarkersRef = useRef<ISeriesMarkersPluginApi<UTCTimestamp> | null>(null);
   const mlRsiMarkersRef = useRef<ISeriesMarkersPluginApi<UTCTimestamp> | null>(null);
+  const smcStructureSeriesRef = useRef<ISeriesApi<"Line">[]>([]);
+  const smcPriceLinesRef = useRef<IPriceLine[]>([]);
+  const smcMarkersRef = useRef<ISeriesMarkersPluginApi<UTCTimestamp> | null>(null);
   const [ready, setReady] = useState(false);
   const [oscillatorReconcileTick, setOscillatorReconcileTick] = useState(0);
   const [candleSwapTick, setCandleSwapTick] = useState(0);
@@ -345,6 +369,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const activeKlines = selectedSymbol === "BTC" ? rawKlines : fetchedKlines;
   const isSymbolDataReady = selectedSymbol === "BTC" || Object.keys(fetchedKlines).length > 0;
   const signalForgeEnabled = enabledIndicators.includes("signalForge");
+  const smcEnabled = enabledIndicators.includes("smc");
   const signalForgeKlines = useMemo(
     () => (isSymbolDataReady ? getClosedKlines(activeKlines[selectedTF] ?? []) : []),
     [activeKlines, isSymbolDataReady, selectedTF]
@@ -356,6 +381,10 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
   const signalForgeSummaryByKey = useMemo(
     () => new Map(signalForgeAnalysis?.indicatorSummaries.map((summary) => [summary.key, summary]) ?? []),
     [signalForgeAnalysis]
+  );
+  const smcAnalysis = useMemo(
+    () => (smcEnabled && signalForgeKlines.length > 0 ? runSmc(signalForgeKlines) : null),
+    [smcEnabled, signalForgeKlines]
   );
 
   const toggleSignalForgeRequireAll = () => {
@@ -426,6 +455,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
+      clearSmcOverlay(chart, candleSeriesRef.current, smcStructureSeriesRef, smcPriceLinesRef, smcMarkersRef);
       signalForgeMarkersRef.current?.detach();
       mlRsiMarkersRef.current?.detach();
       chart.remove();
@@ -459,6 +489,9 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       signalForgeLinesRef.current = [];
       signalForgeMarkersRef.current = null;
       mlRsiMarkersRef.current = null;
+      smcStructureSeriesRef.current = [];
+      smcPriceLinesRef.current = [];
+      smcMarkersRef.current = null;
     };
   }, []);
 
@@ -556,6 +589,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     signalForgeMarkersRef.current = null;
     mlRsiMarkersRef.current?.detach();
     mlRsiMarkersRef.current = null;
+    clearSmcOverlay(chart, candleSeriesRef.current, smcStructureSeriesRef, smcPriceLinesRef, smcMarkersRef);
 
     chart.removeSeries(candleSeriesRef.current);
     candleSeriesRef.current = shouldBeCustom
@@ -587,6 +621,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
       signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
       signalForgeLinesRef.current = [];
       signalForgeMarkersRef.current?.setMarkers([]);
+      clearSmcOverlay(chartRef.current, candleSeriesRef.current, smcStructureSeriesRef, smcPriceLinesRef, smcMarkersRef);
       mlRsiSeriesRef.current?.setData([]);
       mlRsiSignalSeriesRef.current?.setData([]);
       mlSuperTrendUpSeriesRef.current?.setData([]);
@@ -786,6 +821,7 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
     signalForgeLinesRef.current.forEach((line) => candleSeriesRef.current?.removePriceLine(line));
     signalForgeLinesRef.current = [];
     signalForgeMarkersRef.current?.setMarkers([]);
+    clearSmcOverlay(chartRef.current, candleSeriesRef.current, smcStructureSeriesRef, smcPriceLinesRef, smcMarkersRef);
     mlRsiMarkersRef.current?.setMarkers([]);
   }, [ready, isSymbolDataReady]);
 
@@ -912,6 +948,138 @@ export default function TradingChartTab({ rawKlines, selectedTF, onSelectTF, act
 
     signalForgeLinesRef.current = newLines;
   }, [ready, signalForgeEnabled, signalForgeAnalysis, isSymbolDataReady, candleSwapTick]);
+
+  // Draw Smart Money Concepts as a visual-only overlay. The analyzer is pure
+  // display logic and does not feed rule alerts, live trading, or notifications.
+  useEffect(() => {
+    if (!ready || !chartRef.current || !candleSeriesRef.current) return;
+    const chart = chartRef.current;
+    const candleSeries = candleSeriesRef.current;
+
+    clearSmcOverlay(chart, candleSeries, smcStructureSeriesRef, smcPriceLinesRef, smcMarkersRef);
+
+    if (!smcEnabled || !smcAnalysis || !isSymbolDataReady) return;
+
+    const toTime = (time: number) => Math.floor(time / 1000) as UTCTimestamp;
+    const structureLines: ISeriesApi<"Line">[] = [];
+    const priceLines: IPriceLine[] = [];
+
+    for (const event of smcAnalysis.structureEvents) {
+      const color = event.bias === "bullish" ? COLORS.bull : COLORS.bear;
+      const series = chart.addSeries(LineSeries, {
+        color,
+        lineWidth: event.scope === "swing" ? 2 : 1,
+        lineStyle: LineStyle.Dashed,
+        lastValueVisible: false,
+        priceLineVisible: false,
+        title: `SMC ${event.type}`,
+      });
+      series.setData([
+        { time: toTime(event.pivotTime), value: event.priceLevel },
+        { time: toTime(event.barTime), value: event.priceLevel },
+      ]);
+      structureLines.push(series);
+    }
+
+    for (const level of smcAnalysis.equalLevels) {
+      const color = level.kind === "EQH" ? COLORS.bear : COLORS.bull;
+      const series = chart.addSeries(LineSeries, {
+        color,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dotted,
+        lastValueVisible: false,
+        priceLineVisible: false,
+        title: `SMC ${level.kind}`,
+      });
+      series.setData([
+        { time: toTime(level.previousPivotTime), value: level.priceLevel },
+        { time: toTime(level.currentPivotTime), value: level.priceLevel },
+      ]);
+      structureLines.push(series);
+    }
+
+    const markers: SeriesMarker<UTCTimestamp>[] = smcAnalysis.structureEvents.map((event) => ({
+      time: toTime(event.barTime),
+      position: event.bias === "bullish" ? "aboveBar" : "belowBar",
+      shape: event.bias === "bullish" ? "arrowUp" : "arrowDown",
+      color: event.bias === "bullish" ? COLORS.bull : COLORS.bear,
+      text: event.type,
+      size: event.scope === "swing" ? 1.5 : 1.2,
+    }));
+    markers.push(...smcAnalysis.equalLevels.map((level): SeriesMarker<UTCTimestamp> => ({
+      time: toTime(level.barTime),
+      position: level.kind === "EQH" ? "aboveBar" : "belowBar",
+      shape: "circle",
+      color: level.kind === "EQH" ? COLORS.bear : COLORS.bull,
+      text: level.kind,
+      size: 1.1,
+    })));
+
+    if (markers.length > 0) {
+      smcMarkersRef.current = createSeriesMarkers(
+        candleSeries as unknown as ISeriesApi<"Candlestick", UTCTimestamp>,
+        markers,
+        { zOrder: "top" }
+      );
+    }
+
+    for (const block of smcAnalysis.orderBlocks) {
+      const color = block.bias === "bullish" ? COLORS.bull : COLORS.bear;
+      const prefix = `SMC ${block.scope === "internal" ? "i" : "s"} ${block.bias === "bullish" ? "Bull" : "Bear"} OB`;
+      priceLines.push(
+        candleSeries.createPriceLine({
+          price: block.top,
+          color,
+          lineWidth: 1,
+          lineStyle: LineStyle.Solid,
+          title: `${prefix} top`,
+        }),
+        candleSeries.createPriceLine({
+          price: block.bottom,
+          color,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dotted,
+          title: `${prefix} bot`,
+        })
+      );
+    }
+
+    if (smcAnalysis.zones) {
+      priceLines.push(
+        candleSeries.createPriceLine({
+          price: smcAnalysis.zones.premium.bottom,
+          color: COLORS.bear,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dotted,
+          title: "SMC Premium",
+        }),
+        candleSeries.createPriceLine({
+          price: smcAnalysis.zones.equilibrium.top,
+          color: "#ffd166",
+          lineWidth: 1,
+          lineStyle: LineStyle.Dotted,
+          title: "SMC EQ",
+        }),
+        candleSeries.createPriceLine({
+          price: smcAnalysis.zones.equilibrium.bottom,
+          color: "#ffd166",
+          lineWidth: 1,
+          lineStyle: LineStyle.Dotted,
+          title: "SMC EQ",
+        }),
+        candleSeries.createPriceLine({
+          price: smcAnalysis.zones.discount.top,
+          color: COLORS.bull,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dotted,
+          title: "SMC Discount",
+        })
+      );
+    }
+
+    smcStructureSeriesRef.current = structureLines;
+    smcPriceLinesRef.current = priceLines;
+  }, [ready, smcEnabled, smcAnalysis, isSymbolDataReady, candleSwapTick]);
 
   return (
     <View style={styles.container}>
