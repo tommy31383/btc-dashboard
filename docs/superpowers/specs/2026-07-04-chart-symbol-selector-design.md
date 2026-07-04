@@ -56,6 +56,34 @@ export function useSymbolKlines(symbol: string | null): {
   as `useBinanceKlines` (extracted inline — small enough that duplicating
   the ~10 line map is simpler than introducing a shared module for one
   caller).
+- On HTTP 429/418 (rate limited), back off: skip that fetch cycle, surface
+  `error`, and let the next 60s interval retry — no tight retry loop.
+
+**Stale-response race guard (Codex-caught P1):** if the user switches
+symbol quickly (e.g. ETH → SOL → BTC before ETH's fetch resolves), a
+late-arriving response for a no-longer-selected symbol must NOT overwrite
+`rawKlines`. The hook tags every fetch with the `symbol` it was requested
+for and only commits the result if `symbol` still matches the hook's
+current input at resolve time:
+
+```ts
+useEffect(() => {
+  if (!symbol) { setRawKlines({}); return; }
+  let cancelled = false;
+  const fetchForSymbol = async () => {
+    const results = await Promise.all(/* ... per-TF fetch ... */);
+    if (cancelled) return; // symbol changed again before this resolved — discard
+    setRawKlines(newRawKlines);
+  };
+  fetchForSymbol();
+  const interval = setInterval(fetchForSymbol, 60000);
+  return () => { cancelled = true; clearInterval(interval); };
+}, [symbol]);
+```
+
+The `cancelled` flag (closed over per-effect-run) is sufficient — no
+`AbortController` needed since these are plain `fetch` calls with no
+in-flight cancellation requirement beyond "don't apply a stale result".
 
 **Why not extend `useBinanceKlines` itself:** it also drives
 `useRuleAlerts`/`useAlerts`/`useRiskRadar`/etc., all of which assume BTC.
@@ -115,15 +143,50 @@ dependency array.
 
 ## Loading / Error States
 
-While `useSymbolKlines` is fetching (symbol switch to non-BTC), the chart
-keeps showing the previously-loaded data (if any) rather than blanking —
-avoids a jarring empty-chart flash on every symbol switch. A small inline
-"Loading ETH..." label appears near the symbol row while `loading` is true
-and `rawKlines` for that symbol is still empty. On fetch error, show a
-compact red inline error text near the symbol row (reuse the existing error
-display pattern from `useBinanceKlines`'s `klineError` if one exists in this
-component, otherwise a simple `Text` node) — the chart does not crash, it
-just remains on last-known-good data.
+**Codex-caught P1 (mislabeled stale chart):** the original draft said "keep
+showing previously-loaded data while fetching" — but if the user is on ETH
+and switches to SOL, `fetchedKlines` still holds ETH data until SOL's fetch
+resolves. Silently leaving the ETH candles on screen while the symbol row
+shows "SOL" selected is a labeled-wrong-coin bug, not an acceptable
+loading UX. Fixed behavior:
+
+- `useSymbolKlines` tracks which symbol its current `rawKlines` actually
+  belongs to (internally, alongside the stale-response guard above — the
+  same `symbol` tag used to discard late responses is also compared before
+  ever showing data for a *different* symbol than requested).
+- In `TradingChartTab`, `activeKlines` is only "ready" once
+  `useSymbolKlines`'s data corresponds to the currently-selected symbol.
+  Until then (i.e. on every symbol switch, while the new fetch is
+  in-flight), the chart's candle/volume series are cleared (`setData([])`)
+  and a centered "Loading ETH..." overlay is shown instead of leaving the
+  previous symbol's candles visible. This is a deliberate UX tradeoff:
+  a brief blank/loading state is preferable to a mislabeled chart.
+  Switching timeframe (not symbol) is unaffected — that continues to use
+  already-fetched data with no flash, since all TFs are fetched together
+  per symbol.
+- On fetch error, show a compact red inline error text near the symbol row
+  (reuse the existing error display pattern from `useBinanceKlines`'s
+  `klineError` if one exists in this component, otherwise a simple `Text`
+  node) — the chart does not crash, it shows the loading/error state, never
+  a stale different-symbol chart.
+
+## Codex Audit Notes (post-write)
+
+2 P1s found and fixed inline above (stale-response race guard;
+mislabeled-stale-chart on symbol switch). 3 P2s noted, not blocking:
+
+- Rate-limit handling (429/418 backoff) — addressed above in Data Fetching.
+- Direct-to-Binance-public-API dependency for non-BTC symbols has more
+  geo/WAF exposure than the server-proxied BTC path; Binance's own docs
+  suggest `data-api.binance.vision` for market-data-only use. Not switching
+  to it now (adds a second endpoint to maintain for 3 symbols) — revisit if
+  ETH/ETHFI/SOL fetches prove unreliable in practice.
+- The Indicators panel's "Rule Entry/TP/SL" toggle stays in whatever
+  on/off state the user left it — switching to a non-BTC symbol suppresses
+  the drawn lines but does NOT auto-toggle the checkbox off. This is
+  intentional (documented here so the implementation plan doesn't "fix" it
+  as a bug) — toggling back to BTC while the checkbox is still on
+  immediately restores the lines with no extra user action needed.
 
 ## Out of Scope
 
