@@ -1,45 +1,7 @@
 {
   "version": 1,
-  "updatedAt": 1783225676788,
+  "updatedAt": 1783243986551,
   "trades": [
-    {
-      "id": "okwk0qxhp3",
-      "ruleId": "15m:8",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "WIN",
-      "entryPrice": 70818.5,
-      "slPrice": 72234.87,
-      "tpPrice": 67277.575,
-      "leverage": 100,
-      "targetPct": 5,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1780330629614,
-      "deadlineMs": 1780420500000,
-      "exitPrice": 67277.575,
-      "leveragedPnlPct": 500,
-      "closedMs": 1780414256077
-    },
-    {
-      "id": "bo43m8o5l4m",
-      "ruleId": "15m:2",
-      "tfKey": "15m",
-      "side": "SHORT",
-      "status": "WIN",
-      "entryPrice": 70818.5,
-      "slPrice": 72234.87,
-      "tpPrice": 68693.94499999999,
-      "leverage": 100,
-      "targetPct": 3,
-      "stopPct": 2,
-      "maxHoldBars": 100,
-      "openedMs": 1780330629613,
-      "deadlineMs": 1780420500000,
-      "exitPrice": 68693.94499999999,
-      "leveragedPnlPct": 300,
-      "closedMs": 1780408870157
-    },
     {
       "id": "ij2nlaw4qb",
       "ruleId": "1h:4",
@@ -3795,6 +3757,38 @@
       "maxHoldBars": 100,
       "openedMs": 1783225655814,
       "deadlineMs": 1783584000000
+    },
+    {
+      "id": "1vb7afm9y2e",
+      "ruleId": "1h:32",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 62710.8,
+      "slPrice": 64592.124,
+      "tpPrice": 57693.93600000001,
+      "leverage": 100,
+      "targetPct": 8,
+      "stopPct": 3,
+      "maxHoldBars": 100,
+      "openedMs": 1783243966548,
+      "deadlineMs": 1783602000000
+    },
+    {
+      "id": "lv9ti8w92im",
+      "ruleId": "1h:18",
+      "tfKey": "1h",
+      "side": "SHORT",
+      "status": "OPEN",
+      "entryPrice": 62710.8,
+      "slPrice": 63965.016,
+      "tpPrice": 57693.93600000001,
+      "leverage": 100,
+      "targetPct": 8,
+      "stopPct": 2,
+      "maxHoldBars": 100,
+      "openedMs": 1783243966548,
+      "deadlineMs": 1783602000000
     }
   ]
 }
