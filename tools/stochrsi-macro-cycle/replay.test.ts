@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { HOUR_MS, type CampaignSignal, type Candle } from "./core";
 import {
+  VARIANT_NAMES,
   buildVariantLegs,
   minimumWalletToSurvive,
   runVariant,
@@ -95,6 +96,15 @@ test("full-at-arm matches episode qty and is simulated", () => {
 
   assert.equal(result.legs[0].qty, 0.003);
   assert.equal(result.simulatedNotTradable, true);
+});
+
+test("Task 2 keeps the global variant registry frozen to the original four", () => {
+  assert.deepEqual(VARIANT_NAMES, [
+    "MACRO_ONCE",
+    "DAILY_EPISODE",
+    "DAILY_EVERY_BAR",
+    "WINDOW_FULL_AT_ARM",
+  ]);
 });
 
 test("HYBRID_LITE realizes tactical exits while its core leg remains active", () => {

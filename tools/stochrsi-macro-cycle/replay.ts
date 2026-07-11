@@ -19,7 +19,6 @@ export const VARIANT_NAMES: VariantName[] = [
   "DAILY_EPISODE",
   "DAILY_EVERY_BAR",
   "WINDOW_FULL_AT_ARM",
-  "HYBRID_LITE",
 ];
 
 export interface FundingPayment {
