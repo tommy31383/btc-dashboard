@@ -12,7 +12,8 @@ export type VariantName =
   | "DAILY_EPISODE"
   | "DAILY_EVERY_BAR"
   | "WINDOW_FULL_AT_ARM"
-  | "HYBRID_LITE";
+  | "HYBRID_LITE"
+  | "DAILY_EPISODE_MATCHED_PEAK";
 
 export const VARIANT_NAMES: VariantName[] = [
   "MACRO_ONCE",
@@ -330,6 +331,7 @@ function fundingPnlFor(
 export function buildVariantLegs(
   campaign: CampaignSignal,
   variant: VariantName,
+  quantityScale = 1,
 ): VariantLegs {
   const campaignExit = {
     ...(campaign.exitTime === undefined ? {} : { exitTime: campaign.exitTime }),
@@ -355,6 +357,16 @@ export function buildVariantLegs(
           ...campaignExit,
         })),
         simulatedNotTradable: false,
+      };
+    case "DAILY_EPISODE_MATCHED_PEAK":
+      return {
+        legs: campaign.episodeEntries.map((entryTime) => ({
+          entryTime,
+          qty: QTY_PER_LEG * quantityScale,
+          role: "SIMULATED",
+          ...campaignExit,
+        })),
+        simulatedNotTradable: true,
       };
     case "DAILY_EVERY_BAR":
       return {
@@ -596,13 +608,14 @@ function replayCampaign(
   hourly: Candle[],
   hourlyByTime: Map<number, Candle>,
   funding: ResolvedFundingPayment[],
+  quantityScale = 1,
 ): CampaignReplay {
   const lastHourly = hourly[hourly.length - 1];
   const markTime = campaign.exitTime ?? lastHourly.time + HOUR_MS;
   const markPrice = campaign.exitTime
     ? hourlyOpenAt(hourlyByTime, campaign.exitTime)
     : lastHourly.close;
-  const legs = buildVariantLegs(campaign, variant).legs.map((intent) =>
+  const legs = buildVariantLegs(campaign, variant, quantityScale).legs.map((intent) =>
     replayLeg(intent, markPrice, hourly, hourlyByTime, funding),
   );
   const totalQty = sum(legs.map((leg) => leg.qty));
@@ -730,19 +743,20 @@ function walletScenario(
   };
 }
 
-export function runVariant(
+function runVariantWithQuantityScale(
   name: VariantName,
   campaigns: CampaignSignal[],
   hourlyInput: Candle[],
   fundingInput: FundingPayment[],
   options: RunVariantOptions = {},
+  quantityScale = 1,
 ): VariantRun {
   if (hourlyInput.length === 0) throw new Error("Hourly candles are required for replay");
   const hourly = [...hourlyInput].sort((left, right) => left.time - right.time);
   const funding = resolveFunding(fundingInput, hourly);
   const hourlyByTime = new Map(hourly.map((candle) => [candle.time, candle]));
   const replays = campaigns.map((campaign) =>
-    replayCampaign(campaign, name, hourly, hourlyByTime, funding),
+    replayCampaign(campaign, name, hourly, hourlyByTime, funding, quantityScale),
   );
   const allLegs = replays.flatMap((campaign) => campaign.legs);
   const accountPath = buildAccountPath(allLegs, hourly, funding);
@@ -761,7 +775,8 @@ export function runVariant(
   }
   return {
     name,
-    simulatedNotTradable: name === "WINDOW_FULL_AT_ARM",
+    simulatedNotTradable:
+      name === "WINDOW_FULL_AT_ARM" || name === "DAILY_EPISODE_MATCHED_PEAK",
     campaigns: replays,
     accountPath,
     openCampaign: replays.find((campaign) => !campaign.closed),
@@ -773,6 +788,85 @@ export function runVariant(
     maxNotional: Math.max(0, ...accountPath.map((point) => point.notional)),
     minimumWallet: minimumWalletToSurvive(accountPath),
   };
+}
+
+function matchedPeakScale(base: VariantRun, hybrid: VariantRun): number {
+  return base.maxQuantity === 0
+    ? 1
+    : hybrid.maxQuantity / base.maxQuantity;
+}
+
+export function runVariant(
+  name: VariantName,
+  campaigns: CampaignSignal[],
+  hourly: Candle[],
+  funding: FundingPayment[],
+  options: RunVariantOptions = {},
+): VariantRun {
+  if (name !== "DAILY_EPISODE_MATCHED_PEAK") {
+    return runVariantWithQuantityScale(name, campaigns, hourly, funding, options);
+  }
+
+  const base = runVariantWithQuantityScale(
+    "DAILY_EPISODE",
+    campaigns,
+    hourly,
+    funding,
+    options,
+  );
+  const hybrid = runVariantWithQuantityScale(
+    "HYBRID_LITE",
+    campaigns,
+    hourly,
+    funding,
+    options,
+  );
+  return runVariantWithQuantityScale(
+    "DAILY_EPISODE_MATCHED_PEAK",
+    campaigns,
+    hourly,
+    funding,
+    options,
+    matchedPeakScale(base, hybrid),
+  );
+}
+
+export function runFrozenVariants(
+  campaigns: CampaignSignal[],
+  hourly: Candle[],
+  funding: FundingPayment[],
+  options: RunVariantOptions = {},
+): VariantRun[] {
+  const base = runVariantWithQuantityScale(
+    "DAILY_EPISODE",
+    campaigns,
+    hourly,
+    funding,
+    options,
+  );
+  const hybrid = runVariantWithQuantityScale(
+    "HYBRID_LITE",
+    campaigns,
+    hourly,
+    funding,
+    options,
+  );
+  const matched = runVariantWithQuantityScale(
+    "DAILY_EPISODE_MATCHED_PEAK",
+    campaigns,
+    hourly,
+    funding,
+    options,
+    matchedPeakScale(base, hybrid),
+  );
+  return [
+    runVariantWithQuantityScale("MACRO_ONCE", campaigns, hourly, funding, options),
+    base,
+    hybrid,
+    matched,
+    runVariantWithQuantityScale("DAILY_EVERY_BAR", campaigns, hourly, funding, options),
+    runVariantWithQuantityScale("WINDOW_FULL_AT_ARM", campaigns, hourly, funding, options),
+  ];
 }
 
 function stabilitySummary(campaigns: CampaignReplay[]): StabilitySummary {

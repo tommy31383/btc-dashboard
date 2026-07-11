@@ -6,6 +6,7 @@ import {
   VARIANT_NAMES,
   buildVariantLegs,
   minimumWalletToSurvive,
+  runFrozenVariants,
   runVariant,
   settleLeg,
   summarizeVariant,
@@ -15,6 +16,7 @@ function campaignWithEpisodeCount(count: number): CampaignSignal {
   return {
     armTime: 100,
     episodeEntries: Array.from({ length: count }, (_, index) => 200 + index * 100),
+    episodeRecoveryTimes: Array.from({ length: count }, () => null),
     dailyOversoldEntries: Array.from({ length: count }, (_, index) => 200 + index * 100),
     exitTime: 1_000,
     exitReason: "MACRO_OVERBOUGHT",
@@ -102,6 +104,58 @@ test("Task 2 keeps the global variant registry frozen to the original four", () 
   assert.deepEqual(VARIANT_NAMES, [
     "MACRO_ONCE",
     "DAILY_EPISODE",
+    "DAILY_EVERY_BAR",
+    "WINDOW_FULL_AT_ARM",
+  ]);
+});
+
+test("DAILY_EPISODE_MATCHED_PEAK derives scale from replayed base and Hybrid peaks", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const exitTime = start + 5 * HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start, start + HOUR_MS, start + 2 * HOUR_MS, start + 3 * HOUR_MS],
+    episodeRecoveryTimes: [null, start + 2 * HOUR_MS, start + 3 * HOUR_MS, start + 4 * HOUR_MS],
+    dailyOversoldEntries: [start, start + HOUR_MS, start + 2 * HOUR_MS, start + 3 * HOUR_MS],
+    exitTime,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const hourly = Array.from({ length: 6 }, (_, index) => bar(start + index * HOUR_MS, 100));
+
+  const base = runVariant("DAILY_EPISODE", [campaign], hourly, []);
+  const hybrid = runVariant("HYBRID_LITE", [campaign], hourly, []);
+  const matched = runVariant("DAILY_EPISODE_MATCHED_PEAK", [campaign], hourly, []);
+
+  assert.equal(base.maxQuantity, 0.004);
+  assert.equal(hybrid.maxQuantity, 0.002);
+  assert.equal(matched.simulatedNotTradable, true);
+  assert.equal(matched.maxQuantity, hybrid.maxQuantity);
+  assert.deepEqual(
+    matched.campaigns[0].legs.map((leg) => leg.entryTime),
+    campaign.episodeEntries,
+  );
+  assert.deepEqual(
+    matched.campaigns[0].legs.map((leg) => leg.qty),
+    campaign.episodeEntries.map(() => 0.001 * hybrid.maxQuantity / base.maxQuantity),
+  );
+});
+
+test("runFrozenVariants returns the V2 rows in frozen report order", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const campaigns = [campaignWithEpisodeCount(1)];
+  campaigns[0].armTime = start;
+  campaigns[0].episodeEntries = [start];
+  campaigns[0].dailyOversoldEntries = [start];
+  campaigns[0].exitTime = start + HOUR_MS;
+  const hourly = [bar(start, 100), bar(start + HOUR_MS, 100)];
+
+  const frozen = runFrozenVariants(campaigns, hourly, []);
+
+  assert.deepEqual(frozen.map((run) => run.name), [
+    "MACRO_ONCE",
+    "DAILY_EPISODE",
+    "HYBRID_LITE",
+    "DAILY_EPISODE_MATCHED_PEAK",
     "DAILY_EVERY_BAR",
     "WINDOW_FULL_AT_ARM",
   ]);
@@ -227,6 +281,7 @@ test("minimum wallet strictly survives the liquidation boundary", () => {
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
   };
   const initial = runVariant(
@@ -256,6 +311,7 @@ test("liquidated wallet does not publish a full-path ROI", () => {
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
   };
   const run = runVariant(
@@ -387,6 +443,7 @@ test("open final campaign is marked at the last hourly close without exit costs"
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
   };
   const run = runVariant(
@@ -410,6 +467,7 @@ test("hourly account path tracks equity, maintenance, drawdown, and wallet liqui
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
     exitTime: start + 3 * HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
@@ -442,6 +500,7 @@ test("long risk uses the intrahour low even when the candle close is safe", () =
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
   };
   const run = runVariant(
@@ -469,6 +528,7 @@ test("prior-hour high sets the causal drawdown peak before a later-hour low", ()
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
     exitTime: start + 2 * HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
@@ -495,6 +555,7 @@ test("hourly low-risk point excludes funding first known at the future candle cl
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
   };
   const run = runVariant(
@@ -542,6 +603,7 @@ test("summaries separate open campaigns and expose required stability views", ()
     {
       armTime: before,
       episodeEntries: [before],
+      episodeRecoveryTimes: [null],
       dailyOversoldEntries: [before],
       exitTime: before + HOUR_MS,
       exitReason: "MACRO_OVERBOUGHT",
@@ -549,6 +611,7 @@ test("summaries separate open campaigns and expose required stability views", ()
     {
       armTime: after,
       episodeEntries: [after, after + HOUR_MS],
+      episodeRecoveryTimes: [null, null],
       dailyOversoldEntries: [after, after + HOUR_MS],
       exitTime: after + 2 * HOUR_MS,
       exitReason: "MACRO_OVERBOUGHT",
@@ -556,6 +619,7 @@ test("summaries separate open campaigns and expose required stability views", ()
     {
       armTime: open,
       episodeEntries: [open],
+      episodeRecoveryTimes: [null],
       dailyOversoldEntries: [open],
     },
   ];
@@ -603,6 +667,7 @@ test("entry improvement expands the macro baseline to the variant quantity by ca
     {
       armTime: first,
       episodeEntries: [first + HOUR_MS, first + 2 * HOUR_MS],
+      episodeRecoveryTimes: [null, null],
       dailyOversoldEntries: [first + HOUR_MS, first + 2 * HOUR_MS],
       exitTime: first + 3 * HOUR_MS,
       exitReason: "MACRO_OVERBOUGHT",
@@ -610,6 +675,7 @@ test("entry improvement expands the macro baseline to the variant quantity by ca
     {
       armTime: second,
       episodeEntries: [second + HOUR_MS],
+      episodeRecoveryTimes: [null],
       dailyOversoldEntries: [second + HOUR_MS],
       exitTime: second + 2 * HOUR_MS,
       exitReason: "MACRO_OVERBOUGHT",
@@ -646,6 +712,7 @@ test("summary counts repeated oversold bars suppressed by episode entry", () => 
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start, start + HOUR_MS, start + 2 * HOUR_MS],
     exitTime: start + 3 * HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
@@ -669,6 +736,7 @@ test("campaign drawdown includes an adverse gap at the exit open", () => {
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
     exitTime: start + HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
@@ -689,6 +757,7 @@ test("concentration shares are null when closed executed net PnL is not positive
   const campaign: CampaignSignal = {
     armTime: start,
     episodeEntries: [start],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start],
     exitTime: start + HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
@@ -711,6 +780,7 @@ test("pre and post cohorts are frozen by campaign arm time", () => {
   const campaign: CampaignSignal = {
     armTime,
     episodeEntries: [armTime],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [armTime],
     exitTime,
     exitReason: "MACRO_OVERBOUGHT",
@@ -731,6 +801,7 @@ test("campaign performance metrics exclude closed zero-entry opportunities", () 
   const zeroEntry: CampaignSignal = {
     armTime: start,
     episodeEntries: [],
+    episodeRecoveryTimes: [],
     dailyOversoldEntries: [],
     exitTime: start + HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
@@ -738,6 +809,7 @@ test("campaign performance metrics exclude closed zero-entry opportunities", () 
   const executed: CampaignSignal = {
     armTime: start + 2 * HOUR_MS,
     episodeEntries: [start + 2 * HOUR_MS],
+    episodeRecoveryTimes: [null],
     dailyOversoldEntries: [start + 2 * HOUR_MS],
     exitTime: start + 3 * HOUR_MS,
     exitReason: "MACRO_OVERBOUGHT",
