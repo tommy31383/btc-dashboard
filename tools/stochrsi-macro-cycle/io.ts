@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 import { HOUR_MS, type Candle } from "./core";
@@ -9,8 +9,8 @@ const FUTURES_REST = "https://fapi.binance.com";
 const SYMBOL = "BTCUSDT";
 const KLINE_LIMIT = 1_500;
 const FUNDING_LIMIT = 1_000;
-const SEVEN_YEARS_MS = 7 * 365 * 24 * HOUR_MS;
 const DEFAULT_RETRY_ATTEMPTS = 3;
+const MAX_RETRY_ATTEMPTS = 5;
 const REQUEST_TIMEOUT_MS = 30_000;
 
 export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v1";
@@ -52,6 +52,7 @@ export interface Provenance {
   refreshedAt: string;
   asOfMs: number;
   gitSha: string;
+  gitDirty: boolean;
   evaluatorVersion: string;
   hourly: FileProvenance;
   funding: FileProvenance;
@@ -72,6 +73,7 @@ export interface FetchResponse {
 }
 
 export type FetchLike = (url: string, init: { signal: AbortSignal }) => Promise<FetchResponse>;
+export type RenameLike = (from: string, to: string) => Promise<void>;
 
 export interface LoadAndRefreshDataOptions {
   refresh?: boolean;
@@ -81,7 +83,9 @@ export interface LoadAndRefreshDataOptions {
   retryAttempts?: number;
   retryDelayMs?: number;
   gitSha?: string;
+  gitDirty?: boolean;
   evaluatorVersion?: string;
+  cacheRenameImpl?: RenameLike;
 }
 
 function defaultCachePaths(): CachePaths {
@@ -183,6 +187,20 @@ function sortAndDedupeFunding(existing: FundingRecord[], incoming: FundingRecord
   return [...byTime.values()].sort((left, right) => left.time - right.time);
 }
 
+function validateFundingData(funding: FundingRecord[]): void {
+  for (let index = 0; index < funding.length; index += 1) {
+    const entry = funding[index];
+    if (!Number.isSafeInteger(entry.time) || entry.time < 0) throw new Error(`Invalid funding time: ${entry.time}`);
+    if (!Number.isFinite(entry.rate)) throw new Error(`Invalid funding rate: ${entry.rate}`);
+    if (entry.mark !== null && (!Number.isFinite(entry.mark) || entry.mark < 0)) {
+      throw new Error(`Invalid funding mark: ${entry.mark}`);
+    }
+    if (index > 0 && entry.time <= funding[index - 1].time) {
+      throw new Error(`Funding records are not strictly sorted at ${entry.time}`);
+    }
+  }
+}
+
 export function mergeCandles(existing: Candle[], incoming: Candle[], nowMs: number): Candle[] {
   const byTime = new Map<number, Candle>();
   for (const candle of existing) {
@@ -227,11 +245,78 @@ async function readJson(path: string): Promise<unknown | undefined> {
   }
 }
 
-async function writeJsonAtomically(path: string, value: unknown): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
-  const temporaryPath = `${path}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`;
-  await writeFile(temporaryPath, JSON.stringify(value));
-  await rename(temporaryPath, path);
+function temporarySibling(path: string, kind: "stage" | "backup"): string {
+  return `${path}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.${kind}`;
+}
+
+function isFileNotFound(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "code" in error && error.code === "ENOENT");
+}
+
+async function stageAndCommitCachePair(
+  cachePaths: CachePaths,
+  hourly: Candle[],
+  funding: FundingRecord[],
+  renameImpl: RenameLike,
+): Promise<void> {
+  validateHourlyData(hourly);
+  validateFundingData(funding);
+
+  const destinations = [cachePaths.hourlyCachePath, cachePaths.fundingCachePath];
+  const stages = destinations.map((path) => temporarySibling(path, "stage"));
+  const backups = destinations.map((path) => temporarySibling(path, "backup"));
+  await Promise.all(destinations.map((path) => mkdir(dirname(path), { recursive: true })));
+
+  try {
+    const stageWrites = await Promise.allSettled([
+      writeFile(stages[0], JSON.stringify(hourly)),
+      writeFile(stages[1], JSON.stringify(funding)),
+    ]);
+    const failedStageWrite = stageWrites.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    if (failedStageWrite) throw failedStageWrite.reason;
+
+    const [stagedHourlyRaw, stagedFundingRaw] = await Promise.all([readJson(stages[0]), readJson(stages[1])]);
+    const stagedHourly = parseCachedCandles(stagedHourlyRaw);
+    const stagedFunding = parseFundings(stagedFundingRaw, "staged funding", false);
+    validateHourlyData(stagedHourly);
+    validateFundingData(stagedFunding);
+  } catch (error) {
+    await Promise.all(stages.map((path) => rm(path, { force: true })));
+    throw error;
+  }
+
+  const backupChecked = [false, false];
+  const hadOriginal = [false, false];
+  try {
+    for (let index = 0; index < destinations.length; index += 1) {
+      try {
+        await renameImpl(destinations[index], backups[index]);
+        hadOriginal[index] = true;
+      } catch (error) {
+        if (!isFileNotFound(error)) throw error;
+      }
+      backupChecked[index] = true;
+    }
+
+    await renameImpl(stages[0], destinations[0]);
+    await renameImpl(stages[1], destinations[1]);
+  } catch (error) {
+    const rollbackErrors: unknown[] = [];
+    for (let index = destinations.length - 1; index >= 0; index -= 1) {
+      if (!backupChecked[index]) continue;
+      try {
+        await rm(destinations[index], { force: true });
+        if (hadOriginal[index]) await renameImpl(backups[index], destinations[index]);
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError);
+      }
+    }
+    await Promise.all(stages.map((path) => rm(path, { force: true })));
+    if (rollbackErrors.length > 0) throw new AggregateError([error, ...rollbackErrors], "Cache pair commit and rollback failed");
+    throw error;
+  }
+
+  await Promise.all(backups.map((path) => rm(path, { force: true })));
 }
 
 function delay(milliseconds: number): Promise<void> {
@@ -245,13 +330,40 @@ async function fetchJson(
   retryDelayMs: number,
 ): Promise<unknown> {
   for (let attempt = 1; attempt <= retryAttempts; attempt += 1) {
-    const response = await fetchImpl(`${FUTURES_REST}${path}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-    if (response.ok) return response.json();
+    let response: FetchResponse;
+    try {
+      response = await fetchImpl(`${FUTURES_REST}${path}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+      if (response.ok) return await response.json();
+    } catch (error) {
+      const retryable = error instanceof TypeError || (error instanceof Error && error.name === "AbortError");
+      if (!retryable || attempt === retryAttempts) throw error;
+      await delay(retryDelayMs * attempt);
+      continue;
+    }
     const retryable = response.status === 429 || response.status >= 500;
     if (!retryable || attempt === retryAttempts) throw new Error(`Binance ${response.status} ${path}`);
     await delay(retryDelayMs * attempt);
   }
   throw new Error(`Binance retry limit reached for ${path}`);
+}
+
+function validateOfficialPage<T extends { time: number }>(
+  page: T[],
+  label: "klines" | "funding",
+  cursor: number,
+  endTime: number,
+  limit: number,
+): void {
+  if (page.length > limit) throw new Error(`Binance ${label} page exceeds endpoint limit ${limit}`);
+  for (let index = 0; index < page.length; index += 1) {
+    const time = page[index].time;
+    if (time < cursor || time > endTime) {
+      throw new Error(`Binance ${label} page timestamp ${time} is outside [${cursor}, ${endTime}]`);
+    }
+    if (index > 0 && time <= page[index - 1].time) {
+      throw new Error(`Binance ${label} page timestamps are not strictly ascending at ${time}`);
+    }
+  }
 }
 
 function query(path: string, parameters: Record<string, string | number>): string {
@@ -278,9 +390,9 @@ async function fetchKlines(
         retryDelayMs,
       ),
     );
+    validateOfficialPage(page, "klines", cursor, nowMs, KLINE_LIMIT);
     if (page.length === 0) break;
     const last = page.at(-1)!;
-    if (last.time < cursor) throw new Error(`Binance klines did not advance from ${cursor}`);
     result.push(...page);
     cursor = last.time + HOUR_MS;
     if (page.length < KLINE_LIMIT) break;
@@ -308,9 +420,9 @@ async function fetchFunding(
       "Binance funding response",
       true,
     );
+    validateOfficialPage(page, "funding", cursor, nowMs, FUNDING_LIMIT);
     if (page.length === 0) break;
     const last = page.at(-1)!;
-    if (last.time < cursor) throw new Error(`Binance funding did not advance from ${cursor}`);
     result.push(...page);
     cursor = last.time + 1;
     if (page.length < FUNDING_LIMIT) break;
@@ -326,11 +438,29 @@ function dataRange<T extends { time: number }>(entries: T[]): DataRange {
   };
 }
 
-function resolveGitSha(explicit: string | undefined): string {
-  if (explicit) return explicit;
-  const gitSha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: process.cwd(), encoding: "utf8" }).trim();
+function sevenCalendarYearsBeforeAlignedHour(nowMs: number): number {
+  const now = new Date(nowMs);
+  return Date.UTC(
+    now.getUTCFullYear() - 7,
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    now.getUTCHours(),
+  );
+}
+
+function resolveGitMetadata(explicitSha: string | undefined, explicitDirty: boolean | undefined): {
+  gitSha: string;
+  gitDirty: boolean;
+} {
+  const gitSha = explicitSha === undefined
+    ? execFileSync("git", ["rev-parse", "HEAD"], { cwd: process.cwd(), encoding: "utf8" }).trim()
+    : explicitSha.trim();
   if (!gitSha) throw new Error("Unable to resolve evaluator git SHA");
-  return gitSha;
+  const gitDirty = explicitDirty === undefined
+    ? execFileSync("git", ["status", "--porcelain"], { cwd: process.cwd(), encoding: "utf8" }).trim().length > 0
+    : explicitDirty;
+  if (typeof gitDirty !== "boolean") throw new Error("Unable to resolve evaluator dirty-worktree state");
+  return { gitSha, gitDirty };
 }
 
 export async function sha256File(path: string): Promise<string> {
@@ -344,31 +474,33 @@ export async function loadAndRefreshData(options: LoadAndRefreshDataOptions = {}
   const retryAttempts = options.retryAttempts ?? DEFAULT_RETRY_ATTEMPTS;
   const retryDelayMs = options.retryDelayMs ?? 250;
   if (!Number.isInteger(nowMs) || nowMs <= 0) throw new Error(`Invalid refresh timestamp: ${nowMs}`);
-  if (!Number.isInteger(retryAttempts) || retryAttempts < 1) throw new Error(`Invalid retry attempts: ${retryAttempts}`);
+  if (!Number.isInteger(retryAttempts) || retryAttempts < 1 || retryAttempts > MAX_RETRY_ATTEMPTS) {
+    throw new Error(`Invalid retry attempts: ${retryAttempts}; expected 1-${MAX_RETRY_ATTEMPTS}`);
+  }
   if (!Number.isFinite(retryDelayMs) || retryDelayMs < 0) throw new Error(`Invalid retry delay: ${retryDelayMs}`);
+  const gitMetadata = resolveGitMetadata(options.gitSha, options.gitDirty);
 
   const cachedHourlyRaw = await readJson(cachePaths.hourlyCachePath);
   const cachedFundingRaw = await readJson(cachePaths.fundingCachePath);
-  let hourly = cachedHourlyRaw === undefined ? [] : parseCachedCandles(cachedHourlyRaw);
-  let funding = cachedFundingRaw === undefined ? [] : parseFundings(cachedFundingRaw, "cached funding", false);
+  let hourly = mergeCandles([], cachedHourlyRaw === undefined ? [] : parseCachedCandles(cachedHourlyRaw), nowMs);
+  let funding = sortAndDedupeFunding(
+    [],
+    cachedFundingRaw === undefined ? [] : parseFundings(cachedFundingRaw, "cached funding", false),
+    nowMs,
+  );
 
   if (refresh) {
     const fetchImpl = options.fetchImpl ?? ((url, init) => fetch(url, init));
-    const klineStart = hourly.at(-1)?.time !== undefined ? hourly.at(-1)!.time + HOUR_MS : nowMs - SEVEN_YEARS_MS;
-    const fundingStart = funding.at(-1)?.time !== undefined ? funding.at(-1)!.time + 1 : nowMs - SEVEN_YEARS_MS;
+    const bootstrapStart = sevenCalendarYearsBeforeAlignedHour(nowMs);
+    const klineStart = hourly.at(-1)?.time !== undefined ? hourly.at(-1)!.time + HOUR_MS : bootstrapStart;
+    const fundingStart = funding.at(-1)?.time !== undefined ? funding.at(-1)!.time + 1 : bootstrapStart;
     const [newHourly, newFunding] = await Promise.all([
       fetchKlines(klineStart, nowMs, fetchImpl, retryAttempts, retryDelayMs),
       fetchFunding(fundingStart, nowMs, fetchImpl, retryAttempts, retryDelayMs),
     ]);
     hourly = mergeCandles(hourly, newHourly, nowMs);
     funding = sortAndDedupeFunding(funding, newFunding, nowMs);
-    await Promise.all([
-      writeJsonAtomically(cachePaths.hourlyCachePath, hourly),
-      writeJsonAtomically(cachePaths.fundingCachePath, funding),
-    ]);
-  } else {
-    hourly = mergeCandles([], hourly, nowMs);
-    funding = sortAndDedupeFunding([], funding, nowMs);
+    await stageAndCommitCachePair(cachePaths, hourly, funding, options.cacheRenameImpl ?? rename);
   }
 
   if (hourly.length === 0) throw new Error("No completed BTCUSDT 1h candles are available");
@@ -383,7 +515,8 @@ export async function loadAndRefreshData(options: LoadAndRefreshDataOptions = {}
     interval: "1h",
     refreshedAt: new Date(nowMs).toISOString(),
     asOfMs: nowMs,
-    gitSha: resolveGitSha(options.gitSha),
+    gitSha: gitMetadata.gitSha,
+    gitDirty: gitMetadata.gitDirty,
     evaluatorVersion: options.evaluatorVersion ?? EVALUATOR_VERSION,
     hourly: { path: cachePaths.hourlyCachePath, sha256: hourlyHash, range: dataRange(hourly) },
     funding: { path: cachePaths.fundingCachePath, sha256: fundingHash, range: dataRange(funding) },
