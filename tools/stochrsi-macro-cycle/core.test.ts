@@ -4,6 +4,7 @@ import {
   advanceMacroLatch,
   aggregateCandles,
   buildCampaignSignalsFromPoints,
+  buildStochPoints,
   DAY_MS,
   emptyMacroLatch,
   HOUR_MS,
@@ -91,6 +92,26 @@ test("2W aggregation preserves its Monday-aligned OHLCV boundaries", () => {
   assert.deepEqual(out, [{ ...bar(start, 100), time: start, high: 436, low: 98, close: 435, volume: 336 }]);
 });
 
+test("aggregation is independent of complete source-candle order", () => {
+  const start = Date.UTC(2026, 0, 5);
+  const source = hourlyBars(start, 24);
+
+  assert.deepEqual(
+    aggregateCandles([...source].reverse(), "1d", start + DAY_MS),
+    aggregateCandles(source, "1d", start + DAY_MS),
+  );
+});
+
+test("aggregation rejects duplicate hourly timestamps", () => {
+  const start = Date.UTC(2026, 0, 5);
+  const source = hourlyBars(start, 24);
+
+  assert.throws(
+    () => aggregateCandles([...source, source[12]], "1d", start + DAY_MS),
+    /duplicate hourly timestamp/i,
+  );
+});
+
 test("drops a complete 1W bucket when its first or final source hour is missing", () => {
   const start = Date.UTC(2026, 0, 5);
   const fullBucket = hourlyBars(start, 7 * 24);
@@ -100,6 +121,36 @@ test("drops a complete 1W bucket when its first or final source hour is missing"
       fullBucket.filter((_, index) => index !== missingIndex),
       "1w",
       start + WEEK_MS,
+    ).length,
+  );
+
+  assert.deepEqual(bucketLengths, [0, 0]);
+});
+
+test("drops a complete 1D bucket when its first or final source hour is missing", () => {
+  const start = Date.UTC(2026, 0, 5);
+  const fullBucket = hourlyBars(start, 24);
+
+  const bucketLengths = [0, fullBucket.length - 1].map((missingIndex) =>
+    aggregateCandles(
+      fullBucket.filter((_, index) => index !== missingIndex),
+      "1d",
+      start + DAY_MS,
+    ).length,
+  );
+
+  assert.deepEqual(bucketLengths, [0, 0]);
+});
+
+test("drops a complete 2W bucket when its first or final source hour is missing", () => {
+  const start = Date.UTC(2026, 0, 5);
+  const fullBucket = hourlyBars(start, 2 * WEEK_MS / HOUR_MS);
+
+  const bucketLengths = [0, fullBucket.length - 1].map((missingIndex) =>
+    aggregateCandles(
+      fullBucket.filter((_, index) => index !== missingIndex),
+      "2w",
+      start + 2 * WEEK_MS,
     ).length,
   );
 
@@ -184,6 +235,23 @@ test("records a daily oversold intent at that daily close time", () => {
 
   assert.deepEqual(campaign.episodeEntries, [dailyCloseTime]);
   assert.equal(campaign.episodeEntries[0], dailyCloseTime);
+});
+
+test("records daily intent at the next daily open derived from an aggregated candle", () => {
+  const dailyOpen = Date.UTC(2026, 0, 5);
+  const [daily] = buildStochPoints(
+    aggregateCandles(hourlyBars(dailyOpen, 24), "1d", dailyOpen + DAY_MS),
+    DAY_MS,
+  );
+  const macro = macroRecoveryPoints();
+  const campaign = buildCampaignSignalsFromPoints({
+    weekly: macro.weekly,
+    twoWeekly: macro.twoWeekly,
+    daily: [{ ...daily, k: 5, d: 5 }],
+  })[0];
+
+  assert.equal(daily.closeTime, dailyOpen + DAY_MS);
+  assert.deepEqual(campaign.episodeEntries, [daily.closeTime]);
 });
 
 test("leaves the final open campaign without an exit time", () => {

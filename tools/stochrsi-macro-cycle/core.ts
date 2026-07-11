@@ -73,7 +73,14 @@ function bucketStart(time: number, span: AggregateSpan): number {
 }
 
 export function aggregateCandles(source: Candle[], span: AggregateSpan, asOfMs: number): Candle[] {
-  const completedSource = source.filter((bar) => bar.time + HOUR_MS <= asOfMs);
+  const orderedSource = [...source].sort((left, right) => left.time - right.time);
+  for (let index = 1; index < orderedSource.length; index += 1) {
+    if (orderedSource[index - 1].time === orderedSource[index].time) {
+      throw new Error(`Duplicate hourly timestamp: ${orderedSource[index].time}`);
+    }
+  }
+
+  const completedSource = orderedSource.filter((bar) => bar.time + HOUR_MS <= asOfMs);
   const targetSpanMs = spanMs(span);
   const buckets = new Map<number, AggregateBucket>();
 
