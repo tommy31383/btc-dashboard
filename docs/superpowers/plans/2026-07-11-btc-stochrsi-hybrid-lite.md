@@ -196,12 +196,11 @@ Expected: all existing metrics remain unchanged in regression fixtures.
 **Files:**
 - Modify: `tools/stochrsi-macro-cycle/replay.ts`
 - Test: `tools/stochrsi-macro-cycle/replay.test.ts`
-- Modify: `tools/backtest-stochrsi-macro-cycle-7y.ts`
 
 **Interfaces:**
 - Consumes: the executable `HYBRID_LITE` variant from Task 2.
-- Produces: `DAILY_EPISODE_MATCHED_PEAK` and fixed orchestration.
-- Produces: `runFrozenVariants(campaigns, hourly, funding, options?)` in report order.
+- Produces: directly executable `DAILY_EPISODE_MATCHED_PEAK` and fixed orchestration.
+- Produces: `runFrozenVariants(campaigns, hourly, funding, options?)` in the future V2 report order without changing the current global report registry yet.
 
 - [ ] **Step 1: Write failing variant tests**
 
@@ -209,7 +208,14 @@ Expected: all existing metrics remain unchanged in regression fixtures.
 assert.equal(matched.simulatedNotTradable, true);
 assert.equal(matched.maxQuantity, hybrid.maxQuantity);
 const frozen = runFrozenVariants(campaigns, hourly, []);
-assert.deepEqual(frozen.map((run) => run.name), VARIANT_NAMES);
+assert.deepEqual(frozen.map((run) => run.name), [
+  "MACRO_ONCE",
+  "DAILY_EPISODE",
+  "HYBRID_LITE",
+  "DAILY_EPISODE_MATCHED_PEAK",
+  "DAILY_EVERY_BAR",
+  "WINDOW_FULL_AT_ARM",
+]);
 ```
 
 Task 2 already owns entry parity, roles, tactical overlap, and macro/recovery tie behavior. Task 3 verifies the matched control uses Hybrid's measured peak rather than a hand-entered scale.
@@ -228,11 +234,9 @@ const matchedPeakScale = base.maxQuantity === 0
   : hybrid.maxQuantity / base.maxQuantity;
 ```
 
-Replay all base episode entries with quantities multiplied by this scale and mark that row simulated/non-tradable. Return every variant exactly once in `VARIANT_NAMES` order.
+Replay all base episode entries with quantities multiplied by this scale and mark that row simulated/non-tradable. Return the six variants in the literal frozen order asserted above. Keep `VARIANT_NAMES` unchanged in Task 3 so the old report cannot expose a half-integrated schema.
 
-- [ ] **Step 4: Switch runner and verify**
-
-Replace `VARIANT_NAMES.map(runVariant)` with `runFrozenVariants`.
+- [ ] **Step 4: Verify orchestration**
 
 ```bash
 /tmp/npm-cache-tmpfix/_npx/fd45a72a545557e9/node_modules/.bin/tsx --test tools/stochrsi-macro-cycle/*.test.ts
@@ -244,7 +248,7 @@ Expected: focused tests and targeted TypeScript pass.
 - [ ] **Step 5: Commit Task 3**
 
 ```bash
-git add tools/stochrsi-macro-cycle/replay.ts tools/stochrsi-macro-cycle/replay.test.ts tools/backtest-stochrsi-macro-cycle-7y.ts
+git add tools/stochrsi-macro-cycle/replay.ts tools/stochrsi-macro-cycle/replay.test.ts
 git commit -m "feat: add frozen Hybrid-Lite falsification variants"
 ```
 
@@ -259,6 +263,7 @@ git commit -m "feat: add frozen Hybrid-Lite falsification variants"
 - Test: `tools/stochrsi-macro-cycle/replay.test.ts`
 - Modify: `tools/stochrsi-macro-cycle/io.ts`
 - Test: `tools/stochrsi-macro-cycle/io.test.ts`
+- Modify: `tools/backtest-stochrsi-macro-cycle-7y.ts`
 
 **Interfaces:**
 - Produces: `realizedLegs`, `realizedLegWinRate`, role attribution, and Hybrid kill checks.
@@ -304,7 +309,7 @@ Represent each frozen criterion as `{ id, passed, actual, requirement }`. Entry 
 
 - [ ] **Step 5: Update JSON/Markdown and versions**
 
-Use labels `Realized legs / all legs` and `Realized leg WR`. Add Hybrid core/tactical attribution and every kill check. Label matched peak and window-full rows simulated.
+Atomically add `HYBRID_LITE` and `DAILY_EPISODE_MATCHED_PEAK` to `VARIANT_NAMES`, switch the CLI runner from `VARIANT_NAMES.map(runVariant)` to `runFrozenVariants`, and update report fixtures with aligned recovery arrays. Use labels `Realized legs / all legs` and `Realized leg WR`. Add Hybrid core/tactical attribution and every kill check. Label matched peak and window-full rows simulated.
 
 ```ts
 export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v4";
@@ -316,7 +321,7 @@ schemaVersion: "btc-stochrsi-macro-cycle-report/v3";
 Run all focused tests and targeted TypeScript from Task 3.
 
 ```bash
-git add tools/stochrsi-macro-cycle/io.ts tools/stochrsi-macro-cycle/io.test.ts tools/stochrsi-macro-cycle/replay.ts tools/stochrsi-macro-cycle/replay.test.ts tools/stochrsi-macro-cycle/report.ts tools/stochrsi-macro-cycle/report.test.ts
+git add tools/stochrsi-macro-cycle/io.ts tools/stochrsi-macro-cycle/io.test.ts tools/stochrsi-macro-cycle/replay.ts tools/stochrsi-macro-cycle/replay.test.ts tools/stochrsi-macro-cycle/report.ts tools/stochrsi-macro-cycle/report.test.ts tools/backtest-stochrsi-macro-cycle-7y.ts
 git commit -m "feat: report Hybrid-Lite falsification evidence"
 ```
 
