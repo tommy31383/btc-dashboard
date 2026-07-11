@@ -72,6 +72,20 @@ test("positive funding is paid by a long", () => {
   assert.equal(leg.fundingPnl, -0.105);
 });
 
+test("zero funding mark falls back to the latest causal hourly close", () => {
+  const leg = settleLeg({
+    qty: 1,
+    entryOpen: 100,
+    exitOpen: 110,
+    funding: [{ time: HOUR_MS, rate: 0.001, mark: 0 }],
+    entryTime: 0,
+    exitTime: 2 * HOUR_MS,
+    hourly: [bar(0, 100)],
+  });
+
+  assert.equal(leg.fundingPnl, -0.1);
+});
+
 test("full-at-arm matches episode qty and is simulated", () => {
   const result = buildVariantLegs(campaignWithEpisodeCount(3), "WINDOW_FULL_AT_ARM");
 
@@ -116,6 +130,27 @@ test("minimum wallet strictly survives the liquidation boundary", () => {
 
   assert.equal(scenario?.liquidated, false);
   assert.ok(scenario!.minimumBuffer > 0);
+});
+
+test("liquidated wallet does not publish a full-path ROI", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start],
+    dailyOversoldEntries: [start],
+  };
+  const run = runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [barWithLow(start, 100_000, 1, 100_000)],
+    [],
+    { walletSizes: [1] },
+  );
+  const scenario = run.walletScenarios.find((wallet) => wallet.startingWallet === 1)!;
+
+  assert.equal(scenario.liquidated, true);
+  assert.equal(scenario.scaleTestRoiPct, null);
+  assert.equal(scenario.outcome, "LIQUIDATED_PATH_INVALID");
 });
 
 test("all frozen variants build their prescribed entry schedules", () => {

@@ -136,3 +136,17 @@ test("serialization rejects malformed non-finite evidence instead of converting 
 
   assert.throws(() => serializeReport(report), /Non-finite report value at .*totalNetPnl/);
 });
+
+test("Markdown marks post-liquidation ROI invalid without formatting null as a percent", () => {
+  const report = buildReport(input(5), { generatedAt: "2026-07-11T13:00:00.000Z" });
+  const wallet = report.variants[0].walletScenarios[0];
+  wallet.liquidated = true;
+  wallet.liquidationCount = 1;
+  wallet.scaleTestRoiPct = null;
+  wallet.outcome = "LIQUIDATED_PATH_INVALID";
+
+  const markdown = renderMarkdown(report);
+
+  assert.match(markdown, /\| 100 \| null \| LIQUIDATED_PATH_INVALID \| true \| 1 \|/);
+  assert.doesNotMatch(markdown, /null%/);
+});

@@ -254,6 +254,10 @@ function formatNumber(value: number | null, digits = 4): string {
   });
 }
 
+function formatPercent(value: number | null, digits = 4): string {
+  return value === null ? "null" : `${formatNumber(value, digits)}%`;
+}
+
 function formatTime(value: number | null | undefined): string {
   return value === null || value === undefined ? "null" : new Date(value).toISOString();
 }
@@ -344,10 +348,10 @@ export function renderMarkdown(report: MacroCycleReport): string {
         `${formatNumber(variant.averageUnderwaterHours)}h; suppressed duplicate daily entries ` +
         `${variant.suppressedDuplicateDailyEntries}.`,
       `Entry (all campaigns, exposure-matched): weighted average ${formatNumber(variant.weightedAverageEntry)}; ` +
-        `improvement vs MACRO_ONCE ${formatNumber(variant.weightedEntryImprovementVsMacroOncePct)}%.`,
+        `improvement vs MACRO_ONCE ${formatPercent(variant.weightedEntryImprovementVsMacroOncePct)}.`,
       `Entry (closed campaigns only, exposure-matched): weighted average ` +
         `${formatNumber(variant.closedWeightedAverageEntry)}; improvement vs MACRO_ONCE ` +
-        `${formatNumber(variant.closedWeightedEntryImprovementVsMacroOncePct)}%.`,
+        `${formatPercent(variant.closedWeightedEntryImprovementVsMacroOncePct)}.`,
       `Best campaign: ${campaignLabel(variant.bestCampaign)}`,
       `Worst campaign: ${campaignLabel(variant.worstCampaign)}`,
       `Open campaign marked to market: ${campaignLabel(variant.openCampaign)}`,
@@ -362,19 +366,20 @@ export function renderMarkdown(report: MacroCycleReport): string {
       "",
       "### Fixed-wallet feasibility",
       "",
-      "| Wallet USDT | ROI | Liquidated | Liquidations | Minimum buffer |",
-      "|---:|---:|---|---:|---:|",
+      "| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |",
+      "|---:|---:|---|---|---:|---:|",
       ...variant.walletScenarios.map((wallet) =>
-        `| ${formatNumber(wallet.startingWallet)} | ${formatNumber(wallet.scaleTestRoiPct)}% | ` +
-        `${wallet.liquidated} | ${wallet.liquidationCount} | ${formatNumber(wallet.minimumBuffer)} |`,
+        `| ${formatNumber(wallet.startingWallet)} | ${formatPercent(wallet.scaleTestRoiPct)} | ` +
+        `${wallet.outcome} | ${wallet.liquidated} | ${wallet.liquidationCount} | ` +
+        `${formatNumber(wallet.minimumBuffer)} |`,
       ),
       "",
       "### Concentration",
       "",
       `Best one/three campaign PnL: ${formatNumber(variant.concentration.bestOnePnl)} / ` +
         `${formatNumber(variant.concentration.bestThreePnl)} USDT; shares: ` +
-        `${formatNumber(variant.concentration.bestOneSharePct)}% / ` +
-        `${formatNumber(variant.concentration.bestThreeSharePct)}%.`,
+        `${formatPercent(variant.concentration.bestOneSharePct)} / ` +
+        `${formatPercent(variant.concentration.bestThreeSharePct)}.`,
       `Net without best one/three: ${formatNumber(variant.concentration.netPnlWithoutBestOne)} / ` +
         `${formatNumber(variant.concentration.netPnlWithoutBestThree)} USDT.`,
       "",

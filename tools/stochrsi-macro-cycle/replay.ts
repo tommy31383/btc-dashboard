@@ -113,7 +113,8 @@ export interface WalletScenario {
   basis: "FULL_HISTORY_SCALE_TEST";
   startingWallet: number;
   snapshotTime?: number;
-  scaleTestRoiPct: number;
+  scaleTestRoiPct: number | null;
+  outcome: "SURVIVED" | "LIQUIDATED_PATH_INVALID";
   liquidated: boolean;
   liquidationCount: number;
   minimumBuffer: number;
@@ -249,13 +250,19 @@ function resolveFunding(
   let cumulativePnlPerBtc = 0;
   return funding.map((payment) => {
     assertFinite(payment.rate, "Funding rate");
+    if (payment.mark !== undefined) {
+      assertFinite(payment.mark, "Funding mark");
+      if (payment.mark < 0) throw new Error("Funding mark must not be negative");
+    }
     while (
       candleIndex + 1 < hourly.length &&
       hourly[candleIndex + 1].time + HOUR_MS <= payment.time
     ) {
       candleIndex += 1;
     }
-    const mark = payment.mark ?? hourly[candleIndex]?.close;
+    const mark = payment.mark !== undefined && payment.mark > 0
+      ? payment.mark
+      : hourly[candleIndex]?.close;
     if (mark === undefined) throw new Error(`Funding mark fallback unavailable at ${payment.time}`);
     assertFinite(mark, "Funding mark");
     cumulativePnlPerBtc += -mark * payment.rate;
@@ -639,7 +646,8 @@ function walletScenario(
     basis: "FULL_HISTORY_SCALE_TEST",
     startingWallet,
     snapshotTime: liveWallet?.timestamp,
-    scaleTestRoiPct: (netPnl / startingWallet) * 100,
+    scaleTestRoiPct: liquidated ? null : (netPnl / startingWallet) * 100,
+    outcome: liquidated ? "LIQUIDATED_PATH_INVALID" : "SURVIVED",
     liquidated,
     liquidationCount,
     minimumBuffer: minimumBuffer === Number.POSITIVE_INFINITY ? startingWallet : minimumBuffer,

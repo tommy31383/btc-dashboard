@@ -6,6 +6,7 @@ import test from "node:test";
 
 import { HOUR_MS, type Candle } from "./core";
 import {
+  EVALUATOR_VERSION,
   defaultCachePaths,
   loadAndRefreshData,
   mergeCandles,
@@ -24,6 +25,10 @@ function jsonResponse(body: unknown, status = 200) {
     json: async () => body,
   };
 }
+
+test("material audit fixes use evaluator version v2", () => {
+  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v2");
+});
 
 test("default caches are explicitly Futures-specific", () => {
   const paths = defaultCachePaths();
@@ -55,6 +60,57 @@ test("validation lists gaps over three hours with the documented handling", () =
       handling: "aggregate_available_hours",
     },
   ]);
+});
+
+test("normalizes a zero cached funding mark to missing", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+  const hourlyCachePath = join(directory, "hourly.json");
+  const fundingCachePath = join(directory, "funding.json");
+  const now = Date.UTC(2026, 6, 11, 12);
+
+  try {
+    await writeFile(hourlyCachePath, JSON.stringify([bar(now - HOUR_MS, 100)]));
+    await writeFile(
+      fundingCachePath,
+      JSON.stringify([{ time: now - 8 * HOUR_MS, rate: 0.001, mark: 0 }]),
+    );
+
+    const data = await loadAndRefreshData({
+      refresh: false,
+      nowMs: now,
+      cachePaths: { hourlyCachePath, fundingCachePath },
+      gitSha: "test-git-sha",
+      gitDirty: false,
+    });
+
+    assert.equal(data.funding[0].mark, null);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("offline default pins as-of time to the cached completed-hour cutoff", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+  const hourlyCachePath = join(directory, "hourly.json");
+  const fundingCachePath = join(directory, "funding.json");
+  const futureHour = Date.UTC(2099, 0, 1);
+
+  try {
+    await writeFile(hourlyCachePath, JSON.stringify([bar(futureHour, 100)]));
+    await writeFile(fundingCachePath, "[]");
+
+    const data = await loadAndRefreshData({
+      refresh: false,
+      cachePaths: { hourlyCachePath, fundingCachePath },
+      gitSha: "test-git-sha",
+      gitDirty: false,
+    });
+
+    assert.equal(data.asOfMs, futureHour + HOUR_MS);
+    assert.equal(data.hourly.length, 1);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("refreshes incrementally through fake Binance responses and writes reproducible provenance", async () => {

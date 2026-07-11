@@ -198,6 +198,25 @@ test("overbought clears a confirmed latch before the other macro timeframe confi
   assert.equal(campaigns.length, 0);
 });
 
+test("overbought clears a confirmed latch even when both timeframes confirm before arm", () => {
+  const start = Date.UTC(2026, 0, 1);
+  const campaigns = buildCampaignSignalsFromPoints({
+    weekly: [
+      point(start + DAY_MS, 15, 18),
+      point(start + 2 * DAY_MS, 22, 19),
+      point(start + 3 * DAY_MS, 85, 70),
+      point(start + 4 * DAY_MS, 50, 55),
+    ],
+    twoWeekly: [
+      point(start + DAY_MS, 15, 18),
+      point(start + 3 * DAY_MS, 22, 19),
+    ],
+    daily: [],
+  });
+
+  assert.equal(campaigns.length, 0);
+});
+
 test("multi-day daily oversold produces one entry", () => {
   const campaigns = buildCampaignSignalsFromPoints(fixtureWithDailyK([12, 8, 5, 7, 11, 9]));
 

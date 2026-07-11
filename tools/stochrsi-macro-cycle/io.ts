@@ -13,7 +13,7 @@ const DEFAULT_RETRY_ATTEMPTS = 3;
 const MAX_RETRY_ATTEMPTS = 5;
 const REQUEST_TIMEOUT_MS = 30_000;
 
-export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v1";
+export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v2";
 
 export interface FundingRecord {
   time: number;
@@ -166,8 +166,11 @@ function parseFunding(value: unknown, label: string, requireSymbol: boolean): Fu
   const timeValue = record.time ?? record.fundingTime;
   const rateValue = record.rate ?? record.fundingRate;
   const markValue = record.mark ?? record.markPrice;
-  const mark = markValue === null || markValue === undefined ? null : finiteNumber(markValue, `${label}.mark`);
-  if (mark !== null && mark < 0) throw new Error(`Invalid ${label}.mark: negative`);
+  const parsedMark = markValue === null || markValue === undefined
+    ? null
+    : finiteNumber(markValue, `${label}.mark`);
+  if (parsedMark !== null && parsedMark < 0) throw new Error(`Invalid ${label}.mark: negative`);
+  const mark = parsedMark === 0 ? null : parsedMark;
   return {
     time: timestamp(timeValue, `${label}.time`),
     rate: finiteNumber(rateValue, `${label}.rate`),
@@ -192,7 +195,7 @@ function validateFundingData(funding: FundingRecord[]): void {
     const entry = funding[index];
     if (!Number.isSafeInteger(entry.time) || entry.time < 0) throw new Error(`Invalid funding time: ${entry.time}`);
     if (!Number.isFinite(entry.rate)) throw new Error(`Invalid funding rate: ${entry.rate}`);
-    if (entry.mark !== null && (!Number.isFinite(entry.mark) || entry.mark < 0)) {
+    if (entry.mark !== null && (!Number.isFinite(entry.mark) || entry.mark <= 0)) {
       throw new Error(`Invalid funding mark: ${entry.mark}`);
     }
     if (index > 0 && entry.time <= funding[index - 1].time) {
@@ -470,12 +473,10 @@ export async function sha256File(path: string): Promise<string> {
 }
 
 export async function loadAndRefreshData(options: LoadAndRefreshDataOptions = {}): Promise<RefreshResult> {
-  const nowMs = options.nowMs ?? Date.now();
   const cachePaths = { ...defaultCachePaths(), ...options.cachePaths };
   const refresh = options.refresh ?? true;
   const retryAttempts = options.retryAttempts ?? DEFAULT_RETRY_ATTEMPTS;
   const retryDelayMs = options.retryDelayMs ?? 250;
-  if (!Number.isInteger(nowMs) || nowMs <= 0) throw new Error(`Invalid refresh timestamp: ${nowMs}`);
   if (!Number.isInteger(retryAttempts) || retryAttempts < 1 || retryAttempts > MAX_RETRY_ATTEMPTS) {
     throw new Error(`Invalid retry attempts: ${retryAttempts}; expected 1-${MAX_RETRY_ATTEMPTS}`);
   }
@@ -484,7 +485,15 @@ export async function loadAndRefreshData(options: LoadAndRefreshDataOptions = {}
 
   const cachedHourlyRaw = await readJson(cachePaths.hourlyCachePath);
   const cachedFundingRaw = await readJson(cachePaths.fundingCachePath);
-  let hourly = mergeCandles([], cachedHourlyRaw === undefined ? [] : parseCachedCandles(cachedHourlyRaw), nowMs);
+  const cachedHourly = cachedHourlyRaw === undefined ? [] : parseCachedCandles(cachedHourlyRaw);
+  const cachedCutoffMs = cachedHourly.reduce(
+    (latest, candle) => Math.max(latest, candle.time + HOUR_MS),
+    0,
+  );
+  const nowMs = options.nowMs ?? (!refresh && cachedCutoffMs > 0 ? cachedCutoffMs : Date.now());
+  if (!Number.isInteger(nowMs) || nowMs <= 0) throw new Error(`Invalid refresh timestamp: ${nowMs}`);
+
+  let hourly = mergeCandles([], cachedHourly, nowMs);
   let funding = sortAndDedupeFunding(
     [],
     cachedFundingRaw === undefined ? [] : parseFundings(cachedFundingRaw, "cached funding", false),

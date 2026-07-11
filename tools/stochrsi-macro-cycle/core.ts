@@ -147,7 +147,10 @@ export function advanceMacroLatch(state: MacroLatch, value: KdValue): MacroLatch
   ) {
     reboundConfirmed = true;
   }
-  if (!reboundConfirmed && value.k >= 80) oversoldSeen = false;
+  if (value.k >= 80) {
+    oversoldSeen = false;
+    reboundConfirmed = false;
+  }
 
   return {
     oversoldSeen,
