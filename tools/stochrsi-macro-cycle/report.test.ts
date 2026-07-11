@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 
 import type { CampaignSignal, Candle } from "./core";
@@ -163,6 +164,27 @@ function tacticalOnlyOpenInput(): BuildReportInput {
   return reportInput;
 }
 
+function tacticalOnlyRecoveredOpenInput(): BuildReportInput {
+  const reportInput = input(1);
+  const recovery = START + 3_600_000;
+  const campaign: CampaignSignal = {
+    armTime: START,
+    episodeEntries: [START],
+    episodeRecoveryTimes: [recovery],
+    dailyOversoldEntries: [START],
+  };
+  const hourly = [bar(START, 100), bar(recovery, 110)];
+  reportInput.campaigns = [campaign];
+  reportInput.variants = runFrozenVariants([campaign], hourly, []);
+  reportInput.provenance.hourly.range = {
+    firstTime: hourly[0].time,
+    lastTime: hourly.at(-1)!.time,
+    rowCount: hourly.length,
+  };
+  reportInput.warmupRange.lastCompletedHourTime = hourly.at(-1)!.time;
+  return reportInput;
+}
+
 test("buildReport emits the complete frozen schema and insufficient-sample verdict", () => {
   const report = buildReport(input(4), { generatedAt: "2026-07-11T13:00:00.000Z" });
   const primary = report.variants.find((variant) => variant.name === "DAILY_EPISODE")!;
@@ -268,6 +290,25 @@ test("generatedAt is the only report field allowed to vary", () => {
   assert.equal(first.verdict, "EVALUATED");
 });
 
+test("all six legacy variants and the complete Hybrid verdict match the frozen golden", () => {
+  const report = buildReport(input(4), { generatedAt: "2026-07-11T13:00:00.000Z" });
+  const legacyNames = new Set([
+    "MACRO_ONCE",
+    "DAILY_EPISODE",
+    "HYBRID_LITE",
+    "DAILY_EPISODE_MATCHED_PEAK",
+    "DAILY_EVERY_BAR",
+    "WINDOW_FULL_AT_ARM",
+  ]);
+  const projection = {
+    variants: report.variants.filter((variant) => legacyNames.has(variant.name)),
+    hybridVerdict: report.hybridVerdict,
+  };
+  const digest = createHash("sha256").update(JSON.stringify(projection)).digest("hex");
+
+  assert.equal(digest, "75c67393702f68b4e30b4ba8d6401a24ae5f9aa47418afee500dfc3413816beb");
+});
+
 test("Hybrid mechanical verdict passes only when all eight frozen checks pass", () => {
   const report = buildReport(hybridPassInput(), { generatedAt: "2026-07-11T13:00:00.000Z" });
 
@@ -304,6 +345,23 @@ test("Tactical-only unresolved check matches only causally unrecovered open epis
   });
 });
 
+test("Markdown distinguishes an open macro campaign whose tactical legs are all realized", () => {
+  const markdown = renderMarkdown(
+    buildReport(tacticalOnlyRecoveredOpenInput(), {
+      generatedAt: "2026-07-11T13:00:00.000Z",
+    }),
+  );
+
+  assert.match(
+    markdown,
+    /## TACTICAL_ONLY[\s\S]*Open macro campaign \(all legs realized\):/,
+  );
+  assert.match(
+    markdown,
+    /## TACTICAL_ONLY[\s\S]*Realized leg hold: average\/median\/maximum 1\/1\/1h/,
+  );
+});
+
 test("Markdown states the frozen strategy, no stop loss, sample limit, and simulated warning", () => {
   const markdown = renderMarkdown(
     buildReport(input(4), { generatedAt: "2026-07-11T13:00:00.000Z" }),
@@ -335,6 +393,8 @@ test("Markdown states the frozen strategy, no stop loss, sample limit, and simul
   assert.match(markdown, /CORE/);
   assert.match(markdown, /TACTICAL/);
   assert.match(markdown, /Monthly entries and realized PnL/);
+  assert.match(markdown, /Macro campaign timing: average span/);
+  assert.match(markdown, /Realized leg hold: average\/median\/maximum/);
   assert.match(markdown, /Pre-\/post-2023/);
   assert.match(markdown, /Entry \(all campaigns, exposure-matched\)/);
   assert.match(markdown, /Entry \(closed campaigns only, exposure-matched\)/);

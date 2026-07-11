@@ -578,6 +578,37 @@ function campaignLabel(campaign: CampaignReplay | null | undefined): string {
     `${campaign.legs.length} legs; net ${formatNumber(campaign.netPnl)} USDT`;
 }
 
+function openMacroCampaignLabel(campaign: CampaignReplay | null | undefined): string {
+  if (!campaign) return "Open macro campaign: null";
+  const openLegs = campaign.legs.filter((leg) => !leg.closed).length;
+  if (openLegs === 0) {
+    return `Open macro campaign (all legs realized): ${campaignLabel(campaign)}`;
+  }
+  return `Open macro campaign (${openLegs} open ${openLegs === 1 ? "leg" : "legs"} marked at cutoff): ` +
+    campaignLabel(campaign);
+}
+
+function realizedLegHoldSummary(variant: ReportVariant): {
+  average: number;
+  median: number;
+  maximum: number;
+} {
+  const holds = variant.campaigns
+    .flatMap((campaign) => campaign.legs)
+    .filter((leg) => leg.closed)
+    .map((leg) => (leg.exitTime! - leg.entryTime) / HOUR_MS)
+    .sort((left, right) => left - right);
+  if (holds.length === 0) return { average: 0, median: 0, maximum: 0 };
+  const midpoint = Math.floor(holds.length / 2);
+  return {
+    average: holds.reduce((total, hold) => total + hold, 0) / holds.length,
+    median: holds.length % 2 === 1
+      ? holds[midpoint]
+      : (holds[midpoint - 1] + holds[midpoint]) / 2,
+    maximum: holds.at(-1)!,
+  };
+}
+
 export function renderMarkdown(report: MacroCycleReport): string {
   assertFiniteReportValue(report, "$report");
   const hybridSummary = report.variants.find((variant) => variant.name === "HYBRID_LITE");
@@ -703,6 +734,7 @@ export function renderMarkdown(report: MacroCycleReport): string {
   ];
 
   for (const variant of report.variants) {
+    const realizedHold = realizedLegHoldSummary(variant);
     lines.push(
       "",
       `## ${variant.name}${variant.warning ? ` - ${variant.warning}` : ""}`,
@@ -712,9 +744,11 @@ export function renderMarkdown(report: MacroCycleReport): string {
         `median ${formatNumber(variant.medianReturnPct)}%.`,
       `Leg counts (all campaigns): average/median per campaign ` +
         `${formatNumber(variant.averageLegsPerCampaign)}/${formatNumber(variant.medianLegsPerCampaign)}.`,
-      `Timing: average hold ${formatNumber(variant.averageHoldHours)}h; average underwater ` +
+      `Macro campaign timing: average span ${formatNumber(variant.averageHoldHours)}h; average underwater ` +
         `${formatNumber(variant.averageUnderwaterHours)}h; suppressed duplicate daily entries ` +
         `${variant.suppressedDuplicateDailyEntries}.`,
+      `Realized leg hold: average/median/maximum ${formatNumber(realizedHold.average)}/` +
+        `${formatNumber(realizedHold.median)}/${formatNumber(realizedHold.maximum)}h.`,
       `Entry (all campaigns, exposure-matched): weighted average ${formatNumber(variant.weightedAverageEntry)}; ` +
         `improvement vs MACRO_ONCE ${formatPercent(variant.weightedEntryImprovementVsMacroOncePct)}.`,
       `Entry (closed campaigns only, exposure-matched): weighted average ` +
@@ -722,7 +756,7 @@ export function renderMarkdown(report: MacroCycleReport): string {
         `${formatPercent(variant.closedWeightedEntryImprovementVsMacroOncePct)}.`,
       `Best campaign: ${campaignLabel(variant.bestCampaign)}`,
       `Worst campaign: ${campaignLabel(variant.worstCampaign)}`,
-      `Open campaign marked to market: ${campaignLabel(variant.openCampaign)}`,
+      openMacroCampaignLabel(variant.openCampaign),
       "",
       "### Monthly entries and realized PnL",
       "",
