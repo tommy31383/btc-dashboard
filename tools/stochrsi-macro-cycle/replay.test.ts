@@ -100,13 +100,56 @@ test("full-at-arm matches episode qty and is simulated", () => {
   assert.equal(result.simulatedNotTradable, true);
 });
 
-test("Task 2 keeps the global variant registry frozen to the original four", () => {
+test("Task 4 atomically registers the six frozen report variants", () => {
   assert.deepEqual(VARIANT_NAMES, [
     "MACRO_ONCE",
     "DAILY_EPISODE",
+    "HYBRID_LITE",
+    "DAILY_EPISODE_MATCHED_PEAK",
     "DAILY_EVERY_BAR",
     "WINDOW_FULL_AT_ARM",
   ]);
+});
+
+test("summary realizes tactical legs inside an open campaign and attributes every role", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const recovery = start + 2 * HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start, start + HOUR_MS],
+    episodeRecoveryTimes: [null, recovery],
+    dailyOversoldEntries: [start, start + HOUR_MS],
+  };
+  const run = runVariant(
+    "HYBRID_LITE",
+    [campaign],
+    [bar(start, 100), bar(start + HOUR_MS, 100), bar(recovery, 120)],
+    [],
+  );
+
+  const summary = summarizeVariant(run);
+
+  assert.equal(summary.realizedLegs, 1);
+  assert.equal(summary.totalLegs, 2);
+  assert.equal(summary.realizedLegWinRate, 1);
+  assert.equal(summary.closedCampaigns, 0);
+  assert.deepEqual(Object.keys(summary.roleAttribution), ["BASE", "CORE", "TACTICAL", "SIMULATED"]);
+  assert.equal(summary.roleAttribution.CORE.entries, 1);
+  assert.equal(summary.roleAttribution.CORE.realized, 0);
+  assert.equal(summary.roleAttribution.CORE.open, 1);
+  assert.equal(summary.roleAttribution.TACTICAL.entries, 1);
+  assert.equal(summary.roleAttribution.TACTICAL.realized, 1);
+  assert.equal(summary.roleAttribution.TACTICAL.open, 0);
+  assert.ok(summary.roleAttribution.TACTICAL.grossPnl > 0);
+  assert.ok(summary.roleAttribution.TACTICAL.fees > 0);
+  assert.ok(summary.roleAttribution.TACTICAL.slippageCost > 0);
+  assert.equal(summary.roleAttribution.TACTICAL.fundingPnl, 0);
+  assert.ok(summary.roleAttribution.TACTICAL.netPnl > 0);
+  assert.deepEqual(summary.roleAttribution.TACTICAL.exitReasons, {
+    DAILY_RECOVERY: 1,
+    MACRO_OVERBOUGHT: 0,
+    OPEN_MARK: 0,
+  });
 });
 
 test("DAILY_EPISODE_MATCHED_PEAK derives scale from replayed base and Hybrid peaks", () => {
@@ -640,10 +683,10 @@ test("summaries separate open campaigns and expose required stability views", ()
   assert.equal(summary.closedCampaigns, 2);
   assert.equal(summary.openCampaigns, 1);
   assert.equal(summary.totalCampaigns, 3);
-  assert.equal(summary.closedLegs, 3);
+  assert.equal(summary.realizedLegs, 3);
   assert.equal(summary.totalLegs, 4);
-  assert.equal(summary.campaignWinRate, 1);
-  assert.equal(summary.legWinRate, 1);
+  assert.equal(summary.closedCampaignWinRate, 1);
+  assert.equal(summary.realizedLegWinRate, 1);
   assert.equal(summary.monthlyEntries["2023-02"], 2);
   assert.ok(summary.monthlyPnl["2023-02"] > 0);
   assert.ok(summary.yearlyPnl["2022"] > 0);
@@ -830,7 +873,7 @@ test("campaign performance metrics exclude closed zero-entry opportunities", () 
   assert.equal(summary.totalCampaigns, 2);
   assert.equal(summary.zeroEntryCampaigns, 1);
   assert.equal(summary.closedCampaigns, 1);
-  assert.equal(summary.campaignWinRate, 1);
+  assert.equal(summary.closedCampaignWinRate, 1);
   assert.equal(summary.netExpectancy, summary.closedNetPnl);
   assert.equal(summary.averageReturnPct, executedReturn);
   assert.equal(summary.medianReturnPct, executedReturn);

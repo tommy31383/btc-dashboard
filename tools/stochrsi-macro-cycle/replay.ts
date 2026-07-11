@@ -18,6 +18,8 @@ export type VariantName =
 export const VARIANT_NAMES: VariantName[] = [
   "MACRO_ONCE",
   "DAILY_EPISODE",
+  "HYBRID_LITE",
+  "DAILY_EPISODE_MATCHED_PEAK",
   "DAILY_EVERY_BAR",
   "WINDOW_FULL_AT_ARM",
 ];
@@ -162,6 +164,22 @@ export interface StabilitySummary {
   winRate: number;
 }
 
+export interface RoleAttribution {
+  entries: number;
+  realized: number;
+  open: number;
+  grossPnl: number;
+  fees: number;
+  slippageCost: number;
+  fundingPnl: number;
+  netPnl: number;
+  exitReasons: {
+    DAILY_RECOVERY: number;
+    MACRO_OVERBOUGHT: number;
+    OPEN_MARK: number;
+  };
+}
+
 export interface VariantSummary {
   name: VariantName;
   simulatedNotTradable: boolean;
@@ -172,10 +190,11 @@ export interface VariantSummary {
   oneEntryCampaigns: number;
   multipleEntryCampaigns: number;
   suppressedDuplicateDailyEntries: number;
-  closedLegs: number;
+  realizedLegs: number;
   totalLegs: number;
-  campaignWinRate: number;
-  legWinRate: number;
+  closedCampaignWinRate: number;
+  realizedLegWinRate: number;
+  roleAttribution: Record<LegRole, RoleAttribution>;
   netExpectancy: number;
   averageReturnPct: number;
   medianReturnPct: number;
@@ -929,8 +948,8 @@ export function summarizeVariant(
   const closed = run.campaigns.filter(
     (campaign) => campaign.closed && campaign.legs.length > 0,
   );
-  const closedLegs = closed.flatMap((campaign) => campaign.legs);
   const allLegs = run.campaigns.flatMap((campaign) => campaign.legs);
+  const realizedLegs = allLegs.filter((leg) => leg.closed);
   const monthlyEntries: Record<string, number> = {};
   const yearlyEntries: Record<string, number> = {};
   const monthlyPnl: Record<string, number> = {};
@@ -972,16 +991,36 @@ export function summarizeVariant(
     suppressedDuplicateDailyEntries: sum(
       run.campaigns.map((campaign) => campaign.suppressedDuplicateDailyEntries),
     ),
-    closedLegs: closedLegs.length,
+    realizedLegs: realizedLegs.length,
     totalLegs: allLegs.length,
-    campaignWinRate:
+    closedCampaignWinRate:
       closed.length === 0
         ? 0
         : closed.filter((campaign) => campaign.netPnl > 0).length / closed.length,
-    legWinRate:
-      closedLegs.length === 0
+    realizedLegWinRate:
+      realizedLegs.length === 0
         ? 0
-        : closedLegs.filter((leg) => leg.netPnl > 0).length / closedLegs.length,
+        : realizedLegs.filter((leg) => leg.netPnl > 0).length / realizedLegs.length,
+    roleAttribution: Object.fromEntries(
+      (["BASE", "CORE", "TACTICAL", "SIMULATED"] as const).map((role) => {
+        const legs = allLegs.filter((leg) => leg.role === role);
+        return [role, {
+          entries: legs.length,
+          realized: legs.filter((leg) => leg.closed).length,
+          open: legs.filter((leg) => !leg.closed).length,
+          grossPnl: sum(legs.map((leg) => leg.grossPnl)),
+          fees: sum(legs.map((leg) => leg.fees)),
+          slippageCost: sum(legs.map((leg) => leg.slippageCost)),
+          fundingPnl: sum(legs.map((leg) => leg.fundingPnl)),
+          netPnl: sum(legs.map((leg) => leg.netPnl)),
+          exitReasons: {
+            DAILY_RECOVERY: legs.filter((leg) => leg.exitReason === "DAILY_RECOVERY").length,
+            MACRO_OVERBOUGHT: legs.filter((leg) => leg.exitReason === "MACRO_OVERBOUGHT").length,
+            OPEN_MARK: legs.filter((leg) => !leg.closed).length,
+          },
+        }];
+      }),
+    ) as Record<LegRole, RoleAttribution>,
     netExpectancy: closed.length === 0 ? 0 : closedNetPnl / closed.length,
     averageReturnPct:
       closed.length === 0

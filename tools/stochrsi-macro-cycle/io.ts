@@ -13,7 +13,7 @@ const DEFAULT_RETRY_ATTEMPTS = 3;
 const MAX_RETRY_ATTEMPTS = 5;
 const REQUEST_TIMEOUT_MS = 30_000;
 
-export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v3";
+export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v4";
 
 export interface FundingRecord {
   time: number;

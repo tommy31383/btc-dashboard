@@ -8,8 +8,7 @@ import {
   writeGeneratedOutputs,
 } from "./stochrsi-macro-cycle/report";
 import {
-  runVariant,
-  VARIANT_NAMES,
+  runFrozenVariants,
   type FundingPayment,
 } from "./stochrsi-macro-cycle/replay";
 
@@ -28,9 +27,7 @@ async function main(): Promise<void> {
     rate: payment.rate,
     ...(payment.mark === null ? {} : { mark: payment.mark }),
   }));
-  const variants = VARIANT_NAMES.map((name) =>
-    runVariant(name, campaigns, data.hourly, funding),
-  );
+  const variants = runFrozenVariants(campaigns, data.hourly, funding);
   const report = buildReport({
     provenance: data.provenance,
     campaigns,

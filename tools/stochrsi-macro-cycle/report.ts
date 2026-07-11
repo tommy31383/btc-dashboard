@@ -42,10 +42,33 @@ export interface ReportVariant extends VariantSummary {
   campaigns: CampaignReplay[];
 }
 
+export type HybridKillCheckId =
+  | "ENTRY_PARITY"
+  | "PEAK_QUANTITY"
+  | "CLOSED_NET_PNL_POSITIVE"
+  | "TOTAL_NET_PNL_POSITIVE"
+  | "BEATS_MATCHED_PEAK"
+  | "TACTICAL_NET_PNL_POSITIVE"
+  | "FIXED_WALLETS_SURVIVE"
+  | "CAMPAIGN_CONSISTENCY";
+
+export interface HybridKillCheck {
+  id: HybridKillCheckId;
+  passed: boolean;
+  actual: unknown;
+  requirement: unknown;
+}
+
+export interface HybridMechanicalVerdict {
+  verdict: "PASS" | "KILL";
+  checks: HybridKillCheck[];
+}
+
 export interface MacroCycleReport {
-  schemaVersion: "btc-stochrsi-macro-cycle-report/v2";
+  schemaVersion: "btc-stochrsi-macro-cycle-report/v3";
   generatedAt: string;
   verdict: "INSUFFICIENT_SAMPLE" | "EVALUATED";
+  hybridVerdict: HybridMechanicalVerdict;
   sampleLimitation: string;
   liveWalletFeasibility: {
     status: "NOT_SUPPLIED_TO_OFFLINE_EVALUATOR";
@@ -72,7 +95,8 @@ export interface MacroCycleReport {
     funding: "HISTORICAL_APPLIED_TO_EACH_OPEN_LEG";
     maintenanceRate: number;
     stopLoss: null;
-    partialClose: false;
+    legClosure: "FULL_LEG_ONLY";
+    hybridTacticalExit: "DAILY_RECOVERY_BEFORE_MACRO_EXIT";
     maximumHoldExit: false;
     frozenVariants: VariantName[];
   };
@@ -151,6 +175,114 @@ function validateGeneratedAt(generatedAt: string): void {
   if (!Number.isFinite(Date.parse(generatedAt))) throw new Error(`Invalid generatedAt: ${generatedAt}`);
 }
 
+function buildHybridVerdict(
+  dailyEpisode: VariantRun,
+  hybrid: VariantRun,
+  matchedPeak: VariantRun,
+  hybridSummary: VariantSummary,
+  matchedPeakSummary: VariantSummary,
+): HybridMechanicalVerdict {
+  const dailyEpisodeEntryTimes = dailyEpisode.campaigns.flatMap((campaign) =>
+    campaign.legs.map((leg) => leg.entryTime),
+  );
+  const hybridEntryTimes = hybrid.campaigns.flatMap((campaign) =>
+    campaign.legs.map((leg) => leg.entryTime),
+  );
+  const orderedTimestampsEqual =
+    dailyEpisodeEntryTimes.length === hybridEntryTimes.length &&
+    dailyEpisodeEntryTimes.every((time, index) => time === hybridEntryTimes[index]);
+  const fixedWallets = [250, 500, 1_000].map((startingWallet) => {
+    const scenario = hybrid.walletScenarios.find((wallet) =>
+      wallet.label === "FIXED_WALLET" && wallet.startingWallet === startingWallet
+    );
+    return { startingWallet, liquidated: scenario?.liquidated ?? true };
+  });
+  const matchedByArmTime = new Map(
+    matchedPeak.campaigns.filter((campaign) => campaign.closed).map((campaign) => [campaign.armTime, campaign]),
+  );
+  const campaignImprovements = hybrid.campaigns
+    .filter((campaign) => campaign.closed)
+    .flatMap((campaign) => {
+      const matched = matchedByArmTime.get(campaign.armTime);
+      return matched
+        ? [{ armTime: campaign.armTime, improvement: campaign.netPnl - matched.netPnl }]
+        : [];
+    });
+  const positiveCompletedCampaigns = campaignImprovements.filter(
+    ({ improvement }) => improvement > 0,
+  ).length;
+  const matchedPeakImprovement = hybridSummary.totalNetPnl - matchedPeakSummary.totalNetPnl;
+  const tacticalNetPnl = hybridSummary.roleAttribution.TACTICAL.netPnl;
+  const checks: HybridKillCheck[] = [
+    {
+      id: "ENTRY_PARITY",
+      passed: orderedTimestampsEqual,
+      actual: {
+        dailyEpisodeEntryCount: dailyEpisodeEntryTimes.length,
+        hybridEntryCount: hybridEntryTimes.length,
+        orderedTimestampsEqual,
+        dailyEpisodeEntryTimes,
+        hybridEntryTimes,
+      },
+      requirement: { sameEntryCount: true, sameOrderedTimestamps: true },
+    },
+    {
+      id: "PEAK_QUANTITY",
+      passed: hybrid.maxQuantity <= 0.002,
+      actual: { maxQuantityBtc: hybrid.maxQuantity },
+      requirement: { maximumQuantityBtc: 0.002 },
+    },
+    {
+      id: "CLOSED_NET_PNL_POSITIVE",
+      passed: hybridSummary.closedNetPnl > 0,
+      actual: { closedNetPnl: hybridSummary.closedNetPnl },
+      requirement: { greaterThan: 0 },
+    },
+    {
+      id: "TOTAL_NET_PNL_POSITIVE",
+      passed: hybridSummary.totalNetPnl > 0,
+      actual: { totalNetPnl: hybridSummary.totalNetPnl },
+      requirement: { greaterThan: 0 },
+    },
+    {
+      id: "BEATS_MATCHED_PEAK",
+      passed: matchedPeakImprovement > 0,
+      actual: {
+        hybridTotalNetPnl: hybridSummary.totalNetPnl,
+        matchedPeakTotalNetPnl: matchedPeakSummary.totalNetPnl,
+        improvement: matchedPeakImprovement,
+      },
+      requirement: { improvementGreaterThan: 0 },
+    },
+    {
+      id: "TACTICAL_NET_PNL_POSITIVE",
+      passed: tacticalNetPnl > 0,
+      actual: { tacticalNetPnl },
+      requirement: { greaterThan: 0 },
+    },
+    {
+      id: "FIXED_WALLETS_SURVIVE",
+      passed: fixedWallets.every((wallet) => !wallet.liquidated),
+      actual: fixedWallets,
+      requirement: { wallets: [250, 500, 1_000], liquidated: false },
+    },
+    {
+      id: "CAMPAIGN_CONSISTENCY",
+      passed: positiveCompletedCampaigns >= 2,
+      actual: {
+        positiveCompletedCampaigns,
+        completedCampaignsCompared: campaignImprovements.length,
+        campaignImprovements,
+      },
+      requirement: { minimumPositiveCompletedCampaigns: 2 },
+    },
+  ];
+  return {
+    verdict: checks.every((check) => check.passed) ? "PASS" : "KILL",
+    checks,
+  };
+}
+
 export function buildReport(
   input: BuildReportInput,
   options: BuildReportOptions = {},
@@ -163,6 +295,13 @@ export function buildReport(
   }
   const macroOnce = requireVariant(orderedRuns, "MACRO_ONCE");
   const dailyEpisode = requireVariant(orderedRuns, "DAILY_EPISODE");
+  const hybrid = requireVariant(orderedRuns, "HYBRID_LITE");
+  const matchedPeak = requireVariant(orderedRuns, "DAILY_EPISODE_MATCHED_PEAK");
+  const variantSummaries = orderedRuns.map((run) => summarizeVariant(run, macroOnce));
+  const hybridSummary = variantSummaries.find((summary) => summary.name === "HYBRID_LITE")!;
+  const matchedPeakSummary = variantSummaries.find(
+    (summary) => summary.name === "DAILY_EPISODE_MATCHED_PEAK",
+  )!;
   const completed = dailyEpisode.campaigns.filter((campaign) => campaign.closed).length;
   const episodeCounts = input.campaigns.map((campaign) => campaign.episodeEntries.length);
   const { refreshedAt: _refreshedAt, asOfMs: _asOfMs, ...stableProvenance } = input.provenance;
@@ -170,9 +309,16 @@ export function buildReport(
   if (rawRange.lastTime === null) throw new Error("Hourly provenance must include a last timestamp");
 
   return {
-    schemaVersion: "btc-stochrsi-macro-cycle-report/v2",
+    schemaVersion: "btc-stochrsi-macro-cycle-report/v3",
     generatedAt,
     verdict: completed < 5 ? "INSUFFICIENT_SAMPLE" : "EVALUATED",
+    hybridVerdict: buildHybridVerdict(
+      dailyEpisode,
+      hybrid,
+      matchedPeak,
+      hybridSummary,
+      matchedPeakSummary,
+    ),
     sampleLimitation:
       `${completed} completed DAILY_EPISODE campaigns; fewer than 5 completed DAILY_EPISODE campaigns ` +
       "forces INSUFFICIENT_SAMPLE. " +
@@ -204,7 +350,8 @@ export function buildReport(
       funding: "HISTORICAL_APPLIED_TO_EACH_OPEN_LEG",
       maintenanceRate: MAINTENANCE_RATE,
       stopLoss: null,
-      partialClose: false,
+      legClosure: "FULL_LEG_ONLY",
+      hybridTacticalExit: "DAILY_RECOVERY_BEFORE_MACRO_EXIT",
       maximumHoldExit: false,
       frozenVariants: [...VARIANT_NAMES],
     },
@@ -224,9 +371,9 @@ export function buildReport(
       multipleDailyEpisodeEntries: episodeCounts.filter((count) => count > 1).length,
       signals: input.campaigns,
     },
-    variants: orderedRuns.map((run) => ({
-      ...summarizeVariant(run, macroOnce),
-      warning: run.name === "WINDOW_FULL_AT_ARM" ? "SIMULATED_NOT_TRADABLE" : null,
+    variants: orderedRuns.map((run, index) => ({
+      ...variantSummaries[index],
+      warning: run.simulatedNotTradable ? "SIMULATED_NOT_TRADABLE" : null,
       campaigns: run.campaigns,
     })),
   };
@@ -282,12 +429,23 @@ function campaignLabel(campaign: CampaignReplay | null | undefined): string {
 
 export function renderMarkdown(report: MacroCycleReport): string {
   assertFiniteReportValue(report, "$report");
+  const hybridSummary = report.variants.find((variant) => variant.name === "HYBRID_LITE");
+  if (!hybridSummary) throw new Error("HYBRID_LITE report variant is required");
   const lines: string[] = [
     "# BTC-only StochRSI Macro-cycle Backtest",
     "",
     `**Verdict: ${report.verdict}**`,
     "",
     `Sample limitation: ${report.sampleLimitation}`,
+    "",
+    `**Hybrid mechanical verdict: ${report.hybridVerdict.verdict}**`,
+    "",
+    "| Kill check | Result | Actual | Requirement |",
+    "|---|---|---|---|",
+    ...report.hybridVerdict.checks.map((check) =>
+      `| ${check.id} | ${check.passed ? "PASS" : "KILL"} | ${JSON.stringify(check.actual)} | ` +
+      `${JSON.stringify(check.requirement)} |`,
+    ),
     "",
     "## Frozen strategy",
     "",
@@ -297,7 +455,8 @@ export function renderMarkdown(report: MacroCycleReport): string {
     "During the armed cycle, DAILY_EPISODE buys 0.001 BTC once per distinct closed-1D %K < 10 episode " +
       "at the next available daily open. It rearms after closed-1D %K >= 10.",
     "The whole campaign exits at the next available daily open after completed 1W and 2W %K are both >= 80.",
-    "No stop loss. No partial close. No maximum-hold exit. Historical funding applies to every open leg.",
+    "No stop loss and no maximum-hold exit. Each leg is fully closed; Hybrid tactical legs may exit before the macro campaign. " +
+      "Historical funding applies to every open leg.",
     `Costs: ${formatNumber(report.strategy.feeRatePerSide * 100)}% taker fee per side and ` +
       `${formatNumber(report.strategy.adverseSlippageRatePerSide * 100)}% adverse slippage per side.`,
     "",
@@ -330,21 +489,37 @@ export function renderMarkdown(report: MacroCycleReport): string {
     "",
     "## Variant summary",
     "",
+    "**DAILY_EPISODE_MATCHED_PEAK: SIMULATED_NOT_TRADABLE. Its full-history multiplier is an exposure control, not an executable strategy.**",
+    "",
     "**WINDOW_FULL_AT_ARM: SIMULATED_NOT_TRADABLE. It uses the future DAILY_EPISODE leg count and is only an exposure-normalized timing counterfactual.**",
     "",
-    "| Variant | Warning | Closed/open/zero | Closed legs / all legs | Closed campaign WR | Closed leg WR | Total gross | Total fees | Total slippage | Total funding | Closed net | Total net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |",
+    "| Variant | Warning | Closed/open/zero | Realized legs / all legs | Closed campaign WR | Realized leg WR | Total gross | Total fees | Total slippage | Total funding | Closed net | Total net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |",
     "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...report.variants.map((variant) =>
       `| ${variant.name} | ${variant.warning ?? "TRADABLE_REPLAY"} | ` +
       `${variant.closedCampaigns}/${variant.openCampaigns}/${variant.zeroEntryCampaigns} | ` +
-      `${variant.closedLegs}/${variant.totalLegs} | ` +
-      `${formatNumber(variant.campaignWinRate * 100)}% | ${formatNumber(variant.legWinRate * 100)}% | ` +
+      `${variant.realizedLegs}/${variant.totalLegs} | ` +
+      `${formatNumber(variant.closedCampaignWinRate * 100)}% | ` +
+      `${formatNumber(variant.realizedLegWinRate * 100)}% | ` +
       `${formatNumber(variant.grossPnl)} | ${formatNumber(variant.fees)} | ${formatNumber(variant.slippageCost)} | ` +
       `${formatNumber(variant.fundingPnl)} | ${formatNumber(variant.closedNetPnl)} | ` +
       `${formatNumber(variant.totalNetPnl)} | ${formatNumber(variant.maxDrawdown)} | ` +
       `${formatNumber(variant.worstUnrealizedPnl)} | ${formatNumber(variant.minimumWallet)} | ` +
       `${formatNumber(variant.maxQuantity, 6)} | ${formatNumber(variant.maxNotional)} |`,
     ),
+    "",
+    "## Hybrid role attribution",
+    "",
+    "| Role | Entries | Realized | Open | Gross | Fees | Slippage | Funding | Net | Daily recovery | Macro overbought | Open mark |",
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ...(["BASE", "CORE", "TACTICAL", "SIMULATED"] as const).map((role) => {
+      const attribution = hybridSummary.roleAttribution[role];
+      return `| ${role} | ${attribution.entries} | ${attribution.realized} | ${attribution.open} | ` +
+        `${formatNumber(attribution.grossPnl)} | ${formatNumber(attribution.fees)} | ` +
+        `${formatNumber(attribution.slippageCost)} | ${formatNumber(attribution.fundingPnl)} | ` +
+        `${formatNumber(attribution.netPnl)} | ${attribution.exitReasons.DAILY_RECOVERY} | ` +
+        `${attribution.exitReasons.MACRO_OVERBOUGHT} | ${attribution.exitReasons.OPEN_MARK} |`;
+    }),
   ];
 
   for (const variant of report.variants) {

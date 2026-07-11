@@ -26,8 +26,8 @@ function jsonResponse(body: unknown, status = 200) {
   };
 }
 
-test("final provenance fixes use evaluator version v3", () => {
-  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v3");
+test("Hybrid report semantics use evaluator version v4", () => {
+  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v4");
 });
 
 test("default caches are explicitly Futures-specific", () => {
