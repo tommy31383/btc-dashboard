@@ -209,3 +209,19 @@ Dispositions:
 - pre-preregistration feature-distribution peeking is forbidden.
 
 Status: activation remains closed pending final Grok and Claude re-audits.
+
+## Grok attempt 7 - APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T02:42:28+07:00`.
+- Packet: `packets/grok-final-metric-freeze-reaudit.md`.
+- Verdict: `APPROVED`; open P0/P1/P2: none.
+- Confirmed exact impulse/resistance formulas, signs, feature-peek ban,
+  two-metric-only claim, six-test family correction, and all prior safety controls.
+
+Three non-blocking implementer pins were still made explicit before Claude:
+split estimand is mean per-signal delta, resistance requires at least 16/20
+non-missing controls, and only H01 LONG PASS is accepted.
+
+Status: Grok design gate passed. Activation remains closed pending Claude approval
+of this exact final text.

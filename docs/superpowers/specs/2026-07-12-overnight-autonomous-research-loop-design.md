@@ -346,6 +346,10 @@ activation. If that evidence proves only a version match, the report must say
 `DEPLOYMENT_IDENTITY_UNVERIFIED`. No Night-1 result may claim VPS byte parity or
 "current deployed behavior" without a pre-existing byte-level provenance record.
 
+Night 1 accepts only H01 `LONG` PASS signals. Production trend SHORT is disabled;
+any returned SHORT PASS is a function/config identity mismatch and makes the
+affected run `INVALID` rather than expanding the geometry post hoc.
+
 ### 5.2 Causal input contract
 
 Night 1 is labeled `FUNCTION_FAITHFUL_INPUTS_NOT_LIVE_VERIFIED`: it invokes the
@@ -442,6 +446,12 @@ accepted-intent/exit replay; none may be inferred from fixed-horizon signals.
   hold in discovery and validation and both validation two-sided 99.1667%
   bootstrap intervals exclude zero (Bonferroni alpha `0.05/6`).
 - Each signal delta is measured against the median of its twenty controls.
+  The split-level confirmatory estimand is the arithmetic mean of those
+  per-signal deltas; no median/trimmed-mean alternative is selected after replay.
+- A confirmatory resistance delta exists only when the signal resistance metric
+  exists and at least 16 of its 20 controls have a non-missing resistance metric;
+  the control median uses exactly those non-missing values. Otherwise that signal
+  is missing and counts against the 80% resistance-coverage floor.
   Confidence intervals use 10,000 deterministic calendar-month block-bootstrap
   resamples within each split so twenty controls and nearby signals are not
   treated as independent observations.
