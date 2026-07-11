@@ -253,3 +253,25 @@ Read-only oracle verification: `node --test test/p1a-pipeline.test.mjs` passed
 499-closed-bar ATR anchoring, and shared evaluator behavior all passed.
 
 Status: activation remains closed pending revised Grok and Claude audits.
+
+## Grok attempt 8 - NOT APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T02:56:41+07:00`.
+- Packet: `packets/grok-claude4-fixes-reaudit.md`.
+- Verdict: `NOT APPROVED`; no P0, one P1 and one P2 mechanical conflict.
+- All Claude attempt-4 fixes otherwise passed.
+
+Dispositions:
+
+- invocable pure exports now include `detectRegime`, `stepRegimePersist`, and
+  `atrEntry4h` in addition to the two slice oracles and H01 snapshot;
+- stateful `evalEntry`, exits, labels, Champion, and every other export remain
+  forbidden;
+- every signal/control ATR calls hash-locked
+  `atrEntry4h(gateSlice4h(b4h,index,500))`, which uses the same 499 closed bars as
+  live; no dashboard ATR implementation is allowed;
+- daily 500-bar indices, insufficient ATR warmup, and missing forming-bar behavior
+  are explicit.
+
+Status: activation remains closed pending Grok and Claude re-audits.

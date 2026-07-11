@@ -55,10 +55,11 @@ Every other env read remains invalid.
 
 Environment was rebuilt with only `TZ=UTC`, `LANG=C`, `LC_ALL=C`, and
 `RULE_DISABLE_S12=false`. Absolute Node path `/usr/local/bin/node` imported the
-active H01 and P1(a) oracle modules successfully. The P1(a) probe returned:
+active H01, regime, and P1(a) oracle modules successfully. The final export probe
+returned:
 
 ```json
-{"gateSlice4h":"function","gateSlice1h":"function"}
+{"gateSlice4h":"function","gateSlice1h":"function","atrEntry4h":"function","evalHedge01TrendSnapshot":"function","detectRegime":"function","stepRegimePersist":"function"}
 ```
 
 An earlier combined design probe had also imported the now-deferred Champion

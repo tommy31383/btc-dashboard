@@ -149,7 +149,7 @@ adjacent checksum cannot be self-consistently widened after freeze.
 |---|---|
 | Dashboard writes | Allow only the dedicated worktree under `tools/overnight-entry-audit/**` and `docs/research/overnight-2026-07-12/**`. |
 | Local data reads | Allow only cache files enumerated with SHA-256 in preregistration. |
-| Production signal imports | Allow read-only imports of hash-locked `btc-trader-server/dist/engine/p1aPipeline.js`, `dist/engine/rules/hedge01.js`, `dist/engine/rules/ruleHelpers.js`, `dist/engine/regime.js`, and `dist/engine/hwm.js`. Resolve the complete runtime import graph before freeze; every transitive module must be on this pure-module list and hash-locked, otherwise the rule is `INVALID`. Only `gateSlice4h`, `gateSlice1h`, and `evalHedge01TrendSnapshot` may be invoked for signal construction/evaluation. |
+| Production signal imports | Allow read-only imports of hash-locked `btc-trader-server/dist/engine/p1aPipeline.js`, `dist/engine/rules/hedge01.js`, `dist/engine/rules/ruleHelpers.js`, `dist/engine/regime.js`, and `dist/engine/hwm.js`. Resolve the complete runtime import graph before freeze; every transitive module must be on this pure-module list and hash-locked, otherwise the rule is `INVALID`. The complete invocable export list is `gateSlice4h`, `gateSlice1h`, `atrEntry4h`, `evalHedge01TrendSnapshot`, `detectRegime`, and `stepRegimePersist`. Stateful `hedge01.evalEntry`, every exit/label function including `hedge01TrailingExit`/`labelTrendLong`, Champion, and all other exports are forbidden. |
 | Local executables | Allow `/usr/bin/sandbox-exec` plus exact argument patterns for `git` metadata/commit operations, the repository's local Node/TypeScript runtime, frozen targeted tests/typecheck, SHA-256, Claude read-only audit, and `scripts/grok/ask.sh` with committed packets. |
 | Public data fallback | Allow HTTPS GET only to the preregistered public kline endpoint and only before preregistration is frozen; the resulting file/hash becomes the frozen cache. |
 | Always deny | Any write/cwd under `btc-trader-server`; source `.ts` runtime import; `ssh`, `scp`, `sftp`, `rsync`, `pm2`, `deploy.sh`, `curl`/generic HTTP clients, shell evaluation, production env loaders, authenticated Binance/account modules, relay TURN edits, and any unlisted network origin. |
@@ -386,8 +386,18 @@ does not claim a live reference-vector comparison.
   to `[max(0,i+2-500), i+2)` with bar `i+1` forming. For 1h forming index
   `pForming`, call `gateSlice1h(b1h,pForming,500)`, equivalent to
   `[max(0,pForming+1-500), pForming+1)`. The runner does not reimplement these
-  slices. Daily regime input is likewise capped to the latest 500 bars including
-  the forming day.
+  slices. A timestamp whose required forming index `i+1`/`pForming` does not exist
+  is skipped before signal/control eligibility.
+- For daily forming index `pDayForming`, regime input is exactly
+  `b1d.slice(max(0,pDayForming+1-500), pDayForming+1)`, including that forming
+  day; no separate daily slicing convention is permitted.
+- Every confirmatory/exploratory ATR at 4h index `k`, including each of the 90
+  prior values used by volatility rank, is exactly
+  `atrEntry4h(gateSlice4h(b4h,k,500))`. This hash-locked oracle computes
+  `calcATR(gate.slice(0,-1),14)` on at most 499 closed bars, matching live. The
+  dashboard cannot implement or substitute another ATR. Zero/invalid ATR or
+  fewer than 90 valid prior oracle ATR values makes the timestamp ineligible as
+  a signal or control before matching.
 - Signal time is the just-closed 4h bar's close timestamp. Outcome measurement
   begins at the next 4h open; no closed bar after signal time enters any feature.
 - Funding is an as-of join using the latest record timestamp `<= signal_time`
@@ -471,6 +481,8 @@ intent/exit replay; none may be inferred from fixed-horizon signals.
   fewer than 10 validation entries, less than 80% control coverage in either arm,
   or less than 80% non-missing confirmatory overhead-resistance coverage in
   either arm.
+- In every formula below, `WilderATR14[k]` means only
+  `atrEntry4h(gateSlice4h(b4h,k,500))`; it is not recomputed in dashboard code.
 - Confirmatory impulse at index `i` is
   `(close[i] - min(low[i-6..i-1])) / WilderATR14[i]`, using six complete prior
   4h bars and ATR14 through the complete signal bar. Per-signal delta is that

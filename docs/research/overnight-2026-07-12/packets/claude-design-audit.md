@@ -55,6 +55,11 @@ Scope B is the permission ceiling, but Night 1 is narrower:
   imports hash-locked `p1aPipeline` slices at 500 bars, requires raw and other-
   setup PASS control arms with twelve-test correction, fixes causal rank bins,
   and commits the full safety gate before any preregistration/replay.
+- Grok attempt 8 then caught an invocable-export contradiction and an unbound ATR
+  implementation. The final text allowlists exactly the six pure exports needed
+  and requires every signal/control ATR to call
+  `atrEntry4h(gateSlice4h(...,500))`; stateful entry/exit/label exports remain
+  denied.
 - The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions
