@@ -580,6 +580,9 @@ function campaignLabel(campaign: CampaignReplay | null | undefined): string {
 
 function openMacroCampaignLabel(campaign: CampaignReplay | null | undefined): string {
   if (!campaign) return "Open macro campaign: null";
+  if (campaign.legs.length === 0) {
+    return `Open macro campaign (no legs executed): ${campaignLabel(campaign)}`;
+  }
   const openLegs = campaign.legs.filter((leg) => !leg.closed).length;
   if (openLegs === 0) {
     return `Open macro campaign (all legs realized): ${campaignLabel(campaign)}`;

@@ -360,6 +360,10 @@ test("Markdown distinguishes an open macro campaign whose tactical legs are all 
     markdown,
     /## TACTICAL_ONLY[\s\S]*Realized leg hold: average\/median\/maximum 1\/1\/1h/,
   );
+  assert.match(
+    markdown,
+    /## WINDOW_FULL_AT_ARM[\s\S]*Open macro campaign \(no legs executed\):/,
+  );
 });
 
 test("Markdown states the frozen strategy, no stop loss, sample limit, and simulated warning", () => {
