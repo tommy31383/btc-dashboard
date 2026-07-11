@@ -88,10 +88,10 @@ export interface LoadAndRefreshDataOptions {
   cacheRenameImpl?: RenameLike;
 }
 
-function defaultCachePaths(): CachePaths {
+export function defaultCachePaths(): CachePaths {
   return {
-    hourlyCachePath: join(process.cwd(), ".cache", "binance-1h-7y.json"),
-    fundingCachePath: join(process.cwd(), ".cache", "binance-funding-7y.json"),
+    hourlyCachePath: join(process.cwd(), ".cache", "binance-futures-btcusdt-1h-7y.json"),
+    fundingCachePath: join(process.cwd(), ".cache", "binance-futures-btcusdt-funding-7y.json"),
   };
 }
 

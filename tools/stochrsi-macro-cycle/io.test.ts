@@ -6,6 +6,7 @@ import test from "node:test";
 
 import { HOUR_MS, type Candle } from "./core";
 import {
+  defaultCachePaths,
   loadAndRefreshData,
   mergeCandles,
   sha256File,
@@ -23,6 +24,14 @@ function jsonResponse(body: unknown, status = 200) {
     json: async () => body,
   };
 }
+
+test("default caches are explicitly Futures-specific", () => {
+  const paths = defaultCachePaths();
+
+  assert.match(paths.hourlyCachePath, /binance-futures-btcusdt-1h-7y\.json$/);
+  assert.match(paths.fundingCachePath, /binance-futures-btcusdt-funding-7y\.json$/);
+  assert.doesNotMatch(paths.hourlyCachePath, /binance-1h-7y\.json$/);
+});
 
 test("merge deduplicates and excludes the forming hour", () => {
   const now = Date.UTC(2026, 6, 11, 12);
