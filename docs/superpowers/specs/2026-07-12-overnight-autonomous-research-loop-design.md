@@ -141,12 +141,15 @@ Before activation, the implementation commits
 `docs/research/overnight-2026-07-12/command-path-matrix.json` and its SHA-256.
 The supervisor loads exactly that file and refuses an unknown executable,
 subcommand, argument pattern, read path, write path, or network origin.
+The frozen preregistration stores `command_path_matrix_sha256` and
+`pure_import_report_sha256`; replay verifies both cross-references so a matrix and
+adjacent checksum cannot be self-consistently widened after freeze.
 
 | Operation | Frozen policy |
 |---|---|
 | Dashboard writes | Allow only the dedicated worktree under `tools/overnight-entry-audit/**` and `docs/research/overnight-2026-07-12/**`. |
 | Local data reads | Allow only cache files enumerated with SHA-256 in preregistration. |
-| Production signal imports | Allow read-only imports of hash-locked `btc-trader-server/dist/engine/rules/hedge01.js`, `dist/engine/rules/ruleHelpers.js`, `dist/engine/regime.js`, and `dist/engine/hwm.js`. Resolve the complete runtime import graph before freeze; every transitive module must be on this pure-module list and hash-locked, otherwise the rule is `INVALID`. Only `evalHedge01TrendSnapshot` may be invoked for entry signals. |
+| Production signal imports | Allow read-only imports of hash-locked `btc-trader-server/dist/engine/p1aPipeline.js`, `dist/engine/rules/hedge01.js`, `dist/engine/rules/ruleHelpers.js`, `dist/engine/regime.js`, and `dist/engine/hwm.js`. Resolve the complete runtime import graph before freeze; every transitive module must be on this pure-module list and hash-locked, otherwise the rule is `INVALID`. Only `gateSlice4h`, `gateSlice1h`, and `evalHedge01TrendSnapshot` may be invoked for signal construction/evaluation. |
 | Local executables | Allow `/usr/bin/sandbox-exec` plus exact argument patterns for `git` metadata/commit operations, the repository's local Node/TypeScript runtime, frozen targeted tests/typecheck, SHA-256, Claude read-only audit, and `scripts/grok/ask.sh` with committed packets. |
 | Public data fallback | Allow HTTPS GET only to the preregistered public kline endpoint and only before preregistration is frozen; the resulting file/hash becomes the frozen cache. |
 | Always deny | Any write/cwd under `btc-trader-server`; source `.ts` runtime import; `ssh`, `scp`, `sftp`, `rsync`, `pm2`, `deploy.sh`, `curl`/generic HTTP clients, shell evaluation, production env loaders, authenticated Binance/account modules, relay TURN edits, and any unlisted network origin. |
@@ -166,9 +169,16 @@ permit outbound network only through their dedicated allowlisted executable and
 still deny every write under `btc-trader-server`, `$HOME`, unrelated repos, and
 all non-declared dashboard paths. Before and after every child, the supervisor
 requires `git -C btc-trader-server status --porcelain` to be empty and rechecks
-the four preregistered server-module hashes; a difference stops the run without
+the five preregistered server-module hashes; a difference stops the run without
 reverting it. Sandbox denial itself is a failed phase, never a reason to retry
 without the profile.
+
+Backgrounding, daemonization, double-fork, `nohup`, and `setsid` are forbidden in
+all production phase commands; argument guards reject them. The only `setsid`
+execution is the dedicated cleanup test fixture. Local phases deny process-fork
+unless their frozen command explicitly requires a trusted child. Import-graph
+changes caused by TypeScript type-erasure drift are caught by the literal graph
+and hash gate and become `INVALID`.
 
 Before dynamic import, a static closure scan rejects production env/secret access,
 network modules/calls, child-process calls, filesystem writes, cwd mutation, and
@@ -302,6 +312,11 @@ The result-audit response must end with one JSON object containing `terminal` an
 `TIMEOUT`, `QUOTA`, `MALFORMED`, or `TOOL_FAILURE`. Missing or inconsistent
 fields become `AUDIT_FAILED/MALFORMED`.
 
+The Grok result packet has a mandatory named attack: determine whether the raw
+arm merely restates ADX/DI/EMA/ATR/volume gate selection and whether the
+gate-conditioned other-setup arm genuinely isolates incremental target-trigger
+crowding. Missing this attack makes the audit `AUDIT_FAILED/MALFORMED`.
+
 Codex remains the orchestrator. Claude and Grok may propose the next item, but
 they do not deploy or arm anything.
 
@@ -360,10 +375,19 @@ does not claim a live reference-vector comparison.
   validates ordering, uniqueness, one-hour spacing, and OHLC consistency before
   any signal call.
 - 4h and 1d bars use UTC epoch buckets and only complete constituent 1h bars. At
-  each 4h evaluation, 1h/4h/1d arrays include one explicit synthetic current
-  partial bar because the production helpers discard their final item with
-  `slice(0,-1)`; the synthetic values are fixture-tested to prove they cannot
-  affect the signal.
+  each historical 4h evaluation, 1h/4h/1d gate arrays include the next recorded
+  bar as the forming-bar container because production helpers discard their final
+  item with `slice(0,-1)`. A mutation-invariance fixture replaces every OHLCV
+  field of that final container and requires an identical signal, proving its
+  future-complete dataset values cannot affect evaluation.
+- Gate arrays use the existing pure, tested server oracle
+  `dist/engine/p1aPipeline.js` with live cache depth exactly 500 bars per
+  timeframe. For closed 4h index `i`, call `gateSlice4h(b4h,i,500)`, equivalent
+  to `[max(0,i+2-500), i+2)` with bar `i+1` forming. For 1h forming index
+  `pForming`, call `gateSlice1h(b1h,pForming,500)`, equivalent to
+  `[max(0,pForming+1-500), pForming+1)`. The runner does not reimplement these
+  slices. Daily regime input is likewise capped to the latest 500 bars including
+  the forming day.
 - Signal time is the just-closed 4h bar's close timestamp. Outcome measurement
   begins at the next 4h open; no closed bar after signal time enters any feature.
 - Funding is an as-of join using the latest record timestamp `<= signal_time`
@@ -374,14 +398,21 @@ does not claim a live reference-vector comparison.
   using `detectRegime` plus
   `stepRegimePersist(..., persistBars=1)`. The value `1` is the current H01
   call-site behavior; the helper's default `3` is not used.
-- Volatility quintile is causal per timestamp: current ATR percentile against the
-  preceding 90 closed 4h bars, then bucketed into five fixed bins. No full-split
-  quantile boundary is fitted.
+- Volatility rank is causal per timestamp: compute the current 500-depth
+  WilderATR14, compare it with the ATR value at each of the preceding 90 closed
+  4h timestamps, and set `rank = count(priorATR < currentATR) / validPriorCount`.
+  Require 90 valid prior values. Fixed quintile bins are `[0,0.2)`, `[0.2,0.4)`,
+  `[0.4,0.6)`, `[0.6,0.8)`, and `[0.8,1]`; no split-wide or adaptive boundary is
+  fitted. Fixtures cover exact-boundary values `0`, `.2`, `.4`, `.6`, `.8`, and
+  `1`.
 
 Hand-computed fixtures cover UTC 1h->4h and 1h->1d boundaries, partial-bar
 exclusion, next-bar indexing, funding as-of behavior, a regime transition with
-`persistBars=1`, and causal volatility bins. Fixture failure is `INVALID`, not a
-reason to alter input construction after seeing outcomes.
+`persistBars=1`, causal volatility bins, and exact 500-bar start/end indices.
+The runtime gate also runs the existing server
+`test/p1a-pipeline.test.mjs` read-only and a dashboard parity test proving its gate
+arrays are byte-equal to the `p1aPipeline` oracle. Any oracle/hash/test mismatch is
+`INVALID`, not a reason to alter input construction after seeing outcomes.
 
 ### 5.3 Measurements
 
@@ -396,22 +427,38 @@ time:
 - MFE and MAE after 1, 3, 6, 12, 24, and 48 rule-timeframe bars;
 - favorable-first versus adverse-first path and fee/slippage break-even.
 
-Two controls are frozen before replay:
+Two twenty-timestamp control arms plus one exploratory delay are frozen before
+replay:
 
-1. twenty deterministic same-side timestamps per entry, matched inside the same
-   temporal split on rule timeframe, calendar quarter, causal trend regime, and
-   volatility quintile, excluding the +/-48-bar entry neighborhood; and
-2. the same entry delayed exactly one bar, when a next bar exists.
+1. **Raw-market arm:** deterministic hypothetical-LONG timestamps where the target
+   setup is not PASS, matched inside the same temporal split on 4h timeframe,
+   calendar quarter, causal trend regime, and volatility quintile, excluding the
+   +/-48-bar signal neighborhood.
+2. **Gate-conditioned arm:** the same matching rules, but each timestamp must have
+   the target setup not PASS and at least one of the other two H01 setups PASS
+   LONG. This holds the shared H01 gate context closer while varying the target
+   setup trigger.
+3. **Exploratory delay:** the same signal delayed exactly one bar, when a next bar
+   exists.
 
 Every control uses the same side and fixed horizon as its source signal. The
 seed is derived from the stable diagnosis ID, source commit, and frozen data hash
 and is itself stored in the preregistration. Unmatched entries remain visible and
 reduce the reported matched-coverage denominator.
 
-The same-side, same-regime, same-volatility, same-quarter matched control is the
-operative defense against disguised BTC beta and exposure timing. Strategy beta,
-time in market, turnover, and PnL are `N/A` because Night 1 has no stateful
-accepted-intent/exit replay; none may be inferred from fixed-horizon signals.
+For each signal-arm pair, candidates are timestamp-sorted, shuffled once with the
+frozen seeded Fisher-Yates algorithm, and the first 20 distinct timestamps are
+selected without replacement. Fewer than 20 candidates makes that pair unmatched;
+a timestamp may be reused for a different source signal but never twice within
+one signal arm.
+
+The raw arm measures combined gate-plus-trigger selection versus the market. The
+gate-conditioned arm is the operative test for late/crowded geometry beyond the
+shared H01 gate context; it also strengthens the defense against disguised BTC
+beta and exposure timing. A positive raw-arm result alone may only be described
+as gate/trigger selection, never incremental crowding. Strategy beta, time in
+market, turnover, and PnL are `N/A` because Night 1 has no stateful accepted-
+intent/exit replay; none may be inferred from fixed-horizon signals.
 
 ### 5.4 Sample and split contract
 
@@ -421,8 +468,9 @@ accepted-intent/exit replay; none may be inferred from fixed-horizon signals.
 - The first 80% of time is discovery and the last 20% is validation. Purge 48
   rule-timeframe bars from both sides of the split boundary.
 - A setup is `INSUFFICIENT_SAMPLE` for inference with fewer than 30 total signals,
-  fewer than 10 validation entries, less than 80% matched-control coverage, or
-  less than 80% non-missing confirmatory overhead-resistance coverage.
+  fewer than 10 validation entries, less than 80% control coverage in either arm,
+  or less than 80% non-missing confirmatory overhead-resistance coverage in
+  either arm.
 - Confirmatory impulse at index `i` is
   `(close[i] - min(low[i-6..i-1])) / WilderATR14[i]`, using six complete prior
   4h bars and ATR14 through the complete signal bar. Per-signal delta is that
@@ -440,18 +488,21 @@ accepted-intent/exit replay; none may be inferred from fixed-horizon signals.
   fixed in this design. Metadata inventory cannot read OHLCV/funding values, and
   no feature distribution may be inspected before preregistration to replace or
   reinterpret them.
-- The confirmatory family is six tests: two metrics times S12/S13/S14. Each setup
-  is reported separately; no pooled or OR-selected setup claim is allowed. A
-  setup has a repeated late/crowded signature only when both expected directions
-  hold in discovery and validation and both validation two-sided 99.1667%
-  bootstrap intervals exclude zero (Bonferroni alpha `0.05/6`).
-- Each signal delta is measured against the median of its twenty controls.
+- The confirmatory family is twelve tests: two metrics times two control arms
+  times S12/S13/S14. Each setup and arm is reported separately; no pooled or
+  OR-selected setup/arm claim is allowed. A setup has a repeated late/crowded
+  signature only when both metrics have their expected direction in discovery
+  and validation for both arms and all four validation two-sided 99.5833%
+  bootstrap intervals exclude zero (Bonferroni alpha `0.05/12`).
+- Each signal-arm delta is measured against the median of that arm's twenty
+  controls.
   The split-level confirmatory estimand is the arithmetic mean of those
   per-signal deltas; no median/trimmed-mean alternative is selected after replay.
 - A confirmatory resistance delta exists only when the signal resistance metric
-  exists and at least 16 of its 20 controls have a non-missing resistance metric;
-  the control median uses exactly those non-missing values. Otherwise that signal
-  is missing and counts against the 80% resistance-coverage floor.
+  exists and at least 16 of the arm's 20 controls have a non-missing resistance
+  metric; the control median uses exactly those non-missing values. Otherwise
+  that signal-arm pair is missing and counts against that arm's 80% resistance-
+  coverage floor.
   Confidence intervals use 10,000 deterministic calendar-month block-bootstrap
   resamples within each split so twenty controls and nearby signals are not
   treated as independent observations.
@@ -480,7 +531,8 @@ The single cycle follows this order:
    count, timestamps, filesystem metadata, and hashes are allowed.
 2. **Pre-registration:** write canonical JSON containing the frozen question,
    evaluator identities, data/split algorithm, costs, controls, sample floors,
-   metrics, bootstrap method, and mechanical interpretation checks.
+   metrics, bootstrap method, matrix/report hashes, and mechanical interpretation
+   checks.
 3. **Freeze:** commit preregistration, write its SHA-256, and append the registry
    key before any replay result exists.
 4. **Test first:** add failing tests for closed-bar causality, next-bar entry,
@@ -536,6 +588,10 @@ deployable, or eligible for live arming.
 The active window starts only after both design audits pass and ends exactly at
 `2026-07-12T07:00:00+07:00` (`deadline_unix=1783814400`).
 
+- Implementation completes, verifies, and commits the entire §9 runtime safety
+  gate before preregistration or replay work begins. No guard, deny row, fixture,
+  or test may be weakened, skipped, marked expected-fail, or removed to meet the
+  deadline.
 - Each external audit call has a 20-minute timeout and one compact retry.
 - Each test or replay child has a 45-minute timeout.
 - No new source-writing or replay phase starts at or after `06:30` ICT.
@@ -548,6 +604,10 @@ The active window starts only after both design audits pass and ends exactly at
   new work.
 - If Claude or Grok is unavailable, freeze the result at `AUDIT_PENDING`; do not
   switch to another scientific lane or generate another candidate.
+- If the safety gate is incomplete by 06:30, emit `CUTOFF` without preregistration
+  or replay. `CUTOFF`, `AUDIT_PENDING`, `INVALID`, and `INSUFFICIENT_SAMPLE` are
+  acceptable honest process outcomes; obtaining `DIAGNOSIS_COMPLETE` is not a
+  reason to relax any control.
 - While a replay runs, only non-conflicting review of frozen inputs or report
   scaffolding is allowed.
 
@@ -611,6 +671,11 @@ approximated or discovered only after a replay starts.
 - Renderer section IDs are frozen as `audited_diagnosis`, `audit_pending`,
   `insufficient_sample`, `invalid`, `cutoff_blocked`, and `backlog`; tests assert
   both ID and visible heading so renaming cannot bypass status routing.
+- Plain-language diagnosis prose is not free-form. The renderer selects a
+  status-specific frozen template; only `DIAGNOSIS_COMPLETE` may state whether
+  the two-metric signature is present or absent, and every other status template
+  states its blocker without positive metric interpretation. Snapshot tests cover
+  all statuses and both present/absent complete outcomes.
 - The supervisor never kills, resets, edits, or cleans unrelated user processes,
   branches, worktrees, or files.
 

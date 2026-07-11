@@ -13,19 +13,23 @@ write a committed machine-readable report before preregistration or replay.
 
 ## Active Night-1 literal runtime graph
 
+`dist/engine/p1aPipeline.js` imports only `rules/hedge01.js` and
+`rules/ruleHelpers.js`.
+
 `dist/engine/rules/hedge01.js` imports only:
 
 - `dist/engine/rules/ruleHelpers.js`
 - `dist/engine/regime.js`
 - `dist/engine/hwm.js`
 
-Those three modules have no runtime import. No module in this four-file closure
+Those three modules have no runtime import. No module in this five-file closure
 contains `require(...)` or dynamic `import(...)`.
 
 ## SHA-256
 
 | Module | SHA-256 |
 |---|---|
+| `dist/engine/p1aPipeline.js` | `3ef7b25354fc2a97aa15cfc0a36b96e09e405bb40c56aed1d0042008340b8ce8` |
 | `dist/engine/rules/hedge01.js` | `2956e5c85f25175c09fcc66f364b267c7066dfd72670ec64efb0e10f11bece4e` |
 | `dist/engine/rules/ruleHelpers.js` | `2a83526f25cd5e58523d4ead9b67cd6d85805569094a2877f9863c2b48310737` |
 | `dist/engine/regime.js` | `31a5a98a15e82cd1313e88dbef7ff273617eec4745b6fefaeffd40b68ed64dba` |
@@ -51,8 +55,14 @@ Every other env read remains invalid.
 
 Environment was rebuilt with only `TZ=UTC`, `LANG=C`, `LC_ALL=C`, and
 `RULE_DISABLE_S12=false`. Absolute Node path `/usr/local/bin/node` imported the
-active H01 module successfully. The combined design probe had also imported the
-now-deferred Champion module and returned:
+active H01 and P1(a) oracle modules successfully. The P1(a) probe returned:
+
+```json
+{"gateSlice4h":"function","gateSlice1h":"function"}
+```
+
+An earlier combined design probe had also imported the now-deferred Champion
+module and returned:
 
 ```json
 {"champion":"function","hedge01":"function"}

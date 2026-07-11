@@ -225,3 +225,31 @@ non-missing controls, and only H01 LONG PASS is accepted.
 
 Status: Grok design gate passed. Activation remains closed pending Claude approval
 of this exact final text.
+
+## Claude attempt 4 - NOT APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T02:51:15+07:00`.
+- Verdict: `NOT APPROVED`; no P0, one P1 and three P2 blockers.
+- Positive verification: pure graph, H01 market-gate boundary, `persistBars=1`,
+  SHORT tripwire, money-path guards, anti-retune, and metric family correction
+  were correct.
+
+Dispositions:
+
+| Finding | Disposition |
+|---|---|
+| P1 missing live 500-bar depth / duplicate harness | Add hash-locked `p1aPipeline.js` to the pure graph and use its tested `gateSlice4h/gateSlice1h` as the slicing oracle with `window=500`; parity-test dashboard inputs against the existing server harness. |
+| P2 raw controls confound gate selection | Add a second gate-conditioned control arm from other-setup H01 PASS LONG timestamps; require both raw and gate-conditioned arms and make gate-selection confounding a mandatory Grok attack. |
+| P2 deadline pressure | Runtime safety gate must complete and commit first; guard weakening/skipping is forbidden; `CUTOFF`/`AUDIT_PENDING` without replay is an acceptable process success. |
+| P2 volatility bins vague | Freeze causal rank formula and exact `[0,.2),...,[.8,1]` bins with fixtures. |
+
+Accepted P3 hardening: preregistration binds the matrix hash, background/daemon
+launches are forbidden, type-erasure/import drift is `INVALID`, and free-text
+diagnosis is rendered only from status-specific templates.
+
+Read-only oracle verification: `node --test test/p1a-pipeline.test.mjs` passed
+9/9 on server commit `6e1f0e8`; forming-bar slicing, off-by-one attribution,
+499-closed-bar ATR anchoring, and shared evaluator behavior all passed.
+
+Status: activation remains closed pending revised Grok and Claude audits.

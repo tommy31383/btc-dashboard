@@ -49,7 +49,12 @@ Scope B is the permission ceiling, but Night 1 is narrower:
 - Grok attempt 6 then found residual metric shopping. The final text fixes one
   six-bar/ATR14 impulse scalar, one 90-bar confirmed overhead-pivot scalar, both
   signs, no feature peek, no path-quality claim, and family-wise correction over
-  all six setup-metric tests.
+  all setup-metric-control-arm tests.
+- Claude attempt 4 then found the live 500-bar depth oracle, gate-selection
+  confounding, vague volatility bins, and deadline pressure. The final text now
+  imports hash-locked `p1aPipeline` slices at 500 bars, requires raw and other-
+  setup PASS control arms with twelve-test correction, fixes causal rank bins,
+  and commits the full safety gate before any preregistration/replay.
 - The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions
