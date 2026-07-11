@@ -226,6 +226,29 @@ non-missing controls, and only H01 LONG PASS is accepted.
 Status: Grok design gate passed. Activation remains closed pending Claude approval
 of this exact final text.
 
+## Claude attempt 5 - failed, no verdict
+
+- Completed before `2026-07-12T03:09:30+07:00`.
+- Model: `claude-opus-4-8`, high effort, final full packet from workspace root.
+- Result: command exited 1 with `You've hit your session limit`; reported reset
+  was `07:10am (Asia/Saigon)`.
+- Disposition: `CLAUDE_AUDIT_FAILED`. The command produced no audit text and no
+  approval. Activation remained closed.
+
+## Claude attempt 6 - compact retry failed, no verdict
+
+- Completed before `2026-07-12T03:09:30+07:00`.
+- Model: Claude Sonnet via the CLI's `sonnet` alias, high effort.
+- Packet: `packets/claude-final-delta-audit.md`.
+- Result: same account session-limit failure and `07:10am` reset.
+- Disposition: `CLAUDE_AUDIT_FAILED`. A different GPT sub-agent was explicitly not
+  substituted because it would not satisfy the owner-requested Claude gate.
+
+The quota reset is ten minutes after the hard stop
+`2026-07-12T07:00:00+07:00`. Therefore Night 1 cannot receive the mandatory final
+Claude approval inside its authorized window. No implementation, preregistration,
+outcome replay, or scientific verdict may start.
+
 ## Claude attempt 4 - NOT APPROVED
 
 - Completion was immediately before this record at
