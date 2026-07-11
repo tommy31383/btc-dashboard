@@ -259,6 +259,8 @@ async function stageAndCommitCachePair(
   funding: FundingRecord[],
   renameImpl: RenameLike,
 ): Promise<void> {
+  // Rollback covers caught rename failures, but two paths cannot be crash-atomic
+  // without a manifest/pointer. An interrupted run must recover via online refresh.
   validateHourlyData(hourly);
   validateFundingData(funding);
 
