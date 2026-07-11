@@ -273,6 +273,43 @@ test("records daily intent at the next daily open derived from an aggregated can
   assert.deepEqual(campaign.episodeEntries, [daily.closeTime]);
 });
 
+test("records recovery time aligned with each daily oversold episode", () => {
+  const macro = macroRecoveryPoints();
+  const entryTime = macro.firstDailyClose;
+  const recoveryTime = entryTime + DAY_MS;
+  const campaign = buildCampaignSignalsFromPoints({
+    weekly: macro.weekly,
+    twoWeekly: macro.twoWeekly,
+    daily: [point(entryTime, 5), point(recoveryTime, 11)],
+  })[0];
+
+  assert.deepEqual(campaign.episodeEntries, [entryTime]);
+  assert.deepEqual(campaign.episodeRecoveryTimes, [recoveryTime]);
+});
+
+test("records null recovery for an unrecovered final episode", () => {
+  const macro = macroRecoveryPoints();
+  const campaign = buildCampaignSignalsFromPoints({
+    weekly: macro.weekly,
+    twoWeekly: macro.twoWeekly,
+    daily: [point(macro.firstDailyClose, 5)],
+  })[0];
+
+  assert.deepEqual(campaign.episodeRecoveryTimes, [null]);
+});
+
+test("macro exit has priority over a same-time daily episode", () => {
+  const fixture = fixtureExitAndOversoldTogether();
+  const sharedTime = fixture.weekly[2].closeTime;
+  const campaign = buildCampaignSignalsFromPoints({
+    ...fixture,
+    daily: [point(sharedTime - DAY_MS, 5), point(sharedTime, 5)],
+  })[0];
+
+  assert.equal(campaign.exitTime, sharedTime);
+  assert.deepEqual(campaign.episodeRecoveryTimes, [null]);
+});
+
 test("leaves the final open campaign without an exit time", () => {
   const macro = macroRecoveryPoints();
   const campaign = buildCampaignSignalsFromPoints({

@@ -43,6 +43,7 @@ export interface CampaignPoints {
 export interface CampaignSignal {
   armTime: number;
   episodeEntries: number[];
+  episodeRecoveryTimes: Array<number | null>;
   dailyOversoldEntries: number[];
   exitTime?: number;
   exitReason?: "MACRO_OVERBOUGHT";
@@ -234,6 +235,7 @@ export function buildCampaignSignalsFromPoints(points: CampaignPoints): Campaign
       activeCampaign = {
         armTime: closeTime,
         episodeEntries: [],
+        episodeRecoveryTimes: [],
         dailyOversoldEntries: [],
       };
       campaigns.push(activeCampaign);
@@ -241,10 +243,20 @@ export function buildCampaignSignalsFromPoints(points: CampaignPoints): Campaign
     }
 
     for (const daily of event.daily) {
-      const isOversold = daily.k !== null && daily.k < 10;
+      if (daily.k === null) continue;
+      const isOversold = daily.k < 10;
+      if (activeCampaign && dailyEpisodeActive && !isOversold) {
+        const index = activeCampaign.episodeRecoveryTimes.length - 1;
+        if (index >= 0 && activeCampaign.episodeRecoveryTimes[index] === null) {
+          activeCampaign.episodeRecoveryTimes[index] = daily.closeTime;
+        }
+      }
       if (activeCampaign && isOversold) {
         activeCampaign.dailyOversoldEntries.push(daily.closeTime);
-        if (!dailyEpisodeActive) activeCampaign.episodeEntries.push(daily.closeTime);
+        if (!dailyEpisodeActive) {
+          activeCampaign.episodeEntries.push(daily.closeTime);
+          activeCampaign.episodeRecoveryTimes.push(null);
+        }
       }
       dailyEpisodeActive = isOversold;
     }
