@@ -21,7 +21,7 @@ Costs: 0.04% taker fee per side and 0.02% adverse slippage per side.
 - Deterministic data cutoff: 2026-07-11T14:00:00.000Z
 - Hourly SHA-256: e5a6d966b322d562f17ae0be680b9c9aa9194181831ba57d3129456405264334
 - Funding SHA-256: d72db4af0b0c078d3510e2b9c12f339082cf5980e7d416b89c0227e5b55562d2
-- Evaluator: stochrsi-macro-cycle/v3 at ae77da1277a7e4f75c4e8b469b83c0053c07f037; dirty=false
+- Evaluator: stochrsi-macro-cycle/v3 at a396589f8ab55c28157ee1cdb58a01242b9efdb0; dirty=false
 - Listed >3h source gaps: 0
 - Live-wallet snapshot: NOT_SUPPLIED_TO_OFFLINE_EVALUATOR (Deterministic offline replay does not access live account state.)
 
@@ -49,7 +49,8 @@ Macro cycles: 4; completed: 3; open: 1; zero/one/multiple DAILY_EPISODE entries:
 
 ## MACRO_ONCE
 
-Returns (closed campaigns only): expectancy 7.9887 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 1/1.
+Returns (closed campaigns only): expectancy 7.9887 USDT; average 15.1281%; median 36.2606%.
+Leg counts (all campaigns): average/median per campaign 1/1.
 Timing: average hold 6837.5h; average underwater 4062.5h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 55764.8032; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 43114.4912; improvement vs MACRO_ONCE 0%.
@@ -92,7 +93,8 @@ Net without best one/three: -16.5288 / 0 USDT.
 
 ## DAILY_EPISODE
 
-Returns (closed campaigns only): expectancy -20.5312 USDT; average 3.7589%; median 1.9868%. Average/median legs per campaign: 12.25/12.
+Returns (closed campaigns only): expectancy -20.5312 USDT; average 3.7589%; median 1.9868%.
+Leg counts (all campaigns): average/median per campaign 12.25/12.
 Timing: average hold 6195.5h; average underwater 4558.75h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
@@ -159,7 +161,8 @@ Net without best one/three: -259.0002 / 0 USDT.
 
 ## DAILY_EVERY_BAR
 
-Returns (closed campaigns only): expectancy -167.7012 USDT; average 5.2311%; median 1.9868%. Average/median legs per campaign: 35.75/37.
+Returns (closed campaigns only): expectancy -167.7012 USDT; average 5.2311%; median 1.9868%.
+Leg counts (all campaigns): average/median per campaign 35.75/37.
 Timing: average hold 6195.5h; average underwater 4545.25h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 65213.0016; improvement vs MACRO_ONCE 5.1387%.
 Entry (closed campaigns only, exposure-matched): weighted average 41758.6102; improvement vs MACRO_ONCE 9.4292%.
@@ -226,7 +229,8 @@ Net without best one/three: -968.1298 / 0 USDT.
 
 ## WINDOW_FULL_AT_ARM - SIMULATED_NOT_TRADABLE
 
-Returns (closed campaigns only): expectancy -73.9604 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 0.75/1.
+Returns (closed campaigns only): expectancy -73.9604 USDT; average 15.1281%; median 36.2606%.
+Leg counts (all campaigns): average/median per campaign 0.75/1.
 Timing: average hold 4200h; average underwater 2619.75h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
