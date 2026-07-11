@@ -50,7 +50,7 @@ Costs: 0.04% taker fee per side and 0.02% adverse slippage per side.
 - Deterministic data cutoff: 2026-07-11T16:00:00.000Z
 - Hourly SHA-256: 41adc7f139a9853cb36d922ee106b28a6fdcbcc91ebcadcb2c2f43f72819a8ae
 - Funding SHA-256: 5dc6289ba8253c28f6506a2ad7bb3c987c7950e19be0b3567aa1dea3dd2dd08e
-- Evaluator: stochrsi-macro-cycle/v5 at f2c01e2bd1db71b00a8fafe0637b5d7391e3c373; dirty=false
+- Evaluator: stochrsi-macro-cycle/v5 at 3000e07ec0b7c9b27319bd9e50d88186a3780d3c; dirty=false
 - Listed >3h source gaps: 0
 - Live-wallet snapshot: NOT_SUPPLIED_TO_OFFLINE_EVALUATOR (Deterministic offline replay does not access live account state.)
 
@@ -103,12 +103,13 @@ Macro cycles: 4; completed: 3; open: 1; zero/one/multiple DAILY_EPISODE entries:
 
 Returns (closed campaigns only): expectancy 7.9887 USDT; average 15.1281%; median 36.2606%.
 Leg counts (all campaigns): average/median per campaign 1/1.
-Timing: average hold 6838h; average underwater 4063h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 6838h; average underwater 4063h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 5600/2688/13104h.
 Entry (all campaigns, exposure-matched): weighted average 55764.8032; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 43114.4912; improvement vs MACRO_ONCE 0%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 1 legs; net 40.4948 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 1 legs; net -26.3719 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 1 legs; net -34.1562 USDT
+Open macro campaign (1 open leg marked at cutoff): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 1 legs; net -34.1562 USDT
 
 ### Monthly entries and realized PnL
 
@@ -147,12 +148,13 @@ Net without best one/three: -16.5288 / 0 USDT.
 
 Returns (closed campaigns only): expectancy -20.5312 USDT; average 3.7589%; median 1.9868%.
 Leg counts (all campaigns): average/median per campaign 12.25/12.
-Timing: average hold 6196h; average underwater 4559.25h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 6196h; average underwater 4559.25h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 5452.8/4080/12336h.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 6 legs; net 197.4065 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -259.7271 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net -757.4097 USDT
+Open macro campaign (24 open legs marked at cutoff): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net -757.4097 USDT
 
 ### Monthly entries and realized PnL
 
@@ -215,12 +217,13 @@ Net without best one/three: -259.0002 / 0 USDT.
 
 Returns (closed campaigns only): expectancy 5.9292 USDT; average 3.2316%; median 1.9868%.
 Leg counts (all campaigns): average/median per campaign 12.25/12.
-Timing: average hold 6196h; average underwater 4122.75h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 6196h; average underwater 4122.75h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 377.5/72/12336h.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 6 legs; net 52.7681 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -35.7075 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net -42.1451 USDT
+Open macro campaign (1 open leg marked at cutoff): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net -42.1451 USDT
 
 ### Monthly entries and realized PnL
 
@@ -284,12 +287,13 @@ Net without best one/three: -34.9806 / 0 USDT.
 
 Returns (closed campaigns only): expectancy 2.2548 USDT; average 1.4016%; median 2.0313%.
 Leg counts (all campaigns): average/median per campaign 12.25/12.
-Timing: average hold 6196h; average underwater 2083.5h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 6196h; average underwater 2083.5h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 70.0408/48/192h.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 6 legs; net 12.9246 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -6.9033 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net 7.2134 USDT
+Open macro campaign (all legs realized): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net 7.2134 USDT
 
 ### Monthly entries and realized PnL
 
@@ -352,12 +356,13 @@ Net without best one/three: -6.1601 / 0 USDT.
 
 Returns (closed campaigns only): expectancy -1.7109 USDT; average 3.7589%; median 1.9868%.
 Leg counts (all campaigns): average/median per campaign 12.25/12.
-Timing: average hold 6196h; average underwater 4559.25h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 6196h; average underwater 4559.25h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 5452.8/4080/12336h.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 6 legs; net 16.4505 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -21.6439 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net -63.1175 USDT
+Open macro campaign (24 open legs marked at cutoff): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net -63.1175 USDT
 
 ### Monthly entries and realized PnL
 
@@ -420,12 +425,13 @@ Net without best one/three: -21.5834 / 0 USDT.
 
 Returns (closed campaigns only): expectancy -167.7012 USDT; average 5.2311%; median 1.9868%.
 Leg counts (all campaigns): average/median per campaign 35.75/37.
-Timing: average hold 6196h; average underwater 4545.75h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 6196h; average underwater 4545.75h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 6565.12/6552/12336h.
 Entry (all campaigns, exposure-matched): weighted average 65213.0016; improvement vs MACRO_ONCE 5.1387%.
 Entry (closed campaigns only, exposure-matched): weighted average 41758.6102; improvement vs MACRO_ONCE 9.4292%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 13 legs; net 465.0263 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 61 legs; net -968.8568 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 68 legs; net -1937.9168 USDT
+Open macro campaign (68 open legs marked at cutoff): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 68 legs; net -1937.9168 USDT
 
 ### Monthly entries and realized PnL
 
@@ -488,12 +494,13 @@ Net without best one/three: -968.1298 / 0 USDT.
 
 Returns (closed campaigns only): expectancy -73.9604 USDT; average 15.1281%; median 36.2606%.
 Leg counts (all campaigns): average/median per campaign 0.75/1.
-Timing: average hold 4200h; average underwater 2619.75h; suppressed duplicate daily entries 94.
+Macro campaign timing: average span 4200h; average underwater 2619.75h; suppressed duplicate daily entries 94.
+Realized leg hold: average/median/maximum 5600/2688/13104h.
 Entry (all campaigns, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 1 legs; net 242.969 USDT
 Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 1 legs; net -474.6934 USDT
-Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 0 legs; net 0 USDT
+Open macro campaign (all legs realized): 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 0 legs; net 0 USDT
 
 ### Monthly entries and realized PnL
 
