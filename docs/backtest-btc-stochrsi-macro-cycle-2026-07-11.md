@@ -21,8 +21,9 @@ Costs: 0.04% taker fee per side and 0.02% adverse slippage per side.
 - Deterministic data cutoff: 2026-07-11T14:00:00.000Z
 - Hourly SHA-256: e5a6d966b322d562f17ae0be680b9c9aa9194181831ba57d3129456405264334
 - Funding SHA-256: d72db4af0b0c078d3510e2b9c12f339082cf5980e7d416b89c0227e5b55562d2
-- Evaluator: stochrsi-macro-cycle/v2 at 0ed621249308cd60dd2fa1222ca033523178528d; dirty=false
+- Evaluator: stochrsi-macro-cycle/v3 at ae77da1277a7e4f75c4e8b469b83c0053c07f037; dirty=false
 - Listed >3h source gaps: 0
+- Live-wallet snapshot: NOT_SUPPLIED_TO_OFFLINE_EVALUATOR (Deterministic offline replay does not access live account state.)
 
 ## Campaign inventory
 
@@ -39,16 +40,16 @@ Macro cycles: 4; completed: 3; open: 1; zero/one/multiple DAILY_EPISODE entries:
 
 **WINDOW_FULL_AT_ARM: SIMULATED_NOT_TRADABLE. It uses the future DAILY_EPISODE leg count and is only an exposure-normalized timing counterfactual.**
 
-| Variant | Warning | Closed/open/zero | Legs | Campaign WR | Leg WR | Gross | Fees | Slippage | Funding | Net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| MACRO_ONCE | TRADABLE_REPLAY | 3/1/0 | 4 | 66.6667% | 66.6667% | 2.7666 | 0.1538 | 0.0769 | -12.6484 | -10.1126 | 69.9241 | -35.9571 | 33.6654 | 0.001 | 125.986 |
-| DAILY_EPISODE | TRADABLE_REPLAY | 3/1/0 | 49 | 66.6667% | 48% | -736.6939 | 1.7572 | 0.8785 | -77.8122 | -817.1418 | 1067.3416 | -869.1423 | 974.2955 | 0.024 | 1649.708 |
-| DAILY_EVERY_BAR | TRADABLE_REPLAY | 3/1/0 | 143 | 66.6667% | 37.3333% | -2205.3228 | 4.8307 | 2.4151 | -223.1774 | -2435.7459 | 3043.0343 | -2265.9787 | 2880.9964 | 0.068 | 4448.658 |
-| WINDOW_FULL_AT_ARM | SIMULATED_NOT_TRADABLE | 3/1/1 | 3 | 66.6667% | 66.6667% | -108.2933 | 0.8892 | 0.4446 | -112.2542 | -221.8813 | 1008.3803 | -510.3588 | 605.8069 | 0.018 | 1236.8673 |
+| Variant | Warning | Closed/open/zero | Closed legs / all legs | Closed campaign WR | Closed leg WR | Total gross | Total fees | Total slippage | Total funding | Closed net | Total net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| MACRO_ONCE | TRADABLE_REPLAY | 3/1/0 | 3/4 | 66.6667% | 66.6667% | 2.7666 | 0.1538 | 0.0769 | -12.6484 | 23.966 | -10.1126 | 69.9241 | -35.9571 | 33.6654 | 0.001 | 125.986 |
+| DAILY_EPISODE | TRADABLE_REPLAY | 3/1/0 | 25/49 | 66.6667% | 48% | -736.6939 | 1.7572 | 0.8785 | -77.8122 | -61.5937 | -817.1418 | 1067.3416 | -869.1423 | 974.2955 | 0.024 | 1649.708 |
+| DAILY_EVERY_BAR | TRADABLE_REPLAY | 3/1/0 | 75/143 | 66.6667% | 37.3333% | -2205.3228 | 4.8307 | 2.4151 | -223.1774 | -503.1035 | -2435.7459 | 3043.0343 | -2265.9787 | 2880.9964 | 0.068 | 4448.658 |
+| WINDOW_FULL_AT_ARM | SIMULATED_NOT_TRADABLE | 3/1/1 | 3/3 | 66.6667% | 66.6667% | -108.2933 | 0.8892 | 0.4446 | -112.2542 | -221.8813 | -221.8813 | 1008.3803 | -510.3588 | 605.8069 | 0.018 | 1236.8673 |
 
 ## MACRO_ONCE
 
-Returns: expectancy 7.9887 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 1/1.
+Returns (closed campaigns only): expectancy 7.9887 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 1/1.
 Timing: average hold 6837.5h; average underwater 4062.5h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 55764.8032; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 43114.4912; improvement vs MACRO_ONCE 0%.
@@ -70,12 +71,12 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---|---:|---:|
-| 100 | -10.1126% | SURVIVED | false | 0 | 66.3446 |
-| 250 | -4.045% | SURVIVED | false | 0 | 216.3446 |
-| 500 | -2.0225% | SURVIVED | false | 0 | 466.3446 |
-| 1000 | -1.0113% | SURVIVED | false | 0 | 966.3446 |
+| Scenario | Basis | Snapshot | Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---|---|---|---:|---:|---|---|---:|---:|
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 100 | -10.1126% | SURVIVED | false | 0 | 66.3446 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 250 | -4.045% | SURVIVED | false | 0 | 216.3446 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 500 | -2.0225% | SURVIVED | false | 0 | 466.3446 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 1000 | -1.0113% | SURVIVED | false | 0 | 966.3446 |
 
 ### Concentration
 
@@ -91,7 +92,7 @@ Net without best one/three: -16.5288 / 0 USDT.
 
 ## DAILY_EPISODE
 
-Returns: expectancy -20.5312 USDT; average 3.7589%; median 1.9868%. Average/median legs per campaign: 12.25/12.
+Returns (closed campaigns only): expectancy -20.5312 USDT; average 3.7589%; median 1.9868%. Average/median legs per campaign: 12.25/12.
 Timing: average hold 6195.5h; average underwater 4558.75h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
@@ -137,12 +138,12 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---|---:|---:|
-| 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -874.2855 |
-| 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -724.2855 |
-| 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -474.2855 |
-| 1000 | -81.7142% | SURVIVED | false | 0 | 25.7145 |
+| Scenario | Basis | Snapshot | Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---|---|---|---:|---:|---|---|---:|---:|
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -874.2855 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -724.2855 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -474.2855 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 1000 | -81.7142% | SURVIVED | false | 0 | 25.7145 |
 
 ### Concentration
 
@@ -158,7 +159,7 @@ Net without best one/three: -259.0002 / 0 USDT.
 
 ## DAILY_EVERY_BAR
 
-Returns: expectancy -167.7012 USDT; average 5.2311%; median 1.9868%. Average/median legs per campaign: 35.75/37.
+Returns (closed campaigns only): expectancy -167.7012 USDT; average 5.2311%; median 1.9868%. Average/median legs per campaign: 35.75/37.
 Timing: average hold 6195.5h; average underwater 4545.25h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 65213.0016; improvement vs MACRO_ONCE 5.1387%.
 Entry (closed campaigns only, exposure-matched): weighted average 41758.6102; improvement vs MACRO_ONCE 9.4292%.
@@ -204,12 +205,12 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---|---:|---:|
-| 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2780.9864 |
-| 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2630.9864 |
-| 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2380.9864 |
-| 1000 | null | LIQUIDATED_PATH_INVALID | true | 1 | -1880.9864 |
+| Scenario | Basis | Snapshot | Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---|---|---|---:|---:|---|---|---:|---:|
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2780.9864 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2630.9864 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2380.9864 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 1000 | null | LIQUIDATED_PATH_INVALID | true | 1 | -1880.9864 |
 
 ### Concentration
 
@@ -225,7 +226,7 @@ Net without best one/three: -968.1298 / 0 USDT.
 
 ## WINDOW_FULL_AT_ARM - SIMULATED_NOT_TRADABLE
 
-Returns: expectancy -73.9604 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 0.75/1.
+Returns (closed campaigns only): expectancy -73.9604 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 0.75/1.
 Timing: average hold 4200h; average underwater 2619.75h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
@@ -246,12 +247,12 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---|---:|---:|
-| 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -505.7969 |
-| 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -355.7969 |
-| 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -105.7969 |
-| 1000 | -22.1881% | SURVIVED | false | 0 | 394.2031 |
+| Scenario | Basis | Snapshot | Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---|---|---|---:|---:|---|---|---:|---:|
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -505.7969 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -355.7969 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -105.7969 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 1000 | -22.1881% | SURVIVED | false | 0 | 394.2031 |
 
 ### Concentration
 

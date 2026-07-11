@@ -1,8 +1,12 @@
 {
-  "schemaVersion": "btc-stochrsi-macro-cycle-report/v1",
-  "generatedAt": "2026-07-11T14:20:34.778Z",
+  "schemaVersion": "btc-stochrsi-macro-cycle-report/v2",
+  "generatedAt": "2026-07-11T14:40:42.931Z",
   "verdict": "INSUFFICIENT_SAMPLE",
   "sampleLimitation": "3 completed DAILY_EPISODE campaigns; fewer than 5 completed DAILY_EPISODE campaigns forces INSUFFICIENT_SAMPLE. Historical results are evidence for this frozen hypothesis only and do not authorize live trading.",
+  "liveWalletFeasibility": {
+    "status": "NOT_SUPPLIED_TO_OFFLINE_EVALUATOR",
+    "reason": "Deterministic offline replay does not access live account state."
+  },
   "strategy": {
     "asset": "BTCUSDT",
     "primaryVariant": "DAILY_EPISODE",
@@ -56,9 +60,9 @@
       "source": "https://fapi.binance.com",
       "symbol": "BTCUSDT",
       "interval": "1h",
-      "gitSha": "0ed621249308cd60dd2fa1222ca033523178528d",
+      "gitSha": "ae77da1277a7e4f75c4e8b469b83c0053c07f037",
       "gitDirty": false,
-      "evaluatorVersion": "stochrsi-macro-cycle/v2",
+      "evaluatorVersion": "stochrsi-macro-cycle/v3",
       "hourly": {
         "path": ".cache/binance-futures-btcusdt-1h-7y.json",
         "sha256": "e5a6d966b322d562f17ae0be680b9c9aa9194181831ba57d3129456405264334",
@@ -327,6 +331,7 @@
       "oneEntryCampaigns": 4,
       "multipleEntryCampaigns": 0,
       "suppressedDuplicateDailyEntries": 94,
+      "closedLegs": 3,
       "totalLegs": 4,
       "campaignWinRate": 0.6666666666666666,
       "legWinRate": 0.6666666666666666,
@@ -695,6 +700,7 @@
       "oneEntryCampaigns": 1,
       "multipleEntryCampaigns": 3,
       "suppressedDuplicateDailyEntries": 94,
+      "closedLegs": 25,
       "totalLegs": 49,
       "campaignWinRate": 0.6666666666666666,
       "legWinRate": 0.48,
@@ -2349,6 +2355,7 @@
       "oneEntryCampaigns": 1,
       "multipleEntryCampaigns": 3,
       "suppressedDuplicateDailyEntries": 94,
+      "closedLegs": 75,
       "totalLegs": 143,
       "campaignWinRate": 0.6666666666666666,
       "legWinRate": 0.37333333333333335,
@@ -6647,6 +6654,7 @@
       "oneEntryCampaigns": 3,
       "multipleEntryCampaigns": 0,
       "suppressedDuplicateDailyEntries": 94,
+      "closedLegs": 3,
       "totalLegs": 3,
       "campaignWinRate": 0.6666666666666666,
       "legWinRate": 0.6666666666666666,
