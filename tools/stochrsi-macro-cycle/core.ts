@@ -247,7 +247,11 @@ export function buildCampaignSignalsFromPoints(points: CampaignPoints): Campaign
       const isOversold = daily.k < 10;
       if (activeCampaign && dailyEpisodeActive && !isOversold) {
         const index = activeCampaign.episodeRecoveryTimes.length - 1;
-        if (index >= 0 && activeCampaign.episodeRecoveryTimes[index] === null) {
+        if (
+          index >= 0 &&
+          activeCampaign.episodeRecoveryTimes[index] === null &&
+          daily.closeTime > activeCampaign.episodeEntries[index]
+        ) {
           activeCampaign.episodeRecoveryTimes[index] = daily.closeTime;
         }
       }
