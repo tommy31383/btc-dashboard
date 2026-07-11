@@ -124,7 +124,7 @@ All variants share macro windows, exit, fills, costs, and funding:
 1. `MACRO_ONCE`: buy one `0.001 BTC` leg when the macro campaign arms; hold to macro exit.
 2. `DAILY_EPISODE`: the requested primary method; buy one `0.001 BTC` leg per distinct 1D `%K < 10` episode.
 3. `DAILY_EVERY_BAR`: buy one `0.001 BTC` leg on every closed day with `%K < 10`; negative control for repeated DCA.
-4. `WINDOW_BUY_HOLD`: equal-notional long exposure for the complete macro window; directional benchmark only.
+4. `WINDOW_FULL_AT_ARM`: counterfactual timing benchmark. For each completed campaign, buy at macro arm the same total BTC quantity that `DAILY_EPISODE` eventually accumulated, then hold to the same exit. It uses future leg count only to normalize exposure and must be labeled `SIMULATED_NOT_TRADABLE`.
 
 The report will not choose a variant by tuning thresholds. `DAILY_EPISODE` is the pre-registered primary hypothesis; the others explain where its result comes from.
 
