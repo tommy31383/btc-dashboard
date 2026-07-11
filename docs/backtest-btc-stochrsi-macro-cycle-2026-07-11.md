@@ -20,8 +20,8 @@ Costs: 0.04% taker fee per side and 0.02% adverse slippage per side.
 - Valid 1D / 1W / 2W: 2019-10-11T00:00:00.000Z / 2020-04-20T00:00:00.000Z / 2020-11-30T00:00:00.000Z
 - Deterministic data cutoff: 2026-07-11T14:00:00.000Z
 - Hourly SHA-256: e5a6d966b322d562f17ae0be680b9c9aa9194181831ba57d3129456405264334
-- Funding SHA-256: 7dcbb7ee3cfcae728e93a303b02083514fd2d1fe9e2f92b2841b6575d485b23b
-- Evaluator: stochrsi-macro-cycle/v1 at b71274114bca1c83ca50e30c8b68d1d7bd820f6a; dirty=false
+- Funding SHA-256: d72db4af0b0c078d3510e2b9c12f339082cf5980e7d416b89c0227e5b55562d2
+- Evaluator: stochrsi-macro-cycle/v2 at 0ed621249308cd60dd2fa1222ca033523178528d; dirty=false
 - Listed >3h source gaps: 0
 
 ## Campaign inventory
@@ -41,19 +41,19 @@ Macro cycles: 4; completed: 3; open: 1; zero/one/multiple DAILY_EPISODE entries:
 
 | Variant | Warning | Closed/open/zero | Legs | Campaign WR | Leg WR | Gross | Fees | Slippage | Funding | Net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| MACRO_ONCE | TRADABLE_REPLAY | 3/1/0 | 4 | 66.6667% | 66.6667% | 2.7666 | 0.1538 | 0.0769 | -7.0925 | -4.5566 | 69.9241 | -35.9571 | 28.4426 | 0.001 | 125.986 |
-| DAILY_EPISODE | TRADABLE_REPLAY | 3/1/0 | 49 | 66.6667% | 48% | -736.6939 | 1.7572 | 0.8785 | -51.254 | -790.5836 | 1067.3416 | -869.1423 | 947.7373 | 0.024 | 1649.708 |
-| DAILY_EVERY_BAR | TRADABLE_REPLAY | 3/1/0 | 143 | 66.6667% | 40% | -2205.3228 | 4.8307 | 2.4151 | -127.8584 | -2340.4269 | 2966.9536 | -2265.9787 | 2785.6774 | 0.068 | 4448.658 |
-| WINDOW_FULL_AT_ARM | SIMULATED_NOT_TRADABLE | 3/1/1 | 3 | 66.6667% | 66.6667% | -108.2933 | 0.8892 | 0.4446 | -13.6502 | -123.2773 | 967.599 | -510.3588 | 511.7961 | 0.018 | 1236.8673 |
+| MACRO_ONCE | TRADABLE_REPLAY | 3/1/0 | 4 | 66.6667% | 66.6667% | 2.7666 | 0.1538 | 0.0769 | -12.6484 | -10.1126 | 69.9241 | -35.9571 | 33.6654 | 0.001 | 125.986 |
+| DAILY_EPISODE | TRADABLE_REPLAY | 3/1/0 | 49 | 66.6667% | 48% | -736.6939 | 1.7572 | 0.8785 | -77.8122 | -817.1418 | 1067.3416 | -869.1423 | 974.2955 | 0.024 | 1649.708 |
+| DAILY_EVERY_BAR | TRADABLE_REPLAY | 3/1/0 | 143 | 66.6667% | 37.3333% | -2205.3228 | 4.8307 | 2.4151 | -223.1774 | -2435.7459 | 3043.0343 | -2265.9787 | 2880.9964 | 0.068 | 4448.658 |
+| WINDOW_FULL_AT_ARM | SIMULATED_NOT_TRADABLE | 3/1/1 | 3 | 66.6667% | 66.6667% | -108.2933 | 0.8892 | 0.4446 | -112.2542 | -221.8813 | 1008.3803 | -510.3588 | 605.8069 | 0.018 | 1236.8673 |
 
 ## MACRO_ONCE
 
-Returns: expectancy 9.8407 USDT; average 19.3953%; median 36.5647%. Average/median legs per campaign: 1/1.
-Timing: average hold 6837.5h; average underwater 3869h; suppressed duplicate daily entries 94.
+Returns: expectancy 7.9887 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 1/1.
+Timing: average hold 6837.5h; average underwater 4062.5h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 55764.8032; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 43114.4912; improvement vs MACRO_ONCE 0%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 1 legs; net 40.4948 USDT
-Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 1 legs; net -20.8984 USDT
+Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 1 legs; net -26.3719 USDT
 Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.000Z; 1 legs; net -34.0786 USDT
 
 ### Monthly entries and realized PnL
@@ -61,42 +61,42 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 | Month | Entries | Realized PnL USDT |
 |---|---:|---:|
 | 2021-08 | 1 | 0 |
-| 2023-02 | 0 | -20.8984 |
+| 2023-02 | 0 | -26.3719 |
 | 2023-10 | 1 | 0 |
-| 2023-11 | 0 | 9.9256 |
+| 2023-11 | 0 | 9.843 |
 | 2024-08 | 1 | 0 |
 | 2024-12 | 0 | 40.4948 |
 | 2025-04 | 1 | 0 |
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---:|---:|
-| 100 | -4.5566% | false | 0 | 71.5674 |
-| 250 | -1.8227% | false | 0 | 221.5674 |
-| 500 | -0.9113% | false | 0 | 471.5674 |
-| 1000 | -0.4557% | false | 0 | 971.5674 |
+| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---:|---:|---|---|---:|---:|
+| 100 | -10.1126% | SURVIVED | false | 0 | 66.3446 |
+| 250 | -4.045% | SURVIVED | false | 0 | 216.3446 |
+| 500 | -2.0225% | SURVIVED | false | 0 | 466.3446 |
+| 1000 | -1.0113% | SURVIVED | false | 0 | 966.3446 |
 
 ### Concentration
 
-Best one/three campaign PnL: 40.4948 / 29.522 USDT; shares: 137.1685% / 100%.
-Net without best one/three: -10.9729 / 0 USDT.
+Best one/three campaign PnL: 40.4948 / 23.966 USDT; shares: 168.9679% / 100%.
+Net without best one/three: -16.5288 / 0 USDT.
 
 ### Pre-/post-2023 stability
 
 | Period | Campaigns | Legs | Net PnL USDT | Win rate |
 |---|---:|---:|---:|---:|
-| Before 2023 | 1 | 1 | -20.8984 | 0% |
-| 2023 onward | 2 | 2 | 50.4204 | 100% |
+| Before 2023 | 1 | 1 | -26.3719 | 0% |
+| 2023 onward | 2 | 2 | 50.3379 | 100% |
 
 ## DAILY_EPISODE
 
-Returns: expectancy -11.6785 USDT; average 5.1306%; median 1.9868%. Average/median legs per campaign: 12.25/12.
-Timing: average hold 6195.5h; average underwater 4535.25h; suppressed duplicate daily entries 94.
+Returns: expectancy -20.5312 USDT; average 3.7589%; median 1.9868%. Average/median legs per campaign: 12.25/12.
+Timing: average hold 6195.5h; average underwater 4558.75h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
 Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 6 legs; net 197.4065 USDT
-Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -233.169 USDT
+Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -259.7271 USDT
 Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.000Z; 24 legs; net -755.5481 USDT
 
 ### Monthly entries and realized PnL
@@ -116,7 +116,7 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 | 2022-10 | 1 | 0 |
 | 2022-11 | 1 | 0 |
 | 2022-12 | 1 | 0 |
-| 2023-02 | 1 | -233.169 |
+| 2023-02 | 1 | -259.7271 |
 | 2023-11 | 1 | 0.7269 |
 | 2024-09 | 2 | 0 |
 | 2024-10 | 2 | 0 |
@@ -137,33 +137,33 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---:|---:|
-| 100 | -790.5836% | true | 1 | -847.7273 |
-| 250 | -316.2335% | true | 1 | -697.7273 |
-| 500 | -158.1167% | true | 1 | -447.7273 |
-| 1000 | -79.0584% | false | 0 | 52.2727 |
+| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---:|---:|---|---|---:|---:|
+| 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -874.2855 |
+| 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -724.2855 |
+| 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -474.2855 |
+| 1000 | -81.7142% | SURVIVED | false | 0 | 25.7145 |
 
 ### Concentration
 
-Best one/three campaign PnL: 197.4065 / -35.0355 USDT; shares: null% / null%.
-Net without best one/three: -232.442 / 0 USDT.
+Best one/three campaign PnL: 197.4065 / -61.5937 USDT; shares: null / null.
+Net without best one/three: -259.0002 / 0 USDT.
 
 ### Pre-/post-2023 stability
 
 | Period | Campaigns | Legs | Net PnL USDT | Win rate |
 |---|---:|---:|---:|---:|
-| Before 2023 | 1 | 18 | -233.169 | 0% |
+| Before 2023 | 1 | 18 | -259.7271 | 0% |
 | 2023 onward | 2 | 7 | 198.1334 | 100% |
 
 ## DAILY_EVERY_BAR
 
-Returns: expectancy -135.9282 USDT; average 6.6305%; median 1.9868%. Average/median legs per campaign: 35.75/37.
-Timing: average hold 6195.5h; average underwater 4530h; suppressed duplicate daily entries 94.
+Returns: expectancy -167.7012 USDT; average 5.2311%; median 1.9868%. Average/median legs per campaign: 35.75/37.
+Timing: average hold 6195.5h; average underwater 4545.25h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 65213.0016; improvement vs MACRO_ONCE 5.1387%.
 Entry (closed campaigns only, exposure-matched): weighted average 41758.6102; improvement vs MACRO_ONCE 9.4292%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 13 legs; net 465.0263 USDT
-Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 61 legs; net -873.5378 USDT
+Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 61 legs; net -968.8568 USDT
 Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.000Z; 68 legs; net -1932.6424 USDT
 
 ### Monthly entries and realized PnL
@@ -183,7 +183,7 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 | 2022-10 | 1 | 0 |
 | 2022-11 | 1 | 0 |
 | 2022-12 | 2 | 0 |
-| 2023-02 | 1 | -873.5378 |
+| 2023-02 | 1 | -968.8568 |
 | 2023-11 | 1 | 0.7269 |
 | 2024-09 | 5 | 0 |
 | 2024-10 | 4 | 0 |
@@ -204,33 +204,33 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---:|---:|
-| 100 | -2340.4269% | true | 1 | -2685.6674 |
-| 250 | -936.1708% | true | 1 | -2535.6674 |
-| 500 | -468.0854% | true | 1 | -2285.6674 |
-| 1000 | -234.0427% | true | 1 | -1785.6674 |
+| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---:|---:|---|---|---:|---:|
+| 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2780.9864 |
+| 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2630.9864 |
+| 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -2380.9864 |
+| 1000 | null | LIQUIDATED_PATH_INVALID | true | 1 | -1880.9864 |
 
 ### Concentration
 
-Best one/three campaign PnL: 465.0263 / -407.7846 USDT; shares: null% / null%.
-Net without best one/three: -872.8109 / 0 USDT.
+Best one/three campaign PnL: 465.0263 / -503.1035 USDT; shares: null / null.
+Net without best one/three: -968.1298 / 0 USDT.
 
 ### Pre-/post-2023 stability
 
 | Period | Campaigns | Legs | Net PnL USDT | Win rate |
 |---|---:|---:|---:|---:|
-| Before 2023 | 1 | 61 | -873.5378 | 0% |
+| Before 2023 | 1 | 61 | -968.8568 | 0% |
 | 2023 onward | 2 | 14 | 465.7532 | 100% |
 
 ## WINDOW_FULL_AT_ARM - SIMULATED_NOT_TRADABLE
 
-Returns: expectancy -41.0924 USDT; average 19.3953%; median 36.5647%. Average/median legs per campaign: 0.75/1.
-Timing: average hold 4200h; average underwater 2426.25h; suppressed duplicate daily entries 94.
+Returns: expectancy -73.9604 USDT; average 15.1281%; median 36.2606%. Average/median legs per campaign: 0.75/1.
+Timing: average hold 4200h; average underwater 2619.75h; suppressed duplicate daily entries 94.
 Entry (all campaigns, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
 Entry (closed campaigns only, exposure-matched): weighted average 46635.6925; improvement vs MACRO_ONCE 0%.
 Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 1 legs; net 242.969 USDT
-Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 1 legs; net -376.172 USDT
+Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 1 legs; net -474.6934 USDT
 Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.000Z; 0 legs; net 0 USDT
 
 ### Monthly entries and realized PnL
@@ -238,29 +238,29 @@ Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T14:00:00.
 | Month | Entries | Realized PnL USDT |
 |---|---:|---:|
 | 2021-08 | 1 | 0 |
-| 2023-02 | 0 | -376.172 |
+| 2023-02 | 0 | -474.6934 |
 | 2023-10 | 1 | 0 |
-| 2023-11 | 0 | 9.9256 |
+| 2023-11 | 0 | 9.843 |
 | 2024-08 | 1 | 0 |
 | 2024-12 | 0 | 242.969 |
 
 ### Fixed-wallet feasibility
 
-| Wallet USDT | ROI | Liquidated | Liquidations | Minimum buffer |
-|---:|---:|---|---:|---:|
-| 100 | -123.2773% | true | 1 | -411.7861 |
-| 250 | -49.3109% | true | 1 | -261.7861 |
-| 500 | -24.6555% | true | 1 | -11.7861 |
-| 1000 | -12.3277% | false | 0 | 488.2139 |
+| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---:|---:|---|---|---:|---:|
+| 100 | null | LIQUIDATED_PATH_INVALID | true | 1 | -505.7969 |
+| 250 | null | LIQUIDATED_PATH_INVALID | true | 1 | -355.7969 |
+| 500 | null | LIQUIDATED_PATH_INVALID | true | 1 | -105.7969 |
+| 1000 | -22.1881% | SURVIVED | false | 0 | 394.2031 |
 
 ### Concentration
 
-Best one/three campaign PnL: 242.969 / -123.2773 USDT; shares: null% / null%.
-Net without best one/three: -366.2464 / 0 USDT.
+Best one/three campaign PnL: 242.969 / -221.8813 USDT; shares: null / null.
+Net without best one/three: -464.8504 / 0 USDT.
 
 ### Pre-/post-2023 stability
 
 | Period | Campaigns | Legs | Net PnL USDT | Win rate |
 |---|---:|---:|---:|---:|
-| Before 2023 | 1 | 1 | -376.172 | 0% |
-| 2023 onward | 2 | 2 | 252.8946 | 100% |
+| Before 2023 | 1 | 1 | -474.6934 | 0% |
+| 2023 onward | 2 | 2 | 252.8121 | 100% |
