@@ -5,6 +5,7 @@ export const FEE_RATE = 0.0004;
 export const SLIPPAGE_RATE = 0.0002;
 export const MAINTENANCE_RATE = 0.004;
 export const PRE_POST_SPLIT_MS = Date.UTC(2023, 0, 1);
+export const FIXED_WALLET_SIZES = [100, 250, 500, 1_000] as const;
 
 export type VariantName =
   | "MACRO_ONCE"
@@ -94,6 +95,7 @@ export interface CampaignReplay {
 export interface AccountPathPoint {
   time: number;
   close: number;
+  riskPrice: number;
   realizedPnl: number;
   unrealizedPnl: number;
   fundingPnl: number;
@@ -107,10 +109,11 @@ export interface AccountPathPoint {
 }
 
 export interface WalletScenario {
-  label: "FIXED_WALLET" | "LIVE_WALLET_FEASIBILITY";
+  label: "FIXED_WALLET" | "LIVE_WALLET_SCALE_FEASIBILITY";
+  basis: "FULL_HISTORY_SCALE_TEST";
   startingWallet: number;
   snapshotTime?: number;
-  roiPct: number;
+  scaleTestRoiPct: number;
   liquidated: boolean;
   liquidationCount: number;
   minimumBuffer: number;
@@ -370,10 +373,11 @@ export function settleLeg(input: SettleLegInput): SettledLeg {
 export function minimumWalletToSurvive(
   path: Array<{ pnlBeforeWallet: number; maintenance: number }>,
 ): number {
-  return path.reduce(
+  const boundary = path.reduce(
     (minimum, point) => Math.max(minimum, point.maintenance - point.pnlBeforeWallet),
     0,
   );
+  return stableNumber(boundary + 0.01);
 }
 
 function hourlyOpenAt(hourlyByTime: Map<number, Candle>, time: number): number {
@@ -460,14 +464,15 @@ function campaignRisk(
   let maxDrawdown = 0;
   let worstUnrealizedPnl = 0;
   for (const candle of hourly) {
-    const closeTime = candle.time + HOUR_MS;
-    if (closeTime > endTime) break;
+    if (candle.time >= endTime) break;
     const active = legs.filter(
-      (leg) => leg.entryTime < closeTime && (leg.exitTime === undefined || leg.exitTime >= closeTime),
+      (leg) =>
+        leg.entryTime <= candle.time &&
+        (leg.exitTime === undefined || leg.exitTime > candle.time),
     );
     if (active.length === 0) continue;
     const unrealizedPnl = sum(
-      active.map((leg) => (candle.close - leg.entryPrice) * leg.qty),
+      active.map((leg) => (candle.low - leg.entryPrice) * leg.qty),
     );
     const pnl = sum(
       active.map((leg) => {
@@ -476,9 +481,9 @@ function campaignRisk(
           funding,
           leg.entryTime,
           leg.exitTime,
-          closeTime,
+          candle.time,
         );
-        return (candle.close - leg.entryPrice) * leg.qty - leg.entryFee + fundingPnl;
+        return (candle.low - leg.entryPrice) * leg.qty - leg.entryFee + fundingPnl;
       }),
     );
     if (pnl < 0) underwater += 1;
@@ -549,7 +554,6 @@ function buildAccountPath(
   const path: AccountPathPoint[] = [];
   let peak = 0;
   for (const candle of hourly) {
-    const closeTime = candle.time + HOUR_MS;
     const closedLegs = legs.filter(
       (leg) => leg.exitTime !== undefined && leg.exitTime <= candle.time,
     );
@@ -557,7 +561,9 @@ function buildAccountPath(
       (leg) => leg.entryTime <= candle.time && (leg.exitTime === undefined || leg.exitTime > candle.time),
     );
     const realizedPnl = sum(closedLegs.map((leg) => leg.netPnl));
-    const unrealizedPnl = sum(activeLegs.map((leg) => (candle.close - leg.entryPrice) * leg.qty));
+    const unrealizedPnl = sum(
+      activeLegs.map((leg) => (candle.low - leg.entryPrice) * leg.qty),
+    );
     const activeFundingPnl = sum(
       activeLegs.map((leg) =>
         fundingPnlFromResolved(
@@ -565,7 +571,7 @@ function buildAccountPath(
           funding,
           leg.entryTime,
           leg.exitTime,
-          closeTime,
+          candle.time,
         ),
       ),
     );
@@ -573,11 +579,12 @@ function buildAccountPath(
     const pnlBeforeWallet = realizedPnl + unrealizedPnl + activeFundingPnl - feesPaid;
     const quantity = sum(activeLegs.map((leg) => leg.qty));
     const notional = quantity * candle.close;
-    const maintenance = notional * MAINTENANCE_RATE;
+    const maintenance = quantity * candle.low * MAINTENANCE_RATE;
     peak = Math.max(peak, pnlBeforeWallet);
     path.push({
-      time: closeTime,
+      time: candle.time,
       close: candle.close,
+      riskPrice: candle.low,
       realizedPnl,
       unrealizedPnl,
       fundingPnl: activeFundingPnl,
@@ -613,10 +620,11 @@ function walletScenario(
     }
   }
   return {
-    label: liveWallet ? "LIVE_WALLET_FEASIBILITY" : "FIXED_WALLET",
+    label: liveWallet ? "LIVE_WALLET_SCALE_FEASIBILITY" : "FIXED_WALLET",
+    basis: "FULL_HISTORY_SCALE_TEST",
     startingWallet,
     snapshotTime: liveWallet?.timestamp,
-    roiPct: (netPnl / startingWallet) * 100,
+    scaleTestRoiPct: (netPnl / startingWallet) * 100,
     liquidated,
     liquidationCount,
     minimumBuffer: minimumBuffer === Number.POSITIVE_INFINITY ? startingWallet : minimumBuffer,
@@ -640,7 +648,10 @@ export function runVariant(
   const allLegs = replays.flatMap((campaign) => campaign.legs);
   const accountPath = buildAccountPath(allLegs, hourly, funding);
   const netPnl = sum(replays.map((campaign) => campaign.netPnl));
-  const walletSizes = options.walletSizes ?? [100, 250, 500, 1_000];
+  const walletSizes = [...new Set([
+    ...FIXED_WALLET_SIZES,
+    ...(options.walletSizes ?? []),
+  ])];
   const walletScenarios = walletSizes.map((wallet) =>
     walletScenario(accountPath, netPnl, wallet),
   );
@@ -681,7 +692,9 @@ export function summarizeVariant(
   run: VariantRun,
   macroOnce?: VariantRun,
 ): VariantSummary {
-  const closed = run.campaigns.filter((campaign) => campaign.closed);
+  const closed = run.campaigns.filter(
+    (campaign) => campaign.closed && campaign.legs.length > 0,
+  );
   const closedLegs = closed.flatMap((campaign) => campaign.legs);
   const allLegs = run.campaigns.flatMap((campaign) => campaign.legs);
   const monthlyEntries: Record<string, number> = {};
@@ -725,7 +738,7 @@ export function summarizeVariant(
     simulatedNotTradable: run.simulatedNotTradable,
     totalCampaigns: run.campaigns.length,
     closedCampaigns: closed.length,
-    openCampaigns: run.campaigns.length - closed.length,
+    openCampaigns: run.campaigns.filter((campaign) => !campaign.closed).length,
     zeroEntryCampaigns: legCounts.filter((count) => count === 0).length,
     oneEntryCampaigns: legCounts.filter((count) => count === 1).length,
     multipleEntryCampaigns: legCounts.filter((count) => count > 1).length,
@@ -777,16 +790,16 @@ export function summarizeVariant(
     concentration: {
       bestOnePnl,
       bestThreePnl,
-      bestOneSharePct: closedNetPnl === 0 ? null : (bestOnePnl / closedNetPnl) * 100,
-      bestThreeSharePct: closedNetPnl === 0 ? null : (bestThreePnl / closedNetPnl) * 100,
+      bestOneSharePct: closedNetPnl <= 0 ? null : (bestOnePnl / closedNetPnl) * 100,
+      bestThreeSharePct: closedNetPnl <= 0 ? null : (bestThreePnl / closedNetPnl) * 100,
       netPnlWithoutBestOne: closedNetPnl - bestOnePnl,
       netPnlWithoutBestThree: closedNetPnl - bestThreePnl,
     },
     pre2023: stabilitySummary(
-      closed.filter((campaign) => campaign.exitTime! < PRE_POST_SPLIT_MS),
+      closed.filter((campaign) => campaign.armTime < PRE_POST_SPLIT_MS),
     ),
     post2023: stabilitySummary(
-      closed.filter((campaign) => campaign.exitTime! >= PRE_POST_SPLIT_MS),
+      closed.filter((campaign) => campaign.armTime >= PRE_POST_SPLIT_MS),
     ),
     openCampaign: run.openCampaign,
     maxDrawdown: run.maxDrawdown,

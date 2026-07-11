@@ -31,6 +31,17 @@ function bar(time: number, open: number, close = open): Candle {
   };
 }
 
+function barWithLow(time: number, open: number, low: number, close = open): Candle {
+  return {
+    time,
+    open,
+    high: Math.max(open, close),
+    low,
+    close,
+    volume: 1,
+  };
+}
+
 test("fills include adverse slippage and both fees", () => {
   const leg = settleLeg({ qty: 0.001, entryOpen: 100, exitOpen: 110, funding: [] });
 
@@ -63,8 +74,37 @@ test("minimum wallet covers worst maintenance minus pre-wallet PnL", () => {
       { pnlBeforeWallet: -20, maintenance: 2 },
       { pnlBeforeWallet: -35, maintenance: 3 },
     ]),
-    38,
+    38.01,
   );
+});
+
+test("minimum wallet strictly survives the liquidation boundary", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start],
+    dailyOversoldEntries: [start],
+  };
+  const initial = runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [barWithLow(start, 100_000, 10_000, 100_000)],
+    [],
+  );
+  const exactWallet = initial.minimumWallet;
+  const evaluated = runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [barWithLow(start, 100_000, 10_000, 100_000)],
+    [],
+    { walletSizes: [exactWallet] },
+  );
+  const scenario = evaluated.walletScenarios.find(
+    (item) => item.label === "FIXED_WALLET" && item.startingWallet === exactWallet,
+  );
+
+  assert.equal(scenario?.liquidated, false);
+  assert.ok(scenario!.minimumBuffer > 0);
 });
 
 test("all frozen variants build their prescribed entry schedules", () => {
@@ -202,6 +242,77 @@ test("hourly account path tracks equity, maintenance, drawdown, and wallet liqui
   assert.equal(run.walletScenarios.find((item) => item.startingWallet === 50)?.liquidated, true);
 });
 
+test("long risk uses the intrahour low even when the candle close is safe", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start],
+    dailyOversoldEntries: [start],
+  };
+  const run = runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [barWithLow(start, 100_000, 1_000, 100_000)],
+    [],
+    { walletSizes: [50] },
+  );
+
+  assert.equal(run.campaigns[0].markPrice, 100_000);
+  assert.ok(run.accountPath[0].unrealizedPnl < -99);
+  assert.ok(run.campaigns[0].worstUnrealizedPnl < -99);
+  assert.ok(run.campaigns[0].maxDrawdown > 99);
+  assert.ok(run.maxDrawdown > 99);
+  assert.ok(run.minimumWallet > 99);
+  assert.equal(
+    run.walletScenarios.find((item) => item.startingWallet === 50)?.liquidated,
+    true,
+  );
+});
+
+test("hourly low-risk point excludes funding first known at the future candle close", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start],
+    dailyOversoldEntries: [start],
+  };
+  const run = runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [bar(start, 100), bar(start + HOUR_MS, 100)],
+    [{ time: start + 2 * HOUR_MS, rate: 0.1, mark: 100 }],
+  );
+
+  assert.equal(run.accountPath[1].fundingPnl, 0);
+  assert.equal(run.accountPath[1].pnlBeforeWallet, run.accountPath[1].unrealizedPnl - run.accountPath[1].feesPaid);
+});
+
+test("custom wallet sizes are additive unique extras after all fixed wallets", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const run = runVariant("DAILY_EPISODE", [], [bar(start, 100)], [], {
+    walletSizes: [50, 100, 250, 50],
+  });
+
+  assert.deepEqual(
+    run.walletScenarios.map((scenario) => scenario.startingWallet),
+    [100, 250, 500, 1_000, 50],
+  );
+});
+
+test("live wallet is labeled as a full-history scale feasibility test", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const run = runVariant("DAILY_EPISODE", [], [bar(start, 100)], [], {
+    liveWallet: { amount: 333, timestamp: start },
+  });
+  const scenario = run.walletScenarios.at(-1)!;
+
+  assert.equal(scenario.label, "LIVE_WALLET_SCALE_FEASIBILITY");
+  assert.equal(scenario.basis, "FULL_HISTORY_SCALE_TEST");
+  assert.equal(scenario.snapshotTime, start);
+  assert.equal(scenario.scaleTestRoiPct, 0);
+  assert.equal("roiPct" in scenario, false);
+});
+
 test("summaries separate open campaigns and expose required stability views", () => {
   const before = Date.UTC(2022, 11, 1);
   const after = Date.UTC(2023, 1, 1);
@@ -255,7 +366,7 @@ test("summaries separate open campaigns and expose required stability views", ()
   assert.ok(summary.concentration.netPnlWithoutBestOne <= summary.closedNetPnl);
   assert.ok(summary.concentration.netPnlWithoutBestThree <= summary.concentration.netPnlWithoutBestOne);
   assert.equal(summary.walletScenarios.length, 5);
-  assert.equal(summary.walletScenarios[4].label, "LIVE_WALLET_FEASIBILITY");
+  assert.equal(summary.walletScenarios[4].label, "LIVE_WALLET_SCALE_FEASIBILITY");
   assert.equal(summary.openCampaign?.closed, false);
   assert.equal(summary.simulatedNotTradable, false);
   assert.equal(summary.suppressedDuplicateDailyEntries, 0);
@@ -304,4 +415,88 @@ test("campaign drawdown includes an adverse gap at the exit open", () => {
 
   assert.ok(run.campaigns[0].maxDrawdown > 0.05);
   assert.ok(run.campaigns[0].worstUnrealizedPnl < -0.05);
+});
+
+test("concentration shares are null when closed executed net PnL is not positive", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start],
+    dailyOversoldEntries: [start],
+    exitTime: start + HOUR_MS,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const summary = summarizeVariant(runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [bar(start, 100), bar(start + HOUR_MS, 90)],
+    [],
+  ));
+
+  assert.ok(summary.closedNetPnl < 0);
+  assert.equal(summary.concentration.bestOneSharePct, null);
+  assert.equal(summary.concentration.bestThreeSharePct, null);
+});
+
+test("pre and post cohorts are frozen by campaign arm time", () => {
+  const armTime = Date.UTC(2022, 11, 31, 23);
+  const exitTime = Date.UTC(2023, 0, 1, 1);
+  const campaign: CampaignSignal = {
+    armTime,
+    episodeEntries: [armTime],
+    dailyOversoldEntries: [armTime],
+    exitTime,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const summary = summarizeVariant(runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [bar(armTime, 100), bar(exitTime, 110)],
+    [],
+  ));
+
+  assert.equal(summary.pre2023.campaigns, 1);
+  assert.equal(summary.post2023.campaigns, 0);
+});
+
+test("campaign performance metrics exclude closed zero-entry opportunities", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const zeroEntry: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [],
+    dailyOversoldEntries: [],
+    exitTime: start + HOUR_MS,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const executed: CampaignSignal = {
+    armTime: start + 2 * HOUR_MS,
+    episodeEntries: [start + 2 * HOUR_MS],
+    dailyOversoldEntries: [start + 2 * HOUR_MS],
+    exitTime: start + 3 * HOUR_MS,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const summary = summarizeVariant(runVariant(
+    "DAILY_EPISODE",
+    [zeroEntry, executed],
+    [
+      bar(start, 100),
+      bar(start + HOUR_MS, 100),
+      bar(start + 2 * HOUR_MS, 100),
+      bar(start + 3 * HOUR_MS, 110),
+    ],
+    [],
+  ));
+  const executedReturn = summary.bestCampaign!.returnPct;
+
+  assert.equal(summary.totalCampaigns, 2);
+  assert.equal(summary.zeroEntryCampaigns, 1);
+  assert.equal(summary.closedCampaigns, 1);
+  assert.equal(summary.campaignWinRate, 1);
+  assert.equal(summary.netExpectancy, summary.closedNetPnl);
+  assert.equal(summary.averageReturnPct, executedReturn);
+  assert.equal(summary.medianReturnPct, executedReturn);
+  assert.equal(summary.bestCampaign?.armTime, executed.armTime);
+  assert.equal(summary.worstCampaign?.armTime, executed.armTime);
+  assert.equal(summary.concentration.bestOneSharePct, 100);
+  assert.equal(summary.concentration.bestThreeSharePct, 100);
 });
