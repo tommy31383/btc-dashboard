@@ -15,35 +15,41 @@ implemented or activated.
 - Live-server policy:
   `/Users/lap16116/BTC_PC/btc-trader-server/AGENTS.md`
 
-## Owner decision
+## Owner decision and narrowed run scope
 
-Scope B is approved:
+Scope B is the permission ceiling, but Night 1 is narrower:
 
-- research may modify `btc-trader-server` source only behind default-OFF entry
-  gates;
-- no deploy, live arming, secret edits, exchange writes, or position changes;
+- dashboard-only source changes and one BTC entry-quality diagnosis;
+- `btc-trader-server` is read-only;
+- no new rule/filter/H05 replay, authenticated API/VPS, deploy, live arming,
+  secret access, exchange writes, or position changes;
 - Claude must approve the design before activation.
 
 ## Known context
 
 - Existing relay watcher is running but the detailed relay STATUS is stale.
-- The project has many old backtests with inconsistent provenance.
+- The watcher remains untouched at `TURN=TOMMY`; the run ledger is the sole source
+  of truth.
 - Codex will orchestrate; Claude is a bounded reviewer; Grok is adversarial.
 - BTC is the research target for this run.
-- The intended active window ends around 07:00 Asia/Ho_Chi_Minh.
+- Grok's first design audit returned `NOT APPROVED`; its P0/P1 findings were
+  incorporated and a re-audit is mandatory.
+- The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions
 
-1. Can any permitted path accidentally deploy, arm, expose secrets, mutate an
-   exchange order, or interfere with CLOSE handling?
-2. Are the anti-overfit rules concrete enough to prevent an endless optimizer
-   from selecting a lucky rule on the same seven-year sample?
-3. Is the evidence ledger sufficient to reproduce and supersede conclusions?
-4. Are Claude/Grok timeout and quota behaviors fail-closed?
-5. Are worktree, branch, concurrency, and stop semantics implementable without
-   corrupting either repository?
-6. Is the queue scoped tightly enough to produce a useful morning report?
-7. Which requirements are ambiguous, contradictory, or impossible to test?
+1. Do the dashboard-only scope and command/path guards mechanically exclude every
+   money path and server source write?
+2. Do preregistration hashing, duplicate registry refusal, frozen 80/20 split,
+   and no-filter rule prevent same-sample retuning?
+3. Are matched controls, one-bar-delay controls, exposure/beta fields, and
+   concentration checks sufficient for the narrow diagnosis being claimed?
+4. Can missing Claude/Grok audits produce any positive status or report language?
+5. Are lock, worktree, child ownership, timeouts, and hard-cutoff semantics
+   implementable and fail-closed?
+6. Is the single diagnosis feasible before the exact deadline?
+7. Which remaining requirements are ambiguous, contradictory, or impossible to
+   test?
 
 ## Expected response
 
