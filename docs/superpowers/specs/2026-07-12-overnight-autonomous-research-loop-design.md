@@ -160,6 +160,10 @@ preregistration; mismatch is `INVALID`. This matrix allows pure signal execution
 while mechanically excluding server writes, credential-bearing modules, and
 operational tooling.
 
+The runtime module adapter is allowlist-only: it exposes wrappers for exactly the
+six named exports and rejects every other namespace-property access before
+invocation. Named denials are documentation; deny-by-default is the mechanism.
+
 Every supervisor child, not only the import child, runs through
 `/usr/bin/sandbox-exec` with a phase-specific profile frozen inside the matrix and
 an exact phase-specific environment allowlist. Local inventory/test/replay phases
@@ -386,8 +390,8 @@ does not claim a live reference-vector comparison.
   to `[max(0,i+2-500), i+2)` with bar `i+1` forming. For 1h forming index
   `pForming`, call `gateSlice1h(b1h,pForming,500)`, equivalent to
   `[max(0,pForming+1-500), pForming+1)`. The runner does not reimplement these
-  slices. A timestamp whose required forming index `i+1`/`pForming` does not exist
-  is skipped before signal/control eligibility.
+  slices. A timestamp whose required forming index `i+1`, `pForming`, or
+  `pDayForming` does not exist is skipped before signal/control eligibility.
 - For daily forming index `pDayForming`, regime input is exactly
   `b1d.slice(max(0,pDayForming+1-500), pDayForming+1)`, including that forming
   day; no separate daily slicing convention is permitted.
@@ -521,6 +525,9 @@ intent/exit replay; none may be inferred from fixed-horizon signals.
 - Adverse-first rate, normalized MAE, normalized MFE, and one-bar-delay outcomes
   are exploratory diagnostics. They are always reported but cannot complete the
   late/crowded diagnosis or select a replacement rule.
+- Exploratory normalized MFE/MAE divide raw price excursion by the source
+  signal's same `atrEntry4h(gateSlice4h(...,500))` value; no alternate volatility
+  divisor is permitted.
 - All confidence intervals, failed checks, and per-setup denominators are
   reported. No pooled result can hide an under-sampled setup.
 

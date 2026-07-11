@@ -60,6 +60,9 @@ Scope B is the permission ceiling, but Night 1 is narrower:
   and requires every signal/control ATR to call
   `atrEntry4h(gateSlice4h(...,500))`; stateful entry/exit/label exports remain
   denied.
+- Grok attempt 9 approved that final binding with no open P0-P2. Daily forming
+  skip, deny-by-default namespace wrappers, and exploratory MFE/MAE normalization
+  were then pinned explicitly before this Claude audit.
 - The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions

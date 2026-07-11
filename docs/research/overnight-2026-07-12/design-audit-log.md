@@ -275,3 +275,19 @@ Dispositions:
   are explicit.
 
 Status: activation remains closed pending Grok and Claude re-audits.
+
+## Grok attempt 9 - APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T03:00:15+07:00`.
+- Packet: `packets/grok-final-export-atr-reaudit.md`.
+- Verdict: `APPROVED`; open P0/P1/P2: none.
+- Confirmed six-export allowlist, exclusive 499-closed-bar ATR oracle, daily/4h/1h
+  index behavior, dual-arm inference, p1a parity, and all safety controls.
+
+Non-blocking pins were made explicit: missing daily forming index skips, runtime
+namespace access is deny-by-default beyond six wrappers, and exploratory MFE/MAE
+uses the same ATR oracle.
+
+Status: Grok design gate passed. Activation remains closed pending Claude approval
+of this exact final text.
