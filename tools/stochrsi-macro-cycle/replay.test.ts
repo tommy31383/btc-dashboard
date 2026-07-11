@@ -411,6 +411,51 @@ test("summaries separate open campaigns and expose required stability views", ()
   assert.ok(summary.bestCampaign!.worstUnrealizedPnl <= 0);
 });
 
+test("entry improvement expands the macro baseline to the variant quantity by campaign", () => {
+  const first = Date.UTC(2022, 0, 1);
+  const second = Date.UTC(2023, 0, 1);
+  const campaigns: CampaignSignal[] = [
+    {
+      armTime: first,
+      episodeEntries: [first + HOUR_MS, first + 2 * HOUR_MS],
+      dailyOversoldEntries: [first + HOUR_MS, first + 2 * HOUR_MS],
+      exitTime: first + 3 * HOUR_MS,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
+    {
+      armTime: second,
+      episodeEntries: [second + HOUR_MS],
+      dailyOversoldEntries: [second + HOUR_MS],
+      exitTime: second + 2 * HOUR_MS,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
+  ];
+  const hourly = [
+    bar(first, 100),
+    bar(first + HOUR_MS, 90),
+    bar(first + 2 * HOUR_MS, 90),
+    bar(first + 3 * HOUR_MS, 110),
+    bar(second, 1_000),
+    bar(second + HOUR_MS, 1_000),
+    bar(second + 2 * HOUR_MS, 1_100),
+  ];
+  const macro = runVariant("MACRO_ONCE", campaigns, hourly, []);
+  const daily = runVariant("DAILY_EPISODE", campaigns, hourly, []);
+  const summary = summarizeVariant(daily, macro);
+  const expectedImprovement = ((2 * 100.02 + 1_000.2) - (2 * 90.018 + 1_000.2)) /
+    (2 * 100.02 + 1_000.2) * 100;
+
+  assert.equal(
+    summary.weightedEntryImprovementVsMacroOncePct?.toFixed(6),
+    expectedImprovement.toFixed(6),
+  );
+  assert.equal(summary.closedWeightedAverageEntry, summary.weightedAverageEntry);
+  assert.equal(
+    summary.closedWeightedEntryImprovementVsMacroOncePct,
+    summary.weightedEntryImprovementVsMacroOncePct,
+  );
+});
+
 test("summary counts repeated oversold bars suppressed by episode entry", () => {
   const start = Date.UTC(2022, 0, 1);
   const campaign: CampaignSignal = {

@@ -126,6 +126,8 @@ test("Markdown states the frozen strategy, no stop loss, sample limit, and simul
   assert.match(markdown, /WINDOW_FULL_AT_ARM: SIMULATED_NOT_TRADABLE/);
   assert.match(markdown, /Monthly entries and realized PnL/);
   assert.match(markdown, /Pre-\/post-2023/);
+  assert.match(markdown, /Entry \(all campaigns, exposure-matched\)/);
+  assert.match(markdown, /Entry \(closed campaigns only, exposure-matched\)/);
 });
 
 test("serialization rejects malformed non-finite evidence instead of converting it to null", () => {

@@ -179,6 +179,8 @@ export interface VariantSummary {
   averageUnderwaterHours: number;
   weightedAverageEntry: number | null;
   weightedEntryImprovementVsMacroOncePct: number | null;
+  closedWeightedAverageEntry: number | null;
+  closedWeightedEntryImprovementVsMacroOncePct: number | null;
   monthlyEntries: Record<string, number>;
   monthlyPnl: Record<string, number>;
   yearlyEntries: Record<string, number>;
@@ -701,6 +703,47 @@ function stabilitySummary(campaigns: CampaignReplay[]): StabilitySummary {
   };
 }
 
+function weightedEntryComparison(
+  campaigns: CampaignReplay[],
+  macroOnce?: VariantRun,
+): {
+  weightedAverageEntry: number | null;
+  improvementVsMacroOncePct: number | null;
+} {
+  const totalQty = sum(campaigns.flatMap((campaign) => campaign.legs).map((leg) => leg.qty));
+  if (totalQty === 0) {
+    return { weightedAverageEntry: null, improvementVsMacroOncePct: null };
+  }
+
+  const entryNotional = sum(
+    campaigns.flatMap((campaign) => campaign.legs).map((leg) => leg.entryPrice * leg.qty),
+  );
+  const weightedAverageEntry = entryNotional / totalQty;
+  if (!macroOnce) return { weightedAverageEntry, improvementVsMacroOncePct: null };
+
+  const macroByArmTime = new Map(
+    macroOnce.campaigns.map((campaign) => [campaign.armTime, campaign.weightedAverageEntry]),
+  );
+  let macroExpandedNotional = 0;
+  for (const campaign of campaigns) {
+    const campaignQty = sum(campaign.legs.map((leg) => leg.qty));
+    if (campaignQty === 0) continue;
+    const macroEntry = macroByArmTime.get(campaign.armTime);
+    if (macroEntry === undefined || macroEntry === null) {
+      return { weightedAverageEntry, improvementVsMacroOncePct: null };
+    }
+    macroExpandedNotional += macroEntry * campaignQty;
+  }
+
+  return {
+    weightedAverageEntry,
+    improvementVsMacroOncePct:
+      macroExpandedNotional === 0
+        ? null
+        : ((macroExpandedNotional - entryNotional) / macroExpandedNotional) * 100,
+  };
+}
+
 export function summarizeVariant(
   run: VariantRun,
   macroOnce?: VariantRun,
@@ -729,15 +772,8 @@ export function summarizeVariant(
   const closedNetPnl = sum(pnlDescending);
   const bestOnePnl = pnlDescending[0] ?? 0;
   const bestThreePnl = sum(pnlDescending.slice(0, 3));
-  const totalQty = sum(allLegs.map((leg) => leg.qty));
-  const entryNotional = sum(allLegs.map((leg) => leg.entryPrice * leg.qty));
-  const weightedAverageEntry = totalQty === 0 ? null : entryNotional / totalQty;
-  const macroLegs = macroOnce?.campaigns.flatMap((campaign) => campaign.legs) ?? [];
-  const macroQty = sum(macroLegs.map((leg) => leg.qty));
-  const macroAverageEntry =
-    macroQty === 0
-      ? null
-      : sum(macroLegs.map((leg) => leg.entryPrice * leg.qty)) / macroQty;
+  const allEntryComparison = weightedEntryComparison(run.campaigns, macroOnce);
+  const closedEntryComparison = weightedEntryComparison(closed, macroOnce);
   const legCounts = run.campaigns.map((campaign) => campaign.legs.length);
   const bestCampaign = closed.length === 0
     ? null
@@ -789,11 +825,11 @@ export function summarizeVariant(
       run.campaigns.length === 0
         ? 0
         : sum(run.campaigns.map((campaign) => campaign.underwaterHours)) / run.campaigns.length,
-    weightedAverageEntry,
-    weightedEntryImprovementVsMacroOncePct:
-      weightedAverageEntry === null || macroAverageEntry === null
-        ? null
-        : ((macroAverageEntry - weightedAverageEntry) / macroAverageEntry) * 100,
+    weightedAverageEntry: allEntryComparison.weightedAverageEntry,
+    weightedEntryImprovementVsMacroOncePct: allEntryComparison.improvementVsMacroOncePct,
+    closedWeightedAverageEntry: closedEntryComparison.weightedAverageEntry,
+    closedWeightedEntryImprovementVsMacroOncePct:
+      closedEntryComparison.improvementVsMacroOncePct,
     monthlyEntries,
     monthlyPnl,
     yearlyEntries,

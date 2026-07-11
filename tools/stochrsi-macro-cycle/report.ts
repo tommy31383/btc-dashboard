@@ -343,8 +343,11 @@ export function renderMarkdown(report: MacroCycleReport): string {
       `Timing: average hold ${formatNumber(variant.averageHoldHours)}h; average underwater ` +
         `${formatNumber(variant.averageUnderwaterHours)}h; suppressed duplicate daily entries ` +
         `${variant.suppressedDuplicateDailyEntries}.`,
-      `Entry: weighted average ${formatNumber(variant.weightedAverageEntry)}; improvement vs MACRO_ONCE ` +
-        `${formatNumber(variant.weightedEntryImprovementVsMacroOncePct)}%.`,
+      `Entry (all campaigns, exposure-matched): weighted average ${formatNumber(variant.weightedAverageEntry)}; ` +
+        `improvement vs MACRO_ONCE ${formatNumber(variant.weightedEntryImprovementVsMacroOncePct)}%.`,
+      `Entry (closed campaigns only, exposure-matched): weighted average ` +
+        `${formatNumber(variant.closedWeightedAverageEntry)}; improvement vs MACRO_ONCE ` +
+        `${formatNumber(variant.closedWeightedEntryImprovementVsMacroOncePct)}%.`,
       `Best campaign: ${campaignLabel(variant.bestCampaign)}`,
       `Worst campaign: ${campaignLabel(variant.worstCampaign)}`,
       `Open campaign marked to market: ${campaignLabel(variant.openCampaign)}`,
