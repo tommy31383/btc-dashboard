@@ -33,6 +33,8 @@ test("material audit fixes use evaluator version v2", () => {
 test("default caches are explicitly Futures-specific", () => {
   const paths = defaultCachePaths();
 
+  assert.equal(paths.hourlyCachePath, join(".cache", "binance-futures-btcusdt-1h-7y.json"));
+  assert.equal(paths.fundingCachePath, join(".cache", "binance-futures-btcusdt-funding-7y.json"));
   assert.match(paths.hourlyCachePath, /binance-futures-btcusdt-1h-7y\.json$/);
   assert.match(paths.fundingCachePath, /binance-futures-btcusdt-funding-7y\.json$/);
   assert.doesNotMatch(paths.hourlyCachePath, /binance-1h-7y\.json$/);

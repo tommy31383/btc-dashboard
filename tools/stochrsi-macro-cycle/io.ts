@@ -90,8 +90,8 @@ export interface LoadAndRefreshDataOptions {
 
 export function defaultCachePaths(): CachePaths {
   return {
-    hourlyCachePath: join(process.cwd(), ".cache", "binance-futures-btcusdt-1h-7y.json"),
-    fundingCachePath: join(process.cwd(), ".cache", "binance-futures-btcusdt-funding-7y.json"),
+    hourlyCachePath: join(".cache", "binance-futures-btcusdt-1h-7y.json"),
+    fundingCachePath: join(".cache", "binance-futures-btcusdt-funding-7y.json"),
   };
 }
 
