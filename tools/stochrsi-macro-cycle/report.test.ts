@@ -87,6 +87,7 @@ test("buildReport emits the complete frozen schema and insufficient-sample verdi
   const primary = report.variants.find((variant) => variant.name === "DAILY_EPISODE")!;
   const simulated = report.variants.find((variant) => variant.name === "WINDOW_FULL_AT_ARM")!;
 
+  assert.equal(report.schemaVersion, "btc-stochrsi-macro-cycle-report/v2");
   assert.equal(report.verdict, "INSUFFICIENT_SAMPLE");
   assert.equal(report.campaigns.completed, 4);
   assert.equal(primary.zeroEntryCampaigns, 1);
@@ -94,6 +95,10 @@ test("buildReport emits the complete frozen schema and insufficient-sample verdi
   assert.deepEqual(primary.walletScenarios.map((wallet) => wallet.startingWallet), [100, 250, 500, 1_000]);
   assert.equal(simulated.warning, "SIMULATED_NOT_TRADABLE");
   assert.equal(report.strategy.stopLoss, null);
+  assert.deepEqual(report.liveWalletFeasibility, {
+    status: "NOT_SUPPLIED_TO_OFFLINE_EVALUATOR",
+    reason: "Deterministic offline replay does not access live account state.",
+  });
   assert.equal("refreshedAt" in report.data.provenance, false);
   assert.equal("asOfMs" in report.data.provenance, false);
   assert.equal(report.data.dataCutoffTime, report.data.rawRange.lastTime! + 3_600_000);
@@ -128,6 +133,13 @@ test("Markdown states the frozen strategy, no stop loss, sample limit, and simul
   assert.match(markdown, /Pre-\/post-2023/);
   assert.match(markdown, /Entry \(all campaigns, exposure-matched\)/);
   assert.match(markdown, /Entry \(closed campaigns only, exposure-matched\)/);
+  assert.match(markdown, /Closed legs \/ all legs/);
+  assert.match(markdown, /Closed campaign WR/);
+  assert.match(markdown, /Closed leg WR/);
+  assert.match(markdown, /Closed net/);
+  assert.match(markdown, /Returns \(closed campaigns only\)/);
+  assert.match(markdown, /Live-wallet snapshot: NOT_SUPPLIED_TO_OFFLINE_EVALUATOR/);
+  assert.match(markdown, /Scenario \| Basis \| Snapshot/);
 });
 
 test("serialization rejects malformed non-finite evidence instead of converting it to null", () => {
@@ -147,6 +159,9 @@ test("Markdown marks post-liquidation ROI invalid without formatting null as a p
 
   const markdown = renderMarkdown(report);
 
-  assert.match(markdown, /\| 100 \| null \| LIQUIDATED_PATH_INVALID \| true \| 1 \|/);
+  assert.match(
+    markdown,
+    /\| FIXED_WALLET \| FULL_HISTORY_SCALE_TEST \| null \| 100 \| null \| LIQUIDATED_PATH_INVALID \| true \| 1 \|/,
+  );
   assert.doesNotMatch(markdown, /null%/);
 });

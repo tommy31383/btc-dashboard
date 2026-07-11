@@ -13,7 +13,7 @@ const DEFAULT_RETRY_ATTEMPTS = 3;
 const MAX_RETRY_ATTEMPTS = 5;
 const REQUEST_TIMEOUT_MS = 30_000;
 
-export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v2";
+export const EVALUATOR_VERSION = "stochrsi-macro-cycle/v3";
 
 export interface FundingRecord {
   time: number;
@@ -159,7 +159,12 @@ function parseCachedCandles(value: unknown): Candle[] {
   return value.map((entry) => parseCandle(entry, "cached candle"));
 }
 
-function parseFunding(value: unknown, label: string, requireSymbol: boolean): FundingRecord {
+function parseFunding(
+  value: unknown,
+  label: string,
+  requireSymbol: boolean,
+  normalizeZeroMark: boolean,
+): FundingRecord {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`Invalid ${label}`);
   const record = value as Record<string, unknown>;
   if (requireSymbol && record.symbol !== SYMBOL) throw new Error(`Invalid ${label}.symbol: ${String(record.symbol)}`);
@@ -170,7 +175,7 @@ function parseFunding(value: unknown, label: string, requireSymbol: boolean): Fu
     ? null
     : finiteNumber(markValue, `${label}.mark`);
   if (parsedMark !== null && parsedMark < 0) throw new Error(`Invalid ${label}.mark: negative`);
-  const mark = parsedMark === 0 ? null : parsedMark;
+  const mark = parsedMark === 0 && normalizeZeroMark ? null : parsedMark;
   return {
     time: timestamp(timeValue, `${label}.time`),
     rate: finiteNumber(rateValue, `${label}.rate`),
@@ -178,9 +183,14 @@ function parseFunding(value: unknown, label: string, requireSymbol: boolean): Fu
   };
 }
 
-function parseFundings(value: unknown, label: string, requireSymbol: boolean): FundingRecord[] {
+function parseFundings(
+  value: unknown,
+  label: string,
+  requireSymbol: boolean,
+  normalizeZeroMark = false,
+): FundingRecord[] {
   if (!Array.isArray(value)) throw new Error(`Invalid ${label}: expected an array`);
-  return value.map((entry) => parseFunding(entry, label, requireSymbol));
+  return value.map((entry) => parseFunding(entry, label, requireSymbol, normalizeZeroMark));
 }
 
 function sortAndDedupeFunding(existing: FundingRecord[], incoming: FundingRecord[], nowMs: number): FundingRecord[] {
@@ -424,6 +434,7 @@ async function fetchFunding(
       ),
       "Binance funding response",
       true,
+      true,
     );
     validateOfficialPage(page, "funding", cursor, nowMs, FUNDING_LIMIT);
     if (page.length === 0) break;
@@ -486,25 +497,41 @@ export async function loadAndRefreshData(options: LoadAndRefreshDataOptions = {}
   const cachedHourlyRaw = await readJson(cachePaths.hourlyCachePath);
   const cachedFundingRaw = await readJson(cachePaths.fundingCachePath);
   const cachedHourly = cachedHourlyRaw === undefined ? [] : parseCachedCandles(cachedHourlyRaw);
+  const cachedFunding = cachedFundingRaw === undefined
+    ? []
+    : parseFundings(cachedFundingRaw, "cached funding", false, refresh);
   const cachedCutoffMs = cachedHourly.reduce(
     (latest, candle) => Math.max(latest, candle.time + HOUR_MS),
     0,
   );
   const nowMs = options.nowMs ?? (!refresh && cachedCutoffMs > 0 ? cachedCutoffMs : Date.now());
   if (!Number.isInteger(nowMs) || nowMs <= 0) throw new Error(`Invalid refresh timestamp: ${nowMs}`);
+  const windowStart = sevenCalendarYearsBeforeAlignedHour(nowMs);
 
-  let hourly = mergeCandles([], cachedHourly, nowMs);
-  let funding = sortAndDedupeFunding(
-    [],
-    cachedFundingRaw === undefined ? [] : parseFundings(cachedFundingRaw, "cached funding", false),
-    nowMs,
-  );
+  if (!refresh) {
+    validateHourlyData(cachedHourly);
+    validateFundingData(cachedFunding);
+    if (
+      (cachedHourly[0]?.time !== undefined && cachedHourly[0].time < windowStart) ||
+      (cachedFunding[0]?.time !== undefined && cachedFunding[0].time < windowStart)
+    ) {
+      throw new Error("Offline cache is older than the rolling seven-year window; run an online refresh");
+    }
+  }
+
+  const windowedHourly = refresh
+    ? cachedHourly.filter((candle) => candle.time >= windowStart)
+    : cachedHourly;
+  const windowedFunding = refresh
+    ? cachedFunding.filter((payment) => payment.time >= windowStart)
+    : cachedFunding;
+  let hourly = mergeCandles([], windowedHourly, nowMs);
+  let funding = sortAndDedupeFunding([], windowedFunding, nowMs);
 
   if (refresh) {
     const fetchImpl = options.fetchImpl ?? ((url, init) => fetch(url, init));
-    const bootstrapStart = sevenCalendarYearsBeforeAlignedHour(nowMs);
-    const klineStart = hourly.at(-1)?.time !== undefined ? hourly.at(-1)!.time + HOUR_MS : bootstrapStart;
-    const fundingStart = funding.at(-1)?.time !== undefined ? funding.at(-1)!.time + 1 : bootstrapStart;
+    const klineStart = hourly.at(-1)?.time !== undefined ? hourly.at(-1)!.time + HOUR_MS : windowStart;
+    const fundingStart = funding.at(-1)?.time !== undefined ? funding.at(-1)!.time + 1 : windowStart;
     const [newHourly, newFunding] = await Promise.all([
       fetchKlines(klineStart, nowMs, fetchImpl, retryAttempts, retryDelayMs),
       fetchFunding(fundingStart, nowMs, fetchImpl, retryAttempts, retryDelayMs),

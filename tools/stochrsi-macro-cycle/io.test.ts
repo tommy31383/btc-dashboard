@@ -26,8 +26,8 @@ function jsonResponse(body: unknown, status = 200) {
   };
 }
 
-test("material audit fixes use evaluator version v2", () => {
-  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v2");
+test("final provenance fixes use evaluator version v3", () => {
+  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v3");
 });
 
 test("default caches are explicitly Futures-specific", () => {
@@ -64,7 +64,7 @@ test("validation lists gaps over three hours with the documented handling", () =
   ]);
 });
 
-test("normalizes a zero cached funding mark to missing", async () => {
+test("online refresh normalizes a zero cached funding mark to missing", async () => {
   const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
   const hourlyCachePath = join(directory, "hourly.json");
   const fundingCachePath = join(directory, "funding.json");
@@ -78,16 +78,57 @@ test("normalizes a zero cached funding mark to missing", async () => {
     );
 
     const data = await loadAndRefreshData({
-      refresh: false,
       nowMs: now,
       cachePaths: { hourlyCachePath, fundingCachePath },
+      fetchImpl: async () => jsonResponse([]),
+      retryDelayMs: 0,
       gitSha: "test-git-sha",
       gitDirty: false,
     });
 
     assert.equal(data.funding[0].mark, null);
+    const persistedFunding = JSON.parse(await readFile(fundingCachePath, "utf8"));
+    assert.equal(persistedFunding[0].mark, null);
   } finally {
     await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("offline replay rejects caches that would require normalization", async (context) => {
+  const now = Date.UTC(2026, 6, 11, 12);
+  const cases: Array<[string, Candle[], Array<{ time: number; rate: number; mark: number | null }>]> = [
+    ["duplicate hourly timestamp", [bar(now - 2 * HOUR_MS, 100), bar(now - 2 * HOUR_MS, 101)], []],
+    ["duplicate funding timestamp", [bar(now - HOUR_MS, 100)], [
+      { time: now - 8 * HOUR_MS, rate: 0.001, mark: null },
+      { time: now - 8 * HOUR_MS, rate: 0.002, mark: null },
+    ]],
+    ["zero funding mark", [bar(now - HOUR_MS, 100)], [
+      { time: now - 8 * HOUR_MS, rate: 0.001, mark: 0 },
+    ]],
+  ];
+
+  for (const [name, hourly, funding] of cases) {
+    await context.test(name, async () => {
+      const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+      const hourlyCachePath = join(directory, "hourly.json");
+      const fundingCachePath = join(directory, "funding.json");
+      try {
+        await writeFile(hourlyCachePath, JSON.stringify(hourly));
+        await writeFile(fundingCachePath, JSON.stringify(funding));
+        await assert.rejects(
+          loadAndRefreshData({
+            refresh: false,
+            nowMs: now,
+            cachePaths: { hourlyCachePath, fundingCachePath },
+            gitSha: "test-git-sha",
+            gitDirty: false,
+          }),
+          /strictly sorted|invalid funding mark/i,
+        );
+      } finally {
+        await rm(directory, { recursive: true, force: true });
+      }
+    });
   }
 });
 
@@ -110,6 +151,76 @@ test("offline default pins as-of time to the cached completed-hour cutoff", asyn
 
     assert.equal(data.asOfMs, futureHour + HOUR_MS);
     assert.equal(data.hourly.length, 1);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("online refresh prunes both caches to the rolling seven-calendar-year window", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+  const hourlyCachePath = join(directory, "hourly.json");
+  const fundingCachePath = join(directory, "funding.json");
+  const now = Date.UTC(2026, 6, 11, 12);
+  const windowStart = Date.UTC(2019, 6, 11, 12);
+  const tooOld = windowStart - HOUR_MS;
+
+  try {
+    await writeFile(
+      hourlyCachePath,
+      JSON.stringify([bar(tooOld, 90), bar(windowStart, 100), bar(now - HOUR_MS, 110)]),
+    );
+    await writeFile(
+      fundingCachePath,
+      JSON.stringify([
+        { time: tooOld, rate: 0.001, mark: null },
+        { time: windowStart, rate: 0.002, mark: null },
+      ]),
+    );
+
+    const data = await loadAndRefreshData({
+      nowMs: now,
+      cachePaths: { hourlyCachePath, fundingCachePath },
+      fetchImpl: async () => jsonResponse([]),
+      retryDelayMs: 0,
+      gitSha: "test-git-sha",
+      gitDirty: false,
+    });
+
+    assert.equal(data.hourly[0].time, windowStart);
+    assert.equal(data.funding[0].time, windowStart);
+    const persistedHourly = JSON.parse(await readFile(hourlyCachePath, "utf8"));
+    const persistedFunding = JSON.parse(await readFile(fundingCachePath, "utf8"));
+    assert.equal(persistedHourly[0].time, windowStart);
+    assert.equal(persistedFunding[0].time, windowStart);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("offline replay rejects a cache older than its rolling seven-year window", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+  const hourlyCachePath = join(directory, "hourly.json");
+  const fundingCachePath = join(directory, "funding.json");
+  const now = Date.UTC(2026, 6, 11, 12);
+  const windowStart = Date.UTC(2019, 6, 11, 12);
+
+  try {
+    await writeFile(
+      hourlyCachePath,
+      JSON.stringify([bar(windowStart - HOUR_MS, 90), bar(now - HOUR_MS, 110)]),
+    );
+    await writeFile(fundingCachePath, "[]");
+
+    await assert.rejects(
+      loadAndRefreshData({
+        refresh: false,
+        nowMs: now,
+        cachePaths: { hourlyCachePath, fundingCachePath },
+        gitSha: "test-git-sha",
+        gitDirty: false,
+      }),
+      /older than the rolling seven-year window/i,
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

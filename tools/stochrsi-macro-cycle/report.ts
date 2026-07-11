@@ -43,10 +43,14 @@ export interface ReportVariant extends VariantSummary {
 }
 
 export interface MacroCycleReport {
-  schemaVersion: "btc-stochrsi-macro-cycle-report/v1";
+  schemaVersion: "btc-stochrsi-macro-cycle-report/v2";
   generatedAt: string;
   verdict: "INSUFFICIENT_SAMPLE" | "EVALUATED";
   sampleLimitation: string;
+  liveWalletFeasibility: {
+    status: "NOT_SUPPLIED_TO_OFFLINE_EVALUATOR";
+    reason: "Deterministic offline replay does not access live account state.";
+  };
   strategy: {
     asset: "BTCUSDT";
     primaryVariant: "DAILY_EPISODE";
@@ -166,13 +170,17 @@ export function buildReport(
   if (rawRange.lastTime === null) throw new Error("Hourly provenance must include a last timestamp");
 
   return {
-    schemaVersion: "btc-stochrsi-macro-cycle-report/v1",
+    schemaVersion: "btc-stochrsi-macro-cycle-report/v2",
     generatedAt,
     verdict: completed < 5 ? "INSUFFICIENT_SAMPLE" : "EVALUATED",
     sampleLimitation:
       `${completed} completed DAILY_EPISODE campaigns; fewer than 5 completed DAILY_EPISODE campaigns ` +
       "forces INSUFFICIENT_SAMPLE. " +
       "Historical results are evidence for this frozen hypothesis only and do not authorize live trading.",
+    liveWalletFeasibility: {
+      status: "NOT_SUPPLIED_TO_OFFLINE_EVALUATOR",
+      reason: "Deterministic offline replay does not access live account state.",
+    },
     strategy: {
       asset: "BTCUSDT",
       primaryVariant: "DAILY_EPISODE",
@@ -305,6 +313,7 @@ export function renderMarkdown(report: MacroCycleReport): string {
     `- Funding SHA-256: ${report.data.provenance.funding.sha256}`,
     `- Evaluator: ${report.data.provenance.evaluatorVersion} at ${report.data.provenance.gitSha}; dirty=${report.data.provenance.gitDirty}`,
     `- Listed >3h source gaps: ${report.data.provenance.gaps.length}`,
+    `- Live-wallet snapshot: ${report.liveWalletFeasibility.status} (${report.liveWalletFeasibility.reason})`,
     "",
     "## Campaign inventory",
     "",
@@ -323,14 +332,16 @@ export function renderMarkdown(report: MacroCycleReport): string {
     "",
     "**WINDOW_FULL_AT_ARM: SIMULATED_NOT_TRADABLE. It uses the future DAILY_EPISODE leg count and is only an exposure-normalized timing counterfactual.**",
     "",
-    "| Variant | Warning | Closed/open/zero | Legs | Campaign WR | Leg WR | Gross | Fees | Slippage | Funding | Net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |",
-    "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    "| Variant | Warning | Closed/open/zero | Closed legs / all legs | Closed campaign WR | Closed leg WR | Total gross | Total fees | Total slippage | Total funding | Closed net | Total net | Max DD | Worst unrealized | Min wallet | Max qty | Max notional |",
+    "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...report.variants.map((variant) =>
       `| ${variant.name} | ${variant.warning ?? "TRADABLE_REPLAY"} | ` +
-      `${variant.closedCampaigns}/${variant.openCampaigns}/${variant.zeroEntryCampaigns} | ${variant.totalLegs} | ` +
+      `${variant.closedCampaigns}/${variant.openCampaigns}/${variant.zeroEntryCampaigns} | ` +
+      `${variant.closedLegs}/${variant.totalLegs} | ` +
       `${formatNumber(variant.campaignWinRate * 100)}% | ${formatNumber(variant.legWinRate * 100)}% | ` +
       `${formatNumber(variant.grossPnl)} | ${formatNumber(variant.fees)} | ${formatNumber(variant.slippageCost)} | ` +
-      `${formatNumber(variant.fundingPnl)} | ${formatNumber(variant.totalNetPnl)} | ${formatNumber(variant.maxDrawdown)} | ` +
+      `${formatNumber(variant.fundingPnl)} | ${formatNumber(variant.closedNetPnl)} | ` +
+      `${formatNumber(variant.totalNetPnl)} | ${formatNumber(variant.maxDrawdown)} | ` +
       `${formatNumber(variant.worstUnrealizedPnl)} | ${formatNumber(variant.minimumWallet)} | ` +
       `${formatNumber(variant.maxQuantity, 6)} | ${formatNumber(variant.maxNotional)} |`,
     ),
@@ -341,7 +352,8 @@ export function renderMarkdown(report: MacroCycleReport): string {
       "",
       `## ${variant.name}${variant.warning ? ` - ${variant.warning}` : ""}`,
       "",
-      `Returns: expectancy ${formatNumber(variant.netExpectancy)} USDT; average ${formatNumber(variant.averageReturnPct)}%; ` +
+      `Returns (closed campaigns only): expectancy ${formatNumber(variant.netExpectancy)} USDT; ` +
+        `average ${formatNumber(variant.averageReturnPct)}%; ` +
         `median ${formatNumber(variant.medianReturnPct)}%. Average/median legs per campaign: ` +
         `${formatNumber(variant.averageLegsPerCampaign)}/${formatNumber(variant.medianLegsPerCampaign)}.`,
       `Timing: average hold ${formatNumber(variant.averageHoldHours)}h; average underwater ` +
@@ -366,10 +378,11 @@ export function renderMarkdown(report: MacroCycleReport): string {
       "",
       "### Fixed-wallet feasibility",
       "",
-      "| Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |",
-      "|---:|---:|---|---|---:|---:|",
+      "| Scenario | Basis | Snapshot | Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |",
+      "|---|---|---|---:|---:|---|---|---:|---:|",
       ...variant.walletScenarios.map((wallet) =>
-        `| ${formatNumber(wallet.startingWallet)} | ${formatPercent(wallet.scaleTestRoiPct)} | ` +
+        `| ${wallet.label} | ${wallet.basis} | ${formatTime(wallet.snapshotTime)} | ` +
+        `${formatNumber(wallet.startingWallet)} | ${formatPercent(wallet.scaleTestRoiPct)} | ` +
         `${wallet.outcome} | ${wallet.liquidated} | ${wallet.liquidationCount} | ` +
         `${formatNumber(wallet.minimumBuffer)} |`,
       ),

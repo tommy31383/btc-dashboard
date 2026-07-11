@@ -427,6 +427,7 @@ test("summaries separate open campaigns and expose required stability views", ()
   assert.equal(summary.closedCampaigns, 2);
   assert.equal(summary.openCampaigns, 1);
   assert.equal(summary.totalCampaigns, 3);
+  assert.equal(summary.closedLegs, 3);
   assert.equal(summary.totalLegs, 4);
   assert.equal(summary.campaignWinRate, 1);
   assert.equal(summary.legWinRate, 1);

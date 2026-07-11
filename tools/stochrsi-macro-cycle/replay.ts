@@ -162,6 +162,7 @@ export interface VariantSummary {
   oneEntryCampaigns: number;
   multipleEntryCampaigns: number;
   suppressedDuplicateDailyEntries: number;
+  closedLegs: number;
   totalLegs: number;
   campaignWinRate: number;
   legWinRate: number;
@@ -802,6 +803,7 @@ export function summarizeVariant(
     suppressedDuplicateDailyEntries: sum(
       run.campaigns.map((campaign) => campaign.suppressedDuplicateDailyEntries),
     ),
+    closedLegs: closedLegs.length,
     totalLegs: allLegs.length,
     campaignWinRate:
       closed.length === 0
