@@ -354,7 +354,8 @@ export function renderMarkdown(report: MacroCycleReport): string {
       "",
       `Returns (closed campaigns only): expectancy ${formatNumber(variant.netExpectancy)} USDT; ` +
         `average ${formatNumber(variant.averageReturnPct)}%; ` +
-        `median ${formatNumber(variant.medianReturnPct)}%. Average/median legs per campaign: ` +
+        `median ${formatNumber(variant.medianReturnPct)}%.`,
+      `Leg counts (all campaigns): average/median per campaign ` +
         `${formatNumber(variant.averageLegsPerCampaign)}/${formatNumber(variant.medianLegsPerCampaign)}.`,
       `Timing: average hold ${formatNumber(variant.averageHoldHours)}h; average underwater ` +
         `${formatNumber(variant.averageUnderwaterHours)}h; suppressed duplicate daily entries ` +

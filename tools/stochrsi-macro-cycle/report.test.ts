@@ -137,7 +137,10 @@ test("Markdown states the frozen strategy, no stop loss, sample limit, and simul
   assert.match(markdown, /Closed campaign WR/);
   assert.match(markdown, /Closed leg WR/);
   assert.match(markdown, /Closed net/);
-  assert.match(markdown, /Returns \(closed campaigns only\)/);
+  assert.match(
+    markdown,
+    /Returns \(closed campaigns only\):[^\n]+\nLeg counts \(all campaigns\):/,
+  );
   assert.match(markdown, /Live-wallet snapshot: NOT_SUPPLIED_TO_OFFLINE_EVALUATOR/);
   assert.match(markdown, /Scenario \| Basis \| Snapshot/);
 });
