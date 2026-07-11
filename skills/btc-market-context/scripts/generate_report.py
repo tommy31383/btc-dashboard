@@ -20,12 +20,31 @@ HTML_PATH   = f"/tmp/btc_context_report_{TF}.html"
 def run_analysis():
     print("Running analysis...")
     script = os.path.join(os.path.dirname(__file__), "fetch_and_analyze.py")
-    subprocess.run(["python3", script], check=True)
+    subprocess.run(["python3", script, "--tf", TF], check=True)
 
 
 def encode_img(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
+
+
+def ensure_chart_b64(result):
+    """Return a result/chart pair, regenerating once for legacy chart-less JSON."""
+    chart_b64 = result.get("chart_b64", "")
+    if chart_b64:
+        return result, chart_b64
+
+    run_analysis()
+    with open(RESULT_PATH, encoding="utf-8") as f:
+        refreshed = json.load(f)
+    chart_b64 = refreshed.get("chart_b64", "")
+    if chart_b64:
+        return refreshed, chart_b64
+
+    # Backward compatibility for an old analyzer that still writes a PNG.
+    if os.path.exists(CHART_PATH):
+        return refreshed, encode_img(CHART_PATH)
+    raise RuntimeError("analysis produced neither chart_b64 nor a legacy chart PNG")
 
 
 def build_html(result, chart_b64):
@@ -325,15 +344,7 @@ def main():
     with open(RESULT_PATH) as f:
         result = json.load(f)
 
-    # Re-run chart if needed
-    if not os.path.exists(CHART_PATH) or \
-       os.path.getmtime(CHART_PATH) < os.path.getmtime(RESULT_PATH):
-        run_analysis()
-        with open(RESULT_PATH) as f:
-            result = json.load(f)
-
-    print("Encoding chart...")
-    chart_b64 = encode_img(CHART_PATH)
+    result, chart_b64 = ensure_chart_b64(result)
 
     print("Building HTML...")
     html = build_html(result, chart_b64)

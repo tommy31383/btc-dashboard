@@ -248,6 +248,18 @@ def parse_kline(k):
     return [int(k[0]), float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])]
 
 
+def fetch_live_series(fetcher=fetch_binance):
+    """Fetch selected-timeframe context and independently warmed indicator series."""
+    return {
+        "selected": [parse_kline(k) for k in fetcher(CFG["interval"], CFG["live_limit"])],
+        "1d": [parse_kline(k) for k in fetcher("1d", 260)],
+        "4h": [parse_kline(k) for k in fetcher("4h", 260)],
+        "3d": [parse_kline(k) for k in fetcher("3d", 20)],
+        "1w": [parse_kline(k) for k in fetcher("1w", 20)],
+        "1M": [parse_kline(k) for k in fetcher("1M", 6)],
+    }
+
+
 # ── Dynamic Relaxation decision (reviewer directive v1-SHADOW, 2026-06-12) ──────
 # Khi Volatility Compression (sideway nghẹt thở) → ATR teo → gate ATR-ratio over-filter
 # → số analog strict tụt dưới ý nghĩa thống kê. Nới biên độ MỘT lần để không mất sạch tín hiệu.
@@ -273,14 +285,14 @@ def main():
     bars_7d_hist = aggregate(raw, 168)
 
     print(f"Fetching live {CFG['label']} data from Binance...")
-    live_tf = [parse_kline(k) for k in fetch_binance(CFG["interval"], CFG["live_limit"])]
-    live_4h = [parse_kline(k) for k in fetch_binance('4h', 210)]  # EMA200_4H cho champion
-    live_3d = [parse_kline(k) for k in fetch_binance('3d', 20)]
-    live_1w = [parse_kline(k) for k in fetch_binance('1w', 20)]
-    live_1M = [parse_kline(k) for k in fetch_binance('1M', 6)]
+    live = fetch_live_series()
+    live_tf = live["selected"]
+    live_1d = live["1d"]
+    live_4h = live["4h"]
+    live_3d = live["3d"]
+    live_1w = live["1w"]
+    live_1M = live["1M"]
 
-    # alias cho backward compat
-    live_1d      = live_tf
     bars_1d_hist = bars_tf_hist
 
     # ── Current structure (LOOK_BACK bars) ────────────────────────────────────
@@ -320,8 +332,8 @@ def main():
     # ATR ratio = drop / ATR (volatility-normalized magnitude)
     # Dùng ATR% ngày đúng (atr_pct tính từ live_1d[-30:]), KHÔNG dùng atr(bars14,14)
     # vì 14 bar thiếu 1 → None → fallback sai. atr_pct gán ở dưới nên defer tính ratio.
-    atr14_cur = atr(bars14, 14) or 1
-    cur_drop_atr_ratio = drop_from_peak / atr_pct if atr_pct else 0
+    # Missing ATR means no ratio bonus; zero would create false similarity around zero.
+    cur_drop_atr_ratio = drop_from_peak / atr_pct if atr_pct else None
 
     vols = [b[5] for b in live_1d[-20:]]
     vol_avg20 = sum(vols[:-1]) / (len(vols) - 1)
@@ -494,9 +506,10 @@ def main():
                 score += 0.3
 
             # ATR-normalized drop ratio (shape của cú giảm so với vol)
-            hist_drop_atr_ratio = drop / atr_pct_h_v if atr_pct_h_v else 0
-            if abs(hist_drop_atr_ratio - cur_drop_atr_ratio) <= 1.5:
-                score += 0.5
+            if cur_drop_atr_ratio is not None and atr_pct_h_v:
+                hist_drop_atr_ratio = drop / atr_pct_h_v
+                if abs(hist_drop_atr_ratio - cur_drop_atr_ratio) <= 1.5:
+                    score += 0.5
 
             # ── Tương đồng tín hiệu oscillator (rank tinh sau khi biên độ đã khớp) ──
             # RSI gần nhau (tối đa +1.0 khi |Δ|≤25) — cùng vùng quá-mua/quá-bán
@@ -650,7 +663,7 @@ def main():
             "win_rate": f"{wins}/{n}", "dir_bias": bias,
             "note": (f"Band d30 {band_desc} ({round(iqr,1)}%), hướng {dir_desc} "
                      f"(win {wins}/{n}) → bất định {level}. " +
-                     ("Analog đồng thuận → context đáng tin hơn." if level=="CAO"
+                     ("Analog nhất quán → context nhất quán hơn (vẫn KHÔNG phải tín hiệu lệnh)." if level=="CAO"
                       else "Hướng coin-flip → size nhỏ/chờ tín hiệu rõ." if level=="THẤP"
                       else "Tín hiệu hỗn hợp.")),
         }
@@ -677,8 +690,8 @@ def main():
     }
 
     # Attach hist bars ref to result for charting
-    result['_bars_1d_hist'] = bars_1d_hist
-    result['_live_1d'] = live_1d
+    result['_bars_tf_hist'] = bars_tf_hist
+    result['_live_tf'] = live_tf
 
     with open(OUTPUT_PATH, 'w') as f:
         # Don't serialize internal bars (too large), save separately
@@ -869,8 +882,8 @@ def draw_chart(result):
     import matplotlib.pyplot as plt
     import matplotlib.gridspec as gridspec
 
-    bars_hist = result['_bars_1d_hist']
-    live_1d   = result['_live_1d']
+    bars_hist = result['_bars_tf_hist']
+    live_tf   = result['_live_tf']
     top       = result['matches']
     cur       = result['current']
     ind       = cur['indicators']
@@ -903,12 +916,12 @@ def draw_chart(result):
                               hspace=0.06)
 
     # ── TOP: Current ──────────────────────────────────────────────────────
-    # Dùng full live_1d (60 bars) để warmup RSI/StochRSI, chỉ hiển thị CUR_CONTEXT ngày cuối
-    rsi_full_cur      = calc_rsi_series(live_1d)
-    stk_k_full_cur, stk_d_full_cur = calc_stochrsi_series(live_1d)
+    # Use the full selected-timeframe series for chart indicator warmup.
+    rsi_full_cur      = calc_rsi_series(live_tf)
+    stk_k_full_cur, stk_d_full_cur = calc_stochrsi_series(live_tf)
 
     # Trim về CUR_CONTEXT ngày cuối để hiển thị
-    cur_bars      = live_1d[-CUR_CONTEXT:]
+    cur_bars      = live_tf[-CUR_CONTEXT:]
     rsi_cur       = rsi_full_cur[-CUR_CONTEXT:]
     stk_k_cur     = stk_k_full_cur[-CUR_CONTEXT:]
     stk_d_cur     = stk_d_full_cur[-CUR_CONTEXT:]
@@ -971,9 +984,13 @@ def draw_chart(result):
             show_dates=(row == n_grid_rows - 1),
         )
 
-    plt.savefig(CHART_PATH, dpi=130, bbox_inches='tight', facecolor=BG)
+    # Render in memory for the HTML report; do not create or auto-open a standalone PNG.
+    import io, base64
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=130, bbox_inches='tight', facecolor=BG)
     plt.close()
-    print(f"Chart saved → {CHART_PATH}")
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode()
 
 
 if __name__ == '__main__':
@@ -1047,9 +1064,12 @@ if __name__ == '__main__':
 
     print(f"\n{r['stats']['disclaimer']}")
 
-    # Draw chart (bỏ qua khi --no-chart, vd lúc chạy multi-TF aggregate)
+    # Embed chart in the JSON consumed by the HTML report. Skip for multi-TF aggregation.
     if not NO_CHART:
-        print("\nDrawing chart...")
-        draw_chart(r)
-        import subprocess
-        subprocess.Popen(['open', CHART_PATH])
+        print("\nRendering chart (embed-only, no PNG file)...")
+        b64 = draw_chart(r)
+        export = json.load(open(OUTPUT_PATH))
+        export['chart_b64'] = b64
+        with open(OUTPUT_PATH, 'w') as f:
+            json.dump(export, f, indent=2)
+        print(f"Chart embedded → {OUTPUT_PATH} (chart_b64)")
