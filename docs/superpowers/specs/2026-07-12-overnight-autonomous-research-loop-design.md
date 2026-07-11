@@ -19,9 +19,9 @@ access, authenticated exchange/VPS access, or exchange write.
 
 Run one bounded research cycle through the morning that:
 
-1. Diagnoses whether current live Champion BEST BTC4h and Hedge01 S12/S13/S14
-   entries systematically occur after an impulse and too close to local
-   resistance.
+1. Diagnoses whether repository live-designated Champion BEST BTC4h and Hedge01
+   S12/S13/S14 entries systematically occur after an impulse and too close to
+   local resistance, without claiming unverified VPS byte identity.
 2. Uses the exact production signal path or returns `INVALID` rather than
    substituting a convenient approximation.
 3. Compares entry timing with deterministic, time/regime/direction-matched
@@ -136,6 +136,13 @@ preregistration; mismatch is `INVALID`. This matrix allows pure signal execution
 while mechanically excluding server writes, credential-bearing modules, and
 operational tooling.
 
+Before dynamic import, a static closure scan rejects production env/secret access,
+network modules/calls, child-process calls, filesystem writes, and cwd mutation.
+The import then runs in an isolated child with secret-like environment variables
+removed and network, child-process, write, and `chdir` operations trapped; any
+attempt terminates the child and records `INVALID`. Tests prove both a pure allowed
+import and each trapped side-effect class.
+
 ### 4.2 Research state
 
 The detailed run state lives under:
@@ -181,11 +188,11 @@ paths, any replay byte differs from the preregistered data hashes, or a result
 already exists for the same
 `mechanism_id + rule_fingerprint + data_range_hash + cost_model_id`.
 
-Night 1 permits exactly one mechanism ID, `entry-quality-diagnosis`, for each
-data-range hash. A second mechanism ID, renamed mechanism, changed rule
-fingerprint, changed cost model, or later variant against that data hash is
-refused. There is no owner-override field or override path in Night 1; a future
-run needs a new pre-approved design and untouched validation data.
+Night 1 permits exactly one mechanism ID, `entry-quality-diagnosis`, and one
+data-range hash for the whole run. A second mechanism ID, renamed mechanism,
+changed data hash, changed rule fingerprint, changed cost model, or later variant
+is refused. There is no owner-override field or override path in Night 1; a
+future run needs a new pre-approved design and untouched validation data.
 
 The supervisor additionally permits exactly one preregistration creation and one
 registry append during the entire Night-1 run, regardless of mechanism name or
@@ -215,6 +222,13 @@ verdict math. One compact retry is allowed after a timeout. Its machine-readable
 terminal must be exactly `ALLOW_DIAGNOSIS`, `KILL_DIAGNOSIS`, or `AUDIT_FAILED`;
 any other/missing terminal is `AUDIT_FAILED`.
 
+The result-audit response must end with one JSON object containing `terminal` and
+`reason_code`. `ALLOW_DIAGNOSIS` requires `reason_code=NONE`;
+`KILL_DIAGNOSIS` requires one of `CAUSALITY_INVALID`, `PARITY_INVALID`,
+`CONTROL_INVALID`, or `INSUFFICIENT_SAMPLE`; `AUDIT_FAILED` requires
+`TIMEOUT`, `QUOTA`, `MALFORMED`, or `TOOL_FAILURE`. Missing or inconsistent
+fields become `AUDIT_FAILED/MALFORMED`.
+
 Codex remains the orchestrator. Claude and Grok may propose the next item, but
 they do not deploy or arm anything.
 
@@ -222,14 +236,21 @@ they do not deploy or arm anything.
 
 ### 5.1 Frozen question
 
-Do current live Champion BEST BTC4h and Hedge01 S12/S13/S14 entries show a
-repeatable late/crowded-entry signature: a large already-completed impulse,
-little remaining distance to causal local resistance, and worse near-term path
-quality than matched same-side timestamps?
+Do repository live-designated Champion BEST BTC4h and Hedge01 S12/S13/S14
+entries show a repeatable late/crowded-entry signature: a large already-completed
+impulse, little remaining distance to causal local resistance, and worse
+near-term path quality than matched same-side timestamps?
 
 The exact production signal path is mandatory. If it cannot be invoked or shown
 equivalent without editing `btc-trader-server`, the affected rule is `INVALID`.
 No approximate rewrite can contribute to the diagnosis.
+
+Preregistration pins the local server git SHA, package version, module/import-graph
+hashes, and any pre-existing non-secret deployment evidence available before
+activation. If that evidence proves only a version match, the report must say
+`VERSION_MATCHED_NOT_BYTE_VERIFIED`; if it proves no match, it must say
+`DEPLOYMENT_IDENTITY_UNVERIFIED`. No Night-1 result may claim VPS byte parity or
+"current deployed behavior" without a pre-existing byte-level provenance record.
 
 ### 5.2 Measurements
 

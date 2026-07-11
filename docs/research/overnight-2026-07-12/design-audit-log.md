@@ -78,3 +78,25 @@ before Claude review:
 
 Status: Grok design gate passed. Activation remains closed until a real Claude
 audit approves this final post-P2 text with no unresolved P0-P2.
+
+## Grok attempt 4 - APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T01:52:55+07:00`.
+- Packet: `packets/grok-design-reaudit-2.md`
+- Verdict: `APPROVED`; open P0/P1: none. The audit confirmed the post-attempt-3
+  public-data, transitive-import, and single-freeze clarifications.
+
+Two non-blocking implementation-fidelity P2s and two P3 bookkeeping notes were
+reported and resolved in the final Claude candidate:
+
+- terminology now says `repository live-designated`; package/version/source and
+  module hashes are pinned, and VPS byte parity cannot be claimed without
+  pre-existing byte-level deployment provenance;
+- import closure is statically scanned and dynamically loaded in a child that
+  traps secret-env, network, child-process, filesystem-write, and cwd side effects;
+- Night 1 wording now permits one mechanism and one data hash for the whole run;
+- Grok result terminals require a structured `reason_code`.
+
+Status: Grok gate remains approved. Claude approval is still mandatory and has
+not yet occurred.
