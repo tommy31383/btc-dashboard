@@ -185,3 +185,27 @@ input-construction finding.
 
 Status: activation remains closed pending the narrowed design plus Grok and
 Claude re-audits.
+
+## Grok attempt 6 - NOT APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T02:39:29+07:00`.
+- Packet: `packets/grok-claude3-fixes-reaudit.md`.
+- Verdict: `NOT APPROVED`; no P0/P1, three P2 multiplicity/freeze findings.
+- Champion removal, causal input label/fixtures, all-child sandbox, recursive
+  PPID cleanup, and the prior safety/anti-retune controls all passed.
+
+Dispositions:
+
+- confirmatory impulse is now one exact six-bar/Wilder-ATR14 formula with fixed
+  positive signal-minus-control sign;
+- confirmatory resistance is now one exact 90-bar confirmed 2-left/2-right
+  overhead-pivot formula with fixed negative sign and no fallback surface;
+- the frozen question now claims only those two metrics; all future-path metrics
+  are explicitly exploratory;
+- the family is six tests (two metrics x three setups), reported per setup with no
+  pooled/OR selection and Bonferroni 99.1667% intervals;
+- funding staleness is 12 hours and regime seed fields are explicit;
+- pre-preregistration feature-distribution peeking is forbidden.
+
+Status: activation remains closed pending final Grok and Claude re-audits.

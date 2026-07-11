@@ -46,6 +46,10 @@ Scope B is the permission ceiling, but Night 1 is narrower:
   freezes/tests H01 causal input construction with `persistBars=1`, sandboxes
   every child, adds recursive PPID/`setsid` cleanup, and uses two Bonferroni-
   corrected primary deltas.
+- Grok attempt 6 then found residual metric shopping. The final text fixes one
+  six-bar/ATR14 impulse scalar, one 90-bar confirmed overhead-pivot scalar, both
+  signs, no feature peek, no path-quality claim, and family-wise correction over
+  all six setup-metric tests.
 - The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions

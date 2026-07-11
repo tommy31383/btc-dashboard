@@ -188,8 +188,8 @@ the process group and records `INVALID`. Tests prove a pure allowed import plus
 every static and runtime side-effect class.
 
 The pure-graph scan and isolated import are an activation go/no-go check, before
-preregistration or outcome replay. If either production signal graph is impure or
-cannot load under these guards, the affected rule is recorded `INVALID`, the run
+preregistration or outcome replay. If the active H01 signal graph is impure or
+cannot load under these guards, H01 is recorded `INVALID`, the run
 does not build/replay an approximation, and the morning report states that the
 faithful path was structurally unavailable.
 
@@ -310,9 +310,13 @@ they do not deploy or arm anything.
 ### 5.1 Frozen question
 
 Do repository live-designated Hedge01 S12/S13/S14 market signals show a
-repeatable late/crowded-entry signature: a large already-completed impulse,
-little remaining distance to causal local resistance, and worse near-term path
-quality than matched same-side timestamps?
+repeatable late/crowded-entry signature: a larger fixed 24-hour impulse and a
+smaller ATR-normalized distance to confirmed causal overhead pivot resistance
+than matched same-side timestamps?
+
+That two-metric conjunction is the entire confirmatory claim. MFE, MAE,
+adverse-first rate, and one-bar delay describe later path quality but are
+explicitly exploratory; they cannot appear in the confirmatory conclusion.
 
 The exact production signal path is mandatory. If it cannot be invoked or shown
 equivalent without editing `btc-trader-server`, the affected rule is `INVALID`.
@@ -358,11 +362,12 @@ does not claim a live reference-vector comparison.
   affect the signal.
 - Signal time is the just-closed 4h bar's close timestamp. Outcome measurement
   begins at the next 4h open; no closed bar after signal time enters any feature.
-- Funding is an as-of join using the latest record timestamp `<= signal_time`.
-  A missing or stale preregistered funding record invalidates that row rather
-  than filling from the future.
-- H01 regime state starts from the production defaults and steps exactly once per
-  newly closed daily bar using `detectRegime` plus
+- Funding is an as-of join using the latest record timestamp `<= signal_time`
+  with maximum age 12 hours measured from UTC epoch milliseconds. A missing or
+  older record invalidates that row rather than filling from the future.
+- H01 regime state starts exactly as `{regime:"RANGE", consecutive:0,
+  lastRaw:"RANGE", lastBarTime:0}` and steps once per newly closed daily bar
+  using `detectRegime` plus
   `stepRegimePersist(..., persistBars=1)`. The value `1` is the current H01
   call-site behavior; the helper's default `3` is not used.
 - Volatility quintile is causal per timestamp: current ATR percentile against the
@@ -379,8 +384,9 @@ reason to alter input construction after seeing outcomes.
 For every causal next-bar entry, measure using only information closed at signal
 time:
 
-- prior impulse in ATR units and distance from the recent causal swing low;
-- distance in ATR units to Donchian/recent resistance and EMA bands;
+- confirmatory impulse and overhead-resistance metrics defined below;
+- exploratory distance from the causal swing low, Donchian level, recent high,
+  and EMA bands;
 - higher-timeframe structure, lower-timeframe trend, and volatility quintile;
 - delay from the first qualifying context event;
 - MFE and MAE after 1, 3, 6, 12, 24, and 48 rule-timeframe bars;
@@ -411,12 +417,30 @@ accepted-intent/exit replay; none may be inferred from fixed-horizon signals.
 - The first 80% of time is discovery and the last 20% is validation. Purge 48
   rule-timeframe bars from both sides of the split boundary.
 - A setup is `INSUFFICIENT_SAMPLE` for inference with fewer than 30 total signals,
-  fewer than 10 validation entries, or less than 80% matched-control coverage.
-- The two confirmatory deltas are frozen as (1) prior impulse and (2) causal
-  overhead-resistance distance versus matched controls. A repeated late/crowded
-  signature requires both expected directions in discovery and validation and
-  both validation two-sided 97.5% bootstrap intervals excluding zero
-  (Bonferroni family-wise alpha 0.05 across two tests).
+  fewer than 10 validation entries, less than 80% matched-control coverage, or
+  less than 80% non-missing confirmatory overhead-resistance coverage.
+- Confirmatory impulse at index `i` is
+  `(close[i] - min(low[i-6..i-1])) / WilderATR14[i]`, using six complete prior
+  4h bars and ATR14 through the complete signal bar. Per-signal delta is that
+  value minus the median value of its twenty matched controls; expected sign is
+  strictly positive.
+- Confirmatory overhead resistance searches indices `i-90..i-1` for a pivot high
+  `j` with two lower highs on each side (`j-2..j+2`), where `j+2 <= i-1`, and
+  `high[j] > close[i]`. Resistance is the smallest qualifying `high[j]` above
+  signal close. Metric is `(resistance - close[i]) / WilderATR14[i]`; per-signal
+  delta is that value minus the median control value; expected sign is strictly
+  negative. A timestamp without a qualifying overhead pivot is missing for this
+  confirmatory metric and counts against matched/metric coverage; no fallback
+  resistance surface is allowed.
+- These formulas, windows, ATR basis, pivot rule, delta definitions, and signs are
+  fixed in this design. Metadata inventory cannot read OHLCV/funding values, and
+  no feature distribution may be inspected before preregistration to replace or
+  reinterpret them.
+- The confirmatory family is six tests: two metrics times S12/S13/S14. Each setup
+  is reported separately; no pooled or OR-selected setup claim is allowed. A
+  setup has a repeated late/crowded signature only when both expected directions
+  hold in discovery and validation and both validation two-sided 99.1667%
+  bootstrap intervals exclude zero (Bonferroni alpha `0.05/6`).
 - Each signal delta is measured against the median of its twenty controls.
   Confidence intervals use 10,000 deterministic calendar-month block-bootstrap
   resamples within each split so twenty controls and nearby signals are not
