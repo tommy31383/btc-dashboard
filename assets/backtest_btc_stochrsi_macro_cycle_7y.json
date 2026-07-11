@@ -1,6 +1,6 @@
 {
   "schemaVersion": "btc-stochrsi-macro-cycle-report/v4",
-  "generatedAt": "2026-07-11T16:57:09.648Z",
+  "generatedAt": "2026-07-11T17:02:52.925Z",
   "verdict": "INSUFFICIENT_SAMPLE",
   "hybridVerdict": {
     "verdict": "KILL",
@@ -144,7 +144,7 @@
         "id": "TOTAL_NET_PNL_POSITIVE",
         "passed": false,
         "actual": {
-          "totalNetPnl": -24.357551903229542
+          "totalNetPnl": -24.348351903229542
         },
         "requirement": {
           "greaterThan": 0
@@ -154,9 +154,9 @@
         "id": "BEATS_MATCHED_PEAK",
         "passed": true,
         "actual": {
-          "hybridTotalNetPnl": -24.357551903229542,
-          "matchedPeakTotalNetPnl": -68.25028439829639,
-          "improvement": 43.892732495066845
+          "hybridTotalNetPnl": -24.348351903229542,
+          "matchedPeakTotalNetPnl": -68.23188439829642,
+          "improvement": 43.88353249506687
         },
         "requirement": {
           "improvementGreaterThan": 0
@@ -405,8 +405,8 @@
         "passed": true,
         "actual": {
           "tacticalOnlyTotalNetPnl": 13.97787159157822,
-          "hybridTotalNetPnl": -24.357551903229542,
-          "improvement": 38.33542349480776
+          "hybridTotalNetPnl": -24.348351903229542,
+          "improvement": 38.32622349480776
         },
         "requirement": {
           "improvementGreaterThan": 0
@@ -481,8 +481,8 @@
   "data": {
     "rawRange": {
       "firstTime": 1567962000000,
-      "lastTime": 1783782000000,
-      "rowCount": 59951
+      "lastTime": 1783785600000,
+      "rowCount": 59952
     },
     "fundingRange": {
       "firstTime": 1568102400000,
@@ -494,23 +494,23 @@
       "firstWeeklyValidTime": 1587340800000,
       "firstTwoWeeklyValidTime": 1606694400000,
       "firstAllIndicatorsValidTime": 1606694400000,
-      "lastCompletedHourTime": 1783782000000
+      "lastCompletedHourTime": 1783785600000
     },
-    "dataCutoffTime": 1783785600000,
+    "dataCutoffTime": 1783789200000,
     "provenance": {
       "source": "https://fapi.binance.com",
       "symbol": "BTCUSDT",
       "interval": "1h",
-      "gitSha": "3000e07ec0b7c9b27319bd9e50d88186a3780d3c",
+      "gitSha": "a98939528f8d5450d22cea20237354c761df5d86",
       "gitDirty": false,
       "evaluatorVersion": "stochrsi-macro-cycle/v5",
       "hourly": {
         "path": ".cache/binance-futures-btcusdt-1h-7y.json",
-        "sha256": "41adc7f139a9853cb36d922ee106b28a6fdcbcc91ebcadcb2c2f43f72819a8ae",
+        "sha256": "f738aefc1304fda8bb871cb919fc00b8c2b98ac0be23cb05e94c22158bd000a7",
         "range": {
           "firstTime": 1567962000000,
-          "lastTime": 1783782000000,
-          "rowCount": 59951
+          "lastTime": 1783785600000,
+          "rowCount": 59952
         }
       },
       "funding": {
@@ -838,11 +838,11 @@
           "entries": 4,
           "realized": 3,
           "open": 1,
-          "grossPnl": 2.6916900000000155,
+          "grossPnl": 2.700890000000012,
           "fees": 0.15383767978479998,
           "slippageCost": 0.07691638200001034,
           "fundingPnl": -12.651104631803234,
-          "netPnl": -10.190168693588028,
+          "netPnl": -10.180968693588035,
           "exitReasons": {
             "DAILY_RECOVERY": 0,
             "MACRO_OVERBOUGHT": 3,
@@ -898,16 +898,16 @@
       "netExpectancy": 7.98866527750409,
       "averageReturnPct": 15.128117258822074,
       "medianReturnPct": 36.2605514927227,
-      "grossPnl": 2.6916900000000155,
+      "grossPnl": 2.700890000000012,
       "fees": 0.15383767978479998,
       "slippageCost": 0.07691638200001034,
       "fundingPnl": -12.651104631803234,
       "closedNetPnl": 23.96599583251227,
-      "totalNetPnl": -10.190168693588028,
+      "totalNetPnl": -10.180968693588035,
       "averageLegsPerCampaign": 1,
       "medianLegsPerCampaign": 1,
-      "averageHoldHours": 6838,
-      "averageUnderwaterHours": 4063,
+      "averageHoldHours": 6838.25,
+      "averageUnderwaterHours": 4063.25,
       "weightedAverageEntry": 55764.80323050001,
       "weightedEntryImprovementVsMacroOncePct": 0,
       "closedWeightedAverageEntry": 43114.491174,
@@ -1031,8 +1031,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [
           {
@@ -1043,22 +1043,22 @@
             "entryFee": 0.03748629576,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -29.558,
+            "grossPnl": -29.548800000000004,
             "fees": 0.03748629576,
             "slippageCost": 0.018739400000005846,
             "fundingPnl": -4.541938830340296,
-            "netPnl": -34.1561645261003
+            "netPnl": -34.146964526100305
           }
         ],
-        "grossPnl": -29.558,
+        "grossPnl": -29.548800000000004,
         "fees": 0.03748629576,
         "slippageCost": 0.018739400000005846,
         "fundingPnl": -4.541938830340296,
-        "netPnl": -34.1561645261003,
-        "returnPct": -36.4465614258391,
+        "netPnl": -34.146964526100305,
+        "returnPct": -36.43674450494738,
         "weightedAverageEntry": 93715.7394,
-        "holdHours": 10552,
-        "underwaterHours": 5773,
+        "holdHours": 10553,
+        "underwaterHours": 5774,
         "maxDrawdown": 69.92413635092689,
         "worstUnrealizedPnl": -35.95713940000001,
         "suppressedDuplicateDailyEntries": 44
@@ -1073,7 +1073,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 100,
-          "scaleTestRoiPct": -10.190168693588028,
+          "scaleTestRoiPct": -10.180968693588035,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -1083,7 +1083,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 250,
-          "scaleTestRoiPct": -4.0760674774352115,
+          "scaleTestRoiPct": -4.072387477435214,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -1093,7 +1093,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 500,
-          "scaleTestRoiPct": -2.0380337387176057,
+          "scaleTestRoiPct": -2.036193738717607,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -1103,7 +1103,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 1000,
-          "scaleTestRoiPct": -1.0190168693588029,
+          "scaleTestRoiPct": -1.0180968693588035,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -1228,8 +1228,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [
             {
@@ -1240,22 +1240,22 @@
               "entryFee": 0.03748629576,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -29.558,
+              "grossPnl": -29.548800000000004,
               "fees": 0.03748629576,
               "slippageCost": 0.018739400000005846,
               "fundingPnl": -4.541938830340296,
-              "netPnl": -34.1561645261003
+              "netPnl": -34.146964526100305
             }
           ],
-          "grossPnl": -29.558,
+          "grossPnl": -29.548800000000004,
           "fees": 0.03748629576,
           "slippageCost": 0.018739400000005846,
           "fundingPnl": -4.541938830340296,
-          "netPnl": -34.1561645261003,
-          "returnPct": -36.4465614258391,
+          "netPnl": -34.146964526100305,
+          "returnPct": -36.43674450494738,
           "weightedAverageEntry": 93715.7394,
-          "holdHours": 10552,
-          "underwaterHours": 5773,
+          "holdHours": 10553,
+          "underwaterHours": 5774,
           "maxDrawdown": 69.92413635092689,
           "worstUnrealizedPnl": -35.95713940000001,
           "suppressedDuplicateDailyEntries": 44
@@ -1281,11 +1281,11 @@
           "entries": 49,
           "realized": 25,
           "open": 24,
-          "grossPnl": -738.4915399999999,
+          "grossPnl": -738.2707399999999,
           "fees": 1.7572059622032001,
           "slippageCost": 0.8785118680001107,
           "fundingPnl": -77.87615494935403,
-          "netPnl": -819.0034127795574,
+          "netPnl": -818.7826127795577,
           "exitReasons": {
             "DAILY_RECOVERY": 0,
             "MACRO_OVERBOUGHT": 25,
@@ -1341,16 +1341,16 @@
       "netExpectancy": -20.53124088841493,
       "averageReturnPct": 3.7588845616705697,
       "medianReturnPct": 1.9867686813836112,
-      "grossPnl": -738.4915399999998,
+      "grossPnl": -738.2707399999998,
       "fees": 1.7572059622031997,
       "slippageCost": 0.8785118680001107,
       "fundingPnl": -77.876154949354,
       "closedNetPnl": -61.5937226652448,
-      "totalNetPnl": -819.0034127795574,
+      "totalNetPnl": -818.7826127795577,
       "averageLegsPerCampaign": 12.25,
       "medianLegsPerCampaign": 12,
-      "averageHoldHours": 6196,
-      "averageUnderwaterHours": 4559.25,
+      "averageHoldHours": 6196.25,
+      "averageUnderwaterHours": 4559.5,
       "weightedAverageEntry": 68078.78527934688,
       "weightedEntryImprovementVsMacroOncePct": 2.3194129963902475,
       "closedWeightedAverageEntry": 43220.47196591997,
@@ -1876,8 +1876,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [
           {
@@ -1888,11 +1888,11 @@
             "entryFee": 0.043591116480000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.817,
+            "grossPnl": -44.8078,
             "fees": 0.043591116480000004,
             "slippageCost": 0.02179120000000694,
             "fundingPnl": -4.198066722793392,
-            "netPnl": -49.080449039273404
+            "netPnl": -49.071249039273404
           },
           {
             "qty": 0.001,
@@ -1902,11 +1902,11 @@
             "entryFee": 0.042224403192,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -41.40089999999999,
+            "grossPnl": -41.3917,
             "fees": 0.042224403192,
             "slippageCost": 0.021107980000000682,
             "fundingPnl": -4.130178322033775,
-            "netPnl": -45.59441070522577
+            "netPnl": -45.58521070522578
           },
           {
             "qty": 0.001,
@@ -1916,11 +1916,11 @@
             "entryFee": 0.040591596696,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -37.3197,
+            "grossPnl": -37.3105,
             "fees": 0.040591596696,
             "slippageCost": 0.02029174000000057,
             "fundingPnl": -4.049352501533776,
-            "netPnl": -41.42993583822977
+            "netPnl": -41.42073583822977
           },
           {
             "qty": 0.001,
@@ -1930,11 +1930,11 @@
             "entryFee": 0.041306699688,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -39.10710000000001,
+            "grossPnl": -39.09790000000001,
             "fees": 0.041306699688,
             "slippageCost": 0.020649219999992058,
             "fundingPnl": -3.9283085467251513,
-            "netPnl": -43.09736446641315
+            "netPnl": -43.08816446641315
           },
           {
             "qty": 0.001,
@@ -1944,11 +1944,11 @@
             "entryFee": 0.047042766672000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -53.444399999999995,
+            "grossPnl": -53.435199999999995,
             "fees": 0.047042766672000004,
             "slippageCost": 0.023516680000000633,
             "fundingPnl": -3.1998147187940775,
-            "netPnl": -56.714774165466075
+            "netPnl": -56.705574165466075
           },
           {
             "qty": 0.001,
@@ -1958,11 +1958,11 @@
             "entryFee": 0.047168271768,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -53.758100000000006,
+            "grossPnl": -53.74890000000001,
             "fees": 0.047168271768,
             "slippageCost": 0.02357941999999457,
             "fundingPnl": -3.0579885872813213,
-            "netPnl": -56.88683627904933
+            "netPnl": -56.877636279049334
           },
           {
             "qty": 0.001,
@@ -1972,11 +1972,11 @@
             "entryFee": 0.04569733764,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -50.0815,
+            "grossPnl": -50.072300000000006,
             "fees": 0.04569733764,
             "slippageCost": 0.022844100000002074,
             "fundingPnl": -2.550115659144387,
-            "netPnl": -52.70015709678439
+            "netPnl": -52.690957096784395
           },
           {
             "qty": 0.001,
@@ -1986,11 +1986,11 @@
             "entryFee": 0.044692936800000006,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -47.571,
+            "grossPnl": -47.561800000000005,
             "fees": 0.044692936800000006,
             "slippageCost": 0.022342000000004192,
             "fundingPnl": -2.3843244746709025,
-            "netPnl": -50.0223594114709
+            "netPnl": -50.01315941147091
           },
           {
             "qty": 0.001,
@@ -2000,11 +2000,11 @@
             "entryFee": 0.043292016672,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.069399999999995,
+            "grossPnl": -44.060199999999995,
             "fees": 0.043292016672,
             "slippageCost": 0.021641680000000635,
             "fundingPnl": -2.289764442820677,
-            "netPnl": -46.42409813949267
+            "netPnl": -46.41489813949267
           },
           {
             "qty": 0.001,
@@ -2014,11 +2014,11 @@
             "entryFee": 0.045310620312000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -49.1149,
+            "grossPnl": -49.1057,
             "fees": 0.045310620312000005,
             "slippageCost": 0.022650780000010855,
             "fundingPnl": -1.8745844985772129,
-            "netPnl": -51.05744589888923
+            "netPnl": -51.04824589888923
           },
           {
             "qty": 0.001,
@@ -2028,11 +2028,11 @@
             "entryFee": 0.043839646175999995,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -45.438199999999995,
+            "grossPnl": -45.429,
             "fees": 0.043839646175999995,
             "slippageCost": 0.021915439999997035,
             "fundingPnl": -1.8294732087259982,
-            "netPnl": -47.333428294901985
+            "netPnl": -47.32422829490199
           },
           {
             "qty": 0.001,
@@ -2042,11 +2042,11 @@
             "entryFee": 0.043260410352000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -43.990399999999994,
+            "grossPnl": -43.9812,
             "fees": 0.043260410352000005,
             "slippageCost": 0.021625880000006873,
             "fundingPnl": -1.5593798176648852,
-            "netPnl": -45.614666108016884
+            "netPnl": -45.60546610801689
           },
           {
             "qty": 0.001,
@@ -2056,11 +2056,11 @@
             "entryFee": 0.04154310696,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -39.698,
+            "grossPnl": -39.6888,
             "fees": 0.04154310696,
             "slippageCost": 0.020767399999996997,
             "fundingPnl": -1.3244333078518613,
-            "netPnl": -41.08474381481186
+            "netPnl": -41.07554381481186
           },
           {
             "qty": 0.001,
@@ -2070,11 +2070,11 @@
             "entryFee": 0.037696217736,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -30.0827,
+            "grossPnl": -30.0735,
             "fees": 0.037696217736,
             "slippageCost": 0.01884433999999601,
             "fundingPnl": -1.1337998258112494,
-            "netPnl": -31.273040383547244
+            "netPnl": -31.263840383547244
           },
           {
             "qty": 0.001,
@@ -2084,11 +2084,11 @@
             "entryFee": 0.035363351256,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -24.251699999999996,
+            "grossPnl": -24.2425,
             "fees": 0.035363351256,
             "slippageCost": 0.017678140000003624,
             "fundingPnl": -0.3586952389048165,
-            "netPnl": -24.663436730160814
+            "netPnl": -24.654236730160818
           },
           {
             "qty": 0.001,
@@ -2098,11 +2098,11 @@
             "entryFee": 0.034658490312,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -22.489899999999995,
+            "grossPnl": -22.4807,
             "fees": 0.034658490312,
             "slippageCost": 0.017325779999999215,
             "fundingPnl": -0.2807581467457421,
-            "netPnl": -22.82264241705774
+            "netPnl": -22.813442417057743
           },
           {
             "qty": 0.001,
@@ -2112,11 +2112,11 @@
             "entryFee": 0.031488976536,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -14.567699999999997,
+            "grossPnl": -14.5585,
             "fees": 0.031488976536,
             "slippageCost": 0.015741340000007768,
             "fundingPnl": -0.20619248201711163,
-            "netPnl": -14.821122798553116
+            "netPnl": -14.81192279855312
           },
           {
             "qty": 0.001,
@@ -2126,11 +2126,11 @@
             "entryFee": 0.025152269448000003,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 1.2709000000000015,
+            "grossPnl": 1.2800999999999985,
             "fees": 0.025152269448000003,
             "slippageCost": 0.012573620000002847,
             "fundingPnl": -0.2030575536790202,
-            "netPnl": 1.0301165568729784
+            "netPnl": 1.0393165568729754
           },
           {
             "qty": 0.001,
@@ -2140,11 +2140,11 @@
             "entryFee": 0.026539226784,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.195800000000003,
+            "grossPnl": -2.1866000000000057,
             "fees": 0.026539226784,
             "slippageCost": 0.01326695999999356,
             "fundingPnl": -0.30933504226795777,
-            "netPnl": -2.5449412290519544
+            "netPnl": -2.535741229051957
           },
           {
             "qty": 0.001,
@@ -2154,11 +2154,11 @@
             "entryFee": 0.030528264432000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -12.166399999999994,
+            "grossPnl": -12.157199999999998,
             "fees": 0.030528264432000005,
             "slippageCost": 0.015261080000011135,
             "fundingPnl": -0.4521691834313897,
-            "netPnl": -12.664358527863396
+            "netPnl": -12.6551585278634
           },
           {
             "qty": 0.001,
@@ -2168,11 +2168,11 @@
             "entryFee": 0.030978354431999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -13.291399999999994,
+            "grossPnl": -13.282199999999998,
             "fees": 0.030978354431999998,
             "slippageCost": 0.015486080000002404,
             "fundingPnl": -0.448816375792434,
-            "netPnl": -13.78668081022443
+            "netPnl": -13.777480810224434
           },
           {
             "qty": 0.001,
@@ -2182,11 +2182,11 @@
             "entryFee": 0.029442447312,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -9.452399999999994,
+            "grossPnl": -9.443199999999997,
             "fees": 0.029442447312,
             "slippageCost": 0.01471828000000096,
             "fundingPnl": -0.30576660842874115,
-            "netPnl": -9.802327335740735
+            "netPnl": -9.793127335740738
           },
           {
             "qty": 0.001,
@@ -2196,11 +2196,11 @@
             "entryFee": 0.026697378408000003,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.5911000000000057,
+            "grossPnl": -2.581900000000009,
             "fees": 0.026697378408000003,
             "slippageCost": 0.013346019999997225,
             "fundingPnl": -0.24289163805067074,
-            "netPnl": -2.8740350364586735
+            "netPnl": -2.8648350364586768
           },
           {
             "qty": 0.001,
@@ -2210,22 +2210,22 @@
             "entryFee": 0.024033565752000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 4.067099999999999,
+            "grossPnl": 4.076299999999995,
             "fees": 0.024033565752000004,
             "slippageCost": 0.012014380000000529,
             "fundingPnl": -0.17760419874993386,
-            "netPnl": 3.853447855498065
+            "netPnl": 3.8626478554980612
           }
         ],
-        "grossPnl": -715.5616999999999,
+        "grossPnl": -715.3408999999999,
         "fees": 0.9021394718159998,
         "slippageCost": 0.45097954000002943,
         "fundingPnl": -40.49487110249647,
-        "netPnl": -757.4096901143125,
-        "returnPct": -33.58282011936148,
+        "netPnl": -757.1888901143128,
+        "returnPct": -33.573030058870934,
         "weightedAverageEntry": 93972.86164749994,
-        "holdHours": 9880,
-        "underwaterHours": 7303,
+        "holdHours": 9881,
+        "underwaterHours": 7304,
         "maxDrawdown": 1067.3416298714426,
         "worstUnrealizedPnl": -869.1422795400002,
         "suppressedDuplicateDailyEntries": 44
@@ -2270,7 +2270,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 1000,
-          "scaleTestRoiPct": -81.90034127795573,
+          "scaleTestRoiPct": -81.87826127795577,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -2769,8 +2769,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [
             {
@@ -2781,11 +2781,11 @@
               "entryFee": 0.043591116480000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.817,
+              "grossPnl": -44.8078,
               "fees": 0.043591116480000004,
               "slippageCost": 0.02179120000000694,
               "fundingPnl": -4.198066722793392,
-              "netPnl": -49.080449039273404
+              "netPnl": -49.071249039273404
             },
             {
               "qty": 0.001,
@@ -2795,11 +2795,11 @@
               "entryFee": 0.042224403192,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -41.40089999999999,
+              "grossPnl": -41.3917,
               "fees": 0.042224403192,
               "slippageCost": 0.021107980000000682,
               "fundingPnl": -4.130178322033775,
-              "netPnl": -45.59441070522577
+              "netPnl": -45.58521070522578
             },
             {
               "qty": 0.001,
@@ -2809,11 +2809,11 @@
               "entryFee": 0.040591596696,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -37.3197,
+              "grossPnl": -37.3105,
               "fees": 0.040591596696,
               "slippageCost": 0.02029174000000057,
               "fundingPnl": -4.049352501533776,
-              "netPnl": -41.42993583822977
+              "netPnl": -41.42073583822977
             },
             {
               "qty": 0.001,
@@ -2823,11 +2823,11 @@
               "entryFee": 0.041306699688,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -39.10710000000001,
+              "grossPnl": -39.09790000000001,
               "fees": 0.041306699688,
               "slippageCost": 0.020649219999992058,
               "fundingPnl": -3.9283085467251513,
-              "netPnl": -43.09736446641315
+              "netPnl": -43.08816446641315
             },
             {
               "qty": 0.001,
@@ -2837,11 +2837,11 @@
               "entryFee": 0.047042766672000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -53.444399999999995,
+              "grossPnl": -53.435199999999995,
               "fees": 0.047042766672000004,
               "slippageCost": 0.023516680000000633,
               "fundingPnl": -3.1998147187940775,
-              "netPnl": -56.714774165466075
+              "netPnl": -56.705574165466075
             },
             {
               "qty": 0.001,
@@ -2851,11 +2851,11 @@
               "entryFee": 0.047168271768,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -53.758100000000006,
+              "grossPnl": -53.74890000000001,
               "fees": 0.047168271768,
               "slippageCost": 0.02357941999999457,
               "fundingPnl": -3.0579885872813213,
-              "netPnl": -56.88683627904933
+              "netPnl": -56.877636279049334
             },
             {
               "qty": 0.001,
@@ -2865,11 +2865,11 @@
               "entryFee": 0.04569733764,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -50.0815,
+              "grossPnl": -50.072300000000006,
               "fees": 0.04569733764,
               "slippageCost": 0.022844100000002074,
               "fundingPnl": -2.550115659144387,
-              "netPnl": -52.70015709678439
+              "netPnl": -52.690957096784395
             },
             {
               "qty": 0.001,
@@ -2879,11 +2879,11 @@
               "entryFee": 0.044692936800000006,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -47.571,
+              "grossPnl": -47.561800000000005,
               "fees": 0.044692936800000006,
               "slippageCost": 0.022342000000004192,
               "fundingPnl": -2.3843244746709025,
-              "netPnl": -50.0223594114709
+              "netPnl": -50.01315941147091
             },
             {
               "qty": 0.001,
@@ -2893,11 +2893,11 @@
               "entryFee": 0.043292016672,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.069399999999995,
+              "grossPnl": -44.060199999999995,
               "fees": 0.043292016672,
               "slippageCost": 0.021641680000000635,
               "fundingPnl": -2.289764442820677,
-              "netPnl": -46.42409813949267
+              "netPnl": -46.41489813949267
             },
             {
               "qty": 0.001,
@@ -2907,11 +2907,11 @@
               "entryFee": 0.045310620312000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -49.1149,
+              "grossPnl": -49.1057,
               "fees": 0.045310620312000005,
               "slippageCost": 0.022650780000010855,
               "fundingPnl": -1.8745844985772129,
-              "netPnl": -51.05744589888923
+              "netPnl": -51.04824589888923
             },
             {
               "qty": 0.001,
@@ -2921,11 +2921,11 @@
               "entryFee": 0.043839646175999995,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -45.438199999999995,
+              "grossPnl": -45.429,
               "fees": 0.043839646175999995,
               "slippageCost": 0.021915439999997035,
               "fundingPnl": -1.8294732087259982,
-              "netPnl": -47.333428294901985
+              "netPnl": -47.32422829490199
             },
             {
               "qty": 0.001,
@@ -2935,11 +2935,11 @@
               "entryFee": 0.043260410352000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -43.990399999999994,
+              "grossPnl": -43.9812,
               "fees": 0.043260410352000005,
               "slippageCost": 0.021625880000006873,
               "fundingPnl": -1.5593798176648852,
-              "netPnl": -45.614666108016884
+              "netPnl": -45.60546610801689
             },
             {
               "qty": 0.001,
@@ -2949,11 +2949,11 @@
               "entryFee": 0.04154310696,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -39.698,
+              "grossPnl": -39.6888,
               "fees": 0.04154310696,
               "slippageCost": 0.020767399999996997,
               "fundingPnl": -1.3244333078518613,
-              "netPnl": -41.08474381481186
+              "netPnl": -41.07554381481186
             },
             {
               "qty": 0.001,
@@ -2963,11 +2963,11 @@
               "entryFee": 0.037696217736,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -30.0827,
+              "grossPnl": -30.0735,
               "fees": 0.037696217736,
               "slippageCost": 0.01884433999999601,
               "fundingPnl": -1.1337998258112494,
-              "netPnl": -31.273040383547244
+              "netPnl": -31.263840383547244
             },
             {
               "qty": 0.001,
@@ -2977,11 +2977,11 @@
               "entryFee": 0.035363351256,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -24.251699999999996,
+              "grossPnl": -24.2425,
               "fees": 0.035363351256,
               "slippageCost": 0.017678140000003624,
               "fundingPnl": -0.3586952389048165,
-              "netPnl": -24.663436730160814
+              "netPnl": -24.654236730160818
             },
             {
               "qty": 0.001,
@@ -2991,11 +2991,11 @@
               "entryFee": 0.034658490312,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -22.489899999999995,
+              "grossPnl": -22.4807,
               "fees": 0.034658490312,
               "slippageCost": 0.017325779999999215,
               "fundingPnl": -0.2807581467457421,
-              "netPnl": -22.82264241705774
+              "netPnl": -22.813442417057743
             },
             {
               "qty": 0.001,
@@ -3005,11 +3005,11 @@
               "entryFee": 0.031488976536,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -14.567699999999997,
+              "grossPnl": -14.5585,
               "fees": 0.031488976536,
               "slippageCost": 0.015741340000007768,
               "fundingPnl": -0.20619248201711163,
-              "netPnl": -14.821122798553116
+              "netPnl": -14.81192279855312
             },
             {
               "qty": 0.001,
@@ -3019,11 +3019,11 @@
               "entryFee": 0.025152269448000003,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 1.2709000000000015,
+              "grossPnl": 1.2800999999999985,
               "fees": 0.025152269448000003,
               "slippageCost": 0.012573620000002847,
               "fundingPnl": -0.2030575536790202,
-              "netPnl": 1.0301165568729784
+              "netPnl": 1.0393165568729754
             },
             {
               "qty": 0.001,
@@ -3033,11 +3033,11 @@
               "entryFee": 0.026539226784,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.195800000000003,
+              "grossPnl": -2.1866000000000057,
               "fees": 0.026539226784,
               "slippageCost": 0.01326695999999356,
               "fundingPnl": -0.30933504226795777,
-              "netPnl": -2.5449412290519544
+              "netPnl": -2.535741229051957
             },
             {
               "qty": 0.001,
@@ -3047,11 +3047,11 @@
               "entryFee": 0.030528264432000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -12.166399999999994,
+              "grossPnl": -12.157199999999998,
               "fees": 0.030528264432000005,
               "slippageCost": 0.015261080000011135,
               "fundingPnl": -0.4521691834313897,
-              "netPnl": -12.664358527863396
+              "netPnl": -12.6551585278634
             },
             {
               "qty": 0.001,
@@ -3061,11 +3061,11 @@
               "entryFee": 0.030978354431999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -13.291399999999994,
+              "grossPnl": -13.282199999999998,
               "fees": 0.030978354431999998,
               "slippageCost": 0.015486080000002404,
               "fundingPnl": -0.448816375792434,
-              "netPnl": -13.78668081022443
+              "netPnl": -13.777480810224434
             },
             {
               "qty": 0.001,
@@ -3075,11 +3075,11 @@
               "entryFee": 0.029442447312,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -9.452399999999994,
+              "grossPnl": -9.443199999999997,
               "fees": 0.029442447312,
               "slippageCost": 0.01471828000000096,
               "fundingPnl": -0.30576660842874115,
-              "netPnl": -9.802327335740735
+              "netPnl": -9.793127335740738
             },
             {
               "qty": 0.001,
@@ -3089,11 +3089,11 @@
               "entryFee": 0.026697378408000003,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.5911000000000057,
+              "grossPnl": -2.581900000000009,
               "fees": 0.026697378408000003,
               "slippageCost": 0.013346019999997225,
               "fundingPnl": -0.24289163805067074,
-              "netPnl": -2.8740350364586735
+              "netPnl": -2.8648350364586768
             },
             {
               "qty": 0.001,
@@ -3103,22 +3103,22 @@
               "entryFee": 0.024033565752000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 4.067099999999999,
+              "grossPnl": 4.076299999999995,
               "fees": 0.024033565752000004,
               "slippageCost": 0.012014380000000529,
               "fundingPnl": -0.17760419874993386,
-              "netPnl": 3.853447855498065
+              "netPnl": 3.8626478554980612
             }
           ],
-          "grossPnl": -715.5616999999999,
+          "grossPnl": -715.3408999999999,
           "fees": 0.9021394718159998,
           "slippageCost": 0.45097954000002943,
           "fundingPnl": -40.49487110249647,
-          "netPnl": -757.4096901143125,
-          "returnPct": -33.58282011936148,
+          "netPnl": -757.1888901143128,
+          "returnPct": -33.573030058870934,
           "weightedAverageEntry": 93972.86164749994,
-          "holdHours": 9880,
-          "underwaterHours": 7303,
+          "holdHours": 9881,
+          "underwaterHours": 7304,
           "maxDrawdown": 1067.3416298714426,
           "worstUnrealizedPnl": -869.1422795400002,
           "suppressedDuplicateDailyEntries": 44
@@ -3159,11 +3159,11 @@
           "entries": 4,
           "realized": 3,
           "open": 1,
-          "grossPnl": -25.186379999999996,
+          "grossPnl": -25.177179999999996,
           "fees": 0.1649911380304,
           "slippageCost": 0.08249199600001884,
           "fundingPnl": -11.228158727261507,
-          "netPnl": -36.66202186129192,
+          "netPnl": -36.652821861291926,
           "exitReasons": {
             "DAILY_RECOVERY": 0,
             "MACRO_OVERBOUGHT": 3,
@@ -3204,16 +3204,16 @@
       "netExpectancy": 5.929172101294211,
       "averageReturnPct": 3.2315534771502534,
       "medianReturnPct": 1.9867686813836112,
-      "grossPnl": -7.923349999999985,
+      "grossPnl": -7.914149999999978,
       "fees": 2.639335576988,
       "slippageCost": 1.3196649060000203,
       "fundingPnl": -12.475201420241525,
       "closedNetPnl": 17.787516303882633,
-      "totalNetPnl": -24.357551903229542,
+      "totalNetPnl": -24.348351903229542,
       "averageLegsPerCampaign": 12.25,
       "medianLegsPerCampaign": 12,
-      "averageHoldHours": 6196,
-      "averageUnderwaterHours": 4122.75,
+      "averageHoldHours": 6196.25,
+      "averageUnderwaterHours": 4123,
       "weightedAverageEntry": 68078.78527934688,
       "weightedEntryImprovementVsMacroOncePct": 2.3194129963902475,
       "closedWeightedAverageEntry": 43220.47196591997,
@@ -3770,8 +3770,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [
           {
@@ -3782,11 +3782,11 @@
             "entryFee": 0.043591116480000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.817,
+            "grossPnl": -44.8078,
             "fees": 0.043591116480000004,
             "slippageCost": 0.02179120000000694,
             "fundingPnl": -4.198066722793392,
-            "netPnl": -49.080449039273404
+            "netPnl": -49.071249039273404
           },
           {
             "qty": 0.001,
@@ -4180,15 +4180,15 @@
             "closed": true
           }
         ],
-        "grossPnl": -34.61759999999998,
+        "grossPnl": -34.608399999999975,
         "fees": 1.764423420528,
         "slippageCost": 0.8822077600000123,
         "fundingPnl": -4.880837026584181,
-        "netPnl": -42.145068207112175,
-        "returnPct": -1.868671952565138,
+        "netPnl": -42.135868207112175,
+        "returnPct": -1.8682640333780314,
         "weightedAverageEntry": 93972.86164749994,
-        "holdHours": 9880,
-        "underwaterHours": 6575,
+        "holdHours": 9881,
+        "underwaterHours": 6576,
         "maxDrawdown": 77.17553209997605,
         "worstUnrealizedPnl": -57.56123722000001,
         "suppressedDuplicateDailyEntries": 44
@@ -4203,7 +4203,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 100,
-          "scaleTestRoiPct": -24.357551903229542,
+          "scaleTestRoiPct": -24.348351903229542,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -4213,7 +4213,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 250,
-          "scaleTestRoiPct": -9.743020761291817,
+          "scaleTestRoiPct": -9.739340761291816,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -4223,7 +4223,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 500,
-          "scaleTestRoiPct": -4.871510380645908,
+          "scaleTestRoiPct": -4.869670380645908,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -4233,7 +4233,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 1000,
-          "scaleTestRoiPct": -2.435755190322954,
+          "scaleTestRoiPct": -2.434835190322954,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -4732,8 +4732,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [
             {
@@ -4744,11 +4744,11 @@
               "entryFee": 0.043591116480000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.817,
+              "grossPnl": -44.8078,
               "fees": 0.043591116480000004,
               "slippageCost": 0.02179120000000694,
               "fundingPnl": -4.198066722793392,
-              "netPnl": -49.080449039273404
+              "netPnl": -49.071249039273404
             },
             {
               "qty": 0.001,
@@ -5142,15 +5142,15 @@
               "closed": true
             }
           ],
-          "grossPnl": -34.61759999999998,
+          "grossPnl": -34.608399999999975,
           "fees": 1.764423420528,
           "slippageCost": 0.8822077600000123,
           "fundingPnl": -4.880837026584181,
-          "netPnl": -42.145068207112175,
-          "returnPct": -1.868671952565138,
+          "netPnl": -42.135868207112175,
+          "returnPct": -1.8682640333780314,
           "weightedAverageEntry": 93972.86164749994,
-          "holdHours": 9880,
-          "underwaterHours": 6575,
+          "holdHours": 9881,
+          "underwaterHours": 6576,
           "maxDrawdown": 77.17553209997605,
           "worstUnrealizedPnl": -57.56123722000001,
           "suppressedDuplicateDailyEntries": 44
@@ -5244,7 +5244,7 @@
       "totalNetPnl": 13.97787159157822,
       "averageLegsPerCampaign": 12.25,
       "medianLegsPerCampaign": 12,
-      "averageHoldHours": 6196,
+      "averageHoldHours": 6196.25,
       "averageUnderwaterHours": 2083.5,
       "weightedAverageEntry": 68078.78527934688,
       "weightedEntryImprovementVsMacroOncePct": 2.3194129963902475,
@@ -5802,8 +5802,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [
           {
@@ -6222,7 +6222,7 @@
         "netPnl": 7.2134147700232285,
         "returnPct": 0.3198359010055365,
         "weightedAverageEntry": 93972.86164749994,
-        "holdHours": 9880,
+        "holdHours": 9881,
         "underwaterHours": 1591,
         "maxDrawdown": 17.686145913508284,
         "worstUnrealizedPnl": -13.640544339999993,
@@ -6767,8 +6767,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [
             {
@@ -7187,7 +7187,7 @@
           "netPnl": 7.2134147700232285,
           "returnPct": 0.3198359010055365,
           "weightedAverageEntry": 93972.86164749994,
-          "holdHours": 9880,
+          "holdHours": 9881,
           "underwaterHours": 1591,
           "maxDrawdown": 17.686145913508284,
           "worstUnrealizedPnl": -13.640544339999993,
@@ -7259,11 +7259,11 @@
           "entries": 49,
           "realized": 25,
           "open": 24,
-          "grossPnl": -61.54096166666665,
+          "grossPnl": -61.52256166666663,
           "fees": 0.14643383018359996,
           "slippageCost": 0.07320932233334253,
           "fundingPnl": -6.489679579112833,
-          "netPnl": -68.25028439829642,
+          "netPnl": -68.2318843982964,
           "exitReasons": {
             "DAILY_RECOVERY": 0,
             "MACRO_OVERBOUGHT": 25,
@@ -7274,16 +7274,16 @@
       "netExpectancy": -1.7109367407012428,
       "averageReturnPct": 3.7588845616705746,
       "medianReturnPct": 1.9867686813836112,
-      "grossPnl": -61.54096166666664,
+      "grossPnl": -61.52256166666663,
       "fees": 0.14643383018359996,
       "slippageCost": 0.07320932233334251,
       "fundingPnl": -6.489679579112832,
       "closedNetPnl": -5.132810222103728,
-      "totalNetPnl": -68.25028439829639,
+      "totalNetPnl": -68.23188439829642,
       "averageLegsPerCampaign": 12.25,
       "medianLegsPerCampaign": 12,
-      "averageHoldHours": 6196,
-      "averageUnderwaterHours": 4559.25,
+      "averageHoldHours": 6196.25,
+      "averageUnderwaterHours": 4559.5,
       "weightedAverageEntry": 68078.78527934694,
       "weightedEntryImprovementVsMacroOncePct": 2.3194129963901835,
       "closedWeightedAverageEntry": 43220.47196592001,
@@ -7809,8 +7809,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [
           {
@@ -7821,11 +7821,11 @@
             "entryFee": 0.0036325930399999985,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.7347499999999982,
+            "grossPnl": -3.7339833333333314,
             "fees": 0.0036325930399999985,
             "slippageCost": 0.0018159333333339106,
             "fundingPnl": -0.3498388935661158,
-            "netPnl": -4.090037419939447
+            "netPnl": -4.089270753272781
           },
           {
             "qty": 0.00008333333333333329,
@@ -7835,11 +7835,11 @@
             "entryFee": 0.0035187002659999985,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.450074999999998,
+            "grossPnl": -3.4493083333333314,
             "fees": 0.0035187002659999985,
             "slippageCost": 0.001758998333333389,
             "fundingPnl": -0.3441815268361477,
-            "netPnl": -3.799534225435479
+            "netPnl": -3.798767558768813
           },
           {
             "qty": 0.00008333333333333329,
@@ -7849,11 +7849,11 @@
             "entryFee": 0.0033826330579999984,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.109974999999998,
+            "grossPnl": -3.109208333333332,
             "fees": 0.0033826330579999984,
             "slippageCost": 0.00169097833333338,
             "fundingPnl": -0.3374460417944812,
-            "netPnl": -3.4524946531858127
+            "netPnl": -3.4517279865191464
           },
           {
             "qty": 0.00008333333333333329,
@@ -7863,11 +7863,11 @@
             "entryFee": 0.0034422249739999985,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.2589249999999987,
+            "grossPnl": -3.2581583333333324,
             "fees": 0.0034422249739999985,
             "slippageCost": 0.0017207683333326704,
             "fundingPnl": -0.3273590455604291,
-            "netPnl": -3.5914470388677606
+            "netPnl": -3.5906803722010943
           },
           {
             "qty": 0.00008333333333333329,
@@ -7877,11 +7877,11 @@
             "entryFee": 0.003920230555999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -4.453699999999997,
+            "grossPnl": -4.4529333333333305,
             "fees": 0.003920230555999998,
             "slippageCost": 0.0019597233333333852,
             "fundingPnl": -0.266651226566173,
-            "netPnl": -4.726231180455503
+            "netPnl": -4.725464513788837
           },
           {
             "qty": 0.00008333333333333329,
@@ -7891,11 +7891,11 @@
             "entryFee": 0.003930689313999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -4.4798416666666645,
+            "grossPnl": -4.479074999999998,
             "fees": 0.003930689313999998,
             "slippageCost": 0.001964951666666213,
             "fundingPnl": -0.2548323822734433,
-            "netPnl": -4.7405696899207745
+            "netPnl": -4.739803023254108
           },
           {
             "qty": 0.00008333333333333329,
@@ -7905,11 +7905,11 @@
             "entryFee": 0.003808111469999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -4.173458333333331,
+            "grossPnl": -4.1726916666666645,
             "fees": 0.003808111469999998,
             "slippageCost": 0.0019036750000001716,
             "fundingPnl": -0.21250963826203212,
-            "netPnl": -4.391679758065363
+            "netPnl": -4.390913091398697
           },
           {
             "qty": 0.00008333333333333329,
@@ -7919,11 +7919,11 @@
             "entryFee": 0.0037244113999999984,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.964249999999998,
+            "grossPnl": -3.9634833333333317,
             "fees": 0.0037244113999999984,
             "slippageCost": 0.0018618333333336816,
             "fundingPnl": -0.1986937062225751,
-            "netPnl": -4.168529950955907
+            "netPnl": -4.16776328428924
           },
           {
             "qty": 0.00008333333333333329,
@@ -7933,11 +7933,11 @@
             "entryFee": 0.003607668055999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.6724499999999978,
+            "grossPnl": -3.671683333333331,
             "fees": 0.003607668055999998,
             "slippageCost": 0.001803473333333385,
             "fundingPnl": -0.19081370356838964,
-            "netPnl": -3.8686748449577206
+            "netPnl": -3.867908178291054
           },
           {
             "qty": 0.00008333333333333329,
@@ -7947,11 +7947,11 @@
             "entryFee": 0.0037758850259999983,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -4.092908333333331,
+            "grossPnl": -4.092141666666664,
             "fees": 0.0037758850259999983,
             "slippageCost": 0.0018875650000009035,
             "fundingPnl": -0.1562153748814343,
-            "netPnl": -4.254787158240766
+            "netPnl": -4.2540204915740985
           },
           {
             "qty": 0.00008333333333333329,
@@ -7961,11 +7961,11 @@
             "entryFee": 0.003653303847999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.7865166666666643,
+            "grossPnl": -3.785749999999998,
             "fees": 0.003653303847999998,
             "slippageCost": 0.0018262866666664186,
             "fundingPnl": -0.15245610072716642,
-            "netPnl": -3.944452357908497
+            "netPnl": -3.9436856912418308
           },
           {
             "qty": 0.00008333333333333329,
@@ -7975,11 +7975,11 @@
             "entryFee": 0.0036050341959999984,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.6658666666666644,
+            "grossPnl": -3.665099999999998,
             "fees": 0.0036050341959999984,
             "slippageCost": 0.0018021566666672384,
             "fundingPnl": -0.12994831813874036,
-            "netPnl": -3.801222175668072
+            "netPnl": -3.800455509001406
           },
           {
             "qty": 0.00008333333333333329,
@@ -7989,11 +7989,11 @@
             "entryFee": 0.0034619255799999984,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -3.308166666666665,
+            "grossPnl": -3.3073999999999986,
             "fees": 0.0034619255799999984,
             "slippageCost": 0.0017306166666664156,
             "fundingPnl": -0.11036944232098837,
-            "netPnl": -3.4237286512343195
+            "netPnl": -3.422961984567653
           },
           {
             "qty": 0.00008333333333333329,
@@ -8003,11 +8003,11 @@
             "entryFee": 0.003141351477999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.506891666666665,
+            "grossPnl": -2.5061249999999986,
             "fees": 0.003141351477999998,
             "slippageCost": 0.0015703616666663332,
             "fundingPnl": -0.09448331881760406,
-            "netPnl": -2.6060866986289355
+            "netPnl": -2.605320031962269
           },
           {
             "qty": 0.00008333333333333329,
@@ -8017,11 +8017,11 @@
             "entryFee": 0.0029469459379999987,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.0209749999999986,
+            "grossPnl": -2.0202083333333323,
             "fees": 0.0029469459379999987,
             "slippageCost": 0.0014731783333336345,
             "fundingPnl": -0.029891269908734693,
-            "netPnl": -2.055286394180067
+            "netPnl": -2.0545197275134006
           },
           {
             "qty": 0.00008333333333333329,
@@ -8031,11 +8031,11 @@
             "entryFee": 0.0028882075259999986,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -1.8741583333333318,
+            "grossPnl": -1.8733916666666655,
             "fees": 0.0028882075259999986,
             "slippageCost": 0.0014438149999999336,
             "fundingPnl": -0.023396512228811832,
-            "netPnl": -1.9018868680881436
+            "netPnl": -1.9011202014214772
           },
           {
             "qty": 0.00008333333333333329,
@@ -8045,11 +8045,11 @@
             "entryFee": 0.0026240813779999993,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -1.2139749999999991,
+            "grossPnl": -1.2132083333333328,
             "fees": 0.0026240813779999993,
             "slippageCost": 0.00131177833333398,
             "fundingPnl": -0.017182706834759292,
-            "netPnl": -1.2350935665460925
+            "netPnl": -1.2343268998794261
           },
           {
             "qty": 0.00008333333333333329,
@@ -8059,11 +8059,11 @@
             "entryFee": 0.002096022453999999,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 0.1059083333333334,
+            "grossPnl": 0.10667499999999983,
             "fees": 0.002096022453999999,
             "slippageCost": 0.0010478016666669034,
             "fundingPnl": -0.01692146280658501,
-            "netPnl": 0.0858430464060815
+            "netPnl": 0.08660971307274792
           },
           {
             "qty": 0.00008333333333333329,
@@ -8073,11 +8073,11 @@
             "entryFee": 0.002211602231999999,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -0.18298333333333347,
+            "grossPnl": -0.18221666666666705,
             "fees": 0.002211602231999999,
             "slippageCost": 0.0011055799999994628,
             "fundingPnl": -0.025777920188996467,
-            "netPnl": -0.21207843575432941
+            "netPnl": -0.211311769087663
           },
           {
             "qty": 0.00008333333333333329,
@@ -8087,11 +8087,11 @@
             "entryFee": 0.002544022035999999,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -1.0138666666666656,
+            "grossPnl": -1.0130999999999992,
             "fees": 0.002544022035999999,
             "slippageCost": 0.001271756666667594,
             "fundingPnl": -0.037680765285949123,
-            "netPnl": -1.0553632106552824
+            "netPnl": -1.054596543988616
           },
           {
             "qty": 0.00008333333333333329,
@@ -8101,11 +8101,11 @@
             "entryFee": 0.0025815295359999987,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -1.1076166666666656,
+            "grossPnl": -1.1068499999999992,
             "fees": 0.0025815295359999987,
             "slippageCost": 0.0012905066666668663,
             "fundingPnl": -0.03740136464936948,
-            "netPnl": -1.148890067518702
+            "netPnl": -1.1481234008520356
           },
           {
             "qty": 0.00008333333333333329,
@@ -8115,11 +8115,11 @@
             "entryFee": 0.002453537275999999,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -0.7876999999999991,
+            "grossPnl": -0.7869333333333327,
             "fees": 0.002453537275999999,
             "slippageCost": 0.0012265233333334127,
             "fundingPnl": -0.025480550702395084,
-            "netPnl": -0.8168606113117275
+            "netPnl": -0.8160939446450611
           },
           {
             "qty": 0.00008333333333333329,
@@ -8129,11 +8129,11 @@
             "entryFee": 0.002224781533999999,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -0.21592500000000037,
+            "grossPnl": -0.21515833333333395,
             "fees": 0.002224781533999999,
             "slippageCost": 0.0011121683333331015,
             "fundingPnl": -0.020240969837555883,
-            "netPnl": -0.23950291970488935
+            "netPnl": -0.23873625303822293
           },
           {
             "qty": 0.00008333333333333329,
@@ -8143,22 +8143,22 @@
             "entryFee": 0.002002797145999999,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 0.3389249999999997,
+            "grossPnl": 0.3396916666666661,
             "fees": 0.002002797145999999,
             "slippageCost": 0.0010011983333333768,
             "fundingPnl": -0.014800349895827814,
-            "netPnl": 0.3211206546248385
+            "netPnl": 0.32188732129150494
           }
         ],
-        "grossPnl": -59.630141666666646,
+        "grossPnl": -59.61174166666664,
         "fees": 0.07517828931799998,
         "slippageCost": 0.03758162833333576,
         "fundingPnl": -3.3745725918747054,
-        "netPnl": -63.11747417619266,
-        "returnPct": -33.58282011936148,
+        "netPnl": -63.09907417619268,
+        "returnPct": -33.57303005887093,
         "weightedAverageEntry": 93972.86164749999,
-        "holdHours": 9880,
-        "underwaterHours": 7303,
+        "holdHours": 9881,
+        "underwaterHours": 7304,
         "maxDrawdown": 88.94513582262014,
         "worstUnrealizedPnl": -72.42852329499996,
         "suppressedDuplicateDailyEntries": 44
@@ -8173,7 +8173,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 100,
-          "scaleTestRoiPct": -68.25028439829639,
+          "scaleTestRoiPct": -68.23188439829642,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -8183,7 +8183,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 250,
-          "scaleTestRoiPct": -27.300113759318556,
+          "scaleTestRoiPct": -27.292753759318565,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -8193,7 +8193,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 500,
-          "scaleTestRoiPct": -13.650056879659278,
+          "scaleTestRoiPct": -13.646376879659282,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -8203,7 +8203,7 @@
           "label": "FIXED_WALLET",
           "basis": "FULL_HISTORY_SCALE_TEST",
           "startingWallet": 1000,
-          "scaleTestRoiPct": -6.825028439829639,
+          "scaleTestRoiPct": -6.823188439829641,
           "outcome": "SURVIVED",
           "liquidated": false,
           "liquidationCount": 0,
@@ -8702,8 +8702,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [
             {
@@ -8714,11 +8714,11 @@
               "entryFee": 0.0036325930399999985,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.7347499999999982,
+              "grossPnl": -3.7339833333333314,
               "fees": 0.0036325930399999985,
               "slippageCost": 0.0018159333333339106,
               "fundingPnl": -0.3498388935661158,
-              "netPnl": -4.090037419939447
+              "netPnl": -4.089270753272781
             },
             {
               "qty": 0.00008333333333333329,
@@ -8728,11 +8728,11 @@
               "entryFee": 0.0035187002659999985,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.450074999999998,
+              "grossPnl": -3.4493083333333314,
               "fees": 0.0035187002659999985,
               "slippageCost": 0.001758998333333389,
               "fundingPnl": -0.3441815268361477,
-              "netPnl": -3.799534225435479
+              "netPnl": -3.798767558768813
             },
             {
               "qty": 0.00008333333333333329,
@@ -8742,11 +8742,11 @@
               "entryFee": 0.0033826330579999984,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.109974999999998,
+              "grossPnl": -3.109208333333332,
               "fees": 0.0033826330579999984,
               "slippageCost": 0.00169097833333338,
               "fundingPnl": -0.3374460417944812,
-              "netPnl": -3.4524946531858127
+              "netPnl": -3.4517279865191464
             },
             {
               "qty": 0.00008333333333333329,
@@ -8756,11 +8756,11 @@
               "entryFee": 0.0034422249739999985,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.2589249999999987,
+              "grossPnl": -3.2581583333333324,
               "fees": 0.0034422249739999985,
               "slippageCost": 0.0017207683333326704,
               "fundingPnl": -0.3273590455604291,
-              "netPnl": -3.5914470388677606
+              "netPnl": -3.5906803722010943
             },
             {
               "qty": 0.00008333333333333329,
@@ -8770,11 +8770,11 @@
               "entryFee": 0.003920230555999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -4.453699999999997,
+              "grossPnl": -4.4529333333333305,
               "fees": 0.003920230555999998,
               "slippageCost": 0.0019597233333333852,
               "fundingPnl": -0.266651226566173,
-              "netPnl": -4.726231180455503
+              "netPnl": -4.725464513788837
             },
             {
               "qty": 0.00008333333333333329,
@@ -8784,11 +8784,11 @@
               "entryFee": 0.003930689313999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -4.4798416666666645,
+              "grossPnl": -4.479074999999998,
               "fees": 0.003930689313999998,
               "slippageCost": 0.001964951666666213,
               "fundingPnl": -0.2548323822734433,
-              "netPnl": -4.7405696899207745
+              "netPnl": -4.739803023254108
             },
             {
               "qty": 0.00008333333333333329,
@@ -8798,11 +8798,11 @@
               "entryFee": 0.003808111469999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -4.173458333333331,
+              "grossPnl": -4.1726916666666645,
               "fees": 0.003808111469999998,
               "slippageCost": 0.0019036750000001716,
               "fundingPnl": -0.21250963826203212,
-              "netPnl": -4.391679758065363
+              "netPnl": -4.390913091398697
             },
             {
               "qty": 0.00008333333333333329,
@@ -8812,11 +8812,11 @@
               "entryFee": 0.0037244113999999984,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.964249999999998,
+              "grossPnl": -3.9634833333333317,
               "fees": 0.0037244113999999984,
               "slippageCost": 0.0018618333333336816,
               "fundingPnl": -0.1986937062225751,
-              "netPnl": -4.168529950955907
+              "netPnl": -4.16776328428924
             },
             {
               "qty": 0.00008333333333333329,
@@ -8826,11 +8826,11 @@
               "entryFee": 0.003607668055999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.6724499999999978,
+              "grossPnl": -3.671683333333331,
               "fees": 0.003607668055999998,
               "slippageCost": 0.001803473333333385,
               "fundingPnl": -0.19081370356838964,
-              "netPnl": -3.8686748449577206
+              "netPnl": -3.867908178291054
             },
             {
               "qty": 0.00008333333333333329,
@@ -8840,11 +8840,11 @@
               "entryFee": 0.0037758850259999983,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -4.092908333333331,
+              "grossPnl": -4.092141666666664,
               "fees": 0.0037758850259999983,
               "slippageCost": 0.0018875650000009035,
               "fundingPnl": -0.1562153748814343,
-              "netPnl": -4.254787158240766
+              "netPnl": -4.2540204915740985
             },
             {
               "qty": 0.00008333333333333329,
@@ -8854,11 +8854,11 @@
               "entryFee": 0.003653303847999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.7865166666666643,
+              "grossPnl": -3.785749999999998,
               "fees": 0.003653303847999998,
               "slippageCost": 0.0018262866666664186,
               "fundingPnl": -0.15245610072716642,
-              "netPnl": -3.944452357908497
+              "netPnl": -3.9436856912418308
             },
             {
               "qty": 0.00008333333333333329,
@@ -8868,11 +8868,11 @@
               "entryFee": 0.0036050341959999984,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.6658666666666644,
+              "grossPnl": -3.665099999999998,
               "fees": 0.0036050341959999984,
               "slippageCost": 0.0018021566666672384,
               "fundingPnl": -0.12994831813874036,
-              "netPnl": -3.801222175668072
+              "netPnl": -3.800455509001406
             },
             {
               "qty": 0.00008333333333333329,
@@ -8882,11 +8882,11 @@
               "entryFee": 0.0034619255799999984,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -3.308166666666665,
+              "grossPnl": -3.3073999999999986,
               "fees": 0.0034619255799999984,
               "slippageCost": 0.0017306166666664156,
               "fundingPnl": -0.11036944232098837,
-              "netPnl": -3.4237286512343195
+              "netPnl": -3.422961984567653
             },
             {
               "qty": 0.00008333333333333329,
@@ -8896,11 +8896,11 @@
               "entryFee": 0.003141351477999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.506891666666665,
+              "grossPnl": -2.5061249999999986,
               "fees": 0.003141351477999998,
               "slippageCost": 0.0015703616666663332,
               "fundingPnl": -0.09448331881760406,
-              "netPnl": -2.6060866986289355
+              "netPnl": -2.605320031962269
             },
             {
               "qty": 0.00008333333333333329,
@@ -8910,11 +8910,11 @@
               "entryFee": 0.0029469459379999987,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.0209749999999986,
+              "grossPnl": -2.0202083333333323,
               "fees": 0.0029469459379999987,
               "slippageCost": 0.0014731783333336345,
               "fundingPnl": -0.029891269908734693,
-              "netPnl": -2.055286394180067
+              "netPnl": -2.0545197275134006
             },
             {
               "qty": 0.00008333333333333329,
@@ -8924,11 +8924,11 @@
               "entryFee": 0.0028882075259999986,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -1.8741583333333318,
+              "grossPnl": -1.8733916666666655,
               "fees": 0.0028882075259999986,
               "slippageCost": 0.0014438149999999336,
               "fundingPnl": -0.023396512228811832,
-              "netPnl": -1.9018868680881436
+              "netPnl": -1.9011202014214772
             },
             {
               "qty": 0.00008333333333333329,
@@ -8938,11 +8938,11 @@
               "entryFee": 0.0026240813779999993,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -1.2139749999999991,
+              "grossPnl": -1.2132083333333328,
               "fees": 0.0026240813779999993,
               "slippageCost": 0.00131177833333398,
               "fundingPnl": -0.017182706834759292,
-              "netPnl": -1.2350935665460925
+              "netPnl": -1.2343268998794261
             },
             {
               "qty": 0.00008333333333333329,
@@ -8952,11 +8952,11 @@
               "entryFee": 0.002096022453999999,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 0.1059083333333334,
+              "grossPnl": 0.10667499999999983,
               "fees": 0.002096022453999999,
               "slippageCost": 0.0010478016666669034,
               "fundingPnl": -0.01692146280658501,
-              "netPnl": 0.0858430464060815
+              "netPnl": 0.08660971307274792
             },
             {
               "qty": 0.00008333333333333329,
@@ -8966,11 +8966,11 @@
               "entryFee": 0.002211602231999999,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -0.18298333333333347,
+              "grossPnl": -0.18221666666666705,
               "fees": 0.002211602231999999,
               "slippageCost": 0.0011055799999994628,
               "fundingPnl": -0.025777920188996467,
-              "netPnl": -0.21207843575432941
+              "netPnl": -0.211311769087663
             },
             {
               "qty": 0.00008333333333333329,
@@ -8980,11 +8980,11 @@
               "entryFee": 0.002544022035999999,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -1.0138666666666656,
+              "grossPnl": -1.0130999999999992,
               "fees": 0.002544022035999999,
               "slippageCost": 0.001271756666667594,
               "fundingPnl": -0.037680765285949123,
-              "netPnl": -1.0553632106552824
+              "netPnl": -1.054596543988616
             },
             {
               "qty": 0.00008333333333333329,
@@ -8994,11 +8994,11 @@
               "entryFee": 0.0025815295359999987,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -1.1076166666666656,
+              "grossPnl": -1.1068499999999992,
               "fees": 0.0025815295359999987,
               "slippageCost": 0.0012905066666668663,
               "fundingPnl": -0.03740136464936948,
-              "netPnl": -1.148890067518702
+              "netPnl": -1.1481234008520356
             },
             {
               "qty": 0.00008333333333333329,
@@ -9008,11 +9008,11 @@
               "entryFee": 0.002453537275999999,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -0.7876999999999991,
+              "grossPnl": -0.7869333333333327,
               "fees": 0.002453537275999999,
               "slippageCost": 0.0012265233333334127,
               "fundingPnl": -0.025480550702395084,
-              "netPnl": -0.8168606113117275
+              "netPnl": -0.8160939446450611
             },
             {
               "qty": 0.00008333333333333329,
@@ -9022,11 +9022,11 @@
               "entryFee": 0.002224781533999999,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -0.21592500000000037,
+              "grossPnl": -0.21515833333333395,
               "fees": 0.002224781533999999,
               "slippageCost": 0.0011121683333331015,
               "fundingPnl": -0.020240969837555883,
-              "netPnl": -0.23950291970488935
+              "netPnl": -0.23873625303822293
             },
             {
               "qty": 0.00008333333333333329,
@@ -9036,22 +9036,22 @@
               "entryFee": 0.002002797145999999,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 0.3389249999999997,
+              "grossPnl": 0.3396916666666661,
               "fees": 0.002002797145999999,
               "slippageCost": 0.0010011983333333768,
               "fundingPnl": -0.014800349895827814,
-              "netPnl": 0.3211206546248385
+              "netPnl": 0.32188732129150494
             }
           ],
-          "grossPnl": -59.630141666666646,
+          "grossPnl": -59.61174166666664,
           "fees": 0.07517828931799998,
           "slippageCost": 0.03758162833333576,
           "fundingPnl": -3.3745725918747054,
-          "netPnl": -63.11747417619266,
-          "returnPct": -33.58282011936148,
+          "netPnl": -63.09907417619268,
+          "returnPct": -33.57303005887093,
           "weightedAverageEntry": 93972.86164749999,
-          "holdHours": 9880,
-          "underwaterHours": 7303,
+          "holdHours": 9881,
+          "underwaterHours": 7304,
           "maxDrawdown": 88.94513582262014,
           "worstUnrealizedPnl": -72.42852329499996,
           "suppressedDuplicateDailyEntries": 44
@@ -9077,11 +9077,11 @@
           "entries": 143,
           "realized": 75,
           "open": 68,
-          "grossPnl": -2210.41601,
+          "grossPnl": -2209.7904100000005,
           "fees": 4.830654153440801,
           "slippageCost": 2.415064202000143,
           "fundingPnl": -223.3586281810657,
-          "netPnl": -2441.0203565365055,
+          "netPnl": -2440.3947565365065,
           "exitReasons": {
             "DAILY_RECOVERY": 0,
             "MACRO_OVERBOUGHT": 75,
@@ -9137,16 +9137,16 @@
       "netExpectancy": -167.7011720700731,
       "averageReturnPct": 5.231099350218739,
       "medianReturnPct": 1.9867686813836112,
-      "grossPnl": -2210.41601,
+      "grossPnl": -2209.79041,
       "fees": 4.8306541534408005,
       "slippageCost": 2.415064202000143,
       "fundingPnl": -223.35862818106574,
       "closedNetPnl": -503.1035162102193,
-      "totalNetPnl": -2441.0203565365064,
+      "totalNetPnl": -2440.3947565365065,
       "averageLegsPerCampaign": 35.75,
       "medianLegsPerCampaign": 37,
-      "averageHoldHours": 6196,
-      "averageUnderwaterHours": 4545.75,
+      "averageHoldHours": 6196.25,
+      "averageUnderwaterHours": 4546,
       "weightedAverageEntry": 65213.00160071326,
       "weightedEntryImprovementVsMacroOncePct": 5.138676412570213,
       "closedWeightedAverageEntry": 41758.61018535996,
@@ -10522,8 +10522,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [
           {
@@ -10534,11 +10534,11 @@
             "entryFee": 0.043591116480000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.817,
+            "grossPnl": -44.8078,
             "fees": 0.043591116480000004,
             "slippageCost": 0.02179120000000694,
             "fundingPnl": -4.198066722793392,
-            "netPnl": -49.080449039273404
+            "netPnl": -49.071249039273404
           },
           {
             "qty": 0.001,
@@ -10548,11 +10548,11 @@
             "entryFee": 0.042224403192,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -41.40089999999999,
+            "grossPnl": -41.3917,
             "fees": 0.042224403192,
             "slippageCost": 0.021107980000000682,
             "fundingPnl": -4.130178322033775,
-            "netPnl": -45.59441070522577
+            "netPnl": -45.58521070522578
           },
           {
             "qty": 0.001,
@@ -10562,11 +10562,11 @@
             "entryFee": 0.041588275992000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -39.8109,
+            "grossPnl": -39.8017,
             "fees": 0.041588275992000004,
             "slippageCost": 0.02078998000000138,
             "fundingPnl": -4.106728878019778,
-            "netPnl": -43.98000713401178
+            "netPnl": -43.97080713401178
           },
           {
             "qty": 0.001,
@@ -10576,11 +10576,11 @@
             "entryFee": 0.041826203568,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -40.40560000000001,
+            "grossPnl": -40.39640000000001,
             "fees": 0.041826203568,
             "slippageCost": 0.02090891999998712,
             "fundingPnl": -4.093999459238018,
-            "netPnl": -44.56233458280602
+            "netPnl": -44.55313458280602
           },
           {
             "qty": 0.001,
@@ -10590,11 +10590,11 @@
             "entryFee": 0.042241766664,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -41.444300000000005,
+            "grossPnl": -41.435100000000006,
             "fees": 0.042241766664,
             "slippageCost": 0.021116659999999683,
             "fundingPnl": -4.087865098662016,
-            "netPnl": -45.595523525326016
+            "netPnl": -45.586323525326016
           },
           {
             "qty": 0.001,
@@ -10604,11 +10604,11 @@
             "entryFee": 0.040591596696,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -37.3197,
+            "grossPnl": -37.3105,
             "fees": 0.040591596696,
             "slippageCost": 0.02029174000000057,
             "fundingPnl": -4.049352501533776,
-            "netPnl": -41.42993583822977
+            "netPnl": -41.42073583822977
           },
           {
             "qty": 0.001,
@@ -10618,11 +10618,11 @@
             "entryFee": 0.041306699688,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -39.10710000000001,
+            "grossPnl": -39.09790000000001,
             "fees": 0.041306699688,
             "slippageCost": 0.020649219999992058,
             "fundingPnl": -3.9283085467251513,
-            "netPnl": -43.09736446641315
+            "netPnl": -43.08816446641315
           },
           {
             "qty": 0.001,
@@ -10632,11 +10632,11 @@
             "entryFee": 0.040840086384,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -37.9408,
+            "grossPnl": -37.9316,
             "fees": 0.040840086384,
             "slippageCost": 0.02041595999999845,
             "fundingPnl": -3.9145019772312737,
-            "netPnl": -41.91655802361528
+            "netPnl": -41.90735802361528
           },
           {
             "qty": 0.001,
@@ -10646,11 +10646,11 @@
             "entryFee": 0.040369952376,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -36.765699999999995,
+            "grossPnl": -36.7565,
             "fees": 0.040369952376,
             "slippageCost": 0.02018094000000565,
             "fundingPnl": -3.898292531219446,
-            "netPnl": -40.72454342359544
+            "netPnl": -40.71534342359545
           },
           {
             "qty": 0.001,
@@ -10660,11 +10660,11 @@
             "entryFee": 0.047042766672000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -53.444399999999995,
+            "grossPnl": -53.435199999999995,
             "fees": 0.047042766672000004,
             "slippageCost": 0.023516680000000633,
             "fundingPnl": -3.1998147187940775,
-            "netPnl": -56.714774165466075
+            "netPnl": -56.705574165466075
           },
           {
             "qty": 0.001,
@@ -10674,11 +10674,11 @@
             "entryFee": 0.047165151144,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -53.7503,
+            "grossPnl": -53.74110000000001,
             "fees": 0.047165151144,
             "slippageCost": 0.023577859999990323,
             "fundingPnl": -3.164515701228407,
-            "netPnl": -56.9855587123724
+            "netPnl": -56.97635871237241
           },
           {
             "qty": 0.001,
@@ -10688,11 +10688,11 @@
             "entryFee": 0.047168271768,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -53.758100000000006,
+            "grossPnl": -53.74890000000001,
             "fees": 0.047168271768,
             "slippageCost": 0.02357941999999457,
             "fundingPnl": -3.0579885872813213,
-            "netPnl": -56.88683627904933
+            "netPnl": -56.877636279049334
           },
           {
             "qty": 0.001,
@@ -10702,11 +10702,11 @@
             "entryFee": 0.047117861688,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -53.63210000000001,
+            "grossPnl": -53.62290000000001,
             "fees": 0.047117861688,
             "slippageCost": 0.023554219999990893,
             "fundingPnl": -3.01588887493316,
-            "netPnl": -56.718660956621164
+            "netPnl": -56.709460956621164
           },
           {
             "qty": 0.001,
@@ -10716,11 +10716,11 @@
             "entryFee": 0.046288175784,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -51.5583,
+            "grossPnl": -51.54910000000001,
             "fees": 0.046288175784,
             "slippageCost": 0.023139459999991233,
             "fundingPnl": -2.9922001053766363,
-            "netPnl": -54.61992774116063
+            "netPnl": -54.61072774116064
           },
           {
             "qty": 0.001,
@@ -10730,11 +10730,11 @@
             "entryFee": 0.045306979584,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -49.1058,
+            "grossPnl": -49.09660000000001,
             "fees": 0.045306979584,
             "slippageCost": 0.02264895999999135,
             "fundingPnl": -2.9854967973575004,
-            "netPnl": -52.15925273694149
+            "netPnl": -52.1500527369415
           },
           {
             "qty": 0.001,
@@ -10744,11 +10744,11 @@
             "entryFee": 0.045012520704000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -48.369800000000005,
+            "grossPnl": -48.360600000000005,
             "fees": 0.045012520704000004,
             "slippageCost": 0.022501759999999194,
             "fundingPnl": -2.9676887342851406,
-            "netPnl": -51.40500301498914
+            "netPnl": -51.39580301498914
           },
           {
             "qty": 0.001,
@@ -10758,11 +10758,11 @@
             "entryFee": 0.045669492072,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -50.0119,
+            "grossPnl": -50.0027,
             "fees": 0.045669492072,
             "slippageCost": 0.022830180000004474,
             "fundingPnl": -2.9539896522921882,
-            "netPnl": -53.03438932436419
+            "netPnl": -53.02518932436419
           },
           {
             "qty": 0.001,
@@ -10772,11 +10772,11 @@
             "entryFee": 0.04569733764,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -50.0815,
+            "grossPnl": -50.072300000000006,
             "fees": 0.04569733764,
             "slippageCost": 0.022844100000002074,
             "fundingPnl": -2.550115659144387,
-            "netPnl": -52.70015709678439
+            "netPnl": -52.690957096784395
           },
           {
             "qty": 0.001,
@@ -10786,11 +10786,11 @@
             "entryFee": 0.044993876976000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -48.3232,
+            "grossPnl": -48.314,
             "fees": 0.044993876976000005,
             "slippageCost": 0.022492440000001807,
             "fundingPnl": -2.5316205861951677,
-            "netPnl": -50.92230690317117
+            "netPnl": -50.91310690317117
           },
           {
             "qty": 0.001,
@@ -10800,11 +10800,11 @@
             "entryFee": 0.044692936800000006,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -47.571,
+            "grossPnl": -47.561800000000005,
             "fees": 0.044692936800000006,
             "slippageCost": 0.022342000000004192,
             "fundingPnl": -2.3843244746709025,
-            "netPnl": -50.0223594114709
+            "netPnl": -50.01315941147091
           },
           {
             "qty": 0.001,
@@ -10814,11 +10814,11 @@
             "entryFee": 0.043292016672,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.069399999999995,
+            "grossPnl": -44.060199999999995,
             "fees": 0.043292016672,
             "slippageCost": 0.021641680000000635,
             "fundingPnl": -2.289764442820677,
-            "netPnl": -46.42409813949267
+            "netPnl": -46.41489813949267
           },
           {
             "qty": 0.001,
@@ -10828,11 +10828,11 @@
             "entryFee": 0.04368389503200001,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -45.048899999999996,
+            "grossPnl": -45.039699999999996,
             "fees": 0.04368389503200001,
             "slippageCost": 0.021837580000006712,
             "fundingPnl": -2.265846447788492,
-            "netPnl": -47.38026792282049
+            "netPnl": -47.37106792282049
           },
           {
             "qty": 0.001,
@@ -10842,11 +10842,11 @@
             "entryFee": 0.045310620312000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -49.1149,
+            "grossPnl": -49.1057,
             "fees": 0.045310620312000005,
             "slippageCost": 0.022650780000010855,
             "fundingPnl": -1.8745844985772129,
-            "netPnl": -51.05744589888923
+            "netPnl": -51.04824589888923
           },
           {
             "qty": 0.001,
@@ -10856,11 +10856,11 @@
             "entryFee": 0.043582554768,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.79560000000001,
+            "grossPnl": -44.78640000000001,
             "fees": 0.043582554768,
             "slippageCost": 0.021786919999998645,
             "fundingPnl": -1.8585639438106154,
-            "netPnl": -46.71953341857862
+            "netPnl": -46.71033341857862
           },
           {
             "qty": 0.001,
@@ -10870,11 +10870,11 @@
             "entryFee": 0.043839646175999995,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -45.438199999999995,
+            "grossPnl": -45.429,
             "fees": 0.043839646175999995,
             "slippageCost": 0.021915439999997035,
             "fundingPnl": -1.8294732087259982,
-            "netPnl": -47.333428294901985
+            "netPnl": -47.32422829490199
           },
           {
             "qty": 0.001,
@@ -10884,11 +10884,11 @@
             "entryFee": 0.043260410352000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -43.990399999999994,
+            "grossPnl": -43.9812,
             "fees": 0.043260410352000005,
             "slippageCost": 0.021625880000006873,
             "fundingPnl": -1.5593798176648852,
-            "netPnl": -45.614666108016884
+            "netPnl": -45.60546610801689
           },
           {
             "qty": 0.001,
@@ -10898,11 +10898,11 @@
             "entryFee": 0.04255991028,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -42.2395,
+            "grossPnl": -42.23030000000001,
             "fees": 0.04255991028,
             "slippageCost": 0.021275699999998322,
             "fundingPnl": -1.5657944351443511,
-            "netPnl": -43.86913004542434
+            "netPnl": -43.85993004542435
           },
           {
             "qty": 0.001,
@@ -10912,11 +10912,11 @@
             "entryFee": 0.0428555694,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -42.978500000000004,
+            "grossPnl": -42.969300000000004,
             "fees": 0.0428555694,
             "slippageCost": 0.021423500000004425,
             "fundingPnl": -1.5765288595451057,
-            "netPnl": -44.61930792894511
+            "netPnl": -44.61010792894511
           },
           {
             "qty": 0.001,
@@ -10926,11 +10926,11 @@
             "entryFee": 0.043443166896,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -44.447199999999995,
+            "grossPnl": -44.438,
             "fees": 0.043443166896,
             "slippageCost": 0.02171723999999813,
             "fundingPnl": -1.57340440219827,
-            "netPnl": -46.085764809094265
+            "netPnl": -46.07656480909427
           },
           {
             "qty": 0.001,
@@ -10940,11 +10940,11 @@
             "entryFee": 0.04154310696,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -39.698,
+            "grossPnl": -39.6888,
             "fees": 0.04154310696,
             "slippageCost": 0.020767399999996997,
             "fundingPnl": -1.3244333078518613,
-            "netPnl": -41.08474381481186
+            "netPnl": -41.07554381481186
           },
           {
             "qty": 0.001,
@@ -10954,11 +10954,11 @@
             "entryFee": 0.037696217736,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -30.0827,
+            "grossPnl": -30.0735,
             "fees": 0.037696217736,
             "slippageCost": 0.01884433999999601,
             "fundingPnl": -1.1337998258112494,
-            "netPnl": -31.273040383547244
+            "netPnl": -31.263840383547244
           },
           {
             "qty": 0.001,
@@ -10968,11 +10968,11 @@
             "entryFee": 0.036875293584000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -28.030800000000003,
+            "grossPnl": -28.021600000000007,
             "fees": 0.036875293584000005,
             "slippageCost": 0.01843395999999484,
             "fundingPnl": -1.10845984659018,
-            "netPnl": -29.194569100174178
+            "netPnl": -29.18536910017418
           },
           {
             "qty": 0.001,
@@ -10982,11 +10982,11 @@
             "entryFee": 0.037174153344000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -28.777800000000003,
+            "grossPnl": -28.768600000000006,
             "fees": 0.037174153344000004,
             "slippageCost": 0.018583360000004177,
             "fundingPnl": -1.0797725563138811,
-            "netPnl": -29.91333006965789
+            "netPnl": -29.904130069657892
           },
           {
             "qty": 0.001,
@@ -10996,11 +10996,11 @@
             "entryFee": 0.03661092072,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -27.37,
+            "grossPnl": -27.360800000000005,
             "fees": 0.03661092072,
             "slippageCost": 0.018301800000001096,
             "fundingPnl": -1.0676937835377758,
-            "netPnl": -28.49260650425778
+            "netPnl": -28.483406504257783
           },
           {
             "qty": 0.001,
@@ -11010,11 +11010,11 @@
             "entryFee": 0.034647488112,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -22.462399999999995,
+            "grossPnl": -22.4532,
             "fees": 0.034647488112,
             "slippageCost": 0.01732027999999991,
             "fundingPnl": -1.0503817032631633,
-            "netPnl": -23.56474947137516
+            "netPnl": -23.555549471375162
           },
           {
             "qty": 0.001,
@@ -11024,11 +11024,11 @@
             "entryFee": 0.034044247488,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -20.954600000000006,
+            "grossPnl": -20.94540000000001,
             "fees": 0.034044247488,
             "slippageCost": 0.017018719999992753,
             "fundingPnl": -1.0406906793204762,
-            "netPnl": -22.046353646808477
+            "netPnl": -22.03715364680848
           },
           {
             "qty": 0.001,
@@ -11038,11 +11038,11 @@
             "entryFee": 0.033882535152,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -20.550399999999996,
+            "grossPnl": -20.541199999999996,
             "fees": 0.033882535152,
             "slippageCost": 0.01693788000001223,
             "fundingPnl": -1.0263402401639106,
-            "netPnl": -21.627560655315918
+            "netPnl": -21.618360655315918
           },
           {
             "qty": 0.001,
@@ -11052,11 +11052,11 @@
             "entryFee": 0.034729984608,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -22.668600000000005,
+            "grossPnl": -22.65940000000001,
             "fees": 0.034729984608,
             "slippageCost": 0.017361519999991287,
             "fundingPnl": -1.0269863480458734,
-            "netPnl": -23.74767785265387
+            "netPnl": -23.738477852653872
           },
           {
             "qty": 0.001,
@@ -11066,11 +11066,11 @@
             "entryFee": 0.035363351256,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -24.251699999999996,
+            "grossPnl": -24.2425,
             "fees": 0.035363351256,
             "slippageCost": 0.017678140000003624,
             "fundingPnl": -0.3586952389048165,
-            "netPnl": -24.663436730160814
+            "netPnl": -24.654236730160818
           },
           {
             "qty": 0.001,
@@ -11080,11 +11080,11 @@
             "entryFee": 0.035771712912,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -25.272399999999994,
+            "grossPnl": -25.263199999999998,
             "fees": 0.035771712912,
             "slippageCost": 0.017882280000005267,
             "fundingPnl": -0.3422815948982025,
-            "netPnl": -25.6683355878102
+            "netPnl": -25.659135587810205
           },
           {
             "qty": 0.001,
@@ -11094,11 +11094,11 @@
             "entryFee": 0.035814521472000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -25.379399999999993,
+            "grossPnl": -25.370199999999997,
             "fees": 0.035814521472000004,
             "slippageCost": 0.01790368000000308,
             "fundingPnl": -0.3236307114853407,
-            "netPnl": -25.756748912957335
+            "netPnl": -25.74754891295734
           },
           {
             "qty": 0.001,
@@ -11108,11 +11108,11 @@
             "entryFee": 0.034658490312,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -22.489899999999995,
+            "grossPnl": -22.4807,
             "fees": 0.034658490312,
             "slippageCost": 0.017325779999999215,
             "fundingPnl": -0.2807581467457421,
-            "netPnl": -22.82264241705774
+            "netPnl": -22.813442417057743
           },
           {
             "qty": 0.001,
@@ -11122,11 +11122,11 @@
             "entryFee": 0.035327304048000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -24.161600000000007,
+            "grossPnl": -24.15240000000001,
             "fees": 0.035327304048000004,
             "slippageCost": 0.017660120000000463,
             "fundingPnl": -0.2733422807457464,
-            "netPnl": -24.487929704793757
+            "netPnl": -24.47872970479376
           },
           {
             "qty": 0.001,
@@ -11136,11 +11136,11 @@
             "entryFee": 0.031488976536,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -14.567699999999997,
+            "grossPnl": -14.5585,
             "fees": 0.031488976536,
             "slippageCost": 0.015741340000007768,
             "fundingPnl": -0.20619248201711163,
-            "netPnl": -14.821122798553116
+            "netPnl": -14.81192279855312
           },
           {
             "qty": 0.001,
@@ -11150,11 +11150,11 @@
             "entryFee": 0.030778794528,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -12.792600000000006,
+            "grossPnl": -12.78340000000001,
             "fees": 0.030778794528,
             "slippageCost": 0.01538631999999052,
             "fundingPnl": -0.20469634304448847,
-            "netPnl": -13.043461457572485
+            "netPnl": -13.034261457572489
           },
           {
             "qty": 0.001,
@@ -11164,11 +11164,11 @@
             "entryFee": 0.03148329540000001,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -14.5535,
+            "grossPnl": -14.544300000000003,
             "fees": 0.03148329540000001,
             "slippageCost": 0.015738500000006754,
             "fundingPnl": -0.21326319135462837,
-            "netPnl": -14.813984986754633
+            "netPnl": -14.804784986754637
           },
           {
             "qty": 0.001,
@@ -11178,11 +11178,11 @@
             "entryFee": 0.025152269448000003,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 1.2709000000000015,
+            "grossPnl": 1.2800999999999985,
             "fees": 0.025152269448000003,
             "slippageCost": 0.012573620000002847,
             "fundingPnl": -0.2030575536790202,
-            "netPnl": 1.0301165568729784
+            "netPnl": 1.0393165568729754
           },
           {
             "qty": 0.001,
@@ -11192,11 +11192,11 @@
             "entryFee": 0.026539226784,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.195800000000003,
+            "grossPnl": -2.1866000000000057,
             "fees": 0.026539226784,
             "slippageCost": 0.01326695999999356,
             "fundingPnl": -0.30933504226795777,
-            "netPnl": -2.5449412290519544
+            "netPnl": -2.535741229051957
           },
           {
             "qty": 0.001,
@@ -11206,11 +11206,11 @@
             "entryFee": 0.026396478240000007,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -1.839,
+            "grossPnl": -1.829800000000003,
             "fees": 0.026396478240000007,
             "slippageCost": 0.01319560000000638,
             "fundingPnl": -0.30980614376609444,
-            "netPnl": -2.188398222006101
+            "netPnl": -2.1791982220061037
           },
           {
             "qty": 0.001,
@@ -11220,11 +11220,11 @@
             "entryFee": 0.026711101152000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.625399999999994,
+            "grossPnl": -2.616199999999997,
             "fees": 0.026711101152000004,
             "slippageCost": 0.013352880000005826,
             "fundingPnl": -0.30888374672293867,
-            "netPnl": -2.974347727874939
+            "netPnl": -2.9651477278749416
           },
           {
             "qty": 0.001,
@@ -11234,11 +11234,11 @@
             "entryFee": 0.030528264432000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -12.166399999999994,
+            "grossPnl": -12.157199999999998,
             "fees": 0.030528264432000005,
             "slippageCost": 0.015261080000011135,
             "fundingPnl": -0.4521691834313897,
-            "netPnl": -12.664358527863396
+            "netPnl": -12.6551585278634
           },
           {
             "qty": 0.001,
@@ -11248,11 +11248,11 @@
             "entryFee": 0.030978354431999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -13.291399999999994,
+            "grossPnl": -13.282199999999998,
             "fees": 0.030978354431999998,
             "slippageCost": 0.015486080000002404,
             "fundingPnl": -0.448816375792434,
-            "netPnl": -13.78668081022443
+            "netPnl": -13.777480810224434
           },
           {
             "qty": 0.001,
@@ -11262,11 +11262,11 @@
             "entryFee": 0.030791437056,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -12.824199999999998,
+            "grossPnl": -12.815,
             "fees": 0.030791437056,
             "slippageCost": 0.015392640000005486,
             "fundingPnl": -0.43975728093743965,
-            "netPnl": -13.310141357993441
+            "netPnl": -13.300941357993443
           },
           {
             "qty": 0.001,
@@ -11276,11 +11276,11 @@
             "entryFee": 0.030726144,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -12.661,
+            "grossPnl": -12.651800000000003,
             "fees": 0.030726144,
             "slippageCost": 0.015360000000000583,
             "fundingPnl": -0.42781531698544134,
-            "netPnl": -13.134901460985443
+            "netPnl": -13.125701460985447
           },
           {
             "qty": 0.001,
@@ -11290,11 +11290,11 @@
             "entryFee": 0.031010320824000005,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -13.371300000000003,
+            "grossPnl": -13.362100000000007,
             "fees": 0.031010320824000005,
             "slippageCost": 0.015502059999998891,
             "fundingPnl": -0.41383966869114375,
-            "netPnl": -13.831652049515148
+            "netPnl": -13.822452049515151
           },
           {
             "qty": 0.001,
@@ -11304,11 +11304,11 @@
             "entryFee": 0.031040726904000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -13.447300000000004,
+            "grossPnl": -13.438100000000006,
             "fees": 0.031040726904000004,
             "slippageCost": 0.015517259999993257,
             "fundingPnl": -0.4017318148005434,
-            "netPnl": -13.89558980170454
+            "netPnl": -13.886389801704542
           },
           {
             "qty": 0.001,
@@ -11318,11 +11318,11 @@
             "entryFee": 0.030211281048000003,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -11.374100000000006,
+            "grossPnl": -11.36490000000001,
             "fees": 0.030211281048000003,
             "slippageCost": 0.015102619999990565,
             "fundingPnl": -0.400147159409411,
-            "netPnl": -11.819561060457406
+            "netPnl": -11.81036106045741
           },
           {
             "qty": 0.001,
@@ -11332,11 +11332,11 @@
             "entryFee": 0.029442447312,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -9.452399999999994,
+            "grossPnl": -9.443199999999997,
             "fees": 0.029442447312,
             "slippageCost": 0.01471828000000096,
             "fundingPnl": -0.30576660842874115,
-            "netPnl": -9.802327335740735
+            "netPnl": -9.793127335740738
           },
           {
             "qty": 0.001,
@@ -11346,11 +11346,11 @@
             "entryFee": 0.029377154256,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -9.289199999999997,
+            "grossPnl": -9.28,
             "fees": 0.029377154256,
             "slippageCost": 0.014685639999996057,
             "fundingPnl": -0.2943166406051387,
-            "netPnl": -9.627579434861133
+            "netPnl": -9.618379434861135
           },
           {
             "qty": 0.001,
@@ -11360,11 +11360,11 @@
             "entryFee": 0.029548668551999998,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -9.717899999999995,
+            "grossPnl": -9.708699999999997,
             "fees": 0.029548668551999998,
             "slippageCost": 0.014771380000005593,
             "fundingPnl": -0.28297281578754335,
-            "netPnl": -10.045192864339544
+            "netPnl": -10.035992864339546
           },
           {
             "qty": 0.001,
@@ -11374,11 +11374,11 @@
             "entryFee": 0.026697378408000003,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": -2.5911000000000057,
+            "grossPnl": -2.581900000000009,
             "fees": 0.026697378408000003,
             "slippageCost": 0.013346019999997225,
             "fundingPnl": -0.24289163805067074,
-            "netPnl": -2.8740350364586735
+            "netPnl": -2.8648350364586768
           },
           {
             "qty": 0.001,
@@ -11388,11 +11388,11 @@
             "entryFee": 0.025652209416,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 0.02130000000000291,
+            "grossPnl": 0.0305,
             "fees": 0.025652209416,
             "slippageCost": 0.012823540000004869,
             "fundingPnl": -0.22799245672786492,
-            "netPnl": -0.24516820614386686
+            "netPnl": -0.2359682061438698
           },
           {
             "qty": 0.001,
@@ -11402,11 +11402,11 @@
             "entryFee": 0.025546468272,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 0.2855999999999986,
+            "grossPnl": 0.2947999999999956,
             "fees": 0.025546468272,
             "slippageCost": 0.012770680000001448,
             "fundingPnl": -0.22514058657951683,
-            "netPnl": 0.022142265148480333
+            "netPnl": 0.03134226514847735
           },
           {
             "qty": 0.001,
@@ -11416,11 +11416,11 @@
             "entryFee": 0.02441368176,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 3.117,
+            "grossPnl": 3.126199999999997,
             "fees": 0.02441368176,
             "slippageCost": 0.012204400000002351,
             "fundingPnl": -0.22731777491003596,
-            "netPnl": 2.8530641433299615
+            "netPnl": 2.8622641433299587
           },
           {
             "qty": 0.001,
@@ -11430,11 +11430,11 @@
             "entryFee": 0.024344747976,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 3.289300000000003,
+            "grossPnl": 3.2985,
             "fees": 0.024344747976,
             "slippageCost": 0.01216993999999977,
             "fundingPnl": -0.22599714443603444,
-            "netPnl": 3.026788167587969
+            "netPnl": 3.0359881675879663
           },
           {
             "qty": 0.001,
@@ -11444,11 +11444,11 @@
             "entryFee": 0.024033565752000004,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 4.067099999999999,
+            "grossPnl": 4.076299999999995,
             "fees": 0.024033565752000004,
             "slippageCost": 0.012014380000000529,
             "fundingPnl": -0.17760419874993386,
-            "netPnl": 3.853447855498065
+            "netPnl": 3.8626478554980612
           },
           {
             "qty": 0.001,
@@ -11458,11 +11458,11 @@
             "entryFee": 0.024004960032000002,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 4.1385999999999985,
+            "grossPnl": 4.147799999999996,
             "fees": 0.024004960032000002,
             "slippageCost": 0.012000079999997979,
             "fundingPnl": -0.17018084443992848,
-            "netPnl": 3.9324141155280716
+            "netPnl": 3.941614115528069
           },
           {
             "qty": 0.001,
@@ -11472,22 +11472,22 @@
             "entryFee": 0.023824844016,
             "exitFee": 0,
             "closed": false,
-            "grossPnl": 4.588800000000003,
+            "grossPnl": 4.598,
             "fees": 0.023824844016,
             "slippageCost": 0.011910040000002483,
             "fundingPnl": -0.16671367970248685,
-            "netPnl": 4.3863514362815135
+            "netPnl": 4.395551436281511
           }
         ],
-        "grossPnl": -1830.8730000000003,
+        "grossPnl": -1830.2474000000004,
         "fees": 2.4774253860000006,
         "slippageCost": 1.238465000000011,
         "fundingPnl": -103.32794994028727,
-        "netPnl": -1937.916840326287,
-        "returnPct": -31.289206145662497,
+        "netPnl": -1937.2912403262874,
+        "returnPct": -31.27910533691911,
         "weightedAverageEntry": 91081.81566176465,
-        "holdHours": 9880,
-        "underwaterHours": 7229,
+        "holdHours": 9881,
+        "underwaterHours": 7230,
         "maxDrawdown": 2727.2344351886295,
         "worstUnrealizedPnl": -2265.978664999999,
         "suppressedDuplicateDailyEntries": 44
@@ -12881,8 +12881,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [
             {
@@ -12893,11 +12893,11 @@
               "entryFee": 0.043591116480000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.817,
+              "grossPnl": -44.8078,
               "fees": 0.043591116480000004,
               "slippageCost": 0.02179120000000694,
               "fundingPnl": -4.198066722793392,
-              "netPnl": -49.080449039273404
+              "netPnl": -49.071249039273404
             },
             {
               "qty": 0.001,
@@ -12907,11 +12907,11 @@
               "entryFee": 0.042224403192,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -41.40089999999999,
+              "grossPnl": -41.3917,
               "fees": 0.042224403192,
               "slippageCost": 0.021107980000000682,
               "fundingPnl": -4.130178322033775,
-              "netPnl": -45.59441070522577
+              "netPnl": -45.58521070522578
             },
             {
               "qty": 0.001,
@@ -12921,11 +12921,11 @@
               "entryFee": 0.041588275992000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -39.8109,
+              "grossPnl": -39.8017,
               "fees": 0.041588275992000004,
               "slippageCost": 0.02078998000000138,
               "fundingPnl": -4.106728878019778,
-              "netPnl": -43.98000713401178
+              "netPnl": -43.97080713401178
             },
             {
               "qty": 0.001,
@@ -12935,11 +12935,11 @@
               "entryFee": 0.041826203568,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -40.40560000000001,
+              "grossPnl": -40.39640000000001,
               "fees": 0.041826203568,
               "slippageCost": 0.02090891999998712,
               "fundingPnl": -4.093999459238018,
-              "netPnl": -44.56233458280602
+              "netPnl": -44.55313458280602
             },
             {
               "qty": 0.001,
@@ -12949,11 +12949,11 @@
               "entryFee": 0.042241766664,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -41.444300000000005,
+              "grossPnl": -41.435100000000006,
               "fees": 0.042241766664,
               "slippageCost": 0.021116659999999683,
               "fundingPnl": -4.087865098662016,
-              "netPnl": -45.595523525326016
+              "netPnl": -45.586323525326016
             },
             {
               "qty": 0.001,
@@ -12963,11 +12963,11 @@
               "entryFee": 0.040591596696,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -37.3197,
+              "grossPnl": -37.3105,
               "fees": 0.040591596696,
               "slippageCost": 0.02029174000000057,
               "fundingPnl": -4.049352501533776,
-              "netPnl": -41.42993583822977
+              "netPnl": -41.42073583822977
             },
             {
               "qty": 0.001,
@@ -12977,11 +12977,11 @@
               "entryFee": 0.041306699688,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -39.10710000000001,
+              "grossPnl": -39.09790000000001,
               "fees": 0.041306699688,
               "slippageCost": 0.020649219999992058,
               "fundingPnl": -3.9283085467251513,
-              "netPnl": -43.09736446641315
+              "netPnl": -43.08816446641315
             },
             {
               "qty": 0.001,
@@ -12991,11 +12991,11 @@
               "entryFee": 0.040840086384,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -37.9408,
+              "grossPnl": -37.9316,
               "fees": 0.040840086384,
               "slippageCost": 0.02041595999999845,
               "fundingPnl": -3.9145019772312737,
-              "netPnl": -41.91655802361528
+              "netPnl": -41.90735802361528
             },
             {
               "qty": 0.001,
@@ -13005,11 +13005,11 @@
               "entryFee": 0.040369952376,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -36.765699999999995,
+              "grossPnl": -36.7565,
               "fees": 0.040369952376,
               "slippageCost": 0.02018094000000565,
               "fundingPnl": -3.898292531219446,
-              "netPnl": -40.72454342359544
+              "netPnl": -40.71534342359545
             },
             {
               "qty": 0.001,
@@ -13019,11 +13019,11 @@
               "entryFee": 0.047042766672000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -53.444399999999995,
+              "grossPnl": -53.435199999999995,
               "fees": 0.047042766672000004,
               "slippageCost": 0.023516680000000633,
               "fundingPnl": -3.1998147187940775,
-              "netPnl": -56.714774165466075
+              "netPnl": -56.705574165466075
             },
             {
               "qty": 0.001,
@@ -13033,11 +13033,11 @@
               "entryFee": 0.047165151144,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -53.7503,
+              "grossPnl": -53.74110000000001,
               "fees": 0.047165151144,
               "slippageCost": 0.023577859999990323,
               "fundingPnl": -3.164515701228407,
-              "netPnl": -56.9855587123724
+              "netPnl": -56.97635871237241
             },
             {
               "qty": 0.001,
@@ -13047,11 +13047,11 @@
               "entryFee": 0.047168271768,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -53.758100000000006,
+              "grossPnl": -53.74890000000001,
               "fees": 0.047168271768,
               "slippageCost": 0.02357941999999457,
               "fundingPnl": -3.0579885872813213,
-              "netPnl": -56.88683627904933
+              "netPnl": -56.877636279049334
             },
             {
               "qty": 0.001,
@@ -13061,11 +13061,11 @@
               "entryFee": 0.047117861688,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -53.63210000000001,
+              "grossPnl": -53.62290000000001,
               "fees": 0.047117861688,
               "slippageCost": 0.023554219999990893,
               "fundingPnl": -3.01588887493316,
-              "netPnl": -56.718660956621164
+              "netPnl": -56.709460956621164
             },
             {
               "qty": 0.001,
@@ -13075,11 +13075,11 @@
               "entryFee": 0.046288175784,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -51.5583,
+              "grossPnl": -51.54910000000001,
               "fees": 0.046288175784,
               "slippageCost": 0.023139459999991233,
               "fundingPnl": -2.9922001053766363,
-              "netPnl": -54.61992774116063
+              "netPnl": -54.61072774116064
             },
             {
               "qty": 0.001,
@@ -13089,11 +13089,11 @@
               "entryFee": 0.045306979584,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -49.1058,
+              "grossPnl": -49.09660000000001,
               "fees": 0.045306979584,
               "slippageCost": 0.02264895999999135,
               "fundingPnl": -2.9854967973575004,
-              "netPnl": -52.15925273694149
+              "netPnl": -52.1500527369415
             },
             {
               "qty": 0.001,
@@ -13103,11 +13103,11 @@
               "entryFee": 0.045012520704000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -48.369800000000005,
+              "grossPnl": -48.360600000000005,
               "fees": 0.045012520704000004,
               "slippageCost": 0.022501759999999194,
               "fundingPnl": -2.9676887342851406,
-              "netPnl": -51.40500301498914
+              "netPnl": -51.39580301498914
             },
             {
               "qty": 0.001,
@@ -13117,11 +13117,11 @@
               "entryFee": 0.045669492072,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -50.0119,
+              "grossPnl": -50.0027,
               "fees": 0.045669492072,
               "slippageCost": 0.022830180000004474,
               "fundingPnl": -2.9539896522921882,
-              "netPnl": -53.03438932436419
+              "netPnl": -53.02518932436419
             },
             {
               "qty": 0.001,
@@ -13131,11 +13131,11 @@
               "entryFee": 0.04569733764,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -50.0815,
+              "grossPnl": -50.072300000000006,
               "fees": 0.04569733764,
               "slippageCost": 0.022844100000002074,
               "fundingPnl": -2.550115659144387,
-              "netPnl": -52.70015709678439
+              "netPnl": -52.690957096784395
             },
             {
               "qty": 0.001,
@@ -13145,11 +13145,11 @@
               "entryFee": 0.044993876976000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -48.3232,
+              "grossPnl": -48.314,
               "fees": 0.044993876976000005,
               "slippageCost": 0.022492440000001807,
               "fundingPnl": -2.5316205861951677,
-              "netPnl": -50.92230690317117
+              "netPnl": -50.91310690317117
             },
             {
               "qty": 0.001,
@@ -13159,11 +13159,11 @@
               "entryFee": 0.044692936800000006,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -47.571,
+              "grossPnl": -47.561800000000005,
               "fees": 0.044692936800000006,
               "slippageCost": 0.022342000000004192,
               "fundingPnl": -2.3843244746709025,
-              "netPnl": -50.0223594114709
+              "netPnl": -50.01315941147091
             },
             {
               "qty": 0.001,
@@ -13173,11 +13173,11 @@
               "entryFee": 0.043292016672,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.069399999999995,
+              "grossPnl": -44.060199999999995,
               "fees": 0.043292016672,
               "slippageCost": 0.021641680000000635,
               "fundingPnl": -2.289764442820677,
-              "netPnl": -46.42409813949267
+              "netPnl": -46.41489813949267
             },
             {
               "qty": 0.001,
@@ -13187,11 +13187,11 @@
               "entryFee": 0.04368389503200001,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -45.048899999999996,
+              "grossPnl": -45.039699999999996,
               "fees": 0.04368389503200001,
               "slippageCost": 0.021837580000006712,
               "fundingPnl": -2.265846447788492,
-              "netPnl": -47.38026792282049
+              "netPnl": -47.37106792282049
             },
             {
               "qty": 0.001,
@@ -13201,11 +13201,11 @@
               "entryFee": 0.045310620312000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -49.1149,
+              "grossPnl": -49.1057,
               "fees": 0.045310620312000005,
               "slippageCost": 0.022650780000010855,
               "fundingPnl": -1.8745844985772129,
-              "netPnl": -51.05744589888923
+              "netPnl": -51.04824589888923
             },
             {
               "qty": 0.001,
@@ -13215,11 +13215,11 @@
               "entryFee": 0.043582554768,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.79560000000001,
+              "grossPnl": -44.78640000000001,
               "fees": 0.043582554768,
               "slippageCost": 0.021786919999998645,
               "fundingPnl": -1.8585639438106154,
-              "netPnl": -46.71953341857862
+              "netPnl": -46.71033341857862
             },
             {
               "qty": 0.001,
@@ -13229,11 +13229,11 @@
               "entryFee": 0.043839646175999995,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -45.438199999999995,
+              "grossPnl": -45.429,
               "fees": 0.043839646175999995,
               "slippageCost": 0.021915439999997035,
               "fundingPnl": -1.8294732087259982,
-              "netPnl": -47.333428294901985
+              "netPnl": -47.32422829490199
             },
             {
               "qty": 0.001,
@@ -13243,11 +13243,11 @@
               "entryFee": 0.043260410352000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -43.990399999999994,
+              "grossPnl": -43.9812,
               "fees": 0.043260410352000005,
               "slippageCost": 0.021625880000006873,
               "fundingPnl": -1.5593798176648852,
-              "netPnl": -45.614666108016884
+              "netPnl": -45.60546610801689
             },
             {
               "qty": 0.001,
@@ -13257,11 +13257,11 @@
               "entryFee": 0.04255991028,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -42.2395,
+              "grossPnl": -42.23030000000001,
               "fees": 0.04255991028,
               "slippageCost": 0.021275699999998322,
               "fundingPnl": -1.5657944351443511,
-              "netPnl": -43.86913004542434
+              "netPnl": -43.85993004542435
             },
             {
               "qty": 0.001,
@@ -13271,11 +13271,11 @@
               "entryFee": 0.0428555694,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -42.978500000000004,
+              "grossPnl": -42.969300000000004,
               "fees": 0.0428555694,
               "slippageCost": 0.021423500000004425,
               "fundingPnl": -1.5765288595451057,
-              "netPnl": -44.61930792894511
+              "netPnl": -44.61010792894511
             },
             {
               "qty": 0.001,
@@ -13285,11 +13285,11 @@
               "entryFee": 0.043443166896,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -44.447199999999995,
+              "grossPnl": -44.438,
               "fees": 0.043443166896,
               "slippageCost": 0.02171723999999813,
               "fundingPnl": -1.57340440219827,
-              "netPnl": -46.085764809094265
+              "netPnl": -46.07656480909427
             },
             {
               "qty": 0.001,
@@ -13299,11 +13299,11 @@
               "entryFee": 0.04154310696,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -39.698,
+              "grossPnl": -39.6888,
               "fees": 0.04154310696,
               "slippageCost": 0.020767399999996997,
               "fundingPnl": -1.3244333078518613,
-              "netPnl": -41.08474381481186
+              "netPnl": -41.07554381481186
             },
             {
               "qty": 0.001,
@@ -13313,11 +13313,11 @@
               "entryFee": 0.037696217736,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -30.0827,
+              "grossPnl": -30.0735,
               "fees": 0.037696217736,
               "slippageCost": 0.01884433999999601,
               "fundingPnl": -1.1337998258112494,
-              "netPnl": -31.273040383547244
+              "netPnl": -31.263840383547244
             },
             {
               "qty": 0.001,
@@ -13327,11 +13327,11 @@
               "entryFee": 0.036875293584000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -28.030800000000003,
+              "grossPnl": -28.021600000000007,
               "fees": 0.036875293584000005,
               "slippageCost": 0.01843395999999484,
               "fundingPnl": -1.10845984659018,
-              "netPnl": -29.194569100174178
+              "netPnl": -29.18536910017418
             },
             {
               "qty": 0.001,
@@ -13341,11 +13341,11 @@
               "entryFee": 0.037174153344000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -28.777800000000003,
+              "grossPnl": -28.768600000000006,
               "fees": 0.037174153344000004,
               "slippageCost": 0.018583360000004177,
               "fundingPnl": -1.0797725563138811,
-              "netPnl": -29.91333006965789
+              "netPnl": -29.904130069657892
             },
             {
               "qty": 0.001,
@@ -13355,11 +13355,11 @@
               "entryFee": 0.03661092072,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -27.37,
+              "grossPnl": -27.360800000000005,
               "fees": 0.03661092072,
               "slippageCost": 0.018301800000001096,
               "fundingPnl": -1.0676937835377758,
-              "netPnl": -28.49260650425778
+              "netPnl": -28.483406504257783
             },
             {
               "qty": 0.001,
@@ -13369,11 +13369,11 @@
               "entryFee": 0.034647488112,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -22.462399999999995,
+              "grossPnl": -22.4532,
               "fees": 0.034647488112,
               "slippageCost": 0.01732027999999991,
               "fundingPnl": -1.0503817032631633,
-              "netPnl": -23.56474947137516
+              "netPnl": -23.555549471375162
             },
             {
               "qty": 0.001,
@@ -13383,11 +13383,11 @@
               "entryFee": 0.034044247488,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -20.954600000000006,
+              "grossPnl": -20.94540000000001,
               "fees": 0.034044247488,
               "slippageCost": 0.017018719999992753,
               "fundingPnl": -1.0406906793204762,
-              "netPnl": -22.046353646808477
+              "netPnl": -22.03715364680848
             },
             {
               "qty": 0.001,
@@ -13397,11 +13397,11 @@
               "entryFee": 0.033882535152,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -20.550399999999996,
+              "grossPnl": -20.541199999999996,
               "fees": 0.033882535152,
               "slippageCost": 0.01693788000001223,
               "fundingPnl": -1.0263402401639106,
-              "netPnl": -21.627560655315918
+              "netPnl": -21.618360655315918
             },
             {
               "qty": 0.001,
@@ -13411,11 +13411,11 @@
               "entryFee": 0.034729984608,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -22.668600000000005,
+              "grossPnl": -22.65940000000001,
               "fees": 0.034729984608,
               "slippageCost": 0.017361519999991287,
               "fundingPnl": -1.0269863480458734,
-              "netPnl": -23.74767785265387
+              "netPnl": -23.738477852653872
             },
             {
               "qty": 0.001,
@@ -13425,11 +13425,11 @@
               "entryFee": 0.035363351256,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -24.251699999999996,
+              "grossPnl": -24.2425,
               "fees": 0.035363351256,
               "slippageCost": 0.017678140000003624,
               "fundingPnl": -0.3586952389048165,
-              "netPnl": -24.663436730160814
+              "netPnl": -24.654236730160818
             },
             {
               "qty": 0.001,
@@ -13439,11 +13439,11 @@
               "entryFee": 0.035771712912,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -25.272399999999994,
+              "grossPnl": -25.263199999999998,
               "fees": 0.035771712912,
               "slippageCost": 0.017882280000005267,
               "fundingPnl": -0.3422815948982025,
-              "netPnl": -25.6683355878102
+              "netPnl": -25.659135587810205
             },
             {
               "qty": 0.001,
@@ -13453,11 +13453,11 @@
               "entryFee": 0.035814521472000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -25.379399999999993,
+              "grossPnl": -25.370199999999997,
               "fees": 0.035814521472000004,
               "slippageCost": 0.01790368000000308,
               "fundingPnl": -0.3236307114853407,
-              "netPnl": -25.756748912957335
+              "netPnl": -25.74754891295734
             },
             {
               "qty": 0.001,
@@ -13467,11 +13467,11 @@
               "entryFee": 0.034658490312,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -22.489899999999995,
+              "grossPnl": -22.4807,
               "fees": 0.034658490312,
               "slippageCost": 0.017325779999999215,
               "fundingPnl": -0.2807581467457421,
-              "netPnl": -22.82264241705774
+              "netPnl": -22.813442417057743
             },
             {
               "qty": 0.001,
@@ -13481,11 +13481,11 @@
               "entryFee": 0.035327304048000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -24.161600000000007,
+              "grossPnl": -24.15240000000001,
               "fees": 0.035327304048000004,
               "slippageCost": 0.017660120000000463,
               "fundingPnl": -0.2733422807457464,
-              "netPnl": -24.487929704793757
+              "netPnl": -24.47872970479376
             },
             {
               "qty": 0.001,
@@ -13495,11 +13495,11 @@
               "entryFee": 0.031488976536,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -14.567699999999997,
+              "grossPnl": -14.5585,
               "fees": 0.031488976536,
               "slippageCost": 0.015741340000007768,
               "fundingPnl": -0.20619248201711163,
-              "netPnl": -14.821122798553116
+              "netPnl": -14.81192279855312
             },
             {
               "qty": 0.001,
@@ -13509,11 +13509,11 @@
               "entryFee": 0.030778794528,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -12.792600000000006,
+              "grossPnl": -12.78340000000001,
               "fees": 0.030778794528,
               "slippageCost": 0.01538631999999052,
               "fundingPnl": -0.20469634304448847,
-              "netPnl": -13.043461457572485
+              "netPnl": -13.034261457572489
             },
             {
               "qty": 0.001,
@@ -13523,11 +13523,11 @@
               "entryFee": 0.03148329540000001,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -14.5535,
+              "grossPnl": -14.544300000000003,
               "fees": 0.03148329540000001,
               "slippageCost": 0.015738500000006754,
               "fundingPnl": -0.21326319135462837,
-              "netPnl": -14.813984986754633
+              "netPnl": -14.804784986754637
             },
             {
               "qty": 0.001,
@@ -13537,11 +13537,11 @@
               "entryFee": 0.025152269448000003,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 1.2709000000000015,
+              "grossPnl": 1.2800999999999985,
               "fees": 0.025152269448000003,
               "slippageCost": 0.012573620000002847,
               "fundingPnl": -0.2030575536790202,
-              "netPnl": 1.0301165568729784
+              "netPnl": 1.0393165568729754
             },
             {
               "qty": 0.001,
@@ -13551,11 +13551,11 @@
               "entryFee": 0.026539226784,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.195800000000003,
+              "grossPnl": -2.1866000000000057,
               "fees": 0.026539226784,
               "slippageCost": 0.01326695999999356,
               "fundingPnl": -0.30933504226795777,
-              "netPnl": -2.5449412290519544
+              "netPnl": -2.535741229051957
             },
             {
               "qty": 0.001,
@@ -13565,11 +13565,11 @@
               "entryFee": 0.026396478240000007,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -1.839,
+              "grossPnl": -1.829800000000003,
               "fees": 0.026396478240000007,
               "slippageCost": 0.01319560000000638,
               "fundingPnl": -0.30980614376609444,
-              "netPnl": -2.188398222006101
+              "netPnl": -2.1791982220061037
             },
             {
               "qty": 0.001,
@@ -13579,11 +13579,11 @@
               "entryFee": 0.026711101152000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.625399999999994,
+              "grossPnl": -2.616199999999997,
               "fees": 0.026711101152000004,
               "slippageCost": 0.013352880000005826,
               "fundingPnl": -0.30888374672293867,
-              "netPnl": -2.974347727874939
+              "netPnl": -2.9651477278749416
             },
             {
               "qty": 0.001,
@@ -13593,11 +13593,11 @@
               "entryFee": 0.030528264432000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -12.166399999999994,
+              "grossPnl": -12.157199999999998,
               "fees": 0.030528264432000005,
               "slippageCost": 0.015261080000011135,
               "fundingPnl": -0.4521691834313897,
-              "netPnl": -12.664358527863396
+              "netPnl": -12.6551585278634
             },
             {
               "qty": 0.001,
@@ -13607,11 +13607,11 @@
               "entryFee": 0.030978354431999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -13.291399999999994,
+              "grossPnl": -13.282199999999998,
               "fees": 0.030978354431999998,
               "slippageCost": 0.015486080000002404,
               "fundingPnl": -0.448816375792434,
-              "netPnl": -13.78668081022443
+              "netPnl": -13.777480810224434
             },
             {
               "qty": 0.001,
@@ -13621,11 +13621,11 @@
               "entryFee": 0.030791437056,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -12.824199999999998,
+              "grossPnl": -12.815,
               "fees": 0.030791437056,
               "slippageCost": 0.015392640000005486,
               "fundingPnl": -0.43975728093743965,
-              "netPnl": -13.310141357993441
+              "netPnl": -13.300941357993443
             },
             {
               "qty": 0.001,
@@ -13635,11 +13635,11 @@
               "entryFee": 0.030726144,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -12.661,
+              "grossPnl": -12.651800000000003,
               "fees": 0.030726144,
               "slippageCost": 0.015360000000000583,
               "fundingPnl": -0.42781531698544134,
-              "netPnl": -13.134901460985443
+              "netPnl": -13.125701460985447
             },
             {
               "qty": 0.001,
@@ -13649,11 +13649,11 @@
               "entryFee": 0.031010320824000005,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -13.371300000000003,
+              "grossPnl": -13.362100000000007,
               "fees": 0.031010320824000005,
               "slippageCost": 0.015502059999998891,
               "fundingPnl": -0.41383966869114375,
-              "netPnl": -13.831652049515148
+              "netPnl": -13.822452049515151
             },
             {
               "qty": 0.001,
@@ -13663,11 +13663,11 @@
               "entryFee": 0.031040726904000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -13.447300000000004,
+              "grossPnl": -13.438100000000006,
               "fees": 0.031040726904000004,
               "slippageCost": 0.015517259999993257,
               "fundingPnl": -0.4017318148005434,
-              "netPnl": -13.89558980170454
+              "netPnl": -13.886389801704542
             },
             {
               "qty": 0.001,
@@ -13677,11 +13677,11 @@
               "entryFee": 0.030211281048000003,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -11.374100000000006,
+              "grossPnl": -11.36490000000001,
               "fees": 0.030211281048000003,
               "slippageCost": 0.015102619999990565,
               "fundingPnl": -0.400147159409411,
-              "netPnl": -11.819561060457406
+              "netPnl": -11.81036106045741
             },
             {
               "qty": 0.001,
@@ -13691,11 +13691,11 @@
               "entryFee": 0.029442447312,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -9.452399999999994,
+              "grossPnl": -9.443199999999997,
               "fees": 0.029442447312,
               "slippageCost": 0.01471828000000096,
               "fundingPnl": -0.30576660842874115,
-              "netPnl": -9.802327335740735
+              "netPnl": -9.793127335740738
             },
             {
               "qty": 0.001,
@@ -13705,11 +13705,11 @@
               "entryFee": 0.029377154256,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -9.289199999999997,
+              "grossPnl": -9.28,
               "fees": 0.029377154256,
               "slippageCost": 0.014685639999996057,
               "fundingPnl": -0.2943166406051387,
-              "netPnl": -9.627579434861133
+              "netPnl": -9.618379434861135
             },
             {
               "qty": 0.001,
@@ -13719,11 +13719,11 @@
               "entryFee": 0.029548668551999998,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -9.717899999999995,
+              "grossPnl": -9.708699999999997,
               "fees": 0.029548668551999998,
               "slippageCost": 0.014771380000005593,
               "fundingPnl": -0.28297281578754335,
-              "netPnl": -10.045192864339544
+              "netPnl": -10.035992864339546
             },
             {
               "qty": 0.001,
@@ -13733,11 +13733,11 @@
               "entryFee": 0.026697378408000003,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": -2.5911000000000057,
+              "grossPnl": -2.581900000000009,
               "fees": 0.026697378408000003,
               "slippageCost": 0.013346019999997225,
               "fundingPnl": -0.24289163805067074,
-              "netPnl": -2.8740350364586735
+              "netPnl": -2.8648350364586768
             },
             {
               "qty": 0.001,
@@ -13747,11 +13747,11 @@
               "entryFee": 0.025652209416,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 0.02130000000000291,
+              "grossPnl": 0.0305,
               "fees": 0.025652209416,
               "slippageCost": 0.012823540000004869,
               "fundingPnl": -0.22799245672786492,
-              "netPnl": -0.24516820614386686
+              "netPnl": -0.2359682061438698
             },
             {
               "qty": 0.001,
@@ -13761,11 +13761,11 @@
               "entryFee": 0.025546468272,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 0.2855999999999986,
+              "grossPnl": 0.2947999999999956,
               "fees": 0.025546468272,
               "slippageCost": 0.012770680000001448,
               "fundingPnl": -0.22514058657951683,
-              "netPnl": 0.022142265148480333
+              "netPnl": 0.03134226514847735
             },
             {
               "qty": 0.001,
@@ -13775,11 +13775,11 @@
               "entryFee": 0.02441368176,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 3.117,
+              "grossPnl": 3.126199999999997,
               "fees": 0.02441368176,
               "slippageCost": 0.012204400000002351,
               "fundingPnl": -0.22731777491003596,
-              "netPnl": 2.8530641433299615
+              "netPnl": 2.8622641433299587
             },
             {
               "qty": 0.001,
@@ -13789,11 +13789,11 @@
               "entryFee": 0.024344747976,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 3.289300000000003,
+              "grossPnl": 3.2985,
               "fees": 0.024344747976,
               "slippageCost": 0.01216993999999977,
               "fundingPnl": -0.22599714443603444,
-              "netPnl": 3.026788167587969
+              "netPnl": 3.0359881675879663
             },
             {
               "qty": 0.001,
@@ -13803,11 +13803,11 @@
               "entryFee": 0.024033565752000004,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 4.067099999999999,
+              "grossPnl": 4.076299999999995,
               "fees": 0.024033565752000004,
               "slippageCost": 0.012014380000000529,
               "fundingPnl": -0.17760419874993386,
-              "netPnl": 3.853447855498065
+              "netPnl": 3.8626478554980612
             },
             {
               "qty": 0.001,
@@ -13817,11 +13817,11 @@
               "entryFee": 0.024004960032000002,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 4.1385999999999985,
+              "grossPnl": 4.147799999999996,
               "fees": 0.024004960032000002,
               "slippageCost": 0.012000079999997979,
               "fundingPnl": -0.17018084443992848,
-              "netPnl": 3.9324141155280716
+              "netPnl": 3.941614115528069
             },
             {
               "qty": 0.001,
@@ -13831,22 +13831,22 @@
               "entryFee": 0.023824844016,
               "exitFee": 0,
               "closed": false,
-              "grossPnl": 4.588800000000003,
+              "grossPnl": 4.598,
               "fees": 0.023824844016,
               "slippageCost": 0.011910040000002483,
               "fundingPnl": -0.16671367970248685,
-              "netPnl": 4.3863514362815135
+              "netPnl": 4.395551436281511
             }
           ],
-          "grossPnl": -1830.8730000000003,
+          "grossPnl": -1830.2474000000004,
           "fees": 2.4774253860000006,
           "slippageCost": 1.238465000000011,
           "fundingPnl": -103.32794994028727,
-          "netPnl": -1937.916840326287,
-          "returnPct": -31.289206145662497,
+          "netPnl": -1937.2912403262874,
+          "returnPct": -31.27910533691911,
           "weightedAverageEntry": 91081.81566176465,
-          "holdHours": 9880,
-          "underwaterHours": 7229,
+          "holdHours": 9881,
+          "underwaterHours": 7230,
           "maxDrawdown": 2727.2344351886295,
           "worstUnrealizedPnl": -2265.978664999999,
           "suppressedDuplicateDailyEntries": 44
@@ -14063,8 +14063,8 @@
       },
       "openCampaign": {
         "armTime": 1745798400000,
-        "markTime": 1783785600000,
-        "markPrice": 64139,
+        "markTime": 1783789200000,
+        "markPrice": 64148.2,
         "closed": false,
         "legs": [],
         "grossPnl": 0,
@@ -14245,8 +14245,8 @@
         },
         {
           "armTime": 1745798400000,
-          "markTime": 1783785600000,
-          "markPrice": 64139,
+          "markTime": 1783789200000,
+          "markPrice": 64148.2,
           "closed": false,
           "legs": [],
           "grossPnl": 0,
