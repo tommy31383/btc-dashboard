@@ -17,6 +17,21 @@ Sample limitation: 3 completed DAILY_EPISODE campaigns; fewer than 5 completed D
 | FIXED_WALLETS_SURVIVE | PASS | [{"startingWallet":250,"liquidated":false},{"startingWallet":500,"liquidated":false},{"startingWallet":1000,"liquidated":false}] | {"wallets":[250,500,1000],"liquidated":false} |
 | CAMPAIGN_CONSISTENCY | PASS | {"positiveCompletedCampaigns":2,"completedCampaignsCompared":3,"campaignImprovements":[{"armTime":1628467200000,"improvement":-14.063617224685345},{"armTime":1697414400000,"improvement":0.666346285129407},{"armTime":1724025600000,"improvement":36.31759746554229}]} | {"minimumPositiveCompletedCampaigns":2} |
 
+**Tactical-only exploratory verdict: PASS**
+
+**Research status: POST_HOC_EXPLORATORY_NOT_VALIDATION.** This follow-up was selected after the full sample was observed; a mechanical PASS does not authorize live trading.
+
+| Exploratory check | Result | Actual | Requirement |
+|---|---|---|---|
+| ENTRY_PARITY | PASS | {"dailyEpisodeEntryCount":49,"tacticalOnlyEntryCount":49,"orderedTimestampsEqual":true,"dailyEpisodeEntryTimes":[1631232000000,1632268800000,1635033600000,1637193600000,1638748800000,1639180800000,1641427200000,1642896000000,1645315200000,1649376000000,1651968000000,1655078400000,1660953600000,1661644800000,1665619200000,1668038400000,1671408000000,1675555200000,1700352000000,1725148800000,1725667200000,1727913600000,1728604800000,1730678400000,1732752000000,1748217600000,1748563200000,1749168000000,1750464000000,1753488000000,1753833600000,1755734400000,1756252800000,1756684800000,1758758400000,1759017600000,1760659200000,1762387200000,1763337600000,1768953600000,1769385600000,1769904000000,1770336000000,1774742400000,1777593600000,1779062400000,1780012800000,1780444800000,1782518400000],"tacticalOnlyEntryTimes":[1631232000000,1632268800000,1635033600000,1637193600000,1638748800000,1639180800000,1641427200000,1642896000000,1645315200000,1649376000000,1651968000000,1655078400000,1660953600000,1661644800000,1665619200000,1668038400000,1671408000000,1675555200000,1700352000000,1725148800000,1725667200000,1727913600000,1728604800000,1730678400000,1732752000000,1748217600000,1748563200000,1749168000000,1750464000000,1753488000000,1753833600000,1755734400000,1756252800000,1756684800000,1758758400000,1759017600000,1760659200000,1762387200000,1763337600000,1768953600000,1769385600000,1769904000000,1770336000000,1774742400000,1777593600000,1779062400000,1780012800000,1780444800000,1782518400000]} | {"sameEntryCount":true,"sameOrderedTimestamps":true} |
+| TOTAL_NET_PNL_POSITIVE | PASS | {"totalNetPnl":13.97787159157822} | {"greaterThan":0} |
+| TACTICAL_NET_PNL_POSITIVE | PASS | {"tacticalNetPnl":13.977871591578218} | {"greaterThan":0} |
+| PEAK_QUANTITY | PASS | {"maxQuantityBtc":0.001} | {"maximumQuantityBtc":0.001} |
+| FIXED_WALLETS_SURVIVE | PASS | [{"startingWallet":250,"liquidated":false},{"startingWallet":500,"liquidated":false},{"startingWallet":1000,"liquidated":false}] | {"wallets":[250,500,1000],"liquidated":false} |
+| BEATS_HYBRID_LITE | PASS | {"tacticalOnlyTotalNetPnl":13.97787159157822,"hybridTotalNetPnl":-24.357551903229542,"improvement":38.33542349480776} | {"improvementGreaterThan":0} |
+| POSITIVE_COMPLETED_CAMPAIGNS | PASS | {"positiveCompletedCampaigns":2,"completedCampaigns":3} | {"minimumPositiveCompletedCampaigns":2} |
+| UNRESOLVED_LEGS_CAUSAL | PASS | {"expectedOpenEntryTimes":[],"actualOpenEntryTimes":[],"allRolesTactical":true} | {"openLegsEqualUnrecoveredEpisodes":true,"allRolesTactical":true} |
+
 ## Frozen strategy
 
 BTCUSDT only. RSI 14, StochRSI 14, %K SMA 3, %D SMA 3, close source, 0..100 scale.
@@ -24,6 +39,7 @@ BTCUSDT only. RSI 14, StochRSI 14, %K SMA 3, %D SMA 3, close source, 0..100 scal
 During the armed cycle, DAILY_EPISODE buys 0.001 BTC once per distinct closed-1D %K < 10 episode at the next available daily open. It rearms after closed-1D %K >= 10.
 The whole campaign exits at the next available daily open after completed 1W and 2W %K are both >= 80.
 No stop loss and no maximum-hold exit. Each leg is fully closed; Hybrid tactical legs may exit before the macro campaign. Historical funding applies to every open leg.
+TACTICAL_ONLY preserves every DAILY_EPISODE entry but makes every leg tactical: first causal closed-1D %K >= 10 exits at the next daily open, while an earlier or same-time macro exit has priority.
 Costs: 0.04% taker fee per side and 0.02% adverse slippage per side.
 
 ## Data and provenance
@@ -34,7 +50,7 @@ Costs: 0.04% taker fee per side and 0.02% adverse slippage per side.
 - Deterministic data cutoff: 2026-07-11T16:00:00.000Z
 - Hourly SHA-256: 41adc7f139a9853cb36d922ee106b28a6fdcbcc91ebcadcb2c2f43f72819a8ae
 - Funding SHA-256: 5dc6289ba8253c28f6506a2ad7bb3c987c7950e19be0b3567aa1dea3dd2dd08e
-- Evaluator: stochrsi-macro-cycle/v4 at 4c8e1a3905c5176ed71f4a649ccc671f6cd67c79; dirty=false
+- Evaluator: stochrsi-macro-cycle/v5 at f2c01e2bd1db71b00a8fafe0637b5d7391e3c373; dirty=false
 - Listed >3h source gaps: 0
 - Live-wallet snapshot: NOT_SUPPLIED_TO_OFFLINE_EVALUATOR (Deterministic offline replay does not access live account state.)
 
@@ -60,6 +76,7 @@ Macro cycles: 4; completed: 3; open: 1; zero/one/multiple DAILY_EPISODE entries:
 | MACRO_ONCE | TRADABLE_REPLAY | 3/1/0 | 3/4 | 66.6667% | 66.6667% | 2.6917 | 0.1538 | 0.0769 | -12.6511 | 23.966 | -10.1902 | 69.9241 | -35.9571 | 33.6654 | 0.001 | 125.986 |
 | DAILY_EPISODE | TRADABLE_REPLAY | 3/1/0 | 25/49 | 66.6667% | 48% | -738.4915 | 1.7572 | 0.8785 | -77.8762 | -61.5937 | -819.0034 | 1067.3416 | -869.1423 | 974.2955 | 0.024 | 1649.708 |
 | HYBRID_LITE | TRADABLE_REPLAY | 3/1/0 | 48/49 | 66.6667% | 60.4167% | -7.9233 | 2.6393 | 1.3197 | -12.4752 | 17.7875 | -24.3576 | 77.1755 | -57.5612 | 45.5436 | 0.002 | 238.9732 |
+| TACTICAL_ONLY | TRADABLE_REPLAY | 3/1/0 | 49/49 | 66.6667% | 63.2653% | 19.3323 | 2.6759 | 1.3379 | -1.3406 | 6.7645 | 13.9779 | 18.8752 | -13.6405 | 11.971 | 0.001 | 119.4866 |
 | DAILY_EPISODE_MATCHED_PEAK | SIMULATED_NOT_TRADABLE | 3/1/0 | 25/49 | 66.6667% | 48% | -61.541 | 0.1464 | 0.0732 | -6.4897 | -5.1328 | -68.2503 | 88.9451 | -72.4285 | 81.2005 | 0.002 | 137.4757 |
 | DAILY_EVERY_BAR | TRADABLE_REPLAY | 3/1/0 | 75/143 | 66.6667% | 37.3333% | -2210.416 | 4.8307 | 2.4151 | -223.3586 | -503.1035 | -2441.0204 | 3043.0343 | -2265.9787 | 2880.9964 | 0.068 | 4448.658 |
 | WINDOW_FULL_AT_ARM | SIMULATED_NOT_TRADABLE | 3/1/1 | 3/3 | 66.6667% | 66.6667% | -108.2933 | 0.8892 | 0.4446 | -112.2542 | -221.8813 | -221.8813 | 1008.3803 | -510.3588 | 605.8069 | 0.018 | 1236.8673 |
@@ -71,6 +88,15 @@ Macro cycles: 4; completed: 3; open: 1; zero/one/multiple DAILY_EPISODE entries:
 | BASE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | CORE | 4 | 3 | 1 | -25.1864 | 0.165 | 0.0825 | -11.2282 | -36.662 | 0 | 3 | 1 |
 | TACTICAL | 45 | 45 | 0 | 17.263 | 2.4743 | 1.2372 | -1.247 | 12.3045 | 44 | 1 | 0 |
+| SIMULATED | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+## Tactical-only role attribution
+
+| Role | Entries | Realized | Open | Gross | Fees | Slippage | Funding | Net | Daily recovery | Macro overbought | Open mark |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| BASE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| CORE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| TACTICAL | 49 | 49 | 0 | 19.3323 | 2.6759 | 1.3379 | -1.3406 | 13.9779 | 48 | 1 | 0 |
 | SIMULATED | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ## MACRO_ONCE
@@ -253,6 +279,74 @@ Net without best one/three: -34.9806 / 0 USDT.
 |---|---:|---:|---:|---:|
 | Before 2023 | 1 | 18 | -35.7075 | 0% |
 | 2023 onward | 2 | 7 | 53.4951 | 100% |
+
+## TACTICAL_ONLY
+
+Returns (closed campaigns only): expectancy 2.2548 USDT; average 1.4016%; median 2.0313%.
+Leg counts (all campaigns): average/median per campaign 12.25/12.
+Timing: average hold 6196h; average underwater 2083.5h; suppressed duplicate daily entries 94.
+Entry (all campaigns, exposure-matched): weighted average 68078.7853; improvement vs MACRO_ONCE 2.3194%.
+Entry (closed campaigns only, exposure-matched): weighted average 43220.472; improvement vs MACRO_ONCE 7.3232%.
+Best campaign: 2024-08-19T00:00:00.000Z -> 2024-12-09T00:00:00.000Z; 6 legs; net 12.9246 USDT
+Worst campaign: 2021-08-09T00:00:00.000Z -> 2023-02-06T00:00:00.000Z; 18 legs; net -6.9033 USDT
+Open campaign marked to market: 2025-04-28T00:00:00.000Z -> 2026-07-11T16:00:00.000Z; 24 legs; net 7.2134 USDT
+
+### Monthly entries and realized PnL
+
+| Month | Entries | Realized PnL USDT |
+|---|---:|---:|
+| 2021-09 | 2 | 3.2774 |
+| 2021-10 | 1 | 0.5803 |
+| 2021-11 | 1 | -0.7758 |
+| 2021-12 | 2 | 3.2914 |
+| 2022-01 | 2 | 0.2961 |
+| 2022-02 | 1 | -1.7678 |
+| 2022-04 | 1 | -2.3651 |
+| 2022-05 | 1 | -5.4429 |
+| 2022-06 | 1 | -6.0225 |
+| 2022-08 | 2 | 0.4248 |
+| 2022-10 | 1 | 0.1901 |
+| 2022-11 | 1 | 1.7048 |
+| 2022-12 | 1 | 0.1339 |
+| 2023-02 | 1 | -0.428 |
+| 2023-11 | 1 | 0.7432 |
+| 2024-09 | 2 | 3.1419 |
+| 2024-10 | 2 | 3.4586 |
+| 2024-11 | 2 | 6.324 |
+| 2025-05 | 2 | 0.278 |
+| 2025-06 | 2 | 4.651 |
+| 2025-07 | 2 | 1.6271 |
+| 2025-08 | 2 | -1.3219 |
+| 2025-09 | 3 | 1.3771 |
+| 2025-10 | 1 | 2.2265 |
+| 2025-11 | 2 | -8.8665 |
+| 2026-01 | 2 | 3.4526 |
+| 2026-02 | 2 | 4.5532 |
+| 2026-03 | 1 | 0 |
+| 2026-04 | 0 | 1.8285 |
+| 2026-05 | 3 | 0.9337 |
+| 2026-06 | 2 | -3.5259 |
+
+### Fixed-wallet feasibility
+
+| Scenario | Basis | Snapshot | Wallet USDT | ROI | Outcome | Liquidated | Liquidations | Minimum buffer |
+|---|---|---|---:|---:|---|---|---:|---:|
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 100 | 13.9779% | SURVIVED | false | 0 | 88.039 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 250 | 5.5911% | SURVIVED | false | 0 | 238.039 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 500 | 2.7956% | SURVIVED | false | 0 | 488.039 |
+| FIXED_WALLET | FULL_HISTORY_SCALE_TEST | null | 1000 | 1.3978% | SURVIVED | false | 0 | 988.039 |
+
+### Concentration
+
+Best one/three campaign PnL: 12.9246 / 6.7645 USDT; shares: 191.0657% / 100%.
+Net without best one/three: -6.1601 / 0 USDT.
+
+### Pre-/post-2023 stability
+
+| Period | Campaigns | Legs | Net PnL USDT | Win rate |
+|---|---:|---:|---:|---:|
+| Before 2023 | 1 | 18 | -6.9033 | 0% |
+| 2023 onward | 2 | 7 | 13.6678 | 100% |
 
 ## DAILY_EPISODE_MATCHED_PEAK - SIMULATED_NOT_TRADABLE
 
