@@ -106,6 +106,7 @@ git commit -m "feat: record causal daily episode recoveries"
 **Interfaces:**
 - Produces: `LegRole`, `LegExitReason`, extended `LegIntent`, extended `ReplayLeg`.
 - Produces: partial-exit-safe campaign and account risk paths.
+- Produces: the minimal executable `HYBRID_LITE` variant needed to exercise partial exits end to end.
 - Consumes: `CampaignSignal.episodeRecoveryTimes`.
 
 - [ ] **Step 1: Write failing lifecycle/accounting tests**
@@ -143,6 +144,19 @@ export interface LegIntent {
 ```
 
 Add `role` and `exitReason` to `ReplayLeg`. Make `replayLeg` consume `intent.exitTime` directly and copy lifecycle metadata. Existing builders resolve campaign exit into every intent.
+
+Add `HYBRID_LITE` to `VariantName` and build its intents here: entry index zero is `CORE`; later entries are `TACTICAL`; macro exit wins recovery ties. Task 3 will add the matched-peak control and fixed orchestration, not reimplement Hybrid.
+
+```ts
+const macroWins = campaign.exitTime !== undefined &&
+  (recoveryTime === null || campaign.exitTime <= recoveryTime);
+const exitTime = macroWins ? campaign.exitTime : recoveryTime ?? undefined;
+const exitReason = exitTime === undefined
+  ? undefined
+  : macroWins
+    ? "MACRO_OVERBOUGHT"
+    : "DAILY_RECOVERY";
+```
 
 - [ ] **Step 4: Generalize campaign risk**
 
@@ -185,41 +199,26 @@ Expected: all existing metrics remain unchanged in regression fixtures.
 - Modify: `tools/backtest-stochrsi-macro-cycle-7y.ts`
 
 **Interfaces:**
-- Produces: variants `HYBRID_LITE` and `DAILY_EPISODE_MATCHED_PEAK`.
+- Consumes: the executable `HYBRID_LITE` variant from Task 2.
+- Produces: `DAILY_EPISODE_MATCHED_PEAK` and fixed orchestration.
 - Produces: `runFrozenVariants(campaigns, hourly, funding, options?)` in report order.
 
 - [ ] **Step 1: Write failing variant tests**
 
 ```ts
-assert.deepEqual(hybridEntryTimes, baseEntryTimes);
-assert.deepEqual(hybrid.campaigns[0].legs.map((leg) => leg.role), ["CORE", "TACTICAL", "TACTICAL"]);
-assert.ok(hybrid.maxQuantity <= 0.002 + Number.EPSILON);
 assert.equal(matched.simulatedNotTradable, true);
 assert.equal(matched.maxQuantity, hybrid.maxQuantity);
+const frozen = runFrozenVariants(campaigns, hourly, []);
+assert.deepEqual(frozen.map((run) => run.name), VARIANT_NAMES);
 ```
 
-Also assert no two tactical legs overlap and macro exit wins an equal recovery timestamp.
+Task 2 already owns entry parity, roles, tactical overlap, and macro/recovery tie behavior. Task 3 verifies the matched control uses Hybrid's measured peak rather than a hand-entered scale.
 
 - [ ] **Step 2: Run RED replay test**
 
 Run the Task 2 replay command; expect unknown variant/function failures.
 
-- [ ] **Step 3: Implement Hybrid intent resolution**
-
-For entry index zero, emit one core. For later entries, choose macro exit when it is earlier than or equal to recovery.
-
-```ts
-const macroWins = campaign.exitTime !== undefined &&
-  (recoveryTime === null || campaign.exitTime <= recoveryTime);
-const exitTime = macroWins ? campaign.exitTime : recoveryTime ?? undefined;
-const exitReason = exitTime === undefined
-  ? undefined
-  : macroWins
-    ? "MACRO_OVERBOUGHT"
-    : "DAILY_RECOVERY";
-```
-
-- [ ] **Step 4: Implement frozen orchestration**
+- [ ] **Step 3: Implement frozen orchestration**
 
 Run base and Hybrid first, then calculate the diagnostic matched scale.
 
@@ -231,7 +230,7 @@ const matchedPeakScale = base.maxQuantity === 0
 
 Replay all base episode entries with quantities multiplied by this scale and mark that row simulated/non-tradable. Return every variant exactly once in `VARIANT_NAMES` order.
 
-- [ ] **Step 5: Switch runner and verify**
+- [ ] **Step 4: Switch runner and verify**
 
 Replace `VARIANT_NAMES.map(runVariant)` with `runFrozenVariants`.
 
@@ -242,7 +241,7 @@ Replace `VARIANT_NAMES.map(runVariant)` with `runFrozenVariants`.
 
 Expected: focused tests and targeted TypeScript pass.
 
-- [ ] **Step 6: Commit Task 3**
+- [ ] **Step 5: Commit Task 3**
 
 ```bash
 git add tools/stochrsi-macro-cycle/replay.ts tools/stochrsi-macro-cycle/replay.test.ts tools/backtest-stochrsi-macro-cycle-7y.ts
