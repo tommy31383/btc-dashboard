@@ -245,6 +245,19 @@ The exact production signal path is mandatory. If it cannot be invoked or shown
 equivalent without editing `btc-trader-server`, the affected rule is `INVALID`.
 No approximate rewrite can contribute to the diagnosis.
 
+The Night-1 unit is a market-deterministic entry signal, not an exchange fill or
+an account-accepted order. `evalHedge01TrendSnapshot` is the production single
+source of truth for S12/S13/S14 market gates but intentionally excludes cooldown,
+qty, HWM, bucket-cap, and scheduler/account gates. Champion's snapshot accepts
+deterministic capacity/cooldown inputs but still does not prove a fill. Therefore:
+
+- output rows are labeled `MARKET_SIGNAL`, never `LIVE_FILL`;
+- H01 results cannot claim the distribution of actually accepted intents or fills;
+- no win rate, PnL edge, or live execution rate is inferred from this diagnosis;
+- a later actual-intent audit requires a separately preregistered stateful replay
+  of rule state, cooldown confirmation, exits, bucket capacity, and scheduler
+  gates, plus deployment/trade-log identity evidence.
+
 Preregistration pins the local server git SHA, package version, module/import-graph
 hashes, and any pre-existing non-secret deployment evidence available before
 activation. If that evidence proves only a version match, the report must say

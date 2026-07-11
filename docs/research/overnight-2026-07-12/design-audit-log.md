@@ -100,3 +100,12 @@ reported and resolved in the final Claude candidate:
 
 Status: Grok gate remains approved. Claude approval is still mandatory and has
 not yet occurred.
+
+## Codex pre-Claude self-review
+
+Read-only source inventory found that `evalHedge01TrendSnapshot` is the exact
+market-gate path but intentionally excludes account/execution gates. The design
+now labels every Night-1 row `MARKET_SIGNAL`, forbids fill/accepted-intent and win
+rate/PnL claims, and defers stateful actual-intent replay to a separate preregistered
+run. This narrows the claim without changing the Grok-approved money-path or
+anti-retune controls.
