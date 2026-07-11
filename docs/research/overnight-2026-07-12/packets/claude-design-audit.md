@@ -14,6 +14,10 @@ implemented or activated.
   `/Users/lap16116/BTC_PC/docs/THREE_AGENT_PROCESS.md`
 - Live-server policy:
   `/Users/lap16116/BTC_PC/btc-trader-server/AGENTS.md`
+- Pure-import design precheck:
+  `/Users/lap16116/BTC_PC/btc-dashboard/docs/research/overnight-2026-07-12/pure-import-design-precheck.md`
+- Prior audit trail:
+  `/Users/lap16116/BTC_PC/btc-dashboard/docs/research/overnight-2026-07-12/design-audit-log.md`
 
 ## Owner decision and narrowed run scope
 
@@ -34,6 +38,9 @@ Scope B is the permission ceiling, but Night 1 is narrower:
 - BTC is the research target for this run.
 - Grok's first design audit returned `NOT APPROVED`; its P0/P1 findings were
   incorporated and a re-audit is mandatory.
+- Claude attempt 2 returned `NOT APPROVED`; findings O/K/A/M/H plus recommended
+  B/J/E were incorporated. Attempt 2 could not read sibling server/root files;
+  this re-audit runs from the workspace root and must verify them directly.
 - The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions

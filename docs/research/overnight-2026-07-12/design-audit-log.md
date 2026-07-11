@@ -109,3 +109,31 @@ now labels every Night-1 row `MARKET_SIGNAL`, forbids fill/accepted-intent and w
 rate/PnL claims, and defers stateful actual-intent replay to a separate preregistered
 run. This narrows the claim without changing the Grok-approved money-path or
 anti-retune controls.
+
+## Claude attempt 2 - NOT APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T02:15:59+07:00`.
+- Model: `claude-opus-4-8`, high effort, plan permission mode, read-only tools.
+- Packet: `packets/claude-design-audit.md`.
+- Verdict: `NOT APPROVED`; no P0, three P1 and two blocking P2 findings.
+- Limitation: the command ran from the dashboard repository and Claude was not
+  granted read access to sibling root/server paths. Its import-graph finding was
+  explicitly a flagged risk, not an empirical claim. The re-audit will run from
+  the workspace root so it can verify those files directly.
+
+Required findings accepted for resolution:
+
+| ID | Disposition |
+|---|---|
+| O | Move pure transitive-import proof into the activation gate. If it fails, stop before replay and report `INVALID`; never approximate. |
+| K | Spawn each child in an owned process group and terminate/verify the whole group at timeout/cutoff. |
+| A | Reject every computed/dynamic `require` or `import()` in the allowed import closure. |
+| M | Put transient lock/process state outside Git and define source cleanliness by an exact generated-evidence exemption. |
+| H | Add a renderer test proving non-complete statuses cannot appear in audited/positive sections. |
+
+Recommended B/J/E hardening is also accepted: minimal env allowlist, PID
+start-identity stale-lock validation, and a structurally outcome-blind metadata
+inventory executable.
+
+Status: activation remains closed pending fixes plus Grok and Claude re-audits.

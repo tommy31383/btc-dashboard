@@ -98,21 +98,31 @@ encountered.
 The executable supervisor is a local Node process with these mechanical guards:
 
 - atomically acquires
-  `btc-dashboard/docs/research/overnight-2026-07-12/.supervisor.lock/` using
-  `mkdir`; the directory stores PID, start time, host, and deadline;
-- exits non-zero when a live lock exists; a stale lock is recoverable only when
-  its recorded PID is absent, with the recovery appended to the ledger;
+  `${TMPDIR}/btc-pc-overnight-2026-07-12/.supervisor.lock/` using `mkdir`; the
+  directory stores PID, OS process-start identity, hostname, supervisor start,
+  random run ID, and deadline;
+- exits non-zero when a live lock exists; a stale lock is recoverable only on the
+  recorded host when the PID is absent or its OS start identity differs. A lock
+  from another host or an unverifiable identity fails closed, and every recovery
+  is appended to the ledger;
 - asserts that its repository root is the dedicated dashboard research worktree
   before every source-writing step;
 - owns the only ledger writer and uses temp-file-plus-rename for structured state;
-- records every child PID, gives each child a wall-clock timeout, and terminates
-  only its own recorded children at cutoff;
+- starts every child detached in a new owned process group, records PID/PGID/run
+  ID, gives it a wall-clock timeout, and terminates the entire owned process group
+  at timeout or cutoff;
 - executes a frozen command allowlist. SSH, rsync, PM2, deploy scripts,
   authenticated clients, server writes/cwd, and every server import except the
   hash-locked pure modules below are rejected.
 
 No two agents write the same files. A long replay may overlap only with
 read-only review of its already-frozen inputs.
+
+Process-group termination sends `SIGTERM` to the negative owned PGID, waits five
+seconds, then sends `SIGKILL` to that same group if needed. It refuses PGID `<=1`,
+refuses a group not recorded under the current run ID, and verifies that no owned
+descendant remains. Tests cover a child that spawns a grandchild and prove the
+entire subtree dies without touching an unrelated control process.
 
 #### Command and path matrix
 
@@ -137,11 +147,27 @@ while mechanically excluding server writes, credential-bearing modules, and
 operational tooling.
 
 Before dynamic import, a static closure scan rejects production env/secret access,
-network modules/calls, child-process calls, filesystem writes, and cwd mutation.
-The import then runs in an isolated child with secret-like environment variables
-removed and network, child-process, write, and `chdir` operations trapped; any
-attempt terminates the child and records `INVALID`. Tests prove both a pure allowed
-import and each trapped side-effect class.
+network modules/calls, child-process calls, filesystem writes, cwd mutation, and
+every non-literal/computed `require(...)` or `import(...)`. The only permitted env
+read is the exact non-secret literal `process.env.RULE_DISABLE_S12`; its frozen
+repository-default value is `false` and is recorded in preregistration. Every
+other env read is `INVALID`. The complete literal import graph must resolve to the
+hash-locked allowlist. A computed or unresolved edge is `INVALID`; test fixtures
+prove each class is rejected.
+
+The import then runs in an isolated child whose entire environment is rebuilt from
+an exact minimal allowlist (`TZ=UTC`, `LANG=C`, `LC_ALL=C`,
+`RULE_DISABLE_S12=false`); executables use frozen absolute paths, so inherited
+`PATH`, `HOME`, tokens, keys, and arbitrary variables are absent. Network,
+child-process, write, and `chdir` operations are trapped; any attempt terminates
+the process group and records `INVALID`. Tests prove a pure allowed import plus
+every static and runtime side-effect class.
+
+The pure-graph scan and isolated import are an activation go/no-go check, before
+preregistration or outcome replay. If either production signal graph is impure or
+cannot load under these guards, the affected rule is recorded `INVALID`, the run
+does not build/replay an approximation, and the morning report states that the
+faithful path was structurally unavailable.
 
 ### 4.2 Research state
 
@@ -151,8 +177,8 @@ The detailed run state lives under:
 
 Required files:
 
-- `run.json`: atomic supervisor state, timestamps, deadline, owned children, and
-  current phase.
+- `run.json`: finalized evidence copy of supervisor timestamps, deadline, owned
+  process groups, and terminal phase.
 - `ledger.jsonl`: append-only events written by the single supervisor.
 - `prereg/entry-quality-diagnosis.json`: canonical pre-registration.
 - `prereg/entry-quality-diagnosis.sha256`: hash required by the evaluator.
@@ -161,6 +187,16 @@ Required files:
 - `queue.md`: the single active diagnosis, blockers, and deferred backlog.
 - `morning-report.md`: final results and recommendations.
 - `packets/`: short Claude and Grok review packets.
+
+Transient lock data, active child manifests, temp files, and mutable supervisor
+state live only under
+`${TMPDIR}/btc-pc-overnight-2026-07-12/<run-id>/`, outside Git. `run.json`,
+`ledger.jsonl`, raw rows, aggregates, and reports are declared generated-evidence
+paths. The source-clean check parses `git status --porcelain=v1 -z` and permits
+changes only under the exact generated-evidence allowlist; any source, test,
+preregistration, registry, matrix, or packet change after its freeze commit blocks
+replay. Thus the immutable source commit stays clean even while declared outputs
+are generated and later committed.
 
 The existing relay watcher remains untouched at `TURN=TOMMY`. The research
 ledger is the sole source of truth for this run; the supervisor neither changes
@@ -183,8 +219,8 @@ Each diagnosis ledger record includes:
 - next decision.
 
 The evaluator refuses to run when the preregistration file is missing, its
-SHA-256 does not match, the source worktree is dirty outside declared evidence
-paths, any replay byte differs from the preregistered data hashes, or a result
+SHA-256 does not match, the source worktree is dirty outside the exact generated
+evidence allowlist, any replay byte differs from the preregistered data hashes, or a result
 already exists for the same
 `mechanism_id + rule_fingerprint + data_range_hash + cost_model_id`.
 
@@ -319,8 +355,11 @@ a positive production verdict.
 
 The single cycle follows this order:
 
-1. **Metadata inventory:** identify faithful evaluators, available data timestamps,
-   hashes, and exact test commands without reading outcome summaries.
+1. **Metadata inventory:** a separate outcome-blind executable identifies faithful
+   evaluator paths, file size, row count, first/last timestamp, SHA-256, and exact
+   test commands. It cannot import signal/evaluator modules and a static test
+   rejects access to OHLCV/funding values or outcome/result fields; only schema,
+   count, timestamps, filesystem metadata, and hashes are allowed.
 2. **Pre-registration:** write canonical JSON containing the frozen question,
    evaluator identities, data/split algorithm, costs, controls, sample floors,
    metrics, bootstrap method, and mechanical interpretation checks.
@@ -379,10 +418,12 @@ The active window starts only after both design audits pass and ends exactly at
 - Each external audit call has a 20-minute timeout and one compact retry.
 - Each test or replay child has a 45-minute timeout.
 - No new source-writing or replay phase starts at or after `06:30` ICT.
-- At `06:30`, the supervisor enters closeout: finish an owned child only when its
-  timeout is before the hard stop, otherwise terminate it and record `CUTOFF`.
-- At the hard stop, terminate only recorded owned children, atomically write the
-  final run state and partial-or-complete morning report, and start no new work.
+- At `06:30`, the supervisor enters closeout: finish an owned process group only
+  when its timeout is before the hard stop, otherwise terminate the full group
+  and record `CUTOFF`.
+- At the hard stop, terminate and verify only process groups recorded under the
+  current run ID, atomically write the final run state and partial-or-complete
+  morning report, and start no new work.
 - If Claude or Grok is unavailable, freeze the result at `AUDIT_PENDING`; do not
   switch to another scientific lane or generate another candidate.
 - While a replay runs, only non-conflicting review of frozen inputs or report
@@ -392,7 +433,7 @@ The active window starts only after both design audits pass and ends exactly at
 It does not mean generating parameter combinations or filling time with new rule
 families.
 
-## 9. Design Activation Gate
+## 9. Design and Runtime Activation Gates
 
 Before implementation:
 
@@ -402,11 +443,28 @@ Before implementation:
 3. A quota, timeout, command failure, or missing verdict is recorded as an audit
    failure, never an approval.
 4. Every valid P0-P2 is resolved in the design and the affected auditor reruns.
-5. Activation requires explicit approval from Claude with no unresolved P0-P2
-   and no unresolved blocking Grok finding.
+5. Implementation may begin only after explicit Claude approval with no unresolved
+   P0-P2 and no unresolved blocking Grok finding.
 
 The first Claude quota failure and Grok `NOT APPROVED` verdict remain in the
 audit log; later success does not erase them.
+
+Before preregistration or any outcome replay, a second runtime gate requires:
+
+1. the frozen command/path matrix and hash;
+2. a committed pure-import report that resolves every literal transitive edge,
+   rejects computed/dynamic edges, verifies all module hashes, and shows the
+   isolated no-side-effect import passed;
+3. green guard tests for environment allowlisting, command/path denial,
+   source-clean filtering, process-group descendant termination, and report
+   status routing;
+4. a dry run that creates transient state and evidence scaffolding without
+   importing outcome data or replaying signals; and
+5. enough wall-clock remains to finish the next phase before its timeout and the
+   hard stop.
+
+An affected impure/unloadable signal graph is `INVALID` at this gate. It is not
+approximated or discovered only after a replay starts.
 
 ## 10. Failure Handling
 
@@ -423,6 +481,9 @@ audit log; later success does not erase them.
   behavior, or possible exchange mutation stops the entire run immediately.
 - Claude/Grok failure freezes the result at `AUDIT_PENDING` after one compact
   retry; it cannot become a positive status or be retuned.
+- The report renderer has a status-routing unit test: for `AUDIT_PENDING`,
+  `INSUFFICIENT_SAMPLE`, `INVALID`, `CUTOFF`, or `BLOCKED`, metrics cannot appear
+  under `Audited diagnosis`, positive, promotion, or recommendation sections.
 - The supervisor never kills, resets, edits, or cleans unrelated user processes,
   branches, worktrees, or files.
 
@@ -448,7 +509,8 @@ The overnight process is acceptable only if:
 
 - Claude explicitly approves the final design and revised Grok blockers are closed;
 - lock contention, stale-lock recovery, exact worktree assertion, command/path
-  refusal, child timeout, and hard-cutoff behavior have automated tests;
+  refusal, computed-import refusal, process-group descendant termination, child
+  timeout, and hard-cutoff behavior have automated tests;
 - a dry run creates atomic state, preregistration, registry, and packets without
   replaying outcomes or modifying `btc-trader-server`;
 - the evaluator refuses a missing/mismatched preregistration hash and duplicate
@@ -461,6 +523,8 @@ The overnight process is acceptable only if:
 - production signal parity and closed-bar/next-bar behavior pass for every audited
   rule, or that rule is marked `INVALID`;
 - every diagnosis has structured ledger events and raw reproducible evidence;
-- the report separates audited, under-sampled, invalid, and audit-pending results;
+- a unit test proves the report separates audited, under-sampled, invalid,
+  cutoff/blocked, and audit-pending results without leaking their metrics into a
+  positive section;
 - no server write, deploy, arm, secret access, authenticated API/VPS access, or
   exchange mutation occurs.
