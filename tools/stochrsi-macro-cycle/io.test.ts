@@ -26,8 +26,8 @@ function jsonResponse(body: unknown, status = 200) {
   };
 }
 
-test("Hybrid report semantics use evaluator version v4", () => {
-  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v4");
+test("Tactical-only exploratory report semantics use evaluator version v5", () => {
+  assert.equal(EVALUATOR_VERSION, "stochrsi-macro-cycle/v5");
 });
 
 test("default caches are explicitly Futures-specific", () => {

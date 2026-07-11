@@ -64,11 +64,35 @@ export interface HybridMechanicalVerdict {
   checks: HybridKillCheck[];
 }
 
+export type TacticalOnlyKillCheckId =
+  | "ENTRY_PARITY"
+  | "TOTAL_NET_PNL_POSITIVE"
+  | "TACTICAL_NET_PNL_POSITIVE"
+  | "PEAK_QUANTITY"
+  | "FIXED_WALLETS_SURVIVE"
+  | "BEATS_HYBRID_LITE"
+  | "POSITIVE_COMPLETED_CAMPAIGNS"
+  | "UNRESOLVED_LEGS_CAUSAL";
+
+export interface TacticalOnlyKillCheck {
+  id: TacticalOnlyKillCheckId;
+  passed: boolean;
+  actual: unknown;
+  requirement: unknown;
+}
+
+export interface TacticalOnlyMechanicalVerdict {
+  verdict: "PASS" | "KILL";
+  researchStatus: "POST_HOC_EXPLORATORY_NOT_VALIDATION";
+  checks: TacticalOnlyKillCheck[];
+}
+
 export interface MacroCycleReport {
-  schemaVersion: "btc-stochrsi-macro-cycle-report/v3";
+  schemaVersion: "btc-stochrsi-macro-cycle-report/v4";
   generatedAt: string;
   verdict: "INSUFFICIENT_SAMPLE" | "EVALUATED";
   hybridVerdict: HybridMechanicalVerdict;
+  tacticalOnlyVerdict: TacticalOnlyMechanicalVerdict;
   sampleLimitation: string;
   liveWalletFeasibility: {
     status: "NOT_SUPPLIED_TO_OFFLINE_EVALUATOR";
@@ -97,6 +121,7 @@ export interface MacroCycleReport {
     stopLoss: null;
     legClosure: "FULL_LEG_ONLY";
     hybridTacticalExit: "DAILY_RECOVERY_BEFORE_MACRO_EXIT";
+    tacticalOnlyExit: "ALL_LEGS_DAILY_RECOVERY_BEFORE_MACRO_EXIT";
     maximumHoldExit: false;
     frozenVariants: VariantName[];
   };
@@ -283,6 +308,120 @@ function buildHybridVerdict(
   };
 }
 
+function buildTacticalOnlyVerdict(
+  campaigns: CampaignSignal[],
+  dailyEpisode: VariantRun,
+  tacticalOnly: VariantRun,
+  hybridSummary: VariantSummary,
+  tacticalOnlySummary: VariantSummary,
+): TacticalOnlyMechanicalVerdict {
+  const dailyEpisodeEntryTimes = dailyEpisode.campaigns.flatMap((campaign) =>
+    campaign.legs.map((leg) => leg.entryTime),
+  );
+  const tacticalOnlyEntryTimes = tacticalOnly.campaigns.flatMap((campaign) =>
+    campaign.legs.map((leg) => leg.entryTime),
+  );
+  const orderedTimestampsEqual =
+    dailyEpisodeEntryTimes.length === tacticalOnlyEntryTimes.length &&
+    dailyEpisodeEntryTimes.every((time, index) => time === tacticalOnlyEntryTimes[index]);
+  const fixedWallets = [250, 500, 1_000].map((startingWallet) => {
+    const scenario = tacticalOnly.walletScenarios.find((wallet) =>
+      wallet.label === "FIXED_WALLET" && wallet.startingWallet === startingWallet
+    );
+    return { startingWallet, liquidated: scenario?.liquidated ?? true };
+  });
+  const positiveCompletedCampaigns = tacticalOnly.campaigns.filter(
+    (campaign) => campaign.closed && campaign.netPnl > 0,
+  ).length;
+  const completedCampaigns = tacticalOnly.campaigns.filter((campaign) => campaign.closed).length;
+  const expectedOpenEntryTimes = campaigns.flatMap((campaign) =>
+    campaign.exitTime === undefined
+      ? campaign.episodeEntries.filter(
+        (_entryTime, index) => campaign.episodeRecoveryTimes[index] === null,
+      )
+      : []
+  );
+  const candidateLegs = tacticalOnly.campaigns.flatMap((campaign) => campaign.legs);
+  const actualOpenEntryTimes = candidateLegs
+    .filter((leg) => !leg.closed)
+    .map((leg) => leg.entryTime);
+  const allRolesTactical = candidateLegs.every((leg) => leg.role === "TACTICAL");
+  const unresolvedLegsCausal =
+    allRolesTactical &&
+    expectedOpenEntryTimes.length === actualOpenEntryTimes.length &&
+    expectedOpenEntryTimes.every((time, index) => time === actualOpenEntryTimes[index]);
+  const tacticalNetPnl = tacticalOnlySummary.roleAttribution.TACTICAL.netPnl;
+  const improvementVsHybrid = tacticalOnlySummary.totalNetPnl - hybridSummary.totalNetPnl;
+  const checks: TacticalOnlyKillCheck[] = [
+    {
+      id: "ENTRY_PARITY",
+      passed: orderedTimestampsEqual,
+      actual: {
+        dailyEpisodeEntryCount: dailyEpisodeEntryTimes.length,
+        tacticalOnlyEntryCount: tacticalOnlyEntryTimes.length,
+        orderedTimestampsEqual,
+        dailyEpisodeEntryTimes,
+        tacticalOnlyEntryTimes,
+      },
+      requirement: { sameEntryCount: true, sameOrderedTimestamps: true },
+    },
+    {
+      id: "TOTAL_NET_PNL_POSITIVE",
+      passed: tacticalOnlySummary.totalNetPnl > 0,
+      actual: { totalNetPnl: tacticalOnlySummary.totalNetPnl },
+      requirement: { greaterThan: 0 },
+    },
+    {
+      id: "TACTICAL_NET_PNL_POSITIVE",
+      passed: tacticalNetPnl > 0,
+      actual: { tacticalNetPnl },
+      requirement: { greaterThan: 0 },
+    },
+    {
+      id: "PEAK_QUANTITY",
+      passed: tacticalOnly.maxQuantity <= 0.001,
+      actual: { maxQuantityBtc: tacticalOnly.maxQuantity },
+      requirement: { maximumQuantityBtc: 0.001 },
+    },
+    {
+      id: "FIXED_WALLETS_SURVIVE",
+      passed: fixedWallets.every((wallet) => !wallet.liquidated),
+      actual: fixedWallets,
+      requirement: { wallets: [250, 500, 1_000], liquidated: false },
+    },
+    {
+      id: "BEATS_HYBRID_LITE",
+      passed: improvementVsHybrid > 0,
+      actual: {
+        tacticalOnlyTotalNetPnl: tacticalOnlySummary.totalNetPnl,
+        hybridTotalNetPnl: hybridSummary.totalNetPnl,
+        improvement: improvementVsHybrid,
+      },
+      requirement: { improvementGreaterThan: 0 },
+    },
+    {
+      id: "POSITIVE_COMPLETED_CAMPAIGNS",
+      passed: positiveCompletedCampaigns >= 2,
+      actual: { positiveCompletedCampaigns, completedCampaigns },
+      requirement: { minimumPositiveCompletedCampaigns: 2 },
+    },
+    {
+      id: "UNRESOLVED_LEGS_CAUSAL",
+      passed: unresolvedLegsCausal,
+      actual: { expectedOpenEntryTimes, actualOpenEntryTimes, allRolesTactical },
+      requirement: {
+        openLegsEqualUnrecoveredEpisodes: true,
+        allRolesTactical: true,
+      },
+    },
+  ];
+  return {
+    verdict: checks.every((check) => check.passed) ? "PASS" : "KILL",
+    researchStatus: "POST_HOC_EXPLORATORY_NOT_VALIDATION",
+    checks,
+  };
+}
+
 export function buildReport(
   input: BuildReportInput,
   options: BuildReportOptions = {},
@@ -296,9 +435,13 @@ export function buildReport(
   const macroOnce = requireVariant(orderedRuns, "MACRO_ONCE");
   const dailyEpisode = requireVariant(orderedRuns, "DAILY_EPISODE");
   const hybrid = requireVariant(orderedRuns, "HYBRID_LITE");
+  const tacticalOnly = requireVariant(orderedRuns, "TACTICAL_ONLY");
   const matchedPeak = requireVariant(orderedRuns, "DAILY_EPISODE_MATCHED_PEAK");
   const variantSummaries = orderedRuns.map((run) => summarizeVariant(run, macroOnce));
   const hybridSummary = variantSummaries.find((summary) => summary.name === "HYBRID_LITE")!;
+  const tacticalOnlySummary = variantSummaries.find(
+    (summary) => summary.name === "TACTICAL_ONLY",
+  )!;
   const matchedPeakSummary = variantSummaries.find(
     (summary) => summary.name === "DAILY_EPISODE_MATCHED_PEAK",
   )!;
@@ -309,7 +452,7 @@ export function buildReport(
   if (rawRange.lastTime === null) throw new Error("Hourly provenance must include a last timestamp");
 
   return {
-    schemaVersion: "btc-stochrsi-macro-cycle-report/v3",
+    schemaVersion: "btc-stochrsi-macro-cycle-report/v4",
     generatedAt,
     verdict: completed < 5 ? "INSUFFICIENT_SAMPLE" : "EVALUATED",
     hybridVerdict: buildHybridVerdict(
@@ -318,6 +461,13 @@ export function buildReport(
       matchedPeak,
       hybridSummary,
       matchedPeakSummary,
+    ),
+    tacticalOnlyVerdict: buildTacticalOnlyVerdict(
+      input.campaigns,
+      dailyEpisode,
+      tacticalOnly,
+      hybridSummary,
+      tacticalOnlySummary,
     ),
     sampleLimitation:
       `${completed} completed DAILY_EPISODE campaigns; fewer than 5 completed DAILY_EPISODE campaigns ` +
@@ -352,6 +502,7 @@ export function buildReport(
       stopLoss: null,
       legClosure: "FULL_LEG_ONLY",
       hybridTacticalExit: "DAILY_RECOVERY_BEFORE_MACRO_EXIT",
+      tacticalOnlyExit: "ALL_LEGS_DAILY_RECOVERY_BEFORE_MACRO_EXIT",
       maximumHoldExit: false,
       frozenVariants: [...VARIANT_NAMES],
     },
@@ -431,6 +582,8 @@ export function renderMarkdown(report: MacroCycleReport): string {
   assertFiniteReportValue(report, "$report");
   const hybridSummary = report.variants.find((variant) => variant.name === "HYBRID_LITE");
   if (!hybridSummary) throw new Error("HYBRID_LITE report variant is required");
+  const tacticalOnlySummary = report.variants.find((variant) => variant.name === "TACTICAL_ONLY");
+  if (!tacticalOnlySummary) throw new Error("TACTICAL_ONLY report variant is required");
   const lines: string[] = [
     "# BTC-only StochRSI Macro-cycle Backtest",
     "",
@@ -447,6 +600,18 @@ export function renderMarkdown(report: MacroCycleReport): string {
       `${JSON.stringify(check.requirement)} |`,
     ),
     "",
+    `**Tactical-only exploratory verdict: ${report.tacticalOnlyVerdict.verdict}**`,
+    "",
+    `**Research status: ${report.tacticalOnlyVerdict.researchStatus}.** This follow-up was selected after ` +
+      "the full sample was observed; a mechanical PASS does not authorize live trading.",
+    "",
+    "| Exploratory check | Result | Actual | Requirement |",
+    "|---|---|---|---|",
+    ...report.tacticalOnlyVerdict.checks.map((check) =>
+      `| ${check.id} | ${check.passed ? "PASS" : "KILL"} | ${JSON.stringify(check.actual)} | ` +
+      `${JSON.stringify(check.requirement)} |`,
+    ),
+    "",
     "## Frozen strategy",
     "",
     "BTCUSDT only. RSI 14, StochRSI 14, %K SMA 3, %D SMA 3, close source, 0..100 scale.",
@@ -457,6 +622,8 @@ export function renderMarkdown(report: MacroCycleReport): string {
     "The whole campaign exits at the next available daily open after completed 1W and 2W %K are both >= 80.",
     "No stop loss and no maximum-hold exit. Each leg is fully closed; Hybrid tactical legs may exit before the macro campaign. " +
       "Historical funding applies to every open leg.",
+    "TACTICAL_ONLY preserves every DAILY_EPISODE entry but makes every leg tactical: first causal closed-1D " +
+      "%K >= 10 exits at the next daily open, while an earlier or same-time macro exit has priority.",
     `Costs: ${formatNumber(report.strategy.feeRatePerSide * 100)}% taker fee per side and ` +
       `${formatNumber(report.strategy.adverseSlippageRatePerSide * 100)}% adverse slippage per side.`,
     "",
@@ -514,6 +681,19 @@ export function renderMarkdown(report: MacroCycleReport): string {
     "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...(["BASE", "CORE", "TACTICAL", "SIMULATED"] as const).map((role) => {
       const attribution = hybridSummary.roleAttribution[role];
+      return `| ${role} | ${attribution.entries} | ${attribution.realized} | ${attribution.open} | ` +
+        `${formatNumber(attribution.grossPnl)} | ${formatNumber(attribution.fees)} | ` +
+        `${formatNumber(attribution.slippageCost)} | ${formatNumber(attribution.fundingPnl)} | ` +
+        `${formatNumber(attribution.netPnl)} | ${attribution.exitReasons.DAILY_RECOVERY} | ` +
+        `${attribution.exitReasons.MACRO_OVERBOUGHT} | ${attribution.exitReasons.OPEN_MARK} |`;
+    }),
+    "",
+    "## Tactical-only role attribution",
+    "",
+    "| Role | Entries | Realized | Open | Gross | Fees | Slippage | Funding | Net | Daily recovery | Macro overbought | Open mark |",
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ...(["BASE", "CORE", "TACTICAL", "SIMULATED"] as const).map((role) => {
+      const attribution = tacticalOnlySummary.roleAttribution[role];
       return `| ${role} | ${attribution.entries} | ${attribution.realized} | ${attribution.open} | ` +
         `${formatNumber(attribution.grossPnl)} | ${formatNumber(attribution.fees)} | ` +
         `${formatNumber(attribution.slippageCost)} | ${formatNumber(attribution.fundingPnl)} | ` +

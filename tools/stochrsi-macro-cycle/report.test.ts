@@ -113,15 +113,76 @@ function hybridPassInput(): BuildReportInput {
   return reportInput;
 }
 
+function tacticalOnlyPassInput(): BuildReportInput {
+  const reportInput = input(3);
+  const campaigns: CampaignSignal[] = Array.from({ length: 3 }, (_, index) => {
+    const armTime = START + index * 5 * 3_600_000;
+    return {
+      armTime,
+      episodeEntries: [armTime, armTime + 2 * 3_600_000],
+      episodeRecoveryTimes: [armTime + 3_600_000, armTime + 3 * 3_600_000],
+      dailyOversoldEntries: [armTime, armTime + 2 * 3_600_000],
+      exitTime: armTime + 3 * 3_600_000,
+      exitReason: "MACRO_OVERBOUGHT",
+    };
+  });
+  const hourly = campaigns.flatMap((campaign) => [
+    bar(campaign.armTime, 100),
+    bar(campaign.armTime + 3_600_000, 130),
+    bar(campaign.armTime + 2 * 3_600_000, 100),
+    bar(campaign.armTime + 3 * 3_600_000, 110),
+  ]);
+  reportInput.campaigns = campaigns;
+  reportInput.variants = runFrozenVariants(campaigns, hourly, []);
+  reportInput.provenance.hourly.range = {
+    firstTime: hourly[0].time,
+    lastTime: hourly.at(-1)!.time,
+    rowCount: hourly.length,
+  };
+  reportInput.warmupRange.lastCompletedHourTime = hourly.at(-1)!.time;
+  return reportInput;
+}
+
+function tacticalOnlyOpenInput(): BuildReportInput {
+  const reportInput = input(1);
+  const campaign: CampaignSignal = {
+    armTime: START,
+    episodeEntries: [START],
+    episodeRecoveryTimes: [null],
+    dailyOversoldEntries: [START],
+  };
+  const hourly = [bar(START, 100), bar(START + 3_600_000, 105)];
+  reportInput.campaigns = [campaign];
+  reportInput.variants = runFrozenVariants([campaign], hourly, []);
+  reportInput.provenance.hourly.range = {
+    firstTime: hourly[0].time,
+    lastTime: hourly.at(-1)!.time,
+    rowCount: hourly.length,
+  };
+  reportInput.warmupRange.lastCompletedHourTime = hourly.at(-1)!.time;
+  return reportInput;
+}
+
 test("buildReport emits the complete frozen schema and insufficient-sample verdict", () => {
   const report = buildReport(input(4), { generatedAt: "2026-07-11T13:00:00.000Z" });
   const primary = report.variants.find((variant) => variant.name === "DAILY_EPISODE")!;
   const simulated = report.variants.find((variant) => variant.name === "WINDOW_FULL_AT_ARM")!;
   const matched = report.variants.find((variant) => variant.name === "DAILY_EPISODE_MATCHED_PEAK")!;
 
-  assert.equal(report.schemaVersion, "btc-stochrsi-macro-cycle-report/v3");
+  assert.equal(report.schemaVersion, "btc-stochrsi-macro-cycle-report/v4");
   assert.equal(report.verdict, "INSUFFICIENT_SAMPLE");
   assert.equal(report.hybridVerdict.verdict, "KILL");
+  assert.equal(report.tacticalOnlyVerdict.researchStatus, "POST_HOC_EXPLORATORY_NOT_VALIDATION");
+  assert.deepEqual(report.tacticalOnlyVerdict.checks.map((check) => check.id), [
+    "ENTRY_PARITY",
+    "TOTAL_NET_PNL_POSITIVE",
+    "TACTICAL_NET_PNL_POSITIVE",
+    "PEAK_QUANTITY",
+    "FIXED_WALLETS_SURVIVE",
+    "BEATS_HYBRID_LITE",
+    "POSITIVE_COMPLETED_CAMPAIGNS",
+    "UNRESOLVED_LEGS_CAUSAL",
+  ]);
   assert.deepEqual(report.hybridVerdict.checks.map((check) => check.id), [
     "ENTRY_PARITY",
     "PEAK_QUANTITY",
@@ -216,6 +277,33 @@ test("Hybrid mechanical verdict passes only when all eight frozen checks pass", 
   assert.equal(report.hybridVerdict.checks.every((check) => check.passed), true);
 });
 
+test("Tactical-only exploratory verdict passes only when all eight frozen checks pass", () => {
+  const report = buildReport(tacticalOnlyPassInput(), {
+    generatedAt: "2026-07-11T13:00:00.000Z",
+  });
+
+  assert.equal(report.verdict, "INSUFFICIENT_SAMPLE");
+  assert.equal(report.tacticalOnlyVerdict.verdict, "PASS");
+  assert.equal(report.tacticalOnlyVerdict.checks.length, 8);
+  assert.equal(report.tacticalOnlyVerdict.checks.every((check) => check.passed), true);
+});
+
+test("Tactical-only unresolved check matches only causally unrecovered open episodes", () => {
+  const report = buildReport(tacticalOnlyOpenInput(), {
+    generatedAt: "2026-07-11T13:00:00.000Z",
+  });
+  const check = report.tacticalOnlyVerdict.checks.find(
+    (candidate) => candidate.id === "UNRESOLVED_LEGS_CAUSAL",
+  )!;
+
+  assert.equal(check.passed, true);
+  assert.deepEqual(check.actual, {
+    expectedOpenEntryTimes: [START],
+    actualOpenEntryTimes: [START],
+    allRolesTactical: true,
+  });
+});
+
 test("Markdown states the frozen strategy, no stop loss, sample limit, and simulated warning", () => {
   const markdown = renderMarkdown(
     buildReport(input(4), { generatedAt: "2026-07-11T13:00:00.000Z" }),
@@ -229,6 +317,9 @@ test("Markdown states the frozen strategy, no stop loss, sample limit, and simul
   assert.match(markdown, /WINDOW_FULL_AT_ARM: SIMULATED_NOT_TRADABLE/);
   assert.match(markdown, /DAILY_EPISODE_MATCHED_PEAK: SIMULATED_NOT_TRADABLE/);
   assert.match(markdown, /Hybrid mechanical verdict: KILL/);
+  assert.match(markdown, /Tactical-only exploratory verdict:/);
+  assert.match(markdown, /POST_HOC_EXPLORATORY_NOT_VALIDATION/);
+  assert.match(markdown, /does not authorize live trading/);
   for (const id of [
     "ENTRY_PARITY",
     "PEAK_QUANTITY",
@@ -240,6 +331,7 @@ test("Markdown states the frozen strategy, no stop loss, sample limit, and simul
     "CAMPAIGN_CONSISTENCY",
   ]) assert.match(markdown, new RegExp(id));
   assert.match(markdown, /Hybrid role attribution/);
+  assert.match(markdown, /Tactical-only role attribution/);
   assert.match(markdown, /CORE/);
   assert.match(markdown, /TACTICAL/);
   assert.match(markdown, /Monthly entries and realized PnL/);
