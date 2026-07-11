@@ -958,9 +958,9 @@ export function summarizeVariant(
     addMetric(monthlyEntries, monthKey(leg.entryTime), 1);
     addMetric(yearlyEntries, yearKey(leg.entryTime), 1);
   }
-  for (const campaign of closed) {
-    addMetric(monthlyPnl, monthKey(campaign.exitTime!), campaign.netPnl);
-    addMetric(yearlyPnl, yearKey(campaign.exitTime!), campaign.netPnl);
+  for (const leg of realizedLegs) {
+    addMetric(monthlyPnl, monthKey(leg.exitTime!), leg.netPnl);
+    addMetric(yearlyPnl, yearKey(leg.exitTime!), leg.netPnl);
   }
 
   const pnlDescending = closed

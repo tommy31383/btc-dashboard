@@ -152,6 +152,62 @@ test("summary realizes tactical legs inside an open campaign and attributes ever
   });
 });
 
+test("realized PnL buckets an open campaign tactical leg at its own exit time", () => {
+  const coreEntry = Date.UTC(2024, 11, 30);
+  const tacticalEntry = Date.UTC(2024, 11, 31);
+  const tacticalExit = Date.UTC(2025, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: coreEntry,
+    episodeEntries: [coreEntry, tacticalEntry],
+    episodeRecoveryTimes: [null, tacticalExit],
+    dailyOversoldEntries: [coreEntry, tacticalEntry],
+  };
+  const run = runVariant(
+    "HYBRID_LITE",
+    [campaign],
+    [bar(coreEntry, 100), bar(tacticalEntry, 100), bar(tacticalExit, 120)],
+    [],
+  );
+  const tactical = run.campaigns[0].legs.find((leg) => leg.role === "TACTICAL")!;
+
+  const summary = summarizeVariant(run);
+
+  assert.equal(summary.closedCampaigns, 0);
+  assert.equal(summary.closedNetPnl, 0);
+  assert.equal(tactical.closed, true);
+  assert.deepEqual(summary.monthlyPnl, { "2025-01": tactical.netPnl });
+  assert.deepEqual(summary.yearlyPnl, { "2025": tactical.netPnl });
+});
+
+test("pre-Hybrid variants retain realized totals when every leg shares the macro exit", () => {
+  const entryOne = Date.UTC(2024, 11, 31, 22);
+  const entryTwo = entryOne + HOUR_MS;
+  const macroExit = entryTwo + HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: entryOne,
+    episodeEntries: [entryOne, entryTwo],
+    episodeRecoveryTimes: [null, null],
+    dailyOversoldEntries: [entryOne, entryTwo],
+    exitTime: macroExit,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const hourly = [bar(entryOne, 100), bar(entryTwo, 90), bar(macroExit, 120)];
+
+  for (const variant of [
+    "MACRO_ONCE",
+    "DAILY_EPISODE",
+    "DAILY_EVERY_BAR",
+    "WINDOW_FULL_AT_ARM",
+  ] as const) {
+    const run = runVariant(variant, [campaign], hourly, []);
+    const summary = summarizeVariant(run);
+
+    assert.equal(run.campaigns[0].legs.every((leg) => leg.exitTime === macroExit), true);
+    assert.deepEqual(summary.monthlyPnl, { "2025-01": summary.closedNetPnl });
+    assert.deepEqual(summary.yearlyPnl, { "2025": summary.closedNetPnl });
+  }
+});
+
 test("DAILY_EPISODE_MATCHED_PEAK derives scale from replayed base and Hybrid peaks", () => {
   const start = Date.UTC(2024, 0, 1);
   const exitTime = start + 5 * HOUR_MS;
