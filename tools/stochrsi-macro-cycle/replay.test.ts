@@ -100,11 +100,12 @@ test("full-at-arm matches episode qty and is simulated", () => {
   assert.equal(result.simulatedNotTradable, true);
 });
 
-test("Task 4 atomically registers the six frozen report variants", () => {
+test("registers the seven frozen report variants including tactical-only", () => {
   assert.deepEqual(VARIANT_NAMES, [
     "MACRO_ONCE",
     "DAILY_EPISODE",
     "HYBRID_LITE",
+    "TACTICAL_ONLY",
     "DAILY_EPISODE_MATCHED_PEAK",
     "DAILY_EVERY_BAR",
     "WINDOW_FULL_AT_ARM",
@@ -239,7 +240,7 @@ test("DAILY_EPISODE_MATCHED_PEAK derives scale from replayed base and Hybrid pea
   );
 });
 
-test("runFrozenVariants returns the V2 rows in frozen report order", () => {
+test("runFrozenVariants returns the exploratory rows in frozen report order", () => {
   const start = Date.UTC(2024, 0, 1);
   const campaigns = [campaignWithEpisodeCount(1)];
   campaigns[0].armTime = start;
@@ -254,6 +255,7 @@ test("runFrozenVariants returns the V2 rows in frozen report order", () => {
     "MACRO_ONCE",
     "DAILY_EPISODE",
     "HYBRID_LITE",
+    "TACTICAL_ONLY",
     "DAILY_EPISODE_MATCHED_PEAK",
     "DAILY_EVERY_BAR",
     "WINDOW_FULL_AT_ARM",
@@ -363,6 +365,74 @@ test("HYBRID_LITE gives macro exit priority over a same-time tactical recovery",
   assert.equal(core.exitReason, "MACRO_OVERBOUGHT");
   assert.equal(tactical.exitTime, exitTime);
   assert.equal(tactical.exitReason, "MACRO_OVERBOUGHT");
+});
+
+test("TACTICAL_ONLY exits first and later legs at causal recovery with macro priority", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const firstRecovery = start + 2 * HOUR_MS;
+  const secondEntry = start + 3 * HOUR_MS;
+  const macroExit = start + 4 * HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start, secondEntry],
+    episodeRecoveryTimes: [firstRecovery, macroExit],
+    dailyOversoldEntries: [start, secondEntry],
+    exitTime: macroExit,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+
+  const result = buildVariantLegs(campaign, "TACTICAL_ONLY");
+
+  assert.equal(result.simulatedNotTradable, false);
+  assert.deepEqual(result.legs, [
+    {
+      entryTime: start,
+      qty: 0.001,
+      exitTime: firstRecovery,
+      role: "TACTICAL",
+      exitReason: "DAILY_RECOVERY",
+    },
+    {
+      entryTime: secondEntry,
+      qty: 0.001,
+      exitTime: macroExit,
+      role: "TACTICAL",
+      exitReason: "MACRO_OVERBOUGHT",
+    },
+  ]);
+});
+
+test("TACTICAL_ONLY permits only an unrecovered final episode to remain open", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const recoveredEntry = start;
+  const recovery = start + 2 * HOUR_MS;
+  const openEntry = start + 3 * HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [recoveredEntry, openEntry],
+    episodeRecoveryTimes: [recovery, null],
+    dailyOversoldEntries: [recoveredEntry, openEntry],
+  };
+  const hourly = [
+    bar(recoveredEntry, 100),
+    bar(start + HOUR_MS, 105),
+    bar(recovery, 110),
+    bar(openEntry, 90),
+    bar(start + 4 * HOUR_MS, 95),
+  ];
+
+  const run = runVariant("TACTICAL_ONLY", [campaign], hourly, []);
+  const [closedLeg, openLeg] = run.campaigns[0].legs;
+
+  assert.equal(closedLeg.closed, true);
+  assert.equal(closedLeg.exitTime, recovery);
+  assert.equal(closedLeg.exitReason, "DAILY_RECOVERY");
+  assert.equal(openLeg.closed, false);
+  assert.equal(openLeg.exitTime, undefined);
+  assert.equal(openLeg.exitReason, undefined);
+  assert.deepEqual(run.campaigns[0].legs.map((leg) => leg.role), ["TACTICAL", "TACTICAL"]);
+  assert.deepEqual(run.campaigns[0].legs.map((leg) => leg.entryTime), campaign.episodeEntries);
+  assert.equal(run.maxQuantity, 0.001);
 });
 
 test("minimum wallet covers worst maintenance minus pre-wallet PnL", () => {

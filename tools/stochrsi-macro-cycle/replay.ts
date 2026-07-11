@@ -13,12 +13,14 @@ export type VariantName =
   | "DAILY_EVERY_BAR"
   | "WINDOW_FULL_AT_ARM"
   | "HYBRID_LITE"
+  | "TACTICAL_ONLY"
   | "DAILY_EPISODE_MATCHED_PEAK";
 
 export const VARIANT_NAMES: VariantName[] = [
   "MACRO_ONCE",
   "DAILY_EPISODE",
   "HYBRID_LITE",
+  "TACTICAL_ONLY",
   "DAILY_EPISODE_MATCHED_PEAK",
   "DAILY_EVERY_BAR",
   "WINDOW_FULL_AT_ARM",
@@ -347,6 +349,30 @@ function fundingPnlFor(
   return fundingPnlFromResolved(qty, resolveFunding(funding, hourly), entryTime, exitTime);
 }
 
+function buildTacticalLeg(
+  campaign: CampaignSignal,
+  entryTime: number,
+  index: number,
+): LegIntent {
+  const recoveryTime = campaign.episodeRecoveryTimes[index] ?? null;
+  const macroWins =
+    campaign.exitTime !== undefined &&
+    (recoveryTime === null || campaign.exitTime <= recoveryTime);
+  const exitTime = macroWins ? campaign.exitTime : recoveryTime ?? undefined;
+  const exitReason = exitTime === undefined
+    ? undefined
+    : macroWins
+      ? "MACRO_OVERBOUGHT" as const
+      : "DAILY_RECOVERY" as const;
+  return {
+    entryTime,
+    qty: QTY_PER_LEG,
+    exitTime,
+    role: "TACTICAL",
+    exitReason,
+  };
+}
+
 export function buildVariantLegs(
   campaign: CampaignSignal,
   variant: VariantName,
@@ -421,24 +447,15 @@ export function buildVariantLegs(
               ...campaignExit,
             };
           }
-          const recoveryTime = campaign.episodeRecoveryTimes[index] ?? null;
-          const macroWins =
-            campaign.exitTime !== undefined &&
-            (recoveryTime === null || campaign.exitTime <= recoveryTime);
-          const exitTime = macroWins ? campaign.exitTime : recoveryTime ?? undefined;
-          const exitReason = exitTime === undefined
-            ? undefined
-            : macroWins
-              ? "MACRO_OVERBOUGHT" as const
-              : "DAILY_RECOVERY" as const;
-          return {
-            entryTime,
-            qty: QTY_PER_LEG,
-            exitTime,
-            role: "TACTICAL" as const,
-            exitReason,
-          };
+          return buildTacticalLeg(campaign, entryTime, index);
         }),
+        simulatedNotTradable: false,
+      };
+    case "TACTICAL_ONLY":
+      return {
+        legs: campaign.episodeEntries.map((entryTime, index) =>
+          buildTacticalLeg(campaign, entryTime, index)
+        ),
         simulatedNotTradable: false,
       };
   }
@@ -882,6 +899,7 @@ export function runFrozenVariants(
     runVariantWithQuantityScale("MACRO_ONCE", campaigns, hourly, funding, options),
     base,
     hybrid,
+    runVariantWithQuantityScale("TACTICAL_ONLY", campaigns, hourly, funding, options),
     matched,
     runVariantWithQuantityScale("DAILY_EVERY_BAR", campaigns, hourly, funding, options),
     runVariantWithQuantityScale("WINDOW_FULL_AT_ARM", campaigns, hourly, funding, options),
