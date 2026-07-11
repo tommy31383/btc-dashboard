@@ -23,7 +23,7 @@ implemented or activated.
 
 Scope B is the permission ceiling, but Night 1 is narrower:
 
-- dashboard-only source changes and one BTC entry-quality diagnosis;
+- dashboard-only source changes and one H01 S12/S13/S14 market-signal diagnosis;
 - `btc-trader-server` is read-only;
 - no new rule/filter/H05 replay, authenticated API/VPS, deploy, live arming,
   secret access, exchange writes, or position changes;
@@ -41,6 +41,11 @@ Scope B is the permission ceiling, but Night 1 is narrower:
 - Claude attempt 2 returned `NOT APPROVED`; findings O/K/A/M/H plus recommended
   B/J/E were incorporated. Attempt 2 could not read sibling server/root files;
   this re-audit runs from the workspace root and must verify them directly.
+- Claude attempt 3 empirically cleared the import graph but returned one P1 and
+  four P2 findings. The design now removes state-dependent Champion from Night 1,
+  freezes/tests H01 causal input construction with `persistBars=1`, sandboxes
+  every child, adds recursive PPID/`setsid` cleanup, and uses two Bonferroni-
+  corrected primary deltas.
 - The hard stop is `2026-07-12T07:00:00+07:00`.
 
 ## Attack questions

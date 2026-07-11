@@ -19,9 +19,9 @@ access, authenticated exchange/VPS access, or exchange write.
 
 Run one bounded research cycle through the morning that:
 
-1. Diagnoses whether repository live-designated Champion BEST BTC4h and Hedge01
-   S12/S13/S14 entries systematically occur after an impulse and too close to
-   local resistance, without claiming unverified VPS byte identity.
+1. Diagnoses whether repository live-designated Hedge01 S12/S13/S14 market
+   signals systematically occur after an impulse and too close to local
+   resistance, without claiming unverified VPS byte identity.
 2. Uses the exact production signal path or returns `INVALID` rather than
    substituting a convenient approximation.
 3. Compares entry timing with deterministic, time/regime/direction-matched
@@ -111,6 +111,9 @@ The executable supervisor is a local Node process with these mechanical guards:
 - starts every child detached in a new owned process group, records PID/PGID/run
   ID, gives it a wall-clock timeout, and terminates the entire owned process group
   at timeout or cutoff;
+- recursively samples each child's PPID tree, records every observed descendant
+  PID/start identity, and uses both the process group and tracked descendant set
+  during cleanup;
 - executes a frozen command allowlist. SSH, rsync, PM2, deploy scripts,
   authenticated clients, server writes/cwd, and every server import except the
   hash-locked pure modules below are rejected.
@@ -118,11 +121,14 @@ The executable supervisor is a local Node process with these mechanical guards:
 No two agents write the same files. A long replay may overlap only with
 read-only review of its already-frozen inputs.
 
-Process-group termination sends `SIGTERM` to the negative owned PGID, waits five
-seconds, then sends `SIGKILL` to that same group if needed. It refuses PGID `<=1`,
-refuses a group not recorded under the current run ID, and verifies that no owned
-descendant remains. Tests cover a child that spawns a grandchild and prove the
-entire subtree dies without touching an unrelated control process.
+Descendant discovery recursively walks `/bin/ps` PPID links every 100 ms while a
+child is alive and again immediately before termination. Cleanup sends `SIGTERM`
+deepest-first to tracked descendants and to the negative owned PGID, waits five
+seconds, then repeats with `SIGKILL`. It refuses PID/PGID `<=1`, refuses an
+identity not recorded under the current run ID, and verifies both the live PPID
+tree and all tracked identities are gone. Tests cover a normal grandchild, a
+`setsid` grandchild with a new PGID, and an unrelated control process; the two
+owned trees must die and the control must survive.
 
 On this macOS host, OS process-start identity is the normalized value of
 `/bin/ps -o lstart= -p <pid>` plus the resolved executable path. Both are recorded
@@ -140,8 +146,8 @@ subcommand, argument pattern, read path, write path, or network origin.
 |---|---|
 | Dashboard writes | Allow only the dedicated worktree under `tools/overnight-entry-audit/**` and `docs/research/overnight-2026-07-12/**`. |
 | Local data reads | Allow only cache files enumerated with SHA-256 in preregistration. |
-| Production signal imports | Allow read-only imports of hash-locked `btc-trader-server/dist/engine/champion.js`, `dist/engine/rules/hedge01.js`, `dist/engine/rules/ruleHelpers.js`, `dist/engine/regime.js`, and `dist/engine/hwm.js`. Resolve the complete runtime import graph before freeze; every transitive module must be on this pure-module list and hash-locked, otherwise the rule is `INVALID`. Only `evalSleeveSnapshot` and `evalHedge01TrendSnapshot` may be invoked for entries. |
-| Local executables | Allow exact argument patterns for `git` metadata/commit operations, the repository's local Node/TypeScript runtime, frozen targeted tests/typecheck, SHA-256, Claude read-only audit, and `scripts/grok/ask.sh` with committed packets. |
+| Production signal imports | Allow read-only imports of hash-locked `btc-trader-server/dist/engine/rules/hedge01.js`, `dist/engine/rules/ruleHelpers.js`, `dist/engine/regime.js`, and `dist/engine/hwm.js`. Resolve the complete runtime import graph before freeze; every transitive module must be on this pure-module list and hash-locked, otherwise the rule is `INVALID`. Only `evalHedge01TrendSnapshot` may be invoked for entry signals. |
+| Local executables | Allow `/usr/bin/sandbox-exec` plus exact argument patterns for `git` metadata/commit operations, the repository's local Node/TypeScript runtime, frozen targeted tests/typecheck, SHA-256, Claude read-only audit, and `scripts/grok/ask.sh` with committed packets. |
 | Public data fallback | Allow HTTPS GET only to the preregistered public kline endpoint and only before preregistration is frozen; the resulting file/hash becomes the frozen cache. |
 | Always deny | Any write/cwd under `btc-trader-server`; source `.ts` runtime import; `ssh`, `scp`, `sftp`, `rsync`, `pm2`, `deploy.sh`, `curl`/generic HTTP clients, shell evaluation, production env loaders, authenticated Binance/account modules, relay TURN edits, and any unlisted network origin. |
 
@@ -150,6 +156,19 @@ server module and complete transitive-import-graph hashes must equal
 preregistration; mismatch is `INVALID`. This matrix allows pure signal execution
 while mechanically excluding server writes, credential-bearing modules, and
 operational tooling.
+
+Every supervisor child, not only the import child, runs through
+`/usr/bin/sandbox-exec` with a phase-specific profile frozen inside the matrix and
+an exact phase-specific environment allowlist. Local inventory/test/replay phases
+deny all network and allow writes only to their exact TMP run directory plus the
+phase's declared dashboard paths. Public-cache fill and Claude/Grok audit phases
+permit outbound network only through their dedicated allowlisted executable and
+still deny every write under `btc-trader-server`, `$HOME`, unrelated repos, and
+all non-declared dashboard paths. Before and after every child, the supervisor
+requires `git -C btc-trader-server status --porcelain` to be empty and rechecks
+the four preregistered server-module hashes; a difference stops the run without
+reverting it. Sandbox denial itself is a failed phase, never a reason to retry
+without the profile.
 
 Before dynamic import, a static closure scan rejects production env/secret access,
 network modules/calls, child-process calls, filesystem writes, cwd mutation, and
@@ -229,8 +248,9 @@ Each diagnosis ledger record includes:
 - source commit, dirty flag, evaluator version, data range, and data hashes;
 - discovery/validation labels;
 - commands and test counts;
-- entry count, cohort coverage, MFE/MAE, first-move direction, resistance
-  distance, impulse, exposure-matched controls, and costs when applicable;
+- signal count, cohort coverage, MFE/MAE, first-move direction, resistance
+  distance, impulse, same-side/regime/time-matched controls, and costs when
+  applicable;
 - concentration, time-split, control, and robustness results;
 - Claude and Grok verdicts, including failures/timeouts;
 - next decision.
@@ -289,10 +309,10 @@ they do not deploy or arm anything.
 
 ### 5.1 Frozen question
 
-Do repository live-designated Champion BEST BTC4h and Hedge01 S12/S13/S14
-entries show a repeatable late/crowded-entry signature: a large already-completed
-impulse, little remaining distance to causal local resistance, and worse
-near-term path quality than matched same-side timestamps?
+Do repository live-designated Hedge01 S12/S13/S14 market signals show a
+repeatable late/crowded-entry signature: a large already-completed impulse,
+little remaining distance to causal local resistance, and worse near-term path
+quality than matched same-side timestamps?
 
 The exact production signal path is mandatory. If it cannot be invoked or shown
 equivalent without editing `btc-trader-server`, the affected rule is `INVALID`.
@@ -301,8 +321,7 @@ No approximate rewrite can contribute to the diagnosis.
 The Night-1 unit is a market-deterministic entry signal, not an exchange fill or
 an account-accepted order. `evalHedge01TrendSnapshot` is the production single
 source of truth for S12/S13/S14 market gates but intentionally excludes cooldown,
-qty, HWM, bucket-cap, and scheduler/account gates. Champion's snapshot accepts
-deterministic capacity/cooldown inputs but still does not prove a fill. Therefore:
+qty, HWM, bucket-cap, and scheduler/account gates. Therefore:
 
 - output rows are labeled `MARKET_SIGNAL`, never `LIVE_FILL`;
 - H01 results cannot claim the distribution of actually accepted intents or fills;
@@ -311,6 +330,11 @@ deterministic capacity/cooldown inputs but still does not prove a fill. Therefor
   of rule state, cooldown confirmation, exits, bucket capacity, and scheduler
   gates, plus deployment/trade-log identity evidence.
 
+Champion is explicitly deferred because `evalSleeveSnapshot` includes capacity
+and cooldown in its PASS verdict. Treating those inputs as always-passing would be
+an approximation; reproducing them requires a separately preregistered stateful
+Champion replay. No Champion row or conclusion appears in Night 1.
+
 Preregistration pins the local server git SHA, package version, module/import-graph
 hashes, and any pre-existing non-secret deployment evidence available before
 activation. If that evidence proves only a version match, the report must say
@@ -318,7 +342,39 @@ activation. If that evidence proves only a version match, the report must say
 `DEPLOYMENT_IDENTITY_UNVERIFIED`. No Night-1 result may claim VPS byte parity or
 "current deployed behavior" without a pre-existing byte-level provenance record.
 
-### 5.2 Measurements
+### 5.2 Causal input contract
+
+Night 1 is labeled `FUNCTION_FAITHFUL_INPUTS_NOT_LIVE_VERIFIED`: it invokes the
+hash-locked production market-gate function with preregistered causal inputs but
+does not claim a live reference-vector comparison.
+
+- Source bars are the frozen BTC 1h cache with UTC open timestamps. The runner
+  validates ordering, uniqueness, one-hour spacing, and OHLC consistency before
+  any signal call.
+- 4h and 1d bars use UTC epoch buckets and only complete constituent 1h bars. At
+  each 4h evaluation, 1h/4h/1d arrays include one explicit synthetic current
+  partial bar because the production helpers discard their final item with
+  `slice(0,-1)`; the synthetic values are fixture-tested to prove they cannot
+  affect the signal.
+- Signal time is the just-closed 4h bar's close timestamp. Outcome measurement
+  begins at the next 4h open; no closed bar after signal time enters any feature.
+- Funding is an as-of join using the latest record timestamp `<= signal_time`.
+  A missing or stale preregistered funding record invalidates that row rather
+  than filling from the future.
+- H01 regime state starts from the production defaults and steps exactly once per
+  newly closed daily bar using `detectRegime` plus
+  `stepRegimePersist(..., persistBars=1)`. The value `1` is the current H01
+  call-site behavior; the helper's default `3` is not used.
+- Volatility quintile is causal per timestamp: current ATR percentile against the
+  preceding 90 closed 4h bars, then bucketed into five fixed bins. No full-split
+  quantile boundary is fitted.
+
+Hand-computed fixtures cover UTC 1h->4h and 1h->1d boundaries, partial-bar
+exclusion, next-bar indexing, funding as-of behavior, a regime transition with
+`persistBars=1`, and causal volatility bins. Fixture failure is `INVALID`, not a
+reason to alter input construction after seeing outcomes.
+
+### 5.3 Measurements
 
 For every causal next-bar entry, measure using only information closed at signal
 time:
@@ -328,9 +384,7 @@ time:
 - higher-timeframe structure, lower-timeframe trend, and volatility quintile;
 - delay from the first qualifying context event;
 - MFE and MAE after 1, 3, 6, 12, 24, and 48 rule-timeframe bars;
-- favorable-first versus adverse-first path and fee/slippage break-even;
-- live baseline time in market, average gross notional, turnover, and beta to BTC
-  returns when faithful exit/accounting data are available.
+- favorable-first versus adverse-first path and fee/slippage break-even.
 
 Two controls are frozen before replay:
 
@@ -339,28 +393,41 @@ Two controls are frozen before replay:
    volatility quintile, excluding the +/-48-bar entry neighborhood; and
 2. the same entry delayed exactly one bar, when a next bar exists.
 
-Every control uses the same fixed horizon and notional as its source entry. The
+Every control uses the same side and fixed horizon as its source signal. The
 seed is derived from the stable diagnosis ID, source commit, and frozen data hash
 and is itself stored in the preregistration. Unmatched entries remain visible and
 reduce the reported matched-coverage denominator.
 
-### 5.3 Sample and split contract
+The same-side, same-regime, same-volatility, same-quarter matched control is the
+operative defense against disguised BTC beta and exposure timing. Strategy beta,
+time in market, turnover, and PnL are `N/A` because Night 1 has no stateful
+accepted-intent/exit replay; none may be inferred from fixed-horizon signals.
+
+### 5.4 Sample and split contract
 
 - The data range is the complete frozen local BTC cache available before outcome
   replay. Inspecting timestamps and hashes is allowed; inspecting entry outcomes
   before preregistration is not.
 - The first 80% of time is discovery and the last 20% is validation. Purge 48
   rule-timeframe bars from both sides of the split boundary.
-- A rule is `INSUFFICIENT_SAMPLE` for inference with fewer than 30 total entries,
+- A setup is `INSUFFICIENT_SAMPLE` for inference with fewer than 30 total signals,
   fewer than 10 validation entries, or less than 80% matched-control coverage.
-- A repeated late/crowded signature requires the same direction in discovery and
-  validation and a validation 95% bootstrap interval excluding zero for at least
-  two preregistered deltas: prior impulse, resistance distance, adverse-first
-  rate, normalized MAE, or normalized MFE.
-- All confidence intervals, failed checks, and per-rule denominators are reported.
-  No pooled result can hide an under-sampled rule.
+- The two confirmatory deltas are frozen as (1) prior impulse and (2) causal
+  overhead-resistance distance versus matched controls. A repeated late/crowded
+  signature requires both expected directions in discovery and validation and
+  both validation two-sided 97.5% bootstrap intervals excluding zero
+  (Bonferroni family-wise alpha 0.05 across two tests).
+- Each signal delta is measured against the median of its twenty controls.
+  Confidence intervals use 10,000 deterministic calendar-month block-bootstrap
+  resamples within each split so twenty controls and nearby signals are not
+  treated as independent observations.
+- Adverse-first rate, normalized MAE, normalized MFE, and one-bar-delay outcomes
+  are exploratory diagnostics. They are always reported but cannot complete the
+  late/crowded diagnosis or select a replacement rule.
+- All confidence intervals, failed checks, and per-setup denominators are
+  reported. No pooled result can hide an under-sampled setup.
 
-### 5.4 Explicit backlog
+### 5.5 Explicit backlog
 
 New entry methods, threshold filters, macro/tactical variants, H05 hold/cut/DCA/
 hedge/reverse counterfactuals, and full-project knowledge archaeology are deferred.
@@ -383,13 +450,15 @@ The single cycle follows this order:
 3. **Freeze:** commit preregistration, write its SHA-256, and append the registry
    key before any replay result exists.
 4. **Test first:** add failing tests for closed-bar causality, next-bar entry,
-   production-signal parity, split purge, deterministic controls, and hash refusal.
+   production-function identity, causal input fixtures, split purge,
+   deterministic controls, and hash refusal.
 5. **Implement:** add the smallest dashboard-only diagnosis runner.
 6. **Replay:** run once against the frozen cache and preregistration. There is no
    parameter sweep or nearby-parameter perturbation.
-7. **Record:** save raw per-entry rows, aggregate JSON, provenance, commands, and
+7. **Record:** save raw per-signal rows, aggregate JSON, provenance, commands, and
    `RESULT_RECORDED`; do not attach positive language yet.
-8. **Claude audit:** review implementation, causal indexing, parity, and accounting.
+8. **Claude audit:** review implementation, causal input construction, indexing,
+   function identity, and accounting.
 9. **Grok audit:** attack leakage, controls, concentration, interpretation, and
    whether “late entry” is actually exposure or beta; return exactly one defined
    machine-readable terminal.
@@ -403,16 +472,17 @@ The single cycle follows this order:
 
 The diagnosis requires:
 
-- exact production-signal parity, closed-bar causality, and next-bar fill tests;
+- hash-locked production-function identity plus hand-fixture-verified causal input
+  construction, labeled `FUNCTION_FAITHFUL_INPUTS_NOT_LIVE_VERIFIED`;
+- closed-bar causality and next-bar measurement tests;
 - source commit, dirty flag, evaluator identity/hash, local data range/hash,
   preregistration hash, deterministic seed, and exact command set;
-- per-rule and per-split entry counts, matched coverage, monthly/yearly coverage,
+- per-setup and per-split signal counts, matched coverage, monthly/yearly coverage,
   MFE/MAE, impulse, resistance distance, and first-move direction;
-- faithful baseline versus matched and one-bar-delay controls on identical
-  horizons, notional, data, and cost assumptions;
-- baseline percent time in market, average gross notional, turnover, and BTC beta
-  when faithful exit/accounting data are available; otherwise an explicit `N/A`
-  reason that blocks any PnL/edge claim;
+- signal cohort versus same-side/regime/volatility/quarter matched controls and
+  one-bar-delay controls on identical horizons, data, and cost assumptions;
+- explicit `N/A` for strategy beta, percent time in market, gross notional,
+  turnover, PnL, and win rate because no stateful intent/exit replay exists;
 - concentration checks after removing the top 10% fixed-horizon favorable
   outcomes and after removing the best calendar month;
 - discovery and untouched validation results with the frozen 48-bar purge;
@@ -438,9 +508,10 @@ The active window starts only after both design audits pass and ends exactly at
 - At `06:30`, the supervisor enters closeout: finish an owned process group only
   when its timeout is before the hard stop, otherwise terminate the full group
   and record `CUTOFF`.
-- At the hard stop, terminate and verify only process groups recorded under the
-  current run ID, atomically write the final run state and partial-or-complete
-  morning report, and start no new work.
+- At the hard stop, terminate and verify only process groups and recursively
+  tracked descendant identities recorded under the current run ID, atomically
+  write the final run state and partial-or-complete morning report, and start no
+  new work.
 - If Claude or Grok is unavailable, freeze the result at `AUDIT_PENDING`; do not
   switch to another scientific lane or generate another candidate.
 - While a replay runs, only non-conflicting review of frozen inputs or report
@@ -473,8 +544,9 @@ Before preregistration or any outcome replay, a second runtime gate requires:
    rejects computed/dynamic edges, verifies all module hashes, and shows the
    isolated no-side-effect import passed;
 3. green guard tests for environment allowlisting, command/path denial,
-   source-clean filtering, process-group descendant termination, and report
-   status routing;
+   all-child filesystem sandboxing, server-clean/hash assertions, source-clean
+   filtering, process-group plus recursive-PPID descendant termination including
+   `setsid`, and report status routing;
 4. a dry run that creates transient state and evidence scaffolding without
    importing outcome data or replaying signals; and
 5. enough wall-clock remains to finish the next phase before its timeout and the
@@ -491,9 +563,10 @@ approximated or discovered only after a replay starts.
 - A local cache change, public-data extension, or any other replay byte whose
   SHA-256 differs from preregistration records `INVALID`; data cannot be extended
   after freeze.
-- A failed causal/parity test blocks commit and replay.
-- A production-signal mismatch invalidates the affected rule; it is not patched by
-  approximating server behavior.
+- A failed causal-input fixture or production-function identity test blocks commit
+  and replay.
+- A production-function/input-contract mismatch invalidates the affected setup; it
+  is not patched by approximating server behavior.
 - A forbidden command/path attempt, credential-loading attempt, unexpected server
   behavior, or possible exchange mutation stops the entire run immediately.
 - Claude/Grok failure freezes the result at `AUDIT_PENDING` after one compact
@@ -501,6 +574,9 @@ approximated or discovered only after a replay starts.
 - The report renderer has a status-routing unit test: for `AUDIT_PENDING`,
   `INSUFFICIENT_SAMPLE`, `INVALID`, `CUTOFF`, or `BLOCKED`, metrics cannot appear
   under `Audited diagnosis`, positive, promotion, or recommendation sections.
+- Renderer section IDs are frozen as `audited_diagnosis`, `audit_pending`,
+  `insufficient_sample`, `invalid`, `cutoff_blocked`, and `backlog`; tests assert
+  both ID and visible heading so renaming cannot bypass status routing.
 - The supervisor never kills, resets, edits, or cleans unrelated user processes,
   branches, worktrees, or files.
 
@@ -509,9 +585,9 @@ approximated or discovered only after a replay starts.
 By the hard stop, produce:
 
 1. `morning-report.md` with a plain-language diagnosis or exact blocker.
-2. A per-rule table for Champion BEST and H01 S12/S13/S14 with sample sufficiency,
-   control coverage, discovery/validation deltas, and audit status.
-3. Raw per-entry evidence, aggregate JSON, preregistration/hash, source/data hashes,
+2. A per-setup table for H01 S12/S13/S14 with sample sufficiency, control
+   coverage, discovery/validation deltas, and audit status.
+3. Raw per-signal evidence, aggregate JSON, preregistration/hash, source/data hashes,
    commands, test results, and concentration checks.
 4. Separate `Audited diagnosis` and `Unaudited/AUDIT_PENDING` sections; unaudited
    metrics never appear under a positive or promotion heading.
@@ -526,8 +602,10 @@ The overnight process is acceptable only if:
 
 - Claude explicitly approves the final design and revised Grok blockers are closed;
 - lock contention, stale-lock recovery, exact worktree assertion, command/path
-  refusal, computed-import refusal, process-group descendant termination, child
-  timeout, and hard-cutoff behavior have automated tests;
+  refusal, computed-import refusal, all-child filesystem sandboxing,
+  server-clean/hash assertions, process-group plus recursive-PPID termination of
+  normal and `setsid` descendants, child timeout, and hard-cutoff behavior have
+  automated tests;
 - a dry run creates atomic state, preregistration, registry, and packets without
   replaying outcomes or modifying `btc-trader-server`;
 - the evaluator refuses a missing/mismatched preregistration hash and duplicate
@@ -537,8 +615,8 @@ The overnight process is acceptable only if:
 - the supervisor refuses a second preregistration or registry append in the run,
   even when its proposed data hash differs;
 - touched dashboard modules pass the exact frozen strict/test command set;
-- production signal parity and closed-bar/next-bar behavior pass for every audited
-  rule, or that rule is marked `INVALID`;
+- hash-locked H01 function identity and hand-fixture causal input/next-bar behavior
+  pass for every audited setup, or that setup is marked `INVALID`;
 - every diagnosis has structured ledger events and raw reproducible evidence;
 - a unit test proves the report separates audited, under-sampled, invalid,
   cutoff/blocked, and audit-pending results without leaking their metrics into a

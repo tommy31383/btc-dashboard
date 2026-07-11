@@ -157,3 +157,31 @@ identity note was also tightened to the macOS `ps lstart + executable` identity.
 
 Status: Grok gate passed on the Claude fixes. Activation remains closed pending
 Claude re-audit from the workspace root.
+
+## Claude attempt 3 - NOT APPROVED
+
+- Completion was immediately before this record at
+  `2026-07-12T02:31:48+07:00`.
+- Model: `claude-opus-4-8`, high effort, read-only, run from workspace root with
+  explicit dashboard/server access.
+- Verdict: `NOT APPROVED`; no P0, one P1 and four P2 findings.
+- Empirical verification: the five-module closure, hashes, single non-secret env
+  flag, permitted exports, and hard deadline all matched the design evidence.
+
+Dispositions:
+
+| Finding | Disposition |
+|---|---|
+| P1 Champion snapshot is state-dependent | Remove Champion from Night 1. Audit only the exact H01 market-gate snapshot; Champion moves to a future stateful preregistration. |
+| P2 input faithfulness overclaimed | Freeze causal 1h->4h/1d construction, partial-bar convention, H01 live `persistBars=1` regime stepping, funding as-of join, and hand fixtures. Relabel `FUNCTION_FAITHFUL_INPUTS_NOT_LIVE_VERIFIED`. |
+| P2 other children could write outside dashboard | Run every child under a frozen `sandbox-exec` profile and minimal env; assert server Git cleanliness and module hashes before/after each phase. |
+| P2 re-sessioned descendants | Add recursive PPID discovery/tracking plus process-group kill and a `setsid` grandchild test. |
+| P2 any-two-of-five multiplicity | Make impulse and resistance distance the two confirmatory metrics; require both with Bonferroni-corrected intervals. Other path metrics are exploratory only. |
+
+Claude's statement that regime persistence is three bars is not the current H01
+call-site behavior: `hedge01.evalEntry` passes `persistBars=1`. The design will
+freeze and fixture-test that actual call-site value while accepting the broader
+input-construction finding.
+
+Status: activation remains closed pending the narrowed design plus Grok and
+Claude re-audits.
