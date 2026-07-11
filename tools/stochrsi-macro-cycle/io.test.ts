@@ -495,6 +495,60 @@ test("retries thrown TypeError and AbortError without real waits", async () => {
   }
 });
 
+test("retries one Node TimeoutError and uses the subsequent successful response", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+  const now = Date.UTC(2026, 6, 11, 12);
+  let klineAttempts = 0;
+  try {
+    const data = await loadAndRefreshData({
+      nowMs: now,
+      cachePaths: { hourlyCachePath: join(directory, "hourly.json"), fundingCachePath: join(directory, "funding.json") },
+      fetchImpl: async (url) => {
+        if (url.includes("/fundingRate")) return jsonResponse([]);
+        klineAttempts += 1;
+        if (klineAttempts === 1) throw new DOMException("timed out", "TimeoutError");
+        return jsonResponse([[now - HOUR_MS, "100", "102", "99", "101", "1"]]);
+      },
+      retryAttempts: 5,
+      retryDelayMs: 0,
+      gitSha: "test-git-sha",
+      gitDirty: false,
+    } as Parameters<typeof loadAndRefreshData>[0]);
+
+    assert.equal(klineAttempts, 2);
+    assert.equal(data.hourly.length, 1);
+    assert.equal(data.hourly[0].time, now - HOUR_MS);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("bounds repeated Node TimeoutError failures at five attempts", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "stochrsi-io-"));
+  let klineAttempts = 0;
+  try {
+    await assert.rejects(
+      loadAndRefreshData({
+        nowMs: Date.UTC(2026, 6, 11, 12),
+        cachePaths: { hourlyCachePath: join(directory, "hourly.json"), fundingCachePath: join(directory, "funding.json") },
+        fetchImpl: async (url) => {
+          if (url.includes("/klines")) klineAttempts += 1;
+          if (url.includes("/klines")) throw new DOMException("timed out", "TimeoutError");
+          return jsonResponse([]);
+        },
+        retryAttempts: 5,
+        retryDelayMs: 0,
+        gitSha: "test-git-sha",
+        gitDirty: false,
+      } as Parameters<typeof loadAndRefreshData>[0]),
+      /timed out/,
+    );
+    assert.equal(klineAttempts, 5);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("rejects retry attempt counts above the hard maximum of five", async () => {
   await assert.rejects(
     loadAndRefreshData({ retryAttempts: 6, gitSha: "test-git-sha", gitDirty: false } as Parameters<typeof loadAndRefreshData>[0]),

@@ -335,7 +335,7 @@ async function fetchJson(
       response = await fetchImpl(`${FUTURES_REST}${path}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
       if (response.ok) return await response.json();
     } catch (error) {
-      const retryable = error instanceof TypeError || (error instanceof Error && error.name === "AbortError");
+      const retryable = error instanceof TypeError || (error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError"));
       if (!retryable || attempt === retryAttempts) throw error;
       await delay(retryDelayMs * attempt);
       continue;
