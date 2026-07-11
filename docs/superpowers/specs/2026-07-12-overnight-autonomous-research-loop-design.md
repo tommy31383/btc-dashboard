@@ -124,6 +124,11 @@ refuses a group not recorded under the current run ID, and verifies that no owne
 descendant remains. Tests cover a child that spawns a grandchild and prove the
 entire subtree dies without touching an unrelated control process.
 
+On this macOS host, OS process-start identity is the normalized value of
+`/bin/ps -o lstart= -p <pid>` plus the resolved executable path. Both are recorded
+at lock creation and compared during stale-lock recovery; parse/read failure is
+unverifiable and therefore fails closed.
+
 #### Command and path matrix
 
 Before activation, the implementation commits
@@ -188,15 +193,27 @@ Required files:
 - `morning-report.md`: final results and recommendations.
 - `packets/`: short Claude and Grok review packets.
 
-Transient lock data, active child manifests, temp files, and mutable supervisor
-state live only under
+`queue.md`, `knowledge-map.md`, preregistration, registry, matrix, packets, source,
+and tests are committed and frozen before replay. Transient lock data, active
+child manifests, temp files, and mutable supervisor state live only under
 `${TMPDIR}/btc-pc-overnight-2026-07-12/<run-id>/`, outside Git. `run.json`,
-`ledger.jsonl`, raw rows, aggregates, and reports are declared generated-evidence
-paths. The source-clean check parses `git status --porcelain=v1 -z` and permits
-changes only under the exact generated-evidence allowlist; any source, test,
-preregistration, registry, matrix, or packet change after its freeze commit blocks
-replay. Thus the immutable source commit stays clean even while declared outputs
-are generated and later committed.
+`ledger.jsonl`, raw rows, aggregates, and reports are generated evidence.
+
+The complete post-freeze dirty-path allowlist is exactly:
+
+1. `docs/research/overnight-2026-07-12/run.json`
+2. `docs/research/overnight-2026-07-12/ledger.jsonl`
+3. `docs/research/overnight-2026-07-12/artifacts/entry-quality-signals.jsonl`
+4. `docs/research/overnight-2026-07-12/artifacts/entry-quality-aggregate.json`
+5. `docs/research/overnight-2026-07-12/artifacts/entry-quality-provenance.json`
+6. `docs/research/overnight-2026-07-12/artifacts/claude-result-audit.txt`
+7. `docs/research/overnight-2026-07-12/artifacts/grok-result-audit.txt`
+8. `docs/research/overnight-2026-07-12/morning-report.md`
+
+The source-clean check parses `git status --porcelain=v1 -z` and permits only
+those eight literals. Any other changed, staged, renamed, or untracked path after
+the freeze commit blocks replay. Thus the immutable source commit stays clean
+while declared outputs are generated and later committed.
 
 The existing relay watcher remains untouched at `TURN=TOMMY`. The research
 ledger is the sole source of truth for this run; the supervisor neither changes

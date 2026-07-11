@@ -137,3 +137,23 @@ start-identity stale-lock validation, and a structurally outcome-blind metadata
 inventory executable.
 
 Status: activation remains closed pending fixes plus Grok and Claude re-audits.
+
+## Grok attempt 5 - APPROVED after Claude fixes
+
+- Completion was immediately before this record at
+  `2026-07-12T02:21:55+07:00`.
+- Packet: `packets/grok-claude-fixes-reaudit.md`.
+- Verdict: `APPROVED`; open P0/P1: none.
+- Empirical spot-check: server commit/version, five module hashes, literal import
+  graph, single `RULE_DISABLE_S12` env read, and deadline timestamp matched the
+  design precheck.
+- Claude O/K/A/M/H and recommended B/J/E were all assessed resolved.
+
+Grok left one non-blocking P2 clarity item: generated-evidence exemptions needed
+literal paths rather than categories. The design now lists exactly eight allowed
+post-freeze output paths; `queue.md`, `knowledge-map.md`, packets, matrix,
+registry, preregistration, source, and tests freeze before replay. Its P3 PID
+identity note was also tightened to the macOS `ps lstart + executable` identity.
+
+Status: Grok gate passed on the Claude fixes. Activation remains closed pending
+Claude re-audit from the workspace root.
