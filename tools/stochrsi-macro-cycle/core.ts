@@ -253,7 +253,9 @@ export function buildCampaignSignalsFromPoints(points: CampaignPoints): Campaign
           daily.closeTime > activeCampaign.episodeEntries[index]
         ) {
           activeCampaign.episodeRecoveryTimes[index] = daily.closeTime;
+          dailyEpisodeActive = false;
         }
+        continue;
       }
       if (activeCampaign && isOversold) {
         activeCampaign.dailyOversoldEntries.push(daily.closeTime);

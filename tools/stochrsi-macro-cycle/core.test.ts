@@ -300,6 +300,20 @@ test("does not record recovery at the same close time as its episode entry", () 
   assert.deepEqual(campaign.episodeRecoveryTimes, [null]);
 });
 
+test("records the first strictly later recovery after rejecting a same-time point", () => {
+  const macro = macroRecoveryPoints();
+  const entryTime = macro.firstDailyClose;
+  const recoveryTime = entryTime + DAY_MS;
+  const campaign = buildCampaignSignalsFromPoints({
+    weekly: macro.weekly,
+    twoWeekly: macro.twoWeekly,
+    daily: [point(entryTime, 5), point(entryTime, 11), point(recoveryTime, 11)],
+  })[0];
+
+  assert.deepEqual(campaign.episodeEntries, [entryTime]);
+  assert.deepEqual(campaign.episodeRecoveryTimes, [recoveryTime]);
+});
+
 test("records null recovery for an unrecovered final episode", () => {
   const macro = macroRecoveryPoints();
   const campaign = buildCampaignSignalsFromPoints({
