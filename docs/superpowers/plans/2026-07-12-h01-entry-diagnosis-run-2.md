@@ -17,7 +17,7 @@
 - No deploy, PM2, rsync, SSH, secrets, authenticated API, account snapshot, order, position, live arming, or relay TURN change.
 - H01 LONG `MARKET_SIGNAL` only; no fill, accepted-intent, PnL, ROI, win-rate, or live-byte-parity claim.
 - Runtime safety gate and tests commit before preregistration. One preregistration, one registry append, one replay.
-- Missing final Claude/Grok result audit leaves `AUDIT_PENDING`; no positive status or prose.
+- Missing Codex self-audit or Grok result audit leaves `AUDIT_PENDING`; no positive status or prose.
 
 ## File Structure
 
@@ -109,7 +109,7 @@ export const SERVER_MODULES = Object.freeze({
 export const GENERATED_OUTPUTS = Object.freeze([
   "run.json", "ledger.jsonl", "artifacts/entry-quality-signals.jsonl",
   "artifacts/entry-quality-aggregate.json", "artifacts/entry-quality-provenance.json",
-  "artifacts/claude-result-audit.txt", "artifacts/grok-result-audit.txt",
+  "artifacts/codex-result-audit.md", "artifacts/grok-result-audit.txt",
   "morning-report.md",
 ]);
 export const TERMINAL_STATUSES = Object.freeze([
@@ -205,7 +205,7 @@ export function filterDirtyPaths(paths) {
 
 - [ ] **Step 4: Freeze the command/path matrix**
 
-Write JSON with `defaultDeny=true`, the six export names, five server read paths/hashes, exact Node/Git/sha/sandbox/Claude/Grok executable paths, Run-2 write roots, unauthenticated cache endpoint, and explicit denies for SSH/rsync/PM2/deploy/env/auth/account/exchange/relay. Include separate `local_no_network`, `public_cache_fill`, and `auditor_network` sandbox profiles.
+Write JSON with `defaultDeny=true`, the six export names, five server read paths/hashes, exact Node/Git/sha/sandbox/Grok executable paths, Run-2 write roots, unauthenticated cache endpoint, and explicit denies for SSH/rsync/PM2/deploy/env/auth/account/exchange/relay. Include separate `local_no_network`, `public_cache_fill`, and `auditor_network` sandbox profiles.
 
 - [ ] **Step 5: Run tests and commit**
 
@@ -402,7 +402,7 @@ Commit: `feat: add fail-closed H01 report routing`
 - Create: `tools/overnight-entry-audit/supervisor.mjs`
 - Test: `tools/overnight-entry-audit/supervisor.test.mjs`
 - Create: `docs/research/run-2-2026-07-12/pure-import-runtime-report.json`
-- Create: `docs/research/run-2-2026-07-12/packets/claude-result-audit.md`
+- Create: `docs/research/run-2-2026-07-12/packets/codex-self-audit-checklist.md`
 - Create: `docs/research/run-2-2026-07-12/packets/grok-result-audit.md`
 
 **Interfaces:**
@@ -522,9 +522,12 @@ Run: `node tools/overnight-entry-audit/supervisor.mjs verify-artifacts`
 
 Expected: byte-identical aggregate hash and all prereg checks unchanged.
 
-- [ ] **Step 3: Run bounded Claude code/result audit**
+- [ ] **Step 3: Run bounded Codex code/result self-audit**
 
-Use the committed result packet. Required outcome is findings plus explicit approval; quota/timeout/malformed output writes `AUDIT_FAILED` and leaves `AUDIT_PENDING`.
+Review findings first against the frozen design, source diff, tests, raw/aggregate
+reproduction, causal indexing, input fidelity, and interpretation. Save the review
+artifact with an explicit `APPROVED` or `NOT_APPROVED`; any unresolved P0-P2
+leaves `AUDIT_PENDING`.
 
 - [ ] **Step 4: Run Grok adversarial result audit**
 

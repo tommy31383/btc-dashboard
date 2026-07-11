@@ -1,7 +1,8 @@
 # H01 Research Run 2 Authorization Addendum
 
 **Owner instructions:** `vay may tu chay`, followed by
-`lach qua bo vu thoi gian cho tao`, received on 2026-07-12.
+`lach qua bo vu thoi gian cho tao`, then
+`claude het token limit roi may tu lam tu audit di`, received on 2026-07-12.
 
 This starts a new bounded research-only window rather than weakening the expired
 Night-1 cutoff. It inherits every scientific, sandbox, money-path, audit-status,
@@ -30,7 +31,7 @@ the same basenames and semantics:
 3. `artifacts/entry-quality-signals.jsonl`
 4. `artifacts/entry-quality-aggregate.json`
 5. `artifacts/entry-quality-provenance.json`
-6. `artifacts/claude-result-audit.txt`
+6. `artifacts/codex-result-audit.md`
 7. `artifacts/grok-result-audit.txt`
 8. `morning-report.md`
 
@@ -40,7 +41,9 @@ and every no-live restriction remain mandatory. It does not authorize deployment
 live arming, server writes, secrets, VPS/authenticated API, or exchange/account
 mutation.
 
-Claude review remains mandatory for a confirmed scientific conclusion, but it is
-no longer a precondition for implementation/replay in Run 2. Until both result
-audits pass, the maximum status is `AUDIT_PENDING`; owner authorization cannot
-promote, retune, or relabel the result.
+For Run 2, Codex self-audit replaces the unavailable Claude review. A confirmed
+scientific conclusion requires all frozen tests/checks, a written Codex review
+with no unresolved P0-P2, and independent Grok terminal `ALLOW_DIAGNOSIS`.
+Otherwise the maximum status is `AUDIT_PENDING`, `INVALID`, or
+`INSUFFICIENT_SAMPLE`; owner authorization cannot promote, retune, or relabel the
+result.
