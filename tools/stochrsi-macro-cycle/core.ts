@@ -48,6 +48,12 @@ export interface CampaignSignal {
   exitReason?: "MACRO_OVERBOUGHT";
 }
 
+interface AggregateBucket {
+  candle: Candle;
+  hasFirstSourceBar: boolean;
+  hasFinalSourceBar: boolean;
+}
+
 function spanMs(span: AggregateSpan): number {
   switch (span) {
     case "1d":
@@ -68,24 +74,36 @@ function bucketStart(time: number, span: AggregateSpan): number {
 
 export function aggregateCandles(source: Candle[], span: AggregateSpan, asOfMs: number): Candle[] {
   const completedSource = source.filter((bar) => bar.time + HOUR_MS <= asOfMs);
-  const buckets = new Map<number, Candle>();
+  const targetSpanMs = spanMs(span);
+  const buckets = new Map<number, AggregateBucket>();
 
   for (const bar of completedSource) {
     const time = bucketStart(bar.time, span);
+    const isFirstSourceBar = bar.time === time;
+    const isFinalSourceBar = bar.time === time + targetSpanMs - HOUR_MS;
     const existing = buckets.get(time);
     if (existing) {
-      existing.high = Math.max(existing.high, bar.high);
-      existing.low = Math.min(existing.low, bar.low);
-      existing.close = bar.close;
-      existing.volume += bar.volume;
+      existing.candle.high = Math.max(existing.candle.high, bar.high);
+      existing.candle.low = Math.min(existing.candle.low, bar.low);
+      existing.candle.close = bar.close;
+      existing.candle.volume += bar.volume;
+      existing.hasFirstSourceBar ||= isFirstSourceBar;
+      existing.hasFinalSourceBar ||= isFinalSourceBar;
     } else {
-      buckets.set(time, { ...bar, time });
+      buckets.set(time, {
+        candle: { ...bar, time },
+        hasFirstSourceBar: isFirstSourceBar,
+        hasFinalSourceBar: isFinalSourceBar,
+      });
     }
   }
 
-  const targetSpanMs = spanMs(span);
-  return [...buckets.values()]
-    .filter((bar) => bar.time + targetSpanMs <= asOfMs)
+  return [...buckets.entries()]
+    .filter(
+      ([time, bucket]) =>
+        time + targetSpanMs <= asOfMs && bucket.hasFirstSourceBar && bucket.hasFinalSourceBar,
+    )
+    .map(([, bucket]) => bucket.candle)
     .sort((left, right) => left.time - right.time);
 }
 
