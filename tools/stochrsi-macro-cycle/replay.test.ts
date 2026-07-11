@@ -53,6 +53,10 @@ function barWithRange(time: number, open: number, high: number, low: number, clo
   };
 }
 
+function assertClose(actual: number, expected: number): void {
+  assert.ok(Math.abs(actual - expected) < 1e-12, `expected ${actual} to equal ${expected}`);
+}
+
 test("fills include adverse slippage and both fees", () => {
   const leg = settleLeg({ qty: 0.001, entryOpen: 100, exitOpen: 110, funding: [] });
 
@@ -91,6 +95,111 @@ test("full-at-arm matches episode qty and is simulated", () => {
 
   assert.equal(result.legs[0].qty, 0.003);
   assert.equal(result.simulatedNotTradable, true);
+});
+
+test("HYBRID_LITE realizes tactical exits while its core leg remains active", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const recoveryOne = start + 2 * HOUR_MS;
+  const tacticalTwoEntry = start + 3 * HOUR_MS;
+  const recoveryTwo = start + 4 * HOUR_MS;
+  const macroExit = start + 5 * HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start, start + HOUR_MS, tacticalTwoEntry],
+    episodeRecoveryTimes: [null, recoveryOne, recoveryTwo],
+    dailyOversoldEntries: [start, start + HOUR_MS, tacticalTwoEntry],
+    exitTime: macroExit,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+
+  const intents = buildVariantLegs(campaign, "HYBRID_LITE").legs;
+  assert.deepEqual(intents, [
+    {
+      entryTime: start,
+      qty: 0.001,
+      exitTime: macroExit,
+      role: "CORE",
+      exitReason: "MACRO_OVERBOUGHT",
+    },
+    {
+      entryTime: start + HOUR_MS,
+      qty: 0.001,
+      exitTime: recoveryOne,
+      role: "TACTICAL",
+      exitReason: "DAILY_RECOVERY",
+    },
+    {
+      entryTime: tacticalTwoEntry,
+      qty: 0.001,
+      exitTime: recoveryTwo,
+      role: "TACTICAL",
+      exitReason: "DAILY_RECOVERY",
+    },
+  ]);
+
+  const run = runVariant(
+    "HYBRID_LITE",
+    [campaign],
+    [
+      bar(start, 100),
+      barWithRange(start + HOUR_MS, 100, 200, 100),
+      barWithRange(recoveryOne, 110, 110, 50),
+      bar(tacticalTwoEntry, 100),
+      barWithRange(recoveryTwo, 110, 110, 100),
+      bar(macroExit, 120),
+    ],
+    [
+      { time: start + HOUR_MS + HOUR_MS / 2, rate: 0.1, mark: 100 },
+      { time: recoveryOne + HOUR_MS / 2, rate: 0.1, mark: 100 },
+      { time: tacticalTwoEntry + HOUR_MS / 2, rate: 0.1, mark: 100 },
+      { time: recoveryTwo + HOUR_MS / 2, rate: 0.1, mark: 100 },
+    ],
+  );
+  const replay = run.campaigns[0];
+  const [core, tacticalOne, tacticalTwo] = replay.legs;
+  const pathAfterRecovery = run.accountPath.find((point) => point.time === recoveryOne)!;
+  const peakBeforeRecovery =
+    (200 - core.entryPrice) * core.qty - core.entryFee +
+    (200 - tacticalOne.entryPrice) * tacticalOne.qty - tacticalOne.entryFee;
+  const pnlAtRecoveryLow =
+    tacticalOne.netPnl +
+    (50 - core.entryPrice) * core.qty -
+    core.entryFee -
+    0.01;
+
+  assert.deepEqual(replay.legs.map((leg) => leg.exitTime), [macroExit, recoveryOne, recoveryTwo]);
+  assert.deepEqual(replay.legs.map((leg) => leg.exitReason), [
+    "MACRO_OVERBOUGHT",
+    "DAILY_RECOVERY",
+    "DAILY_RECOVERY",
+  ]);
+  assert.equal(tacticalOne.fundingPnl, -0.01);
+  assert.equal(tacticalTwo.fundingPnl, -0.01);
+  assert.equal(pathAfterRecovery.realizedPnl, tacticalOne.netPnl);
+  assert.equal(pathAfterRecovery.fundingPnl, -0.01);
+  assertClose(pathAfterRecovery.pnlBeforeWallet, pnlAtRecoveryLow);
+  assertClose(replay.maxDrawdown, peakBeforeRecovery - pnlAtRecoveryLow);
+  assert.equal(run.maxQuantity, 0.002);
+  assert.ok(tacticalOne.exitTime! <= tacticalTwo.entryTime);
+});
+
+test("HYBRID_LITE gives macro exit priority over a same-time tactical recovery", () => {
+  const start = Date.UTC(2024, 0, 1);
+  const exitTime = start + 2 * HOUR_MS;
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start, start + HOUR_MS],
+    episodeRecoveryTimes: [null, exitTime],
+    dailyOversoldEntries: [start, start + HOUR_MS],
+    exitTime,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+
+  const [core, tactical] = buildVariantLegs(campaign, "HYBRID_LITE").legs;
+
+  assert.equal(core.exitReason, "MACRO_OVERBOUGHT");
+  assert.equal(tactical.exitTime, exitTime);
+  assert.equal(tactical.exitReason, "MACRO_OVERBOUGHT");
 });
 
 test("minimum wallet covers worst maintenance minus pre-wallet PnL", () => {
@@ -158,16 +267,46 @@ test("all frozen variants build their prescribed entry schedules", () => {
   campaign.dailyOversoldEntries = [200, 300, 400, 500];
 
   assert.deepEqual(buildVariantLegs(campaign, "MACRO_ONCE").legs, [
-    { entryTime: 100, qty: 0.001 },
+    {
+      entryTime: 100,
+      qty: 0.001,
+      role: "BASE",
+      exitTime: 1_000,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
   ]);
   assert.deepEqual(buildVariantLegs(campaign, "DAILY_EPISODE").legs, [
-    { entryTime: 200, qty: 0.001 },
-    { entryTime: 300, qty: 0.001 },
-    { entryTime: 400, qty: 0.001 },
+    {
+      entryTime: 200,
+      qty: 0.001,
+      role: "BASE",
+      exitTime: 1_000,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
+    {
+      entryTime: 300,
+      qty: 0.001,
+      role: "BASE",
+      exitTime: 1_000,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
+    {
+      entryTime: 400,
+      qty: 0.001,
+      role: "BASE",
+      exitTime: 1_000,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
   ]);
   assert.equal(buildVariantLegs(campaign, "DAILY_EVERY_BAR").legs.length, 4);
   assert.deepEqual(buildVariantLegs(campaign, "WINDOW_FULL_AT_ARM").legs, [
-    { entryTime: 100, qty: 0.003 },
+    {
+      entryTime: 100,
+      qty: 0.003,
+      role: "SIMULATED",
+      exitTime: 1_000,
+      exitReason: "MACRO_OVERBOUGHT",
+    },
   ]);
 });
 

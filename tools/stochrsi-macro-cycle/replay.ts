@@ -11,13 +11,15 @@ export type VariantName =
   | "MACRO_ONCE"
   | "DAILY_EPISODE"
   | "DAILY_EVERY_BAR"
-  | "WINDOW_FULL_AT_ARM";
+  | "WINDOW_FULL_AT_ARM"
+  | "HYBRID_LITE";
 
 export const VARIANT_NAMES: VariantName[] = [
   "MACRO_ONCE",
   "DAILY_EPISODE",
   "DAILY_EVERY_BAR",
   "WINDOW_FULL_AT_ARM",
+  "HYBRID_LITE",
 ];
 
 export interface FundingPayment {
@@ -31,9 +33,15 @@ interface ResolvedFundingPayment {
   cumulativePnlPerBtc: number;
 }
 
+export type LegRole = "BASE" | "CORE" | "TACTICAL" | "SIMULATED";
+export type LegExitReason = "MACRO_OVERBOUGHT" | "DAILY_RECOVERY";
+
 export interface LegIntent {
   entryTime: number;
   qty: number;
+  exitTime?: number;
+  role: LegRole;
+  exitReason?: LegExitReason;
 }
 
 export interface VariantLegs {
@@ -65,6 +73,8 @@ export interface SettledLeg {
 export interface ReplayLeg extends Omit<SettledLeg, "exitPrice"> {
   entryTime: number;
   exitTime?: number;
+  role: LegRole;
+  exitReason?: LegExitReason;
   exitPrice?: number;
   entryFee: number;
   exitFee: number;
@@ -322,20 +332,39 @@ export function buildVariantLegs(
   campaign: CampaignSignal,
   variant: VariantName,
 ): VariantLegs {
+  const campaignExit = {
+    ...(campaign.exitTime === undefined ? {} : { exitTime: campaign.exitTime }),
+    ...(campaign.exitReason === undefined ? {} : { exitReason: campaign.exitReason }),
+  };
   switch (variant) {
     case "MACRO_ONCE":
       return {
-        legs: [{ entryTime: campaign.armTime, qty: QTY_PER_LEG }],
+        legs: [{
+          entryTime: campaign.armTime,
+          qty: QTY_PER_LEG,
+          role: "BASE",
+          ...campaignExit,
+        }],
         simulatedNotTradable: false,
       };
     case "DAILY_EPISODE":
       return {
-        legs: campaign.episodeEntries.map((entryTime) => ({ entryTime, qty: QTY_PER_LEG })),
+        legs: campaign.episodeEntries.map((entryTime) => ({
+          entryTime,
+          qty: QTY_PER_LEG,
+          role: "BASE",
+          ...campaignExit,
+        })),
         simulatedNotTradable: false,
       };
     case "DAILY_EVERY_BAR":
       return {
-        legs: campaign.dailyOversoldEntries.map((entryTime) => ({ entryTime, qty: QTY_PER_LEG })),
+        legs: campaign.dailyOversoldEntries.map((entryTime) => ({
+          entryTime,
+          qty: QTY_PER_LEG,
+          role: "BASE",
+          ...campaignExit,
+        })),
         simulatedNotTradable: false,
       };
     case "WINDOW_FULL_AT_ARM":
@@ -343,8 +372,44 @@ export function buildVariantLegs(
         legs:
           campaign.exitTime === undefined || campaign.episodeEntries.length === 0
             ? []
-            : [{ entryTime: campaign.armTime, qty: campaign.episodeEntries.length * QTY_PER_LEG }],
+            : [{
+              entryTime: campaign.armTime,
+              qty: campaign.episodeEntries.length * QTY_PER_LEG,
+              role: "SIMULATED",
+              ...campaignExit,
+            }],
         simulatedNotTradable: true,
+      };
+    case "HYBRID_LITE":
+      return {
+        legs: campaign.episodeEntries.map((entryTime, index) => {
+          if (index === 0) {
+            return {
+              entryTime,
+              qty: QTY_PER_LEG,
+              role: "CORE" as const,
+              ...campaignExit,
+            };
+          }
+          const recoveryTime = campaign.episodeRecoveryTimes[index] ?? null;
+          const macroWins =
+            campaign.exitTime !== undefined &&
+            (recoveryTime === null || campaign.exitTime <= recoveryTime);
+          const exitTime = macroWins ? campaign.exitTime : recoveryTime ?? undefined;
+          const exitReason = exitTime === undefined
+            ? undefined
+            : macroWins
+              ? "MACRO_OVERBOUGHT" as const
+              : "DAILY_RECOVERY" as const;
+          return {
+            entryTime,
+            qty: QTY_PER_LEG,
+            exitTime,
+            role: "TACTICAL" as const,
+            exitReason,
+          };
+        }),
+        simulatedNotTradable: false,
       };
   }
 }
@@ -398,12 +463,12 @@ function hourlyOpenAt(hourlyByTime: Map<number, Candle>, time: number): number {
 
 function replayLeg(
   intent: LegIntent,
-  exitTime: number | undefined,
   markPrice: number,
   hourly: Candle[],
   hourlyByTime: Map<number, Candle>,
   funding: ResolvedFundingPayment[],
 ): ReplayLeg {
+  const { exitTime } = intent;
   const entryOpen = hourlyOpenAt(hourlyByTime, intent.entryTime);
   const entryPrice = stableNumber(entryOpen * (1 + SLIPPAGE_RATE));
   const entryFee = entryPrice * intent.qty * FEE_RATE;
@@ -431,6 +496,8 @@ function replayLeg(
       ...settled,
       entryTime: intent.entryTime,
       exitTime,
+      role: intent.role,
+      exitReason: intent.exitReason,
       entryFee,
       exitFee,
       closed: true,
@@ -449,6 +516,8 @@ function replayLeg(
   return {
     qty: intent.qty,
     entryTime: intent.entryTime,
+    role: intent.role,
+    exitReason: intent.exitReason,
     entryPrice,
     entryFee,
     exitFee: 0,
@@ -475,12 +544,16 @@ function campaignRisk(
   let worstUnrealizedPnl = 0;
   for (const candle of hourly) {
     if (candle.time >= endTime) break;
+    const closed = legs.filter(
+      (leg) => leg.exitTime !== undefined && leg.exitTime <= candle.time,
+    );
     const active = legs.filter(
       (leg) =>
         leg.entryTime <= candle.time &&
         (leg.exitTime === undefined || leg.exitTime > candle.time),
     );
-    if (active.length === 0) continue;
+    if (active.length === 0 && closed.length === 0) continue;
+    const realizedPnl = sum(closed.map((leg) => leg.netPnl));
     const fundingPnl = active.map((leg) =>
       fundingPnlFromResolved(
         leg.qty,
@@ -490,10 +563,11 @@ function campaignRisk(
         candle.time,
       ),
     );
-    const pnlAt = (price: number): number => sum(
-      active.map((leg, index) =>
-        (price - leg.entryPrice) * leg.qty - leg.entryFee + fundingPnl[index]),
-    );
+    const pnlAt = (price: number): number =>
+      realizedPnl + sum(
+        active.map((leg, index) =>
+          (price - leg.entryPrice) * leg.qty - leg.entryFee + fundingPnl[index]),
+      );
     const unrealizedPnl = sum(
       active.map((leg) => (candle.low - leg.entryPrice) * leg.qty),
     );
@@ -507,7 +581,9 @@ function campaignRisk(
     peak = Math.max(peak, highPnl);
   }
   const finalUnrealizedPnl = sum(
-    legs.map((leg) => (finalMarkPrice - leg.entryPrice) * leg.qty),
+    legs
+      .filter((leg) => leg.exitTime === undefined || leg.exitTime >= endTime)
+      .map((leg) => (finalMarkPrice - leg.entryPrice) * leg.qty),
   );
   peak = Math.max(peak, finalNetPnl);
   maxDrawdown = Math.max(maxDrawdown, peak - finalNetPnl);
@@ -528,7 +604,7 @@ function replayCampaign(
     ? hourlyOpenAt(hourlyByTime, campaign.exitTime)
     : lastHourly.close;
   const legs = buildVariantLegs(campaign, variant).legs.map((intent) =>
-    replayLeg(intent, campaign.exitTime, markPrice, hourly, hourlyByTime, funding),
+    replayLeg(intent, markPrice, hourly, hourlyByTime, funding),
   );
   const totalQty = sum(legs.map((leg) => leg.qty));
   const entryNotional = sum(legs.map((leg) => leg.entryPrice * leg.qty));
