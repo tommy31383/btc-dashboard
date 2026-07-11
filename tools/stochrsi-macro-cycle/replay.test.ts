@@ -42,6 +42,17 @@ function barWithLow(time: number, open: number, low: number, close = open): Cand
   };
 }
 
+function barWithRange(time: number, open: number, high: number, low: number, close = open): Candle {
+  return {
+    time,
+    open,
+    high,
+    low,
+    close,
+    volume: 1,
+  };
+}
+
 test("fills include adverse slippage and both fees", () => {
   const leg = settleLeg({ qty: 0.001, entryOpen: 100, exitOpen: 110, funding: [] });
 
@@ -267,6 +278,32 @@ test("long risk uses the intrahour low even when the candle close is safe", () =
     run.walletScenarios.find((item) => item.startingWallet === 50)?.liquidated,
     true,
   );
+});
+
+test("prior-hour high sets the causal drawdown peak before a later-hour low", () => {
+  const start = Date.UTC(2022, 0, 1);
+  const campaign: CampaignSignal = {
+    armTime: start,
+    episodeEntries: [start],
+    dailyOversoldEntries: [start],
+    exitTime: start + 2 * HOUR_MS,
+    exitReason: "MACRO_OVERBOUGHT",
+  };
+  const run = runVariant(
+    "DAILY_EPISODE",
+    [campaign],
+    [
+      barWithRange(start, 100, 200, 100),
+      barWithRange(start + HOUR_MS, 100, 100, 50),
+      bar(start + 2 * HOUR_MS, 100),
+    ],
+    [],
+  );
+
+  assert.ok(run.accountPath[0].drawdown < 0.001);
+  assert.ok(run.accountPath[1].drawdown > 0.14);
+  assert.ok(run.maxDrawdown > 0.14);
+  assert.ok(run.campaigns[0].maxDrawdown > 0.14);
 });
 
 test("hourly low-risk point excludes funding first known at the future candle close", () => {

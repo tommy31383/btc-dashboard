@@ -471,25 +471,30 @@ function campaignRisk(
         (leg.exitTime === undefined || leg.exitTime > candle.time),
     );
     if (active.length === 0) continue;
+    const fundingPnl = active.map((leg) =>
+      fundingPnlFromResolved(
+        leg.qty,
+        funding,
+        leg.entryTime,
+        leg.exitTime,
+        candle.time,
+      ),
+    );
+    const pnlAt = (price: number): number => sum(
+      active.map((leg, index) =>
+        (price - leg.entryPrice) * leg.qty - leg.entryFee + fundingPnl[index]),
+    );
     const unrealizedPnl = sum(
       active.map((leg) => (candle.low - leg.entryPrice) * leg.qty),
     );
-    const pnl = sum(
-      active.map((leg) => {
-        const fundingPnl = fundingPnlFromResolved(
-          leg.qty,
-          funding,
-          leg.entryTime,
-          leg.exitTime,
-          candle.time,
-        );
-        return (candle.low - leg.entryPrice) * leg.qty - leg.entryFee + fundingPnl;
-      }),
-    );
+    const openPnl = pnlAt(candle.open);
+    const pnl = pnlAt(candle.low);
+    const highPnl = pnlAt(candle.high);
     if (pnl < 0) underwater += 1;
-    peak = Math.max(peak, pnl);
+    peak = Math.max(peak, openPnl);
     maxDrawdown = Math.max(maxDrawdown, peak - pnl);
     worstUnrealizedPnl = Math.min(worstUnrealizedPnl, unrealizedPnl);
+    peak = Math.max(peak, highPnl);
   }
   const finalUnrealizedPnl = sum(
     legs.map((leg) => (finalMarkPrice - leg.entryPrice) * leg.qty),
@@ -576,11 +581,19 @@ function buildAccountPath(
       ),
     );
     const feesPaid = sum(activeLegs.map((leg) => leg.entryFee));
-    const pnlBeforeWallet = realizedPnl + unrealizedPnl + activeFundingPnl - feesPaid;
+    const pnlAt = (price: number): number =>
+      realizedPnl +
+      sum(activeLegs.map((leg) => (price - leg.entryPrice) * leg.qty)) +
+      activeFundingPnl -
+      feesPaid;
+    const openPnl = pnlAt(candle.open);
+    const pnlBeforeWallet = pnlAt(candle.low);
     const quantity = sum(activeLegs.map((leg) => leg.qty));
     const notional = quantity * candle.close;
     const maintenance = quantity * candle.low * MAINTENANCE_RATE;
-    peak = Math.max(peak, pnlBeforeWallet);
+    peak = Math.max(peak, openPnl);
+    const drawdown = peak - pnlBeforeWallet;
+    peak = Math.max(peak, pnlAt(candle.high));
     path.push({
       time: candle.time,
       close: candle.close,
@@ -594,7 +607,7 @@ function buildAccountPath(
       maintenance,
       quantity,
       notional,
-      drawdown: peak - pnlBeforeWallet,
+      drawdown,
     });
   }
   return path;
