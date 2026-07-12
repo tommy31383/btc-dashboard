@@ -1,4 +1,5 @@
 import math
+import ssl
 import sys
 import unittest
 from pathlib import Path
@@ -11,6 +12,7 @@ from option_surface_gate0 import (  # noqa: E402
     DAY_MS,
     absolute_black_scholes_delta,
     active_catalog_at,
+    build_ssl_context,
     build_decision_requests,
     evaluate_gate,
     has_delta_bracket,
@@ -55,6 +57,15 @@ class DecisionPopulationTests(unittest.TestCase):
         self.assertEqual(requests[0]["setups"], ["S13", "S14"])
         self.assertEqual(requests[0]["episodeCount"], 2)
         self.assertEqual(requests[1]["episodeCount"], 1)
+
+
+class HttpTests(unittest.TestCase):
+    def test_ssl_context_has_verified_ca_roots_when_python_defaults_are_missing(self):
+        context = build_ssl_context()
+
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
+        self.assertTrue(context.check_hostname)
+        self.assertGreater(len(context.get_ca_certs()), 0)
 
 
 class CatalogTests(unittest.TestCase):

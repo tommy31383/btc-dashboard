@@ -14,6 +14,7 @@ import datetime as dt
 import hashlib
 import json
 import math
+import ssl
 import subprocess
 import time
 import urllib.error
@@ -36,6 +37,20 @@ ATM_DELTA_TOLERANCE = 0.15
 HTTP_RETRIES = 3
 HTTP_TIMEOUT_SECONDS = 90
 MAX_WORKERS = 4
+
+
+def build_ssl_context() -> ssl.SSLContext:
+    """Build a verified CA context even when python.org's CA link is absent."""
+    try:
+        import certifi
+    except ImportError as error:
+        raise RuntimeError(
+            "Python CA roots are unavailable; install certifi rather than disabling TLS"
+        ) from error
+    return ssl.create_default_context(cafile=certifi.where())
+
+
+HTTP_SSL_CONTEXT = build_ssl_context()
 
 
 def utc_iso(timestamp_ms: int) -> str:
@@ -447,7 +462,11 @@ def _request_json(
             headers={"User-Agent": "BTC-PC-option-surface-gate0/1.0"},
         )
         try:
-            with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+            with urllib.request.urlopen(
+                request,
+                timeout=HTTP_TIMEOUT_SECONDS,
+                context=HTTP_SSL_CONTEXT,
+            ) as response:
                 raw = response.read()
                 parsed = json.loads(raw)
                 if parsed.get("error"):
