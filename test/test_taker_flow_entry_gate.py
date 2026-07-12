@@ -153,6 +153,21 @@ class FeatureTests(unittest.TestCase):
         self.assertEqual(hour["barCount"], 12)
         self.assertEqual(hour["endTime"], end_time)
 
+    def test_zero_volume_reference_hour_is_neutral_not_invalid(self):
+        end_time = HOUR_MS
+        bars = []
+        for step in range(12):
+            bar = make_bar(step * FIVE_MINUTES_MS)
+            bar["volume"] = 0.0
+            bar["takerBuyBase"] = 0.0
+            bar["trades"] = 0
+            bars.append(bar)
+
+        hour = aggregate_hour(bars, end_time=end_time)
+
+        self.assertEqual(hour["takerImbalance"], 0.0)
+        self.assertTrue(hour["zeroVolume"])
+
     def test_midrank_percentile_handles_ties_without_looking_forward(self):
         self.assertEqual(midrank_percentile(2.0, [1.0, 2.0, 2.0, 3.0]), 0.5)
 

@@ -227,14 +227,20 @@ def aggregate_hour(bars: Iterable[dict], *, end_time: int) -> dict:
         raise ValueError("hour contains a bar not closed before its boundary")
     volume = sum(float(row["volume"]) for row in rows)
     taker_buy = sum(float(row["takerBuyBase"]) for row in rows)
-    if volume <= 0 or taker_buy < 0 or taker_buy > volume + 1e-9:
+    trades = sum(int(row["trades"]) for row in rows)
+    if volume < 0 or taker_buy < 0 or taker_buy > volume + 1e-9:
         raise ValueError("hour has invalid taker volume")
+    zero_volume = volume == 0
+    if zero_volume and (taker_buy != 0 or trades != 0):
+        raise ValueError("zero-volume hour has non-zero taker activity")
     return {
         "endTime": end_time,
         "barCount": len(rows),
+        "trades": trades,
         "volume": volume,
         "takerBuyBase": taker_buy,
-        "takerImbalance": (2 * taker_buy - volume) / volume,
+        "takerImbalance": 0.0 if zero_volume else (2 * taker_buy - volume) / volume,
+        "zeroVolume": zero_volume,
         "open": float(rows[0]["open"]),
         "close": float(rows[-1]["close"]),
         "maxCloseTime": max(int(row["closeTime"]) for row in rows),
@@ -319,6 +325,8 @@ def _hour_from_map(bars_by_open: dict[int, dict], end_time: int) -> dict:
 def build_event_observation(event: dict, bars_by_open: dict[int, dict]) -> dict:
     signal_time = int(event["signalTime"])
     current = _hour_from_map(bars_by_open, signal_time)
+    if current["zeroVolume"]:
+        raise ValueError("current feature hour has zero volume")
     references = [
         _hour_from_map(bars_by_open, signal_time - offset * HOUR_MS)
         for offset in range(1, REFERENCE_HOURS + 1)
@@ -357,6 +365,7 @@ def build_event_observation(event: dict, bars_by_open: dict[int, dict]) -> dict:
         "split": "OOS" if signal_time >= OOS_START_MS else "IS",
         "flowImbalance1h": current["takerImbalance"],
         "flowRank1h": flow_rank,
+        "zeroVolumeReferenceHours": sum(hour["zeroVolume"] for hour in references),
         "featureMaxCloseTime": feature_max_close,
         "immediateOpen": immediate_open,
         "delayedOpen": delayed_open,
