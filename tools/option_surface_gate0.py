@@ -70,6 +70,26 @@ def canonical_sha256(value: object) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def canonical_trade_rows_sha256(decisions: Iterable[dict]) -> str:
+    projected = []
+    for decision in decisions:
+        decision_time = decision.get("decisionTime")
+        trades = decision.get("trades")
+        if not isinstance(decision_time, int) or not isinstance(trades, list):
+            raise ValueError("trade source decision has invalid shape")
+        ordered_trades = sorted(
+            trades,
+            key=lambda row: (
+                row.get("timestamp", -1),
+                row.get("instrumentName", ""),
+                json.dumps(row, sort_keys=True, separators=(",", ":")),
+            ),
+        )
+        projected.append({"decisionTime": decision_time, "trades": ordered_trades})
+    projected.sort(key=lambda item: item["decisionTime"])
+    return canonical_sha256(projected)
+
+
 def build_decision_requests(episodes: Iterable[dict]) -> list[dict]:
     grouped: dict[int, dict] = {}
     for episode in episodes:
@@ -722,6 +742,8 @@ def _render_report(result: dict) -> str:
             f"- H01 episode source SHA-256: `{result['provenance']['episodeSourceSha256']}`.",
             f"- Canonical historical catalog SHA-256: `{result['provenance']['catalogCanonicalSha256']}`.",
             f"- Raw trade source SHA-256: `{result['provenance']['tradeSourceSha256']}`.",
+            f"- Canonical trade rows SHA-256: `{result['provenance']['canonicalTradeRowsSha256']}`.",
+            f"- Relevant historical catalog SHA-256: `{result['provenance']['relevantCatalogCanonicalSha256']}`.",
             "",
         ]
     )
@@ -796,6 +818,9 @@ def run(args: argparse.Namespace) -> dict:
         "decisions": source_decisions,
         "snapshotEndpointProbes": probes,
     }
+    trade_source["canonicalTradeRowsSha256"] = canonical_trade_rows_sha256(
+        source_decisions
+    )
     _write_json(args.source_output, trade_source)
 
     gate = evaluate_gate(
@@ -867,6 +892,10 @@ def run(args: argparse.Namespace) -> dict:
             "catalogCanonicalSha256": catalog_metadata["canonicalSha256"],
             "tradeSourcePath": str(args.source_output.resolve()),
             "tradeSourceSha256": sha256_file(args.source_output),
+            "canonicalTradeRowsSha256": trade_source["canonicalTradeRowsSha256"],
+            "relevantCatalogCanonicalSha256": trade_source["catalog"][
+                "relevantCanonicalSha256"
+            ],
         },
     }
     _write_json(args.output, result)

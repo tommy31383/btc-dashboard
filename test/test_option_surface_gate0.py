@@ -13,6 +13,7 @@ from option_surface_gate0 import (  # noqa: E402
     absolute_black_scholes_delta,
     active_catalog_at,
     build_ssl_context,
+    canonical_trade_rows_sha256,
     build_decision_requests,
     evaluate_gate,
     has_delta_bracket,
@@ -198,6 +199,32 @@ class ProvenanceTests(unittest.TestCase):
         )
 
         self.assertEqual(unexpected, [" M tools/option_surface_gate0.py"])
+
+    def test_canonical_trade_hash_ignores_fetch_envelope_but_detects_row_changes(self):
+        first = [
+            {
+                "decisionTime": 1_000,
+                "fetch": {"rawPageSha256": ["runtime-a"]},
+                "trades": [{"instrumentName": "BTC-X-C", "timestamp": 999, "iv": 50}],
+            }
+        ]
+        second = [
+            {
+                "decisionTime": 1_000,
+                "fetch": {"rawPageSha256": ["runtime-b"]},
+                "trades": [{"instrumentName": "BTC-X-C", "timestamp": 999, "iv": 50}],
+            }
+        ]
+
+        self.assertEqual(
+            canonical_trade_rows_sha256(first),
+            canonical_trade_rows_sha256(second),
+        )
+        second[0]["trades"][0]["iv"] = 51
+        self.assertNotEqual(
+            canonical_trade_rows_sha256(first),
+            canonical_trade_rows_sha256(second),
+        )
 
 
 class GateTests(unittest.TestCase):
