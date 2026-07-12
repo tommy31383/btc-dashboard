@@ -13,6 +13,14 @@ gate. The reference is amended to **120 hours**, the longest whole-day window
 that is complete before the first covered signal. No outcome values were read,
 and every association threshold below remains unchanged.
 
+The first Data-Gate-only execution then exposed one official exchange-maintenance
+hour ending `2024-10-28T21:00Z`: all 12 bars are present and checksum-valid, but
+volume, taker-buy volume, and trade count are all zero. Association evaluation
+did not run. The causal convention is amended so a complete zero-activity hour
+has `takerImbalance = 0` when it occurs in the reference window. A zero-volume
+current signal hour remains unusable. This changes no event, outcome, threshold,
+or split and prevents a real trading halt from being mislabeled as missing data.
+
 ## Question
 
 Do unusually aggressive taker buys immediately before an accepted H01 breakout
@@ -74,6 +82,9 @@ For each UTC-aligned hour:
 ```text
 takerImbalance = (2 * takerBuyBaseVolume - totalBaseVolume) / totalBaseVolume
 ```
+
+For a checksum-valid hour where total volume, taker-buy volume, and trade count
+are all zero, define `takerImbalance = 0` as specified in the amendment above.
 
 At event time `T`:
 
