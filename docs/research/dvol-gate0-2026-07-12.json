@@ -1,0 +1,358 @@
+{
+  "contract": {
+    "added_features": [
+      "dvol_level",
+      "dvol_chg_24h",
+      "dvol_vov_5d",
+      "vrp_proxy"
+    ],
+    "baseline_features": [
+      "atr_pct14",
+      "rv_1d",
+      "rv_7d",
+      "rv_30d"
+    ],
+    "feature_definitions": {
+      "dvol_chg_24h": "DVOL level minus its value 24h earlier",
+      "dvol_level": "last closed Deribit BTC DVOL 1h close",
+      "dvol_vov_5d": "5d rolling population std of 24h DVOL changes",
+      "vrp_proxy": "(DVOL/100)^2 - (realized_vol_30d/100)^2"
+    },
+    "fit_policy": "single IS fit; coefficients and IS scaling frozen for OOS",
+    "gate_pass_requires": "primary target plus at least one secondary target",
+    "oos_start_utc": "2023-07-01T00:00:00+00:00",
+    "parameter_search": false,
+    "pnl_evaluated": false,
+    "target_pass_requires": {
+      "augmented_condition_number_max": 100000000.0,
+      "calendar_month_bootstrap_one_sided_p_max": 0.1,
+      "incremental_oos_r2_min": 0.02,
+      "mae_improvement_gt": 0,
+      "newey_west_one_sided_p_max": 0.1,
+      "oos_unique_days_min": 300
+    }
+  },
+  "data": {
+    "btc_4h_bars": 16285,
+    "btc_first_closed_bar_utc": "2019-01-01T04:00:00+00:00",
+    "btc_last_closed_bar_utc": "2026-06-08T00:00:00+00:00",
+    "btc_sha256": "af79848a576de68e481e3d09d7808d88ad597fb31d28a915bbb6a301df98f586",
+    "btc_source": "/Users/lap16116/BTC_PC/btc-dashboard/.cache/binance-5m-7y.json",
+    "complete_feature_rows": 11377,
+    "dvol_1h_candles": 45649,
+    "dvol_cache": "/Users/lap16116/BTC_PC/btc-dashboard/.cache/deribit-btc-dvol-1h.json",
+    "dvol_cache_sha256": "8d30d42c1c4f22b0cfa93de72287c57424d02c8ffc3ffada9449bff0afc7e38d",
+    "dvol_first_close_utc": "2021-03-24T01:00:00+00:00",
+    "dvol_first_open_utc": "2021-03-24T00:00:00+00:00",
+    "dvol_last_close_utc": "2026-06-08T01:00:00+00:00",
+    "dvol_source": "https://www.deribit.com/api/v2/public/get_volatility_index_data",
+    "max_dvol_age_hours_complete_rows": 0.0
+  },
+  "gate_pass": true,
+  "generated_at_utc": "2026-07-12T15:22:15.839780+00:00",
+  "primary_target": "downside_semivol_3d",
+  "provenance": {
+    "bootstrap_iterations": 5000,
+    "bootstrap_seed": 20260712,
+    "commit": "c88db394add4745fbd93634e8ef29cb3f26f8932",
+    "dirty": false,
+    "evaluator": "/Users/lap16116/BTC_PC/btc-dashboard/tools/dvol_gate0.py",
+    "evaluator_sha256": "1922afd4a91361e429efbeb129e7b9d4fca7db318ff229baaddcbe32cd13094f",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "python": "Python 3.13.12",
+    "scipy": "1.17.1"
+  },
+  "secondary_targets_passing": [
+    "rv_fwd_1d",
+    "rv_fwd_3d"
+  ],
+  "study": "BTC DVOL incremental-information Gate-0",
+  "targets": {
+    "downside_semivol_3d": {
+      "augmented_condition_number": 18.718910593905616,
+      "augmented_is": {
+        "mae": 15.978780806107057,
+        "mse": 473.63720190985947,
+        "r2": 0.2733936102270993
+      },
+      "augmented_oos": {
+        "mae": 11.30295890335278,
+        "mse": 228.214583885656,
+        "r2": 0.11449597592835725
+      },
+      "baseline_condition_number": 4.686756436117554,
+      "baseline_is": {
+        "mae": 16.06232342114963,
+        "mse": 481.09307691443894,
+        "r2": 0.26195555933533987
+      },
+      "baseline_oos": {
+        "mae": 11.836073755389451,
+        "mse": 236.2549885230958,
+        "r2": 0.08329809829760715
+      },
+      "calendar_month_bootstrap": {
+        "ci95_high": 16.43306310477347,
+        "ci95_low": -0.6520891346091897,
+        "iterations": 5000,
+        "mean": 8.040404637439787,
+        "months": 36,
+        "p_one_sided": 0.03459308138372325
+      },
+      "horizon_bars_4h": 18,
+      "incremental_r2_vs_baseline": 0.03403274016647395,
+      "is_last_decision_utc": "2023-06-28T00:00:00+00:00",
+      "is_last_target_end_utc": "2023-07-01T00:00:00+00:00",
+      "is_rows": 4921,
+      "mae_improvement_fraction": 0.04504152838638087,
+      "newey_west_dm": {
+        "mean_loss_improvement": 8.040404637439787,
+        "p_one_sided": 0.023408969418105087,
+        "stat": 1.9879435019133698
+      },
+      "oos_first_decision_utc": "2023-07-01T00:00:00+00:00",
+      "oos_rows": 6421,
+      "oos_unique_days": 1071,
+      "standardized_dvol_coefficients": {
+        "dvol_chg_24h": 1.9000341052418237,
+        "dvol_level": 9.329798131104608,
+        "dvol_vov_5d": -0.2002982857389498,
+        "vrp_proxy": -4.545099741766624
+      },
+      "target_pass": true,
+      "year_slices": {
+        "2023": {
+          "incremental_r2_vs_baseline": 0.11336992302352966,
+          "n": 1104
+        },
+        "2024": {
+          "incremental_r2_vs_baseline": 0.031686482357669576,
+          "n": 2196
+        },
+        "2025": {
+          "incremental_r2_vs_baseline": 0.02092565083334963,
+          "n": 2190
+        },
+        "2026": {
+          "incremental_r2_vs_baseline": -0.004693820367068113,
+          "n": 931
+        }
+      }
+    },
+    "mae_long_5d_pct": {
+      "augmented_condition_number": 18.6901456125381,
+      "augmented_is": {
+        "mae": 3.981123510543761,
+        "mse": 31.90103478946736,
+        "r2": 0.0955208266167098
+      },
+      "augmented_oos": {
+        "mae": 2.9576265610674763,
+        "mse": 15.39869990658196,
+        "r2": -0.013332806878899817
+      },
+      "baseline_condition_number": 4.688761022170481,
+      "baseline_is": {
+        "mae": 3.9857544834814136,
+        "mse": 32.192635308093884,
+        "r2": 0.0872531764358907
+      },
+      "baseline_oos": {
+        "mae": 3.0012488359316314,
+        "mse": 15.450647231605329,
+        "r2": -0.01675127265816223
+      },
+      "calendar_month_bootstrap": {
+        "ci95_high": 0.4058574161695353,
+        "ci95_low": -0.3086938305200224,
+        "iterations": 5000,
+        "mean": 0.05194732502336705,
+        "months": 36,
+        "p_one_sided": 0.39392121575684863
+      },
+      "horizon_bars_4h": 30,
+      "incremental_r2_vs_baseline": 0.00336214556223291,
+      "is_last_decision_utc": "2023-06-26T00:00:00+00:00",
+      "is_last_target_end_utc": "2023-07-01T00:00:00+00:00",
+      "is_rows": 4909,
+      "mae_improvement_fraction": 0.014534707799599755,
+      "newey_west_dm": {
+        "mean_loss_improvement": 0.05194732502336705,
+        "p_one_sided": 0.37102572758290087,
+        "stat": 0.3291379045875921
+      },
+      "oos_first_decision_utc": "2023-07-01T00:00:00+00:00",
+      "oos_rows": 6409,
+      "oos_unique_days": 1069,
+      "standardized_dvol_coefficients": {
+        "dvol_chg_24h": 0.3148701945476985,
+        "dvol_level": 2.4218828346740686,
+        "dvol_vov_5d": -0.25747116853691826,
+        "vrp_proxy": -1.6741831024967038
+      },
+      "target_pass": false,
+      "year_slices": {
+        "2023": {
+          "incremental_r2_vs_baseline": 0.006050289376684059,
+          "n": 1104
+        },
+        "2024": {
+          "incremental_r2_vs_baseline": -0.02571709845736203,
+          "n": 2196
+        },
+        "2025": {
+          "incremental_r2_vs_baseline": 0.029184616755474013,
+          "n": 2190
+        },
+        "2026": {
+          "incremental_r2_vs_baseline": 0.017354141044459648,
+          "n": 919
+        }
+      }
+    },
+    "rv_fwd_1d": {
+      "augmented_condition_number": 18.744721670873112,
+      "augmented_is": {
+        "mae": 21.650108783998757,
+        "mse": 887.3241441157712,
+        "r2": 0.31221545829989794
+      },
+      "augmented_oos": {
+        "mae": 16.1299778645698,
+        "mse": 494.00466346062854,
+        "r2": 0.1676635088783377
+      },
+      "baseline_condition_number": 4.691482820093557,
+      "baseline_is": {
+        "mae": 22.09842138037622,
+        "mse": 915.9907133619079,
+        "r2": 0.2899953673423641
+      },
+      "baseline_oos": {
+        "mae": 17.193398806009704,
+        "mse": 510.216106400872,
+        "r2": 0.14034924136034155
+      },
+      "calendar_month_bootstrap": {
+        "ci95_high": 28.36970890261822,
+        "ci95_low": 4.242836646019483,
+        "iterations": 5000,
+        "mean": 16.211442940243387,
+        "months": 36,
+        "p_one_sided": 0.0033993201359728054
+      },
+      "horizon_bars_4h": 6,
+      "incremental_r2_vs_baseline": 0.031773679303464086,
+      "is_last_decision_utc": "2023-06-30T00:00:00+00:00",
+      "is_last_target_end_utc": "2023-07-01T00:00:00+00:00",
+      "is_rows": 4933,
+      "mae_improvement_fraction": 0.06185053655989192,
+      "newey_west_dm": {
+        "mean_loss_improvement": 16.211442940243387,
+        "p_one_sided": 0.009030799283017128,
+        "stat": 2.3643528985436086
+      },
+      "oos_first_decision_utc": "2023-07-01T00:00:00+00:00",
+      "oos_rows": 6433,
+      "oos_unique_days": 1073,
+      "standardized_dvol_coefficients": {
+        "dvol_chg_24h": 3.229002677359668,
+        "dvol_level": 10.26315039967488,
+        "dvol_vov_5d": 0.7026072667911196,
+        "vrp_proxy": -2.161629706886471
+      },
+      "target_pass": true,
+      "year_slices": {
+        "2023": {
+          "incremental_r2_vs_baseline": 0.12787315257097176,
+          "n": 1104
+        },
+        "2024": {
+          "incremental_r2_vs_baseline": 0.02167595844440362,
+          "n": 2196
+        },
+        "2025": {
+          "incremental_r2_vs_baseline": 0.02090358222052291,
+          "n": 2190
+        },
+        "2026": {
+          "incremental_r2_vs_baseline": -0.0232409415678847,
+          "n": 943
+        }
+      }
+    },
+    "rv_fwd_3d": {
+      "augmented_condition_number": 18.718910593905616,
+      "augmented_is": {
+        "mae": 16.673637655341118,
+        "mse": 508.80489508150606,
+        "r2": 0.4149708574687455
+      },
+      "augmented_oos": {
+        "mae": 12.323203633685686,
+        "mse": 276.8639172875979,
+        "r2": 0.22728262898850138
+      },
+      "baseline_condition_number": 4.686756436117554,
+      "baseline_is": {
+        "mae": 17.340250841650455,
+        "mse": 536.5406499572224,
+        "r2": 0.3830799990095357
+      },
+      "baseline_oos": {
+        "mae": 13.552721484679001,
+        "mse": 307.80851303319093,
+        "r2": 0.14091736006575561
+      },
+      "calendar_month_bootstrap": {
+        "ci95_high": 42.941859389016074,
+        "ci95_low": 18.639139835100558,
+        "iterations": 5000,
+        "mean": 30.944595745592988,
+        "months": 36,
+        "p_one_sided": 0.0001999600079984003
+      },
+      "horizon_bars_4h": 18,
+      "incremental_r2_vs_baseline": 0.10053196853024093,
+      "is_last_decision_utc": "2023-06-28T00:00:00+00:00",
+      "is_last_target_end_utc": "2023-07-01T00:00:00+00:00",
+      "is_rows": 4921,
+      "mae_improvement_fraction": 0.09072110368262587,
+      "newey_west_dm": {
+        "mean_loss_improvement": 30.944595745592988,
+        "p_one_sided": 3.0304614347977468e-06,
+        "stat": 4.524252859357207
+      },
+      "oos_first_decision_utc": "2023-07-01T00:00:00+00:00",
+      "oos_rows": 6421,
+      "oos_unique_days": 1071,
+      "standardized_dvol_coefficients": {
+        "dvol_chg_24h": 4.315463328014875,
+        "dvol_level": 10.408550017550626,
+        "dvol_vov_5d": 0.0276088633896759,
+        "vrp_proxy": -3.971657388737545
+      },
+      "target_pass": true,
+      "year_slices": {
+        "2023": {
+          "incremental_r2_vs_baseline": 0.16784901518034234,
+          "n": 1104
+        },
+        "2024": {
+          "incremental_r2_vs_baseline": 0.0761846891975072,
+          "n": 2196
+        },
+        "2025": {
+          "incremental_r2_vs_baseline": 0.09404894107947648,
+          "n": 2190
+        },
+        "2026": {
+          "incremental_r2_vs_baseline": 0.10873179067028316,
+          "n": 931
+        }
+      }
+    }
+  },
+  "verdict": "PASS_TO_H05_GATE1"
+}
