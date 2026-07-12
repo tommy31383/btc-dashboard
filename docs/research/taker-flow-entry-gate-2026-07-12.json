@@ -1,0 +1,125 @@
+{
+  "associationGate": {
+    "gates": {
+      "bothSetupsHighFlowNonNegative": true,
+      "dropBestHighFlowEventMeanPositive": true,
+      "isRhoPositive": false,
+      "isSampleAtLeast30": true,
+      "oosHighFlowMedianPositive": true,
+      "oosRhoAtLeast020": false,
+      "oosRhoCi90AboveZero": false,
+      "oosSampleAtLeast20": true,
+      "removeBestHighFlowMonthMeanPositive": true
+    },
+    "highFlow": {
+      "bestMonth": "2025-01",
+      "dropBestEventMeanBps": 16.707279540152797,
+      "meanDelayAdvantageBps": 29.401623703836,
+      "medianDelayAdvantageBps": 17.454171317284683,
+      "n": 7,
+      "removeBestMonthMeanBps": 16.707279540152797,
+      "setupMeansBps": {
+        "S13": 16.55790118472642,
+        "S14": 22.716550937748362
+      },
+      "threshold": 0.75
+    },
+    "is": {
+      "n": 36,
+      "rho": -0.03566370808067926
+    },
+    "oos": {
+      "bootstrap": {
+        "ci90High": 0.5176067051592477,
+        "ci90Low": -0.27213668980806255,
+        "iterations": 5000,
+        "months": 11,
+        "pOneSided": 0.29374125174965005,
+        "validIterations": 5000
+      },
+      "n": 21,
+      "rho": 0.12077922077922078
+    },
+    "verdict": "KILL_NO_TAKER_FLOW_TIMING_EDGE"
+  },
+  "dataGate": {
+    "episodeCoverage": 0.9473684210526315,
+    "eventCoverage": 0.9344262295081968,
+    "gates": {
+      "allCoveredEntryPricesMatch": true,
+      "allCoveredWindowsComplete": true,
+      "allMonthsChecksumVerified": true,
+      "episodeCoverageAtLeast90pct": true,
+      "eventCoverageAtLeast90pct": true,
+      "noDuplicateTimestamps": true
+    },
+    "verdict": "PASS_TAKER_FLOW_DATA_GATE0"
+  },
+  "diagnostics": {
+    "diagnosticsCanRescueGate": false,
+    "oosFlowRankVsForward4hRho": -0.10259740259740259,
+    "oosFlowRankVsMae1hAtrRho": 0.2701298701298701
+  },
+  "generatedAtUtc": "2026-07-12T16:29:32.770479+00:00",
+  "interpretation": "The public archive and causal alignment passed, but real taker flow did not pass the frozen OOS timing gate. Do not delay H01 entries from this feature and do not tune another threshold.",
+  "postGateAudit": {
+    "canRescueGate": false,
+    "classification": "POST_GATE_DIAGNOSTIC",
+    "isHighFlow": {
+      "meanDelayAdvantageBps": -25.613688882127683,
+      "medianDelayAdvantageBps": -1.2563017566365478,
+      "n": 10,
+      "positive": 5
+    },
+    "oosHighFlow": {
+      "meanDelayAdvantageBps": 29.401623703836005,
+      "medianDelayAdvantageBps": 17.454171317284683,
+      "n": 7,
+      "positive": 6
+    },
+    "verdict": "REGIME_INVERSION_DOES_NOT_GENERALIZE"
+  },
+  "population": {
+    "acceptedPortfolioEntries": 96,
+    "archiveCoveredEpisodes": 90,
+    "archiveCoveredEvents": 57,
+    "eligibleEpisodes": 95,
+    "eligibleEvents": 61,
+    "sourceRows": 114,
+    "unavailableEpisodes": 5,
+    "unavailableEvents": 4
+  },
+  "provenance": {
+    "archiveManifestCanonicalSha256": "156aa1d62a285e43bf1991402433891b92f867eba7d22181eff564ec914e4147",
+    "dirty": false,
+    "evaluatorPath": "/Users/lap16116/BTC_PC/btc-dashboard/tools/taker_flow_entry_gate.py",
+    "evaluatorSha256": "e4093621269e9c2712a57149d39c6ca8ad0258c457431d545ab247924d5ea605",
+    "gitCommit": "156be28b1acde393b4bb730f475678d3a3f97bd4",
+    "h01SourcePath": "/Users/lap16116/BTC_PC/btc-dashboard/docs/research/dvol-h05-gate1-source-2026-07-12.json",
+    "h01SourceSha256": "30e3cd347ba78287240427f08da65fe08b90c29e3d35755d33d5fda90d3c79a0",
+    "ignoredGeneratedPaths": [
+      "docs/research/taker-flow-entry-gate-2026-07-12.json",
+      "docs/research/taker-flow-entry-gate-source-2026-07-12.json",
+      "docs/taker-flow-entry-gate-2026-07-12.md"
+    ],
+    "observationsCanonicalSha256": "e2e42165d7bc78e740bccfae266488215c5439d991e9fa06c3e5ed1aed6ce8ca",
+    "preregistrationPath": "/Users/lap16116/BTC_PC/btc-dashboard/docs/prereg-taker-flow-entry-gate-2026-07-12.md",
+    "preregistrationSha256": "e77979ca6c7f2688cacfea4ea593212b356b439bf1867c659c6696175babab2a",
+    "sourceOutputPath": "/Users/lap16116/BTC_PC/btc-dashboard/docs/research/taker-flow-entry-gate-source-2026-07-12.json",
+    "sourceOutputSha256": "6319fb2ab75e192fa0ae5a36fb3fd3754551dda5bbff56e2159e26aca27579f6",
+    "unexpectedStatus": []
+  },
+  "reproduction": {
+    "archiveManifestCanonicalSha256": "156aa1d62a285e43bf1991402433891b92f867eba7d22181eff564ec914e4147",
+    "independentExecutions": 2,
+    "observationsCanonicalSha256": "e2e42165d7bc78e740bccfae266488215c5439d991e9fa06c3e5ed1aed6ce8ca",
+    "verdictGatesAndStatisticsStable": true
+  },
+  "review": {
+    "claudeApprovalClaimed": false,
+    "claudeStatus": "UNAVAILABLE_DAILY_QUOTA_EXHAUSTED_2026-07-12",
+    "liveAuthorization": false
+  },
+  "study": "BTC_H01_TRUE_TAKER_FLOW_ENTRY_TIMING",
+  "verdict": "KILL_NO_TAKER_FLOW_TIMING_EDGE"
+}
