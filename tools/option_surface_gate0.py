@@ -192,6 +192,7 @@ def _partition_trades(
         "futureTradeCount": 0,
         "staleTradeCount": 0,
         "catalogTemporalViolationCount": 0,
+        "expiredAtDecisionCount": 0,
         "unknownInstrumentCount": 0,
         "invalidTradeCount": 0,
     }
@@ -218,9 +219,11 @@ def _partition_trades(
             or not isinstance(expiry, int)
             or creation > timestamp
             or timestamp >= expiry
-            or decision_time >= expiry
         ):
             counts["catalogTemporalViolationCount"] += 1
+            continue
+        if decision_time >= expiry:
+            counts["expiredAtDecisionCount"] += 1
             continue
         accepted.append((trade, metadata))
     return accepted, counts
@@ -239,7 +242,16 @@ def summarize_trade_proxy(
     )
     active = active_catalog_at(catalog_list, decision_time)
     accepted_names = {trade["instrument_name"] for trade, _ in accepted}
-    causal_clean = all(count == 0 for count in counts.values())
+    causal_clean = all(
+        counts[name] == 0
+        for name in (
+            "futureTradeCount",
+            "staleTradeCount",
+            "catalogTemporalViolationCount",
+            "unknownInstrumentCount",
+            "invalidTradeCount",
+        )
+    )
     return {
         "rawTradeCount": len(trade_list),
         "acceptedTradeCount": len(accepted),
@@ -614,20 +626,48 @@ def probe_snapshot_endpoints(sample_trade: dict, decision_time: int) -> dict:
     return {"historyHost": compact(history), "mainHost": compact(main)}
 
 
-def _git_provenance(repo: Path) -> dict:
+def unexpected_git_status_entries(
+    status: str, *, ignored_paths: set[str]
+) -> list[str]:
+    unexpected = []
+    for line in status.splitlines():
+        if len(line) < 4:
+            unexpected.append(line)
+            continue
+        path = line[3:]
+        if path in ignored_paths:
+            continue
+        unexpected.append(line)
+    return unexpected
+
+
+def _git_provenance(repo: Path, *, generated_paths: Iterable[Path] = ()) -> dict:
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=repo, check=True, capture_output=True, text=True
     ).stdout.strip()
-    dirty = bool(
-        subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=repo,
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
+    ignored_paths = set()
+    for path in generated_paths:
+        try:
+            ignored_paths.add(str(path.resolve().relative_to(repo.resolve())))
+        except ValueError:
+            continue
+    status = subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=all"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    unexpected = unexpected_git_status_entries(
+        status,
+        ignored_paths=ignored_paths,
     )
-    return {"gitCommit": commit, "dirty": dirty}
+    return {
+        "gitCommit": commit,
+        "dirty": bool(unexpected),
+        "ignoredGeneratedPaths": sorted(ignored_paths),
+        "unexpectedStatus": unexpected,
+    }
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -816,7 +856,10 @@ def run(args: argparse.Namespace) -> dict:
         "decisionSummaries": summaries,
         "nextRoute": "PAID_TIMESTAMPED_QUOTE_OR_MARK_ARCHIVE_REQUIRED",
         "provenance": {
-            **_git_provenance(repo),
+            **_git_provenance(
+                repo,
+                generated_paths=(args.source_output, args.output, args.report),
+            ),
             "evaluatorPath": str(Path(__file__).resolve()),
             "evaluatorSha256": sha256_file(Path(__file__)),
             "episodeSourcePath": str(args.episodes.resolve()),

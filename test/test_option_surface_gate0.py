@@ -18,6 +18,7 @@ from option_surface_gate0 import (  # noqa: E402
     has_delta_bracket,
     nearest_target_expiry,
     summarize_trade_proxy,
+    unexpected_git_status_entries,
 )
 
 
@@ -169,6 +170,34 @@ class SurfaceTests(unittest.TestCase):
         self.assertEqual(summary["catalogTemporalViolationCount"], 1)
         self.assertEqual(summary["unknownInstrumentCount"], 1)
         self.assertFalse(summary["causalWindowClean"])
+
+    def test_option_expiring_at_decision_is_unusable_but_not_future_leakage(self):
+        decision = 10_000
+        catalog = [instrument("EXPIRING", creation=1_000, expiry=decision)]
+
+        summary = summarize_trade_proxy(
+            decision_time=decision,
+            trades=[trade("EXPIRING", timestamp=decision - 1)],
+            catalog=catalog,
+            lookback_ms=1_000,
+        )
+
+        self.assertEqual(summary["acceptedTradeCount"], 0)
+        self.assertEqual(summary["expiredAtDecisionCount"], 1)
+        self.assertEqual(summary["catalogTemporalViolationCount"], 0)
+        self.assertTrue(summary["causalWindowClean"])
+
+
+class ProvenanceTests(unittest.TestCase):
+    def test_declared_generated_outputs_do_not_mark_source_worktree_dirty(self):
+        status = "?? docs/result.json\n M tools/option_surface_gate0.py\n"
+
+        unexpected = unexpected_git_status_entries(
+            status,
+            ignored_paths={"docs/result.json"},
+        )
+
+        self.assertEqual(unexpected, [" M tools/option_surface_gate0.py"])
 
 
 class GateTests(unittest.TestCase):
