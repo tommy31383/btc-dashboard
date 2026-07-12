@@ -2,6 +2,17 @@
 
 Status: **FROZEN BEFORE OUTCOME EVALUATION**
 
+## Pre-Outcome Amendment
+
+The original reference window was 168 hours. A data-boundary check performed
+before any feature/outcome evaluation found that the Futures archive begins at
+`2020-01-01`, while the first covered signal is `2020-01-06T04:00Z`. A 168-hour
+window would therefore discard five otherwise-covered January episodes and
+reduce episode coverage to `85/95 = 89.47%`, below the already-frozen 90% data
+gate. The reference is amended to **120 hours**, the longest whole-day window
+that is complete before the first covered signal. No outcome values were read,
+and every association threshold below remains unchanged.
+
 ## Question
 
 Do unusually aggressive taker buys immediately before an accepted H01 breakout
@@ -48,7 +59,7 @@ Data Gate-0 passes only if:
 
 1. all required monthly files and checksums verify;
 2. at least 90% of source episodes and unique events are usable;
-3. each usable event has 169 complete closed hourly blocks through the current
+3. each usable event has 121 complete closed hourly blocks through the current
    hour and the exact delayed-fill bar;
 4. all covered immediate opens match the frozen H01 source;
 5. there are no duplicate 5m timestamps or future bars in any feature window.
@@ -67,9 +78,9 @@ takerImbalance = (2 * takerBuyBaseVolume - totalBaseVolume) / totalBaseVolume
 At event time `T`:
 
 - current hour: `[T-1h, T)`;
-- reference hours: the 168 complete hours immediately before the current hour;
+- reference hours: the 120 complete hours immediately before the current hour;
 - `flowRank1h`: mid-rank percentile of current-hour `takerImbalance` among the
-  168 reference values.
+  120 reference values.
 
 No other feature enters the acceptance gate. Price return, 4h imbalance,
 absorption, CVD, and order-count diagnostics may be reported but cannot rescue
