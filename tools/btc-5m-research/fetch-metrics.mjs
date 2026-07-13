@@ -58,7 +58,12 @@ async function loadDate(date, temporary) {
   writeFileSync(zipPath, zip);
   const csv = execFileSync("unzip", ["-p", zipPath], { maxBuffer: 2 * 1024 * 1024 })
     .toString("utf8");
-  const rows = parseMetricsCsv(csv);
+  let rows;
+  try {
+    rows = parseMetricsCsv(csv);
+  } catch (error) {
+    throw new Error(`METRICS_ARCHIVE_INVALID:${date}:${error?.message}`, { cause: error });
+  }
   return {
     rows,
     manifest: {

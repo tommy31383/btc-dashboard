@@ -1,5 +1,4 @@
 const DAY_MS = 24 * 60 * 60_000;
-const FIVE_MINUTES_MS = 5 * 60_000;
 const HEADER = [
   "create_time",
   "symbol",
@@ -11,25 +10,33 @@ const HEADER = [
   "sum_taker_long_short_vol_ratio",
 ].join(",");
 
+function parseMetric(field, index) {
+  const normalized = field.replace(/^"|"$/g, "");
+  if (normalized === "") return null;
+  const value = Number(normalized);
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(`METRICS_ROW_VALUE_INVALID:${index}`);
+  }
+  return value === 0 ? null : value;
+}
+
 export function parseMetricsCsv(text) {
   if (typeof text !== "string") throw new Error("METRICS_CSV_INVALID");
   const lines = text.trim().split(/\r?\n/);
   if (lines.shift() !== HEADER) throw new Error("METRICS_HEADER_INVALID");
-  return Object.freeze(lines.map((line, index) => {
+  const rows = [];
+  const byTime = new Map();
+  lines.forEach((line, index) => {
     const fields = line.split(",");
     if (fields.length !== 8 || fields[1] !== "BTCUSDT") {
       throw new Error(`METRICS_ROW_SCHEMA_INVALID:${index}`);
     }
     const time = Date.parse(`${fields[0].replace(" ", "T")}Z`);
-    const values = fields.slice(2).map(Number);
-    if (
-      !Number.isSafeInteger(time) ||
-      time % FIVE_MINUTES_MS !== 0 ||
-      values.some((value) => !Number.isFinite(value) || value <= 0)
-    ) {
+    const values = fields.slice(2).map((field) => parseMetric(field, index));
+    if (!Number.isSafeInteger(time)) {
       throw new Error(`METRICS_ROW_VALUE_INVALID:${index}`);
     }
-    return Object.freeze({
+    const row = Object.freeze({
       time,
       openInterest: values[0],
       openInterestValue: values[1],
@@ -38,7 +45,17 @@ export function parseMetricsCsv(text) {
       accountRatio: values[4],
       takerRatio: values[5],
     });
-  }));
+    const prior = byTime.get(time);
+    if (prior) {
+      if (JSON.stringify(prior) !== JSON.stringify(row)) {
+        throw new Error(`METRICS_DUPLICATE_CONFLICT:${time}`);
+      }
+      return;
+    }
+    byTime.set(time, row);
+    rows.push(row);
+  });
+  return Object.freeze(rows);
 }
 
 function utcDate(time) {
