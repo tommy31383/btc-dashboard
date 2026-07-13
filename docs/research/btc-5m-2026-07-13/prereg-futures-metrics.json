@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "mechanismId": "h01-5m-futures-metrics-state-diagnosis",
+  "status": "FROZEN_BEFORE_DATA_DOWNLOAD_OR_OUTCOME",
+  "question": "Do causal Binance futures positioning states identify H01 entries where immediate execution is fragile and a minimal micro-limit helps?",
+  "source": {
+    "owner": "Binance public data archive",
+    "urlPattern": "https://data.binance.vision/data/futures/um/daily/metrics/BTCUSDT/BTCUSDT-metrics-YYYY-MM-DD.zip",
+    "checksum": "validate every archive against its adjacent .CHECKSUM file",
+    "cadence": "5m",
+    "coverageNeeded": "eight UTC days ending on every eligible H01 signal date"
+  },
+  "population": {
+    "symbol": "BTCUSDT perpetual only",
+    "eligibleSignals": "H01 S12/S13/S14 signals on or after 2020-09-01 with complete prior seven-day metrics",
+    "discovery": "eligible signals through 2023-12-31",
+    "oos": "eligible signals from 2024-01-01",
+    "minimumFlaggedPerSplit": 8
+  },
+  "causality": {
+    "decisionTime": "signalTime",
+    "lastAllowedMetric": "signalTime minus 5 minutes",
+    "history": "only metrics timestamps at or before lastAllowedMetric",
+    "closedBars": true
+  },
+  "features": {
+    "priceChange1h": "BTC 5m close at t-5m divided by close at t-65m minus one",
+    "oiChange1h": "sum_open_interest at t-5m divided by t-65m minus one",
+    "takerRatio1h": "geometric mean of sum_taker_long_short_vol_ratio over the last 12 closed snapshots",
+    "accountLongShort": "count_long_short_ratio at t-5m",
+    "topPositionLongShort": "sum_toptrader_long_short_ratio at t-5m",
+    "rollingRank": "strict percentile rank against the previous seven days ending t-10m"
+  },
+  "states": {
+    "SHORT_COVERING_RALLY": "priceChange1h > 0 and oiChange1h < 0",
+    "BUY_ABSORPTION": "takerRatio1h > 1 and priceChange1h <= 0",
+    "CROWDED_LONG": "oiChange1h > 0 and accountLongShort rollingRank >= 0.75 and topPositionLongShort rollingRank >= 0.75"
+  },
+  "executionComparison": {
+    "baseline": "A MARKET_NOW",
+    "flaggedAction": "M70_O025_T15 only on flagged signals; A otherwise",
+    "entryInvariant": "retain every eligible signal and total target weight 1",
+    "costsAndExit": "same Run3 production oracle, funding, fee/slippage and four scenarios as frozen earlier"
+  },
+  "diagnosticGate": [
+    "state has at least 8 flagged signals in both discovery and OOS",
+    "adaptive policy net delta versus A is positive in discovery and OOS",
+    "drop-top-20% delta is positive in discovery and OOS",
+    "drawdown is no worse than A in discovery and OOS",
+    "2024 and 2025 net deltas are each non-negative",
+    "stress and alternative intrabar OOS net deltas are positive"
+  ],
+  "interpretation": "Exploratory because aggregate micro-ladder OOS was inspected before this conditional hypothesis. A pass may justify a new untouched forward test, but cannot authorize live deployment by itself.",
+  "safety": "Research only; no server edit, arming, deploy, order, or position action."
+}
