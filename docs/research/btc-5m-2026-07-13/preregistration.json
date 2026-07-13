@@ -70,6 +70,10 @@
     "minimumRetainedFraction": 0.8
   },
   "standalone": {
+    "maxHoldBars": 48,
+    "atrPeriod": 14,
+    "compressionDistributionLookbackBars": 288,
+    "intrabarPrimary": "adverse-first",
     "families": {
       "LIQUIDITY_SWEEP_RECLAIM": {
         "lookbackBars": [6, 12],

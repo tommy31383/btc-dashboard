@@ -1,0 +1,617 @@
+{
+  "schemaVersion": 1,
+  "selectionObservedAt": "2026-07-13T05:24:49.115Z",
+  "rawSha256": "a595952365fa226eec4f8a7dc84eb402e417cb35c2b9b5aea16caedbe5e74061",
+  "contract": "Selection reads only discovery rows. Skipped outcomes are zero; skipped baseline outcomes are tagged SIMULATED counterfactual evidence.",
+  "discoveryCount": 78,
+  "scenario": "primaryLowHigh",
+  "baseline": {
+    "count": 78,
+    "netPnl": 251.49247117289084,
+    "winRate": 0.5897435897435898,
+    "profitFactor": 4.872042431423495,
+    "medianTradePnl": 1.0671828757815853,
+    "maxRealizedDrawdown": 20.97179330455694,
+    "dropTop20NetPnl": 26.54971872714125,
+    "meanEntryImprovementAtr": -0.01314343310140118,
+    "timeoutRate": 0,
+    "meanMfe24Atr": 3.2516595043231202,
+    "meanMae24Atr": 0.9677584104005741,
+    "meanHoldHours": 81.36538461538458,
+    "fees": 5.567667027931709,
+    "fundingPnl": -9.861768476443492,
+    "byYear": {
+      "2019": {
+        "count": 7,
+        "netPnl": 0.3336730859568924,
+        "winRate": 0.2857142857142857
+      },
+      "2020": {
+        "count": 27,
+        "netPnl": 13.238706176780877,
+        "winRate": 0.5555555555555556
+      },
+      "2023": {
+        "count": 44,
+        "netPnl": 237.9200919101531,
+        "winRate": 0.6590909090909091
+      }
+    },
+    "byMonth": {
+      "2019-10": {
+        "count": 4,
+        "netPnl": 4.084569591290496,
+        "winRate": 0.5
+      },
+      "2019-11": {
+        "count": 1,
+        "netPnl": -2.0461495985006657,
+        "winRate": 0
+      },
+      "2019-12": {
+        "count": 2,
+        "netPnl": -1.7047469068329377,
+        "winRate": 0
+      },
+      "2020-01": {
+        "count": 14,
+        "netPnl": 8.373952015208612,
+        "winRate": 0.6428571428571429
+      },
+      "2020-02": {
+        "count": 1,
+        "netPnl": -2.31295487844463,
+        "winRate": 0
+      },
+      "2020-05": {
+        "count": 2,
+        "netPnl": 0.9501488877906338,
+        "winRate": 1
+      },
+      "2020-07": {
+        "count": 1,
+        "netPnl": 2.275306437563504,
+        "winRate": 1
+      },
+      "2020-08": {
+        "count": 2,
+        "netPnl": -2.8570410324176523,
+        "winRate": 0
+      },
+      "2020-10": {
+        "count": 7,
+        "netPnl": 6.809294747080406,
+        "winRate": 0.42857142857142855
+      },
+      "2023-01": {
+        "count": 7,
+        "netPnl": 13.922112747382297,
+        "winRate": 0.5714285714285714
+      },
+      "2023-02": {
+        "count": 2,
+        "netPnl": 8.310635464026301,
+        "winRate": 1
+      },
+      "2023-03": {
+        "count": 2,
+        "netPnl": 24.58380447763689,
+        "winRate": 1
+      },
+      "2023-04": {
+        "count": 4,
+        "netPnl": 2.775389259578274,
+        "winRate": 0.5
+      },
+      "2023-06": {
+        "count": 8,
+        "netPnl": 45.8483154726387,
+        "winRate": 0.75
+      },
+      "2023-08": {
+        "count": 2,
+        "netPnl": -3.60333365248255,
+        "winRate": 0
+      },
+      "2023-10": {
+        "count": 9,
+        "netPnl": 147.9908065034944,
+        "winRate": 1
+      },
+      "2023-11": {
+        "count": 2,
+        "netPnl": -11.329144621536132,
+        "winRate": 0
+      },
+      "2023-12": {
+        "count": 8,
+        "netPnl": 9.42150625941487,
+        "winRate": 0.5
+      }
+    },
+    "bySetup": {
+      "S12": {
+        "count": 1,
+        "netPnl": 0.9729752811426023,
+        "winRate": 1
+      },
+      "S13": {
+        "count": 31,
+        "netPnl": 87.78467826069576,
+        "winRate": 0.6451612903225806
+      },
+      "S14": {
+        "count": 46,
+        "netPnl": 162.73481763105252,
+        "winRate": 0.5434782608695652
+      }
+    }
+  },
+  "candidates": {
+    "NR_E60": {
+      "sourceCount": 78,
+      "retainedCount": 49,
+      "retainedFraction": 0.6282051282051282,
+      "netPnl": 60.889320476846514,
+      "winRate": 0.46938775510204084,
+      "profitFactor": 2.064557145589665,
+      "maxRealizedDrawdown": 20.92096877506585,
+      "dropTop20NetPnl": -48.9019854982351,
+      "skippedBaselinePnl": 192.6578652024228,
+      "meanEntryImprovementAtr": -0.00026106467344928563,
+      "meanMfe24Atr": 2.5512792245542752,
+      "meanMae24Atr": 1.1584716199679381,
+      "byMonth": {
+        "2019-10": {
+          "sourceCount": 4,
+          "retainedCount": 4,
+          "netPnl": 4.099538568487295
+        },
+        "2019-11": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -2.091726932144665
+        },
+        "2019-12": {
+          "sourceCount": 2,
+          "retainedCount": 1,
+          "netPnl": -1.0204698751721557
+        },
+        "2020-01": {
+          "sourceCount": 14,
+          "retainedCount": 9,
+          "netPnl": 4.398201681547463
+        },
+        "2020-02": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -2.2488277005106325
+        },
+        "2020-05": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": 1.3799266341522447
+        },
+        "2020-07": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": 2.3754164755675022
+        },
+        "2020-08": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -2.917880905657654
+        },
+        "2020-10": {
+          "sourceCount": 7,
+          "retainedCount": 5,
+          "netPnl": 2.7859211212544315
+        },
+        "2023-01": {
+          "sourceCount": 7,
+          "retainedCount": 5,
+          "netPnl": 8.98057357997951
+        },
+        "2023-02": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-03": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-04": {
+          "sourceCount": 4,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-06": {
+          "sourceCount": 8,
+          "retainedCount": 8,
+          "netPnl": 46.636887552799735
+        },
+        "2023-08": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-10": {
+          "sourceCount": 9,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-11": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -10.618318324704088
+        },
+        "2023-12": {
+          "sourceCount": 8,
+          "retainedCount": 8,
+          "netPnl": 9.130078601247519
+        }
+      }
+    },
+    "NR_S6_60": {
+      "sourceCount": 78,
+      "retainedCount": 33,
+      "retainedFraction": 0.4230769230769231,
+      "netPnl": 99.15888394329497,
+      "winRate": 0.48484848484848486,
+      "profitFactor": 4.095906142615493,
+      "maxRealizedDrawdown": 10.618318324704092,
+      "dropTop20NetPnl": -32.02903427153746,
+      "skippedBaselinePnl": 158.462768508743,
+      "meanEntryImprovementAtr": 0.0638245328352386,
+      "meanMfe24Atr": 3.0190162026245955,
+      "meanMae24Atr": 1.208488859466403,
+      "byMonth": {
+        "2019-10": {
+          "sourceCount": 4,
+          "retainedCount": 2,
+          "netPnl": -5.3927394299727185
+        },
+        "2019-11": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -1.9820611633766652
+        },
+        "2019-12": {
+          "sourceCount": 2,
+          "retainedCount": 1,
+          "netPnl": -0.991602562864151
+        },
+        "2020-01": {
+          "sourceCount": 14,
+          "retainedCount": 9,
+          "netPnl": 4.650753141739459
+        },
+        "2020-02": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -1.9877211096346334
+        },
+        "2020-05": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2020-07": {
+          "sourceCount": 1,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2020-08": {
+          "sourceCount": 2,
+          "retainedCount": 1,
+          "netPnl": -1.60623113054476
+        },
+        "2020-10": {
+          "sourceCount": 7,
+          "retainedCount": 3,
+          "netPnl": 3.9566042208857093
+        },
+        "2023-01": {
+          "sourceCount": 7,
+          "retainedCount": 3,
+          "netPnl": 9.563730136085669
+        },
+        "2023-02": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-03": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-04": {
+          "sourceCount": 4,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-06": {
+          "sourceCount": 8,
+          "retainedCount": 3,
+          "netPnl": 13.892090589217016
+        },
+        "2023-08": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-10": {
+          "sourceCount": 9,
+          "retainedCount": 4,
+          "netPnl": 72.98062290200524
+        },
+        "2023-11": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -10.618318324704088
+        },
+        "2023-12": {
+          "sourceCount": 8,
+          "retainedCount": 3,
+          "netPnl": 16.69375667445889
+        }
+      }
+    },
+    "NR_S12_60": {
+      "sourceCount": 78,
+      "retainedCount": 14,
+      "retainedFraction": 0.1794871794871795,
+      "netPnl": 67.88671310072047,
+      "winRate": 0.5714285714285714,
+      "profitFactor": 9.833104476266362,
+      "maxRealizedDrawdown": 4.716526487964274,
+      "dropTop20NetPnl": -7.685487393829092,
+      "skippedBaselinePnl": 187.9718752400572,
+      "meanEntryImprovementAtr": 0.22940876668741494,
+      "meanMfe24Atr": 1.787864973323074,
+      "meanMae24Atr": 1.2639919600069436,
+      "byMonth": {
+        "2019-10": {
+          "sourceCount": 4,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2019-11": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -1.9820611633766652
+        },
+        "2019-12": {
+          "sourceCount": 2,
+          "retainedCount": 1,
+          "netPnl": -0.9868997424881532
+        },
+        "2020-01": {
+          "sourceCount": 14,
+          "retainedCount": 2,
+          "netPnl": 4.990339923949613
+        },
+        "2020-02": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -1.9877211096346334
+        },
+        "2020-05": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2020-07": {
+          "sourceCount": 1,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2020-08": {
+          "sourceCount": 2,
+          "retainedCount": 1,
+          "netPnl": -1.60623113054476
+        },
+        "2020-10": {
+          "sourceCount": 7,
+          "retainedCount": 2,
+          "netPnl": -1.1225742477848808
+        },
+        "2023-01": {
+          "sourceCount": 7,
+          "retainedCount": 2,
+          "netPnl": 12.117525279927621
+        },
+        "2023-02": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-03": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-04": {
+          "sourceCount": 4,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-06": {
+          "sourceCount": 8,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-08": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-10": {
+          "sourceCount": 9,
+          "retainedCount": 2,
+          "netPnl": 39.706129432297466
+        },
+        "2023-11": {
+          "sourceCount": 2,
+          "retainedCount": 0,
+          "netPnl": 0
+        },
+        "2023-12": {
+          "sourceCount": 8,
+          "retainedCount": 2,
+          "netPnl": 18.758205858374858
+        }
+      }
+    },
+    "TOXICITY_SKIP": {
+      "sourceCount": 78,
+      "retainedCount": 76,
+      "retainedFraction": 0.9743589743589743,
+      "netPnl": 247.23686379640776,
+      "winRate": 0.6052631578947368,
+      "profitFactor": 4.7727551873089835,
+      "maxRealizedDrawdown": 20.07876368772986,
+      "dropTop20NetPnl": 19.950945456989515,
+      "skippedBaselinePnl": -1.0999844359781092,
+      "meanEntryImprovementAtr": -0.10069362984391007,
+      "meanMfe24Atr": 3.234100941609885,
+      "meanMae24Atr": 1.005999632069945,
+      "byMonth": {
+        "2019-10": {
+          "sourceCount": 4,
+          "retainedCount": 4,
+          "netPnl": 4.417249105888905
+        },
+        "2019-11": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -2.076317690912664
+        },
+        "2019-12": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -1.9458923164129371
+        },
+        "2020-01": {
+          "sourceCount": 14,
+          "retainedCount": 14,
+          "netPnl": 6.655090856376592
+        },
+        "2020-02": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": -2.1123458495986256
+        },
+        "2020-05": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": 1.0669389291282358
+        },
+        "2020-07": {
+          "sourceCount": 1,
+          "retainedCount": 1,
+          "netPnl": 2.3251063035451023
+        },
+        "2020-08": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -3.180438366649647
+        },
+        "2020-10": {
+          "sourceCount": 7,
+          "retainedCount": 7,
+          "netPnl": 7.281247786814016
+        },
+        "2023-01": {
+          "sourceCount": 7,
+          "retainedCount": 5,
+          "netPnl": 12.635998465696384
+        },
+        "2023-02": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": 5.821142464986297
+        },
+        "2023-03": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": 25.132111720068878
+        },
+        "2023-04": {
+          "sourceCount": 4,
+          "retainedCount": 4,
+          "netPnl": 1.114622085866293
+        },
+        "2023-06": {
+          "sourceCount": 8,
+          "retainedCount": 8,
+          "netPnl": 46.76276304286372
+        },
+        "2023-08": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -3.5787722124185364
+        },
+        "2023-10": {
+          "sourceCount": 9,
+          "retainedCount": 9,
+          "netPnl": 149.2149839992544
+        },
+        "2023-11": {
+          "sourceCount": 2,
+          "retainedCount": 2,
+          "netPnl": -12.202468371360135
+        },
+        "2023-12": {
+          "sourceCount": 8,
+          "retainedCount": 8,
+          "netPnl": 9.905843843271548
+        }
+      }
+    }
+  },
+  "selected": {
+    "method": null,
+    "candidates": [
+      {
+        "method": "NR_E60",
+        "qualifies": false,
+        "netDelta": -190.60315069604434,
+        "drawdownDelta": -0.050824529491087844,
+        "dropTopDelta": -75.45170422537635,
+        "retainedFraction": 0.6282051282051282,
+        "skippedBaselinePnl": 192.6578652024228
+      },
+      {
+        "method": "NR_S6_60",
+        "qualifies": false,
+        "netDelta": -152.33358722959588,
+        "drawdownDelta": -10.353474979852848,
+        "dropTopDelta": -58.57875299867871,
+        "retainedFraction": 0.4230769230769231,
+        "skippedBaselinePnl": 158.462768508743
+      },
+      {
+        "method": "NR_S12_60",
+        "qualifies": false,
+        "netDelta": -183.60575807217037,
+        "drawdownDelta": -16.255266816592666,
+        "dropTopDelta": -34.235206120970346,
+        "retainedFraction": 0.1794871794871795,
+        "skippedBaselinePnl": 187.9718752400572
+      },
+      {
+        "method": "TOXICITY_SKIP",
+        "qualifies": false,
+        "netDelta": -4.255607376483084,
+        "drawdownDelta": -0.8930296168270786,
+        "dropTopDelta": -6.598773270151735,
+        "retainedFraction": 0.9743589743589743,
+        "skippedBaselinePnl": -1.0999844359781092
+      }
+    ]
+  }
+}

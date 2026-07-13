@@ -178,3 +178,183 @@ export function selectPlateau(stats) {
     families: Object.freeze(families),
   });
 }
+
+export function summarizeFilteredMethod(rows, scenario, method) {
+  if (!Array.isArray(rows) || !rows.length) throw new Error("FILTER_SUMMARY_ROWS_EMPTY");
+  const projected = rows.map((row) => {
+    const baseline = row.scenarios?.[scenario]?.A;
+    const value = row.scenarios?.[scenario]?.[method];
+    const qty = SETUP_QTY[row.setup];
+    if (!baseline || !value || !Number.isFinite(qty) || !Number.isFinite(baseline.netPnl)) {
+      throw new Error(`FILTER_SUMMARY_ROW_INVALID:${row.setup}:${row.signalTime}:${scenario}:${method}`);
+    }
+    const retained = value.skipped === false;
+    if (retained && (!Number.isFinite(value.netPnl) || !Number.isSafeInteger(value.exitTime))) {
+      throw new Error(`FILTER_SUMMARY_RESULT_INVALID:${row.setup}:${row.signalTime}:${method}`);
+    }
+    return {
+      row,
+      baselinePnl: baseline.netPnl * qty,
+      retained,
+      value,
+      pnl: retained ? value.netPnl * qty : 0,
+    };
+  });
+  const retained = projected.filter((item) => item.retained);
+  const pnl = projected.map((item) => item.pnl);
+  const orderedPnl = [...retained]
+    .sort((left, right) => left.value.exitTime - right.value.exitTime || left.row.signalTime - right.row.signalTime)
+    .map((item) => item.pnl);
+  const gains = pnl.filter((value) => value > 0).reduce((total, value) => total + value, 0);
+  const losses = -pnl.filter((value) => value < 0).reduce((total, value) => total + value, 0);
+  const byMonth = {};
+  for (const item of projected) {
+    const key = monthKey(item.row.signalTime);
+    byMonth[key] ??= { sourceCount: 0, retainedCount: 0, netPnl: 0 };
+    byMonth[key].sourceCount += 1;
+    byMonth[key].retainedCount += item.retained ? 1 : 0;
+    byMonth[key].netPnl += item.pnl;
+  }
+  return Object.freeze({
+    sourceCount: rows.length,
+    retainedCount: retained.length,
+    retainedFraction: retained.length / rows.length,
+    netPnl: pnl.reduce((total, value) => total + value, 0),
+    winRate: retained.length ? retained.filter((item) => item.pnl > 0).length / retained.length : null,
+    profitFactor: losses > 0 ? gains / losses : gains > 0 ? Infinity : null,
+    maxRealizedDrawdown: maxRealizedDrawdown(orderedPnl),
+    dropTop20NetPnl: dropTopFraction(pnl, 0.2),
+    skippedBaselinePnl: projected
+      .filter((item) => !item.retained)
+      .reduce((total, item) => total + item.baselinePnl, 0),
+    meanEntryImprovementAtr: mean(retained.map((item) => item.value.entryImprovementAtr)),
+    meanMfe24Atr: mean(retained.map((item) => item.value.mfe24Atr)),
+    meanMae24Atr: mean(retained.map((item) => item.value.mae24Atr)),
+    byMonth,
+  });
+}
+
+export function selectFilter(baseline, candidates) {
+  if (
+    !baseline ||
+    !Number.isFinite(baseline.netPnl) ||
+    !Number.isFinite(baseline.maxRealizedDrawdown) ||
+    !Number.isFinite(baseline.dropTop20NetPnl)
+  ) {
+    throw new Error("FILTER_SELECTION_BASELINE_INVALID");
+  }
+  const rows = Object.entries(candidates).map(([method, value]) => {
+    const qualifies =
+      value.retainedFraction >= 0.8 &&
+      value.netPnl > baseline.netPnl &&
+      value.maxRealizedDrawdown <= baseline.maxRealizedDrawdown &&
+      value.dropTop20NetPnl > baseline.dropTop20NetPnl &&
+      value.skippedBaselinePnl <= 0;
+    return {
+      method,
+      qualifies,
+      netDelta: value.netPnl - baseline.netPnl,
+      drawdownDelta: value.maxRealizedDrawdown - baseline.maxRealizedDrawdown,
+      dropTopDelta: value.dropTop20NetPnl - baseline.dropTop20NetPnl,
+      retainedFraction: value.retainedFraction,
+      skippedBaselinePnl: value.skippedBaselinePnl,
+    };
+  });
+  const qualified = rows.filter((row) => row.qualifies).sort((left, right) => right.netDelta - left.netDelta);
+  return Object.freeze({ method: qualified[0]?.method ?? null, candidates: Object.freeze(rows) });
+}
+
+export function summarizeStandalone(trades) {
+  if (!Array.isArray(trades) || !trades.length) {
+    return Object.freeze({
+      count: 0,
+      netReturn: 0,
+      winRate: null,
+      profitFactor: null,
+      maxRealizedDrawdown: 0,
+      dropTop20NetReturn: 0,
+      byYear: {},
+      byMonth: {},
+      bySide: {},
+    });
+  }
+  const returns = trades.map((trade) => trade.netReturn);
+  if (returns.some((value) => !Number.isFinite(value))) throw new Error("STANDALONE_RETURN_INVALID");
+  const ordered = [...trades]
+    .sort((left, right) => left.exitTime - right.exitTime || left.signalTime - right.signalTime)
+    .map((trade) => trade.netReturn);
+  const gains = returns.filter((value) => value > 0).reduce((total, value) => total + value, 0);
+  const losses = -returns.filter((value) => value < 0).reduce((total, value) => total + value, 0);
+  const groupedTrades = (keyFor) => {
+    const groups = new Map();
+    for (const trade of trades) {
+      const key = keyFor(trade);
+      const group = groups.get(key) ?? [];
+      group.push(trade.netReturn);
+      groups.set(key, group);
+    }
+    return Object.fromEntries([...groups.entries()].sort(([left], [right]) => String(left).localeCompare(String(right))).map(
+      ([key, values]) => [key, {
+        count: values.length,
+        netReturn: values.reduce((total, value) => total + value, 0),
+        winRate: values.filter((value) => value > 0).length / values.length,
+      }],
+    ));
+  };
+  return Object.freeze({
+    count: trades.length,
+    netReturn: returns.reduce((total, value) => total + value, 0),
+    winRate: returns.filter((value) => value > 0).length / returns.length,
+    profitFactor: losses > 0 ? gains / losses : gains > 0 ? Infinity : null,
+    medianTradeReturn: median(returns),
+    maxRealizedDrawdown: maxRealizedDrawdown(ordered),
+    dropTop20NetReturn: dropTopFraction(returns, 0.2),
+    meanMfeAtr: mean(trades.map((trade) => trade.mfeAtr)),
+    meanMaeAtr: mean(trades.map((trade) => trade.maeAtr)),
+    byYear: groupedTrades((trade) => String(new Date(trade.signalTime).getUTCFullYear())),
+    byMonth: groupedTrades((trade) => monthKey(trade.signalTime)),
+    bySide: groupedTrades((trade) => trade.side),
+  });
+}
+
+export function selectStandalone(results) {
+  if (!Array.isArray(results) || !results.length) throw new Error("STANDALONE_SELECTION_EMPTY");
+  const groupedResults = new Map();
+  for (const result of results) {
+    if (
+      !result?.config?.id ||
+      !result?.config?.family ||
+      !Number.isFinite(result?.summary?.netReturn) ||
+      !Number.isFinite(result?.summary?.dropTop20NetReturn)
+    ) {
+      throw new Error("STANDALONE_SELECTION_ROW_INVALID");
+    }
+    const group = groupedResults.get(result.config.family) ?? [];
+    group.push(result);
+    groupedResults.set(result.config.family, group);
+  }
+  const families = [];
+  for (const [family, group] of groupedResults) {
+    const qualifying = group.filter(
+      (result) => result.summary.netReturn > 0 && result.summary.dropTop20NetReturn > 0,
+    );
+    if (qualifying.length < Math.ceil(group.length * 0.75)) continue;
+    const orderedNet = group.map((result) => result.summary.netReturn).sort((left, right) => left - right);
+    const familyMedian = orderedNet.length % 2
+      ? orderedNet[Math.floor(orderedNet.length / 2)]
+      : (orderedNet[orderedNet.length / 2 - 1] + orderedNet[orderedNet.length / 2]) / 2;
+    const representative = [...qualifying].sort(
+      (left, right) =>
+        Math.abs(left.summary.netReturn - familyMedian) - Math.abs(right.summary.netReturn - familyMedian) ||
+        left.config.id.localeCompare(right.config.id),
+    )[0];
+    families.push({ family, familyMedian, representative });
+  }
+  if (!families.length) return Object.freeze({ configId: null, family: null, families: [] });
+  families.sort((left, right) => right.familyMedian - left.familyMedian);
+  return Object.freeze({
+    configId: families[0].representative.config.id,
+    family: families[0].family,
+    families: Object.freeze(families),
+  });
+}
