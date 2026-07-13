@@ -4,9 +4,9 @@
 
 **Goal:** By 19:00 ICT on 2026-07-13, produce reproducible BTCUSDT perpetual-futures evidence for 5m entry timing/filter policies on current H01 signals and for causal standalone 5m mechanisms.
 
-**Architecture:** A research-only Python package consumes the frozen Binance Futures Run 3 5m/funding caches and production H01 signal exports. One causal simulator handles next-bar fills, costs, funding, trailing exits, timing fallbacks, filtering, monthly counts, walk-forward splits, and concentration checks; no server source or live state is touched.
+**Architecture:** A research-only Node package consumes the frozen Binance Futures Run 3 5m/funding caches and the hash-locked Run 2 signal export. It imports the production H01 trailing oracle after verifying the server module hash. One causal simulator handles next-bar fills, costs, funding, timing fallbacks, filtering, monthly counts, walk-forward splits, and concentration checks; no server source or live state is touched.
 
-**Tech Stack:** Python 3 standard library, existing project indicator/evaluator helpers, JSON/JSONL evidence, `pytest`, Claude CLI for one bounded final audit.
+**Tech Stack:** Node.js ESM, built-in `node:test`, hash-locked production evaluator helpers, JSON/JSONL evidence, Claude CLI for one bounded final audit.
 
 ## Global Constraints
 
@@ -25,8 +25,8 @@
 ### Task 1: Freeze Provenance And Baseline
 
 **Files:**
-- Create: `tools/btc_5m_research/provenance.py`
-- Create: `tools/btc_5m_research/test_provenance.py`
+- Create: `tools/btc-5m-research/provenance.mjs`
+- Create: `tools/btc-5m-research/provenance.test.mjs`
 - Create: `docs/research/btc-5m-2026-07-13/preregistration.json`
 
 **Interfaces:**
@@ -37,13 +37,13 @@
 - [ ] Implement minimal frozen input loader for `.cache/binance-futures-btcusdt-5m-run3.json` and `.cache/binance-futures-btcusdt-funding-7y.json`.
 - [ ] Reproduce current H01 source count and baseline fills before evaluating candidates.
 - [ ] Freeze the exact mechanisms, parameter grid, split dates, cost scenarios, and output schema in `preregistration.json`.
-- [ ] Run `python3 -m pytest tools/btc_5m_research/test_provenance.py -q`; expected all pass.
+- [ ] Run `node --test tools/btc-5m-research/provenance.test.mjs`; expected all pass.
 
 ### Task 2: H01 Timing-Only Policies
 
 **Files:**
-- Create: `tools/btc_5m_research/h01_timing.py`
-- Create: `tools/btc_5m_research/test_h01_timing.py`
+- Create: `tools/btc-5m-research/h01-timing.mjs`
+- Create: `tools/btc-5m-research/h01-timing.test.mjs`
 
 **Interfaces:**
 - Produces `IMMEDIATE`, `PULLBACK_FALLBACK`, and `SWEEP_RECLAIM_FALLBACK` schedules with identical source-signal counts.
@@ -57,8 +57,8 @@
 ### Task 3: H01 Filter-Enabled Policies
 
 **Files:**
-- Create: `tools/btc_5m_research/h01_filter.py`
-- Create: `tools/btc_5m_research/test_h01_filter.py`
+- Create: `tools/btc-5m-research/h01-filter.mjs`
+- Create: `tools/btc-5m-research/h01-filter.test.mjs`
 
 **Interfaces:**
 - Produces `TOXICITY_SKIP` and `NO_RECLAIM_SKIP` decisions using only information available before the candidate fill deadline.
@@ -71,8 +71,8 @@
 ### Task 4: Standalone 5m Mechanisms
 
 **Files:**
-- Create: `tools/btc_5m_research/standalone.py`
-- Create: `tools/btc_5m_research/test_standalone.py`
+- Create: `tools/btc-5m-research/standalone.mjs`
+- Create: `tools/btc-5m-research/standalone.test.mjs`
 
 **Interfaces:**
 - Produces exactly three preregistered families: `LIQUIDITY_SWEEP_RECLAIM`, `COMPRESSION_EXPANSION`, and `IMPULSE_PULLBACK_CONTINUATION`.
@@ -86,8 +86,8 @@
 ### Task 5: Walk-Forward, Robustness, And Audit
 
 **Files:**
-- Create: `tools/btc_5m_research/evaluate.py`
-- Create: `tools/btc_5m_research/test_evaluate.py`
+- Create: `tools/btc-5m-research/evaluate.mjs`
+- Create: `tools/btc-5m-research/evaluate.test.mjs`
 - Create: `docs/research/btc-5m-2026-07-13/results.json`
 - Create: `docs/research/btc-5m-2026-07-13/report.md`
 
@@ -99,4 +99,3 @@
 - [ ] Run OOS once plus 1.5x cost stress and low/high adverse intrabar paths.
 - [ ] Send one packet under 200 lines/50 KiB to Claude covering provenance, causal contract, selected evidence, concentration, and test output.
 - [ ] Resolve factual audit findings, label each mechanism `ACCEPT`, `DORMANT`, or `REJECT`, and write the 19:00 report.
-

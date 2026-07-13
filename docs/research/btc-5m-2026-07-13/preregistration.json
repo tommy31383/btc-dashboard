@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "runId": "btc-5m-deep-research-2026-07-13",
+  "deadline": "2026-07-13T19:00:00+07:00",
+  "asset": "BTCUSDT perpetual futures",
+  "resultLabel": "RESEARCH_SIMULATED_NOT_LIVE_AUTHORIZATION",
+  "source": {
+    "h01Signals": {
+      "commit": "0eb49d6613e8a77f0ab8b537a450bec2704caeb3",
+      "path": "docs/research/run-2-2026-07-12/artifacts/entry-quality-signals.jsonl",
+      "sha256": "d72ad3c684b726a1539e60754f805f37d7a25d81c7fcf027011b1dbd7fa721c9",
+      "count": 114,
+      "setupCounts": { "S12": 2, "S13": 44, "S14": 68 }
+    },
+    "fiveMinute": {
+      "path": ".cache/binance-futures-btcusdt-5m-run3.json",
+      "sha256": "57d6d4d9ececb67cd8362123635cbb78bc0d29039d82586825a25e7b1897a8c1",
+      "count": 719413,
+      "firstTime": 1567965300000,
+      "lastTime": 1783788900000
+    },
+    "funding": {
+      "path": ".cache/binance-futures-btcusdt-funding-7y.json",
+      "sha256": "5dc6289ba8253c28f6506a2ad7bb3c987c7950e19be0b3567aa1dea3dd2dd08e",
+      "count": 7490
+    },
+    "productionOracle": {
+      "path": "../btc-trader-server/dist/engine/rules/hedge01.js",
+      "sha256": "2956e5c85f25175c09fcc66f364b267c7066dfd72670ec64efb0e10f11bece4e",
+      "export": "hedge01TrailingExit"
+    }
+  },
+  "causalContract": {
+    "closedBarsOnly": true,
+    "entryDecisionFill": "next 5m bar open",
+    "intrabarOrders": ["LOW_HIGH", "HIGH_LOW"],
+    "horizonDays": 20,
+    "funding": "historical Binance futures records",
+    "primaryCost": { "feeBpsPerSide": 4, "slippageBpsPerMarketSide": 2 },
+    "stressCost": { "feeBpsPerSide": 6, "slippageBpsPerMarketSide": 5 }
+  },
+  "splits": {
+    "discovery": { "start": "2019-09-08", "end": "2023-12-31" },
+    "oos": { "start": "2024-01-01", "end": "2026-07-11" }
+  },
+  "h01Timing": {
+    "baseline": "IMMEDIATE",
+    "families": {
+      "EMA20_RECLAIM_FALLBACK": {
+        "timeoutMinutes": [30, 60],
+        "emaPeriod": 20,
+        "trigger": "closed 5m low <= causal EMA20 and close > causal EMA20",
+        "fallback": "timeout 5m open"
+      },
+      "SWEEP_RECLAIM_FALLBACK": {
+        "timeoutMinutes": [30, 60],
+        "lookbackBars": [6, 12],
+        "trigger": "closed 5m low < prior lookback low, close > prior low, lower wick >= absolute body",
+        "fallback": "timeout 5m open"
+      }
+    },
+    "countInvariant": "all methods fill all 114 source signals"
+  },
+  "h01Filter": {
+    "candidates": {
+      "NO_RECLAIM_SKIP": "skip when the corresponding 60-minute timing trigger never appears",
+      "TOXICITY_SKIP": "skip when first three closed 5m bars lose at least 0.5 causal ATR5, final close is below EMA20, and mean relative volume is at least 1.5"
+    },
+    "counterfactualLabel": "SIMULATED",
+    "minimumRetainedFraction": 0.8
+  },
+  "standalone": {
+    "families": {
+      "LIQUIDITY_SWEEP_RECLAIM": {
+        "lookbackBars": [6, 12],
+        "exitAtr": [[1.5, 1.0], [2.0, 1.0]]
+      },
+      "COMPRESSION_EXPANSION": {
+        "compressionBars": [6, 12],
+        "rangePercentile": [0.2, 0.3],
+        "exitAtr": [[2.0, 1.0]]
+      },
+      "IMPULSE_PULLBACK_CONTINUATION": {
+        "impulseAtr": [1.5, 2.0],
+        "pullbackBars": [3, 6],
+        "exitAtr": [[2.0, 1.0]]
+      }
+    },
+    "directionBias": "causal 1h EMA50/EMA200 and 4h EMA20 slope; LONG and SHORT reported separately",
+    "capacity": "one open position; chronological first accepted signal"
+  },
+  "selection": {
+    "discoveryRule": "select a parameter plateau, not the single best point",
+    "timingWinner": [
+      "same source count as baseline",
+      "OOS net delta > 0",
+      "OOS max drawdown <= baseline or degradation <= 10% with larger net gain",
+      "OOS drop-top-20-percent delta > 0",
+      "both 2024 and 2025 net delta non-negative"
+    ],
+    "filterWinner": [
+      "retained fraction >= 0.8",
+      "OOS net and drawdown improve",
+      "conservative skipped-loss sensitivity remains positive"
+    ],
+    "standaloneWinner": [
+      "OOS net > 0 after primary and stress costs",
+      "drop-top-20-percent net > 0",
+      "positive in at least two OOS calendar years",
+      "neighboring parameters agree in sign"
+    ],
+    "statuses": ["ACCEPT", "DORMANT", "REJECT", "INVALID"]
+  }
+}
