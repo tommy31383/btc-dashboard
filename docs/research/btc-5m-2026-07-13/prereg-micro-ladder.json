@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "mechanismId": "h01-5m-micro-ladder",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parentVerdicts": [
+    "Run 3 12h ladder NO_EXECUTION_WINNER",
+    "2026-07-13 EMA/sweep delay REJECT"
+  ],
+  "question": "Can a short partial-immediate micro-limit improve H01 execution while retaining every signal and total target size?",
+  "population": {
+    "sourceSignals": 114,
+    "setups": ["S12", "S13", "S14"],
+    "side": "LONG",
+    "split": { "discoveryEnd": "2023-12-31", "oosStart": "2024-01-01" }
+  },
+  "contract": {
+    "immediateWeights": [0.5, 0.7],
+    "limitWeights": [0.5, 0.3],
+    "limitOffsetsAtr5": [0.25, 0.5],
+    "timeoutsMinutes": [15, 30],
+    "atr5": "SMA true range 14 over bars closed before signalTime",
+    "limitFee": "same 4 bp per side as market",
+    "limitOpenThrough": "fill at limit price with no favorable price improvement",
+    "unfilledFallback": "market at exact timeout open",
+    "totalWeight": 1,
+    "sourceCountInvariant": 114,
+    "exits": "hash-locked production hedge01TrailingExit independently per child",
+    "primaryCost": { "feeBps": 4, "marketSlippageBps": 2 },
+    "stressCost": { "feeBps": 6, "marketSlippageBps": 5 }
+  },
+  "selection": {
+    "familyPlateau": "at least 6 of 8 configs beat A on discovery NET and drop-top-20%, with drawdown <= 1.1x A",
+    "representative": "qualifying config closest to family median NET delta; ties prefer larger immediate weight, shorter timeout, smaller offset",
+    "oosWinner": [
+      "same 114 source signals and total target weight",
+      "OOS NET delta > 0",
+      "OOS drawdown <= A or degradation <=10% with larger NET gain",
+      "OOS drop-top-20% delta > 0",
+      "2024 and 2025 deltas non-negative",
+      "stress and alternative intrabar deltas positive"
+    ]
+  },
+  "safety": "Research only; no server edit, arming, deploy, order, or position action."
+}
