@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseMetricsCsv, requiredMetricDates } from "./metrics-data.mjs";
+import { metricDateRange, parseMetricsCsv, requiredMetricDates } from "./metrics-data.mjs";
 
 test("metrics parser validates schema and converts timestamps to UTC milliseconds", () => {
   const text = [
@@ -58,4 +58,10 @@ test("metrics parser preserves off-second official event timestamps", () => {
   const row = "2024-03-04 05:35:01,BTCUSDT,76937.539,4877039822.19,1.16,1.43,1.12,0.41";
   const [value] = parseMetricsCsv(`${header}\n${row}\n`);
   assert.equal(value.time, Date.UTC(2024, 2, 4, 5, 35, 1));
+});
+
+test("metric date range is inclusive and UTC-stable", () => {
+  assert.deepEqual(metricDateRange("2024-02-28", "2024-03-01"), [
+    "2024-02-28", "2024-02-29", "2024-03-01",
+  ]);
 });

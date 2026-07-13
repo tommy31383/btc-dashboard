@@ -62,6 +62,23 @@ function utcDate(time) {
   return new Date(time).toISOString().slice(0, 10);
 }
 
+export function metricDateRange(startDate, endDate) {
+  const start = Date.parse(`${startDate}T00:00:00Z`);
+  const end = Date.parse(`${endDate}T00:00:00Z`);
+  if (
+    !Number.isSafeInteger(start) ||
+    !Number.isSafeInteger(end) ||
+    start > end ||
+    utcDate(start) !== startDate ||
+    utcDate(end) !== endDate
+  ) {
+    throw new Error("METRICS_DATE_RANGE_INVALID");
+  }
+  const dates = [];
+  for (let time = start; time <= end; time += DAY_MS) dates.push(utcDate(time));
+  return Object.freeze(dates);
+}
+
 export function requiredMetricDates(signals) {
   if (!Array.isArray(signals) || signals.some((signal) => !Number.isSafeInteger(signal?.signalTime))) {
     throw new Error("METRICS_SIGNALS_INVALID");

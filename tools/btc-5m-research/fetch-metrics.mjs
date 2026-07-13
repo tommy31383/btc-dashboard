@@ -10,15 +10,23 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { parseMetricsCsv, requiredMetricDates } from "./metrics-data.mjs";
+import { metricDateRange, parseMetricsCsv, requiredMetricDates } from "./metrics-data.mjs";
 import { loadFrozenInputs } from "./provenance.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, "../..");
-const CACHE = path.join(REPO, ".cache/binance-futures-btcusdt-metrics-h01-windows.json");
+const FULL = process.argv.includes("--full");
+const CACHE = path.join(
+  REPO,
+  FULL
+    ? ".cache/binance-futures-btcusdt-metrics-2020-09-2025-12.json"
+    : ".cache/binance-futures-btcusdt-metrics-h01-windows.json",
+);
 const MANIFEST = path.join(
   REPO,
-  "docs/research/btc-5m-2026-07-13/artifacts/futures-metrics-manifest.json",
+  FULL
+    ? "docs/research/btc-5m-2026-07-13/artifacts/futures-metrics-full-manifest.json"
+    : "docs/research/btc-5m-2026-07-13/artifacts/futures-metrics-manifest.json",
 );
 const BASE = "https://data.binance.vision/data/futures/um/daily/metrics/BTCUSDT";
 const START = Date.UTC(2020, 8, 1);
@@ -96,13 +104,15 @@ async function mapConcurrent(values, concurrency, fn) {
 
 const inputs = loadFrozenInputs();
 const eligibleSignals = inputs.signals.filter((signal) => signal.signalTime >= START);
-if (eligibleSignals.length !== 87) {
+if (!FULL && eligibleSignals.length !== 87) {
   throw new Error(`METRICS_ELIGIBLE_SIGNAL_COUNT_INVALID:${eligibleSignals.length}`);
 }
-const dates = requiredMetricDates(eligibleSignals);
+const dates = FULL
+  ? metricDateRange("2020-09-01", "2025-12-31")
+  : requiredMetricDates(eligibleSignals);
 const temporary = mkdtempSync(path.join(tmpdir(), "btc-metrics-"));
 try {
-  const daily = await mapConcurrent(dates, 12, (date) => loadDate(date, temporary));
+  const daily = await mapConcurrent(dates, FULL ? 20 : 12, (date) => loadDate(date, temporary));
   const rows = daily.flatMap((item) => item.rows).sort((left, right) => left.time - right.time);
   for (let index = 1; index < rows.length; index += 1) {
     if (rows[index].time <= rows[index - 1].time) {
@@ -113,8 +123,9 @@ try {
   const manifest = {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
+    mode: FULL ? "CONTIGUOUS_STANDALONE" : "H01_WINDOWS",
     source: BASE,
-    signalCount: eligibleSignals.length,
+    signalCount: FULL ? null : eligibleSignals.length,
     dateCount: dates.length,
     firstDate: dates[0],
     lastDate: dates.at(-1),

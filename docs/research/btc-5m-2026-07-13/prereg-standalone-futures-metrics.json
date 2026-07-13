@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "mechanismId": "btc-5m-standalone-futures-positioning",
+  "status": "FROZEN_BEFORE_FULL_METRICS_DOWNLOAD_OR_OUTCOME",
+  "question": "Can price/OI joint states create a standalone BTC 5m edge after price-only standalone rules failed?",
+  "data": {
+    "market": "BTCUSDT USD-M perpetual only",
+    "barsAndFunding": "hash-locked Run3 futures caches",
+    "metrics": "checksummed Binance daily 5m metrics archives, continuous 2020-09-01 through 2025-12-31",
+    "discovery": "2020-09-01 through 2023-12-31",
+    "oos": "2024-01-01 through 2025-12-31"
+  },
+  "causality": {
+    "decision": "closed 5m bar",
+    "lastAllowedMetric": "metric event timestamp at or before the closed bar open timestamp, intentionally one bar stale",
+    "fill": "next 5m open",
+    "capacity": "one open position per config",
+    "funding": true
+  },
+  "bias": "existing causal 1h EMA50/EMA200 direction must agree with 4h EMA20 slope",
+  "families": {
+    "POSITION_BACKED_CONTINUATION": "1h price move in bias direction >= 1 ATR5, OI change1h positive above threshold, geometric taker ratio confirms direction",
+    "LONG_LIQUIDATION_RECLAIM": "LONG bias, 1h price move <= -1 ATR5, OI change1h below negative threshold, taker ratio < 1, current closed 5m bullish and closes above prior 5m high"
+  },
+  "grid": {
+    "oiThresholds": [0.0025, 0.005],
+    "tpAtr": [1.5, 2.0],
+    "slAtr": 1.0,
+    "maxHoldBars": 48,
+    "configs": 8
+  },
+  "costs": {
+    "primary": { "feeBpsPerSide": 4, "slippageBpsPerSide": 2, "intrabar": "ADVERSE_FIRST" },
+    "stress": { "feeBpsPerSide": 6, "slippageBpsPerSide": 5, "intrabar": "ADVERSE_FIRST" }
+  },
+  "discoveryGate": "within a family, at least 3 of 4 configs need >=30 trades, net return >0, profit factor >1, and drop-top-20% net return >0",
+  "representative": "qualifying config closest to family median net return; tie prefers 0.5% OI threshold then TP1.5",
+  "oosGate": [
+    "representative and immediate parameter neighbors remain net positive",
+    "profit factor > 1",
+    "drop-top-20% net return > 0",
+    "2024 and 2025 each non-negative",
+    "stress net return > 0"
+  ],
+  "safety": "Research only; no server edit, arming, deploy, order, or position action."
+}
