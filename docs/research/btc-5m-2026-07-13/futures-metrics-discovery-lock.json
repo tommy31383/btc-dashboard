@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "lockedBeforeConditionalOos": "2026-07-13T06:00:36.498Z",
+  "role": "DISCOVERY_ONLY",
+  "sourceSignals": 51,
+  "featureAvailableSignals": 51,
+  "unavailableReasons": {},
+  "baseline": {
+    "count": 51,
+    "netPnl": 244.7293866572335,
+    "winRate": 0.6274509803921569,
+    "profitFactor": 6.190225864993151,
+    "medianTradePnl": 3.4939038361367087,
+    "maxRealizedDrawdown": 20.971793304556883,
+    "dropTop20NetPnl": 61.66797137404738,
+    "meanEntryImprovementAtr": -0.01409580888277321,
+    "timeoutRate": 0,
+    "meanMfe24Atr": 3.380290741367732,
+    "meanMae24Atr": 0.7881664217299408,
+    "meanHoldHours": 96.16339869281047,
+    "fees": 4.735825090276713,
+    "fundingPnl": -8.099997628269291,
+    "byYear": {
+      "2020": {
+        "count": 7,
+        "netPnl": 6.809294747080406,
+        "winRate": 0.42857142857142855
+      },
+      "2023": {
+        "count": 44,
+        "netPnl": 237.9200919101531,
+        "winRate": 0.6590909090909091
+      }
+    },
+    "byMonth": {
+      "2020-10": {
+        "count": 7,
+        "netPnl": 6.809294747080406,
+        "winRate": 0.42857142857142855
+      },
+      "2023-01": {
+        "count": 7,
+        "netPnl": 13.922112747382297,
+        "winRate": 0.5714285714285714
+      },
+      "2023-02": {
+        "count": 2,
+        "netPnl": 8.310635464026301,
+        "winRate": 1
+      },
+      "2023-03": {
+        "count": 2,
+        "netPnl": 24.58380447763689,
+        "winRate": 1
+      },
+      "2023-04": {
+        "count": 4,
+        "netPnl": 2.775389259578274,
+        "winRate": 0.5
+      },
+      "2023-06": {
+        "count": 8,
+        "netPnl": 45.8483154726387,
+        "winRate": 0.75
+      },
+      "2023-08": {
+        "count": 2,
+        "netPnl": -3.60333365248255,
+        "winRate": 0
+      },
+      "2023-10": {
+        "count": 9,
+        "netPnl": 147.9908065034944,
+        "winRate": 1
+      },
+      "2023-11": {
+        "count": 2,
+        "netPnl": -11.329144621536132,
+        "winRate": 0
+      },
+      "2023-12": {
+        "count": 8,
+        "netPnl": 9.42150625941487,
+        "winRate": 0.5
+      }
+    },
+    "bySetup": {
+      "S13": {
+        "count": 23,
+        "netPnl": 80.22338063143388,
+        "winRate": 0.6086956521739131
+      },
+      "S14": {
+        "count": 28,
+        "netPnl": 164.50600602579965,
+        "winRate": 0.6428571428571429
+      }
+    }
+  },
+  "summaries": {
+    "SHORT_COVERING_RALLY": {
+      "count": 51,
+      "netPnl": 245.16126877900874,
+      "winRate": 0.6274509803921569,
+      "profitFactor": 6.228568358165869,
+      "medianTradePnl": 3.4939038361367087,
+      "maxRealizedDrawdown": 20.832987810559274,
+      "dropTop20NetPnl": 62.01727348502578,
+      "meanEntryImprovementAtr": -0.009783515192487208,
+      "timeoutRate": 0.0196078431372549,
+      "meanMfe24Atr": 3.384603035058018,
+      "meanMae24Atr": 0.7838541280396542,
+      "meanHoldHours": 96.1609477124183,
+      "fees": 4.735652406501513,
+      "fundingPnl": -8.099997628269291,
+      "byYear": {
+        "2020": {
+          "count": 7,
+          "netPnl": 6.809294747080406,
+          "winRate": 0.42857142857142855
+        },
+        "2023": {
+          "count": 44,
+          "netPnl": 238.3519740319283,
+          "winRate": 0.6590909090909091
+        }
+      },
+      "byMonth": {
+        "2020-10": {
+          "count": 7,
+          "netPnl": 6.809294747080406,
+          "winRate": 0.42857142857142855
+        },
+        "2023-01": {
+          "count": 7,
+          "netPnl": 13.967643414081262,
+          "winRate": 0.5714285714285714
+        },
+        "2023-02": {
+          "count": 2,
+          "netPnl": 8.310635464026301,
+          "winRate": 1
+        },
+        "2023-03": {
+          "count": 2,
+          "netPnl": 24.58380447763689,
+          "winRate": 1
+        },
+        "2023-04": {
+          "count": 4,
+          "netPnl": 2.815983106624669,
+          "winRate": 0.5
+        },
+        "2023-06": {
+          "count": 8,
+          "netPnl": 45.7829362634115,
+          "winRate": 0.75
+        },
+        "2023-08": {
+          "count": 2,
+          "netPnl": -3.5386040521378623,
+          "winRate": 0
+        },
+        "2023-10": {
+          "count": 9,
+          "netPnl": 148.0733865142912,
+          "winRate": 1
+        },
+        "2023-11": {
+          "count": 2,
+          "netPnl": -11.204122909418196,
+          "winRate": 0
+        },
+        "2023-12": {
+          "count": 8,
+          "netPnl": 9.560311753412465,
+          "winRate": 0.5
+        }
+      },
+      "bySetup": {
+        "S13": {
+          "count": 23,
+          "netPnl": 80.36112730464392,
+          "winRate": 0.6086956521739131
+        },
+        "S14": {
+          "count": 28,
+          "netPnl": 164.80014147436478,
+          "winRate": 0.6428571428571429
+        }
+      },
+      "flaggedCount": 14
+    },
+    "BUY_ABSORPTION": {
+      "count": 51,
+      "netPnl": 244.8429164641416,
+      "winRate": 0.6274509803921569,
+      "profitFactor": 6.197205088268137,
+      "medianTradePnl": 3.4939038361367087,
+      "maxRealizedDrawdown": 20.971793304556883,
+      "dropTop20NetPnl": 61.78150118095549,
+      "meanEntryImprovementAtr": -0.012807455873563434,
+      "timeoutRate": 0,
+      "meanMfe24Atr": 3.381579094376942,
+      "meanMae24Atr": 0.7868780687207308,
+      "meanHoldHours": 96.16241830065363,
+      "fees": 4.7357796965114565,
+      "fundingPnl": -8.099997628269291,
+      "byYear": {
+        "2020": {
+          "count": 7,
+          "netPnl": 6.809294747080406,
+          "winRate": 0.42857142857142855
+        },
+        "2023": {
+          "count": 44,
+          "netPnl": 238.0336217170612,
+          "winRate": 0.6590909090909091
+        }
+      },
+      "byMonth": {
+        "2020-10": {
+          "count": 7,
+          "netPnl": 6.809294747080406,
+          "winRate": 0.42857142857142855
+        },
+        "2023-01": {
+          "count": 7,
+          "netPnl": 13.922112747382297,
+          "winRate": 0.5714285714285714
+        },
+        "2023-02": {
+          "count": 2,
+          "netPnl": 8.310635464026301,
+          "winRate": 1
+        },
+        "2023-03": {
+          "count": 2,
+          "netPnl": 24.58380447763689,
+          "winRate": 1
+        },
+        "2023-04": {
+          "count": 4,
+          "netPnl": 2.775389259578274,
+          "winRate": 0.5
+        },
+        "2023-06": {
+          "count": 8,
+          "netPnl": 45.961845279546814,
+          "winRate": 0.75
+        },
+        "2023-08": {
+          "count": 2,
+          "netPnl": -3.60333365248255,
+          "winRate": 0
+        },
+        "2023-10": {
+          "count": 9,
+          "netPnl": 147.9908065034944,
+          "winRate": 1
+        },
+        "2023-11": {
+          "count": 2,
+          "netPnl": -11.329144621536132,
+          "winRate": 0
+        },
+        "2023-12": {
+          "count": 8,
+          "netPnl": 9.42150625941487,
+          "winRate": 0.5
+        }
+      },
+      "bySetup": {
+        "S13": {
+          "count": 23,
+          "netPnl": 80.25040116561169,
+          "winRate": 0.6086956521739131
+        },
+        "S14": {
+          "count": 28,
+          "netPnl": 164.59251529852992,
+          "winRate": 0.6428571428571429
+        }
+      },
+      "flaggedCount": 3
+    },
+    "CROWDED_LONG": {
+      "count": 51,
+      "netPnl": 244.75139339492316,
+      "winRate": 0.6274509803921569,
+      "profitFactor": 6.193116312184875,
+      "medianTradePnl": 3.4939038361367087,
+      "maxRealizedDrawdown": 20.971793304556883,
+      "dropTop20NetPnl": 61.68997811173706,
+      "meanEntryImprovementAtr": -0.013252751660202572,
+      "timeoutRate": 0,
+      "meanMfe24Atr": 3.380840387183056,
+      "meanMae24Atr": 0.7873233645073704,
+      "meanHoldHours": 96.1624183006536,
+      "fees": 4.735816291101307,
+      "fundingPnl": -8.099997628269291,
+      "byYear": {
+        "2020": {
+          "count": 7,
+          "netPnl": 6.831301484770098,
+          "winRate": 0.42857142857142855
+        },
+        "2023": {
+          "count": 44,
+          "netPnl": 237.9200919101531,
+          "winRate": 0.6590909090909091
+        }
+      },
+      "byMonth": {
+        "2020-10": {
+          "count": 7,
+          "netPnl": 6.831301484770098,
+          "winRate": 0.42857142857142855
+        },
+        "2023-01": {
+          "count": 7,
+          "netPnl": 13.922112747382297,
+          "winRate": 0.5714285714285714
+        },
+        "2023-02": {
+          "count": 2,
+          "netPnl": 8.310635464026301,
+          "winRate": 1
+        },
+        "2023-03": {
+          "count": 2,
+          "netPnl": 24.58380447763689,
+          "winRate": 1
+        },
+        "2023-04": {
+          "count": 4,
+          "netPnl": 2.775389259578274,
+          "winRate": 0.5
+        },
+        "2023-06": {
+          "count": 8,
+          "netPnl": 45.8483154726387,
+          "winRate": 0.75
+        },
+        "2023-08": {
+          "count": 2,
+          "netPnl": -3.60333365248255,
+          "winRate": 0
+        },
+        "2023-10": {
+          "count": 9,
+          "netPnl": 147.9908065034944,
+          "winRate": 1
+        },
+        "2023-11": {
+          "count": 2,
+          "netPnl": -11.329144621536132,
+          "winRate": 0
+        },
+        "2023-12": {
+          "count": 8,
+          "netPnl": 9.42150625941487,
+          "winRate": 0.5
+        }
+      },
+      "bySetup": {
+        "S13": {
+          "count": 23,
+          "netPnl": 80.2316331580675,
+          "winRate": 0.6086956521739131
+        },
+        "S14": {
+          "count": 28,
+          "netPnl": 164.5197602368557,
+          "winRate": 0.6428571428571429
+        }
+      },
+      "flaggedCount": 2
+    }
+  },
+  "selection": {
+    "candidates": [
+      "SHORT_COVERING_RALLY"
+    ],
+    "rows": [
+      {
+        "state": "SHORT_COVERING_RALLY",
+        "flaggedCount": 14,
+        "netDelta": 0.43188212177523155,
+        "drawdownDelta": -0.13880549399760866,
+        "dropTopDelta": 0.3493021109783996,
+        "qualifies": true
+      },
+      {
+        "state": "BUY_ABSORPTION",
+        "flaggedCount": 3,
+        "netDelta": 0.11352980690810455,
+        "drawdownDelta": 0,
+        "dropTopDelta": 0.11352980690810455,
+        "qualifies": false
+      },
+      {
+        "state": "CROWDED_LONG",
+        "flaggedCount": 2,
+        "netDelta": 0.02200673768965089,
+        "drawdownDelta": 0,
+        "dropTopDelta": 0.022006737689679312,
+        "qualifies": false
+      }
+    ]
+  },
+  "verdict": "DISCOVERY_CANDIDATES"
+}
