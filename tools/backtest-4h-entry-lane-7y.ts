@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 
 import { aggregateCandles, buildStochPoints, HOUR_MS, type Candle, type StochPoint } from "./stochrsi-macro-cycle/core";
-import { settleLong } from "./backtest-4h-entry-lane-7y-fill";
+import { settleLong, triggeredExitPrice } from "./backtest-4h-entry-lane-7y-fill";
 
 const sourcePath = process.env.STOCHRSI_HOURLY ?? ".cache/binance-futures-btcusdt-1h-7y.json";
 const FOUR_H_MS = 4 * HOUR_MS;
@@ -134,7 +134,9 @@ function replay(bars: Candle[], points: StochPoint[], signals: number[], atr: (n
         break;
       }
     }
-    const exitPrice = reason === "SL" ? stop : reason === "TP" ? target : bars[exitIndex].open;
+    const exitPrice = reason === "SL" || reason === "TP"
+      ? triggeredExitPrice(reason, bars[exitIndex].open, reason === "SL" ? stop : target)
+      : bars[exitIndex].open;
     trades.push({ entryTime: bars[entryIndex].time, exitTime: bars[exitIndex].time, pnl: settleLong(entryOpen, exitPrice, FEE_RATE, SLIP_RATE), reason });
     blockedUntil = exitIndex;
   }

@@ -237,3 +237,130 @@ The corrected replay invalidates the earlier positive table for this trade model
 | 1.5 ATR / 3.0 ATR / 30 bars | Spot 2017-2026 | K_FIRST_OVERSOLD | 809 | 38.9% | 0.74 | -2.669 | 2.725 |
 
 The same exact-fill correction also makes the broad `K_TURN_ANY` lane negative in the tested replay. Therefore `K_FIRST_OVERSOLD` is **REJECTED for live promotion under the current exit model**. The earlier positive numbers remain historical evidence of the fill-model bug, not strategy performance.
+
+## Follow-up: early entry with soft 2W context and time exit
+
+After the exact-fill rejection, the next hypothesis kept the entry early but removed the noisy 4H bearish-cross exit:
+
+```text
+ENTRY: first completed 4H K<20 in a new episode
+CONTEXT: completed 2W K rising
+EXIT: 2 ATR stop, 4 ATR target, or 48 x 4H time-stop
+```
+
+Exact-fill results:
+
+| Dataset/window | Trades | Win rate | PF | Net R | Without best | Max DD R |
+|---|---:|---:|---:|---:|---:|---:|
+| Futures 7Y | 149 | 38.3% | 1.10 | +0.270 | +0.131 | 0.290 |
+| Futures IS 2020-2023 | 75 | 38.7% | 1.04 | +0.064 | -0.055 | 0.276 |
+| Futures OOS 2024-2026 | 74 | 37.8% | 1.16 | +0.206 | +0.068 | 0.290 |
+| Spot 2017-2026 | 208 | 40.4% | 1.29 | +1.059 | +0.897 | 0.328 |
+
+This is the first early-entry variant that remains slightly positive after exact fills on both datasets, but it is not robust enough: futures IS is nearly flat, the OOS result is regime-dependent, and 2026 is negative. It remains `RESEARCH_LEAD_CONDITIONAL`, not a live candidate. K10 plus 2W rising failed on futures (PF 0.95, net `-0.130R`) under the same exit.
+
+## Post-fix gap-fill recheck
+
+The exact-fill correction was extended to gap-through exits. For a long, an SL hit on a bar that opens below the stop is filled at the bar open; a TP hit on a bar that opens above the target is also filled at the bar open. Non-gap hits use the configured level, and market/time exits still use the next bar open. The behavior is centralized in `backtest-4h-entry-lane-7y-fill.ts` and covered by the settlement regression.
+
+The main early-entry sweep was rerun after this correction with `TIME` exit, 2 ATR stop, 4 ATR target, and 48 4H bars:
+
+| Dataset | Lane | Trades | Win rate | PF | Net R | Without best | Max DD R |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Futures 7Y | K10 | 381 | 38.1% | 1.15 | +1.168 | +0.940 | 0.992 |
+| Futures 7Y | K20_2W_RISING | 149 | 38.3% | 1.10 | +0.270 | +0.131 | 0.290 |
+| Futures 7Y | K20_ATR_HIGH | 207 | 38.6% | 1.10 | +0.505 | +0.341 | 0.596 |
+| Spot 2017-2026 | K10 | 501 | 37.9% | 1.08 | +1.033 | +0.697 | 1.181 |
+| Spot 2017-2026 | K20_2W_RISING | 208 | 40.4% | 1.29 | +1.059 | +0.897 | 0.328 |
+| Spot 2017-2026 | K20_ATR_HIGH | 279 | 38.7% | 1.08 | +0.655 | +0.310 | 0.656 |
+
+The broad K10 result is positive in aggregate but has negative 2019, 2022, 2025 and 2026 futures years; the 2W-context lane is positive in aggregate but its IS 2020-2023 is only `+0.064R` and OOS 2024-2026 is `+0.206R`, with 2026 negative. These are research leads, not evidence for live promotion.
+
+Reproduce the primary result:
+
+```bash
+cd /Users/lap16116/BTC_PC/btc-dashboard
+STOCHRSI_EXIT_MODE=TIME STOCHRSI_STOP_ATR=2 STOCHRSI_TARGET_ATR=4 STOCHRSI_MAX_HOLD=48 \
+  npx --yes tsx@4.23.1 tools/backtest-4h-early-entry-sweep-7y.ts
+```
+
+The focused Claude audit packet covers this post-fix code path and is recorded in the next section. The decision remains `RESEARCH_ONLY`; no live rule, server code, or deployment has changed.
+
+## Focused Claude audit: post-fix replay
+
+Claude independently reviewed the corrected helper, early-entry sweep, regression test, and report. Verdict: `CONDITIONAL` for research and `REJECT` for live promotion.
+
+### Code findings
+
+- `triggeredExitPrice` correctly handles normal and gap-through SL/TP fills, with adverse slippage applied by `settleLong`.
+- 4H aggregation, completed-bar handling, next-open entry, ATR timing, and 1D/1W/2W context lookup show no lookahead.
+- `blockedUntil` enforces one position at a time.
+- Same-bar SL-before-TP priority is conservative but should remain documented as a backtest assumption.
+- A low-probability, unquantified rapid re-arm is possible after an entry-bar SL if the oscillator exits and re-enters oversold within a few bars. This is a research sensitivity item, not a live authorization.
+
+### Performance decision
+
+Claude agrees that the `K20_2W_RISING`, `TIME`, 2/4 ATR, 48-bar result is not live-ready: futures IS is noise-level and negative without the best trade, OOS is regime-dependent, 2026 is negative, and the spot/futures performance gap needs explanation. The correct status remains `RESEARCH_ONLY`; no live rule or server code was changed.
+
+The report's earlier full-replay command for `backtest-4h-entry-lane-7y.ts` is stale for this newer sweep. The explicit command in the post-fix section above is authoritative.
+
+## Fresh-cache sanity check
+
+The same corrected replay was run on `/tmp/binance-futures-btcusdt-1h-current-20260715.json`, ending at `2026-07-15T14:00:00Z`. The best early lanes were:
+
+| Lane | Trades | Win rate | PF | Net R | Without best | Max DD R |
+|---|---:|---:|---:|---:|---:|---:|
+| K10_1D_RISING | 218 | 40.8% | 1.31 | +1.325 | +1.115 | 0.396 |
+| K20_2W_RISING | 173 | 39.9% | 1.25 | +0.743 | +0.595 | 0.328 |
+| K20_ATR_HIGH | 231 | 38.5% | 1.12 | +0.643 | +0.455 | 0.585 |
+
+This freshness check improves the aggregate picture but does not change the decision: K10_1D_RISING is negative in 2022 and 2025, while K20_2W_RISING is negative in 2021 and 2026. The cache also ends before the current date, so it is evidence of replay stability at a recent file boundary, not a current live signal.
+
+## Rapid-rearm sensitivity
+
+To quantify Claude's medium concern about a new signal shortly after an entry-bar SL, the sweep now accepts an optional `STOCHRSI_MIN_SIGNAL_GAP` in 4H bars. The default is `0`, preserving the original replay; the gate only consumes a new oversold episode when it falls inside the configured gap. This is a sensitivity control, not a production rule.
+
+With the primary `TIME`, 2/4 ATR, 48-bar exit:
+
+| Dataset | Lane | Min gap | Trades | PF | Net R | Without best | Max DD R |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Futures 7Y | K20_2W_RISING | 0 | 149 | 1.10 | +0.270 | +0.131 | 0.290 |
+| Futures 7Y | K20_2W_RISING | 2 | 149 | 1.10 | +0.270 | +0.131 | 0.290 |
+| Futures 7Y | K20_2W_RISING | 6 | 147 | 1.12 | +0.324 | +0.186 | 0.287 |
+| Spot 2017-2026 | K20_2W_RISING | 0 | 208 | 1.29 | +1.059 | +0.897 | 0.328 |
+| Spot 2017-2026 | K20_2W_RISING | 6 | 205 | 1.29 | +1.049 | +0.887 | 0.309 |
+
+The result does not support treating rapid re-arm as the source of the observed edge. The small futures improvement is not mirrored by spot and the yearly regime instability remains. Keep the default gap at `0` for faithful baseline comparison; do not promote `minGap=6` as an optimized live parameter.
+
+Reproduce the sensitivity rows explicitly:
+
+```bash
+cd /Users/lap16116/BTC_PC/btc-dashboard
+for gap in 0 2 6; do
+  STOCHRSI_MIN_SIGNAL_GAP=$gap STOCHRSI_EXIT_MODE=TIME \
+    STOCHRSI_STOP_ATR=2 STOCHRSI_TARGET_ATR=4 STOCHRSI_MAX_HOLD=48 \
+    npx --yes tsx@4.23.1 tools/backtest-4h-early-entry-sweep-7y.ts
+done
+
+for gap in 0 6; do
+  STOCHRSI_HOURLY=.cache/binance-spot-btcusdt-1h-full.json \
+    STOCHRSI_MIN_SIGNAL_GAP=$gap STOCHRSI_EXIT_MODE=TIME \
+    STOCHRSI_STOP_ATR=2 STOCHRSI_TARGET_ATR=4 STOCHRSI_MAX_HOLD=48 \
+    npx --yes tsx@4.23.1 tools/backtest-4h-early-entry-sweep-7y.ts
+done
+```
+
+## Focused Claude audit: rapid-rearm sensitivity
+
+Claude reviewed the sensitivity helper, test, replay integration, and reported rows. The gate semantics and default `minGap=0` fidelity passed. A blocked signal intentionally consumes that oversold episode, so no retry occurs until K exits and re-enters the zone; this is now documented as a sensitivity assumption. Claude found the 0/2/6 rows reproducible from the code but rated methodology `CONDITIONAL` because the commands were previously missing and the effect is too small to explain the edge.
+
+Claude's live verdict remains `REJECT` for both `K20_2W_RISING` and `K10_1D_RISING`: neither has sufficient per-mode walk-forward evidence, both have negative years, and the futures/spot difference is unresolved.
+
+The missing `K10_1D_RISING` futures split was then run:
+
+| Lane | Window | Trades | PF | Net R | Without best | Max DD R |
+|---|---|---:|---:|---:|---:|---:|
+| K10_1D_RISING | IS 2020-2023 | 107 | 1.40 | +0.900 | +0.687 | 0.417 |
+| K10_1D_RISING | OOS 2024-2026 | 80 | 1.16 | +0.211 | +0.086 | 0.344 |
+
+This makes the candidate more interesting than `K20_2W_RISING`, but it still has a small and regime-sensitive OOS sample, with 2025 negative. It remains `RESEARCH_ONLY`, not a live entry rule.
