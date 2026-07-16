@@ -375,3 +375,18 @@ To answer Claude's cross-asset gap, the same exact-fill replay was run on the lo
 | Spot OOS 2024-2026 | 80 | 1.16 | +0.208 | +0.084 | 0.335 |
 
 The futures and spot OOS numbers are close, which is useful structural confirmation, but both OOS windows contain only the same recent regime and 2025 is negative. This strengthens the candidate as a research lead, not as live authorization.
+
+### K10_1D_RISING exit-geometry sensitivity
+
+The early candidate was also tested without changing its entry or context, using three fixed `TIME` exit geometries:
+
+| Geometry | Dataset | Trades | PF | Net R | Without best | Max DD R |
+|---|---|---:|---:|---:|---:|---:|
+| 1 / 2 ATR, 18 bars | Futures 7Y | 231 | 1.19 | +0.494 | +0.349 | 0.242 |
+| 1.5 / 3 ATR, 24 bars | Futures 7Y | 221 | 1.20 | +0.654 | +0.436 | 0.493 |
+| 2 / 4 ATR, 48 bars | Futures 7Y | 193 | 1.27 | +1.021 | +0.808 | 0.417 |
+| 1 / 2 ATR, 18 bars | Spot 2017-2026 | 299 | 1.14 | +0.507 | +0.362 | 0.449 |
+| 1.5 / 3 ATR, 24 bars | Spot 2017-2026 | 287 | 1.30 | +1.359 | +1.141 | 0.360 |
+| 2 / 4 ATR, 48 bars | Spot 2017-2026 | 253 | 1.35 | +1.855 | +1.645 | 0.396 |
+
+The sign is stable across all six exact-fill replays and the best-trade concentration is moderate. However, this is still not live authorization: 2022 is negative in every geometry, recent OOS is short, and no production-order replay or risk-sizing validation has been performed.
