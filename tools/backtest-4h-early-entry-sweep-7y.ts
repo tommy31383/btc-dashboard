@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { aggregateCandles, buildStochPoints, HOUR_MS, type Candle, type StochPoint } from "./stochrsi-macro-cycle/core";
 import { settleLong, triggeredExitPrice } from "./backtest-4h-entry-lane-7y-fill";
 import { signalGapAllowed } from "./early-entry-sensitivity";
+import { oversoldThreshold } from "./early-entry-threshold";
 
 const sourcePath = process.env.STOCHRSI_HOURLY ?? ".cache/binance-futures-btcusdt-1h-7y.json";
 const FOUR_H_MS = 4 * HOUR_MS;
@@ -18,7 +19,7 @@ const MIN_SIGNAL_GAP = Math.max(0, Number(process.env.STOCHRSI_MIN_SIGNAL_GAP ??
 const TRADE_START_MS = process.env.STOCHRSI_TRADE_START ? Date.parse(process.env.STOCHRSI_TRADE_START) : Number.NEGATIVE_INFINITY;
 const TRADE_END_MS = process.env.STOCHRSI_TRADE_END ? Date.parse(process.env.STOCHRSI_TRADE_END) : Number.POSITIVE_INFINITY;
 
-type Mode = "K10" | "K20" | "K30" | "K10_1D_RISING" | "K10_2W_RISING" | "K20_1D_RISING" | "K20_2W_RISING" | "K20_WEEK_ABOVE_EMA20" | "K20_WEEK_ABOVE_RISING" | "K20_ATR_HIGH";
+type Mode = "K5" | "K10" | "K20" | "K30" | "K5_1D_RISING" | "K10_1D_RISING" | "K20_1D_RISING" | "K5_2W_RISING" | "K10_2W_RISING" | "K20_2W_RISING" | "K5_WEEK_ABOVE_RISING" | "K10_WEEK_ABOVE_RISING" | "K20_WEEK_ABOVE_EMA20" | "K20_WEEK_ABOVE_RISING" | "K5_ATR_HIGH" | "K10_ATR_HIGH" | "K20_ATR_HIGH";
 
 interface Trade { entryTime: number; exitTime: number; pnl: number; reason: string; }
 
@@ -95,7 +96,7 @@ function signals(
   atr: (number | null)[],
   mode: Mode,
 ): number[] {
-  const threshold = mode === "K10" || mode === "K10_1D_RISING" || mode === "K10_2W_RISING" ? 10 : 20;
+  const threshold = oversoldThreshold(mode);
   const output: number[] = [];
   let inEpisode = false;
   let entryTaken = false;
@@ -107,16 +108,18 @@ function signals(
     const firstOversold = point.k < threshold && !inEpisode && !entryTaken;
     if (point.k < threshold) inEpisode = true;
     if (!firstOversold) continue;
-    const dailyOk = mode !== "K20_1D_RISING" && mode !== "K10_1D_RISING" || risingAt(daily, point.closeTime);
-    const twoWeeklyOk = mode !== "K20_2W_RISING" && mode !== "K10_2W_RISING" || risingAt(twoWeekly, point.closeTime);
+    const dailyOk = !mode.endsWith("_1D_RISING") || risingAt(daily, point.closeTime);
+    const twoWeeklyOk = !mode.endsWith("_2W_RISING") || risingAt(twoWeekly, point.closeTime);
     const weeklyPoint = currentAt(weekly, point.closeTime);
     const weeklyIndex = weeklyPoint === undefined ? -1 : weekly.indexOf(weeklyPoint);
     const aboveWeeklyEma = weeklyIndex >= 0 && weeklyEma20[weeklyIndex] !== null && weeklyPoint!.close > weeklyEma20[weeklyIndex]!;
     const weeklyEmaRising = weeklyIndex > 0 && weeklyEma20[weeklyIndex] !== null && weeklyEma20[weeklyIndex - 1] !== null && weeklyEma20[weeklyIndex]! > weeklyEma20[weeklyIndex - 1]!;
-    const weeklyOk = mode !== "K20_WEEK_ABOVE_EMA20" && mode !== "K20_WEEK_ABOVE_RISING" || (mode === "K20_WEEK_ABOVE_EMA20" ? aboveWeeklyEma : aboveWeeklyEma && weeklyEmaRising);
+    const weeklyOk = mode === "K20_WEEK_ABOVE_EMA20"
+      ? aboveWeeklyEma
+      : !mode.endsWith("_WEEK_ABOVE_RISING") || aboveWeeklyEma && weeklyEmaRising;
     const recentAtr = atr.slice(Math.max(0, i - 90), i).filter((value): value is number => value !== null);
     const medianAtr = recentAtr.length ? [...recentAtr].sort((a, b) => a - b)[Math.floor(recentAtr.length / 2)] : null;
-    const volatilityOk = mode !== "K20_ATR_HIGH" || (atr[i] !== null && medianAtr !== null && atr[i]! >= medianAtr);
+    const volatilityOk = !mode.endsWith("_ATR_HIGH") || (atr[i] !== null && medianAtr !== null && atr[i]! >= medianAtr);
     if (dailyOk && twoWeeklyOk && weeklyOk && volatilityOk) {
       if (signalGapAllowed(i, lastSignal, MIN_SIGNAL_GAP)) {
         output.push(i);
@@ -187,7 +190,7 @@ async function main(): Promise<void> {
   const weeklyEma20 = ema(weekly.map((point) => point.close), 20);
   const atr = atrSeries(bars, 14);
   console.log(`4H early-entry sweep: ${sourcePath}, bars=${bars.length}, last=${new Date(asOfMs).toISOString()}, stop=${STOP_ATR}ATR target=${TARGET_ATR}ATR hold=${MAX_HOLD} exit=${EXIT_MODE} minSignalGap=${MIN_SIGNAL_GAP} window=${process.env.STOCHRSI_TRADE_START ?? "begin"}..${process.env.STOCHRSI_TRADE_END ?? "end"}`);
-  for (const mode of ["K10", "K20", "K30", "K10_1D_RISING", "K10_2W_RISING", "K20_1D_RISING", "K20_2W_RISING", "K20_WEEK_ABOVE_EMA20", "K20_WEEK_ABOVE_RISING", "K20_ATR_HIGH"] as Mode[]) {
+  for (const mode of ["K5", "K10", "K20", "K30", "K5_1D_RISING", "K10_1D_RISING", "K20_1D_RISING", "K5_2W_RISING", "K10_2W_RISING", "K20_2W_RISING", "K5_WEEK_ABOVE_RISING", "K10_WEEK_ABOVE_RISING", "K20_WEEK_ABOVE_EMA20", "K20_WEEK_ABOVE_RISING", "K5_ATR_HIGH", "K10_ATR_HIGH", "K20_ATR_HIGH"] as Mode[]) {
     report(mode, replay(bars, points, signals(points, daily, twoWeekly, weekly, weeklyEma20, atr, mode), atr));
   }
 }

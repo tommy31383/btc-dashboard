@@ -376,6 +376,80 @@ To answer Claude's cross-asset gap, the same exact-fill replay was run on the lo
 
 The futures and spot OOS numbers are close, which is useful structural confirmation, but both OOS windows contain only the same recent regime and 2025 is negative. This strengthens the candidate as a research lead, not as live authorization.
 
+## Overnight threshold/context expansion
+
+The overnight sweep added exact-fill modes for first entry at `K<5`, plus separate 1D-rising, 2W-rising, weekly price-location, and ATR-high contexts. The primary 2/4 ATR, 48-bar results show that a high full-sample number is not enough:
+
+| Dataset | Mode | Trades | PF | Net R | Without best | Max DD R |
+|---|---|---:|---:|---:|---:|---:|
+| Futures 7Y | K5 | 343 | 1.11 | +0.823 | +0.592 | 1.160 |
+| Futures 7Y | K5_1D_RISING | 144 | 1.38 | +1.046 | +0.832 | 0.502 |
+| Futures 7Y | K10_WEEK_ABOVE_RISING | 218 | 1.40 | +1.644 | +1.416 | 0.344 |
+| Futures 7Y | K10_ATR_HIGH | 197 | 1.29 | +1.337 | +1.108 | 0.823 |
+| Spot 2017-2026 | K5 | 444 | 1.02 | +0.220 | -0.120 | 1.311 |
+| Spot 2017-2026 | K5_1D_RISING | 188 | 1.25 | +1.043 | +0.833 | 0.495 |
+| Spot 2017-2026 | K10_WEEK_ABOVE_RISING | 271 | 1.22 | +1.295 | +1.070 | 0.644 |
+| Spot 2017-2026 | K10_ATR_HIGH | 268 | 1.09 | +0.709 | +0.373 | 0.756 |
+
+The strongest full-sample rows were then split before any promotion:
+
+| Dataset/window | Mode | Trades | PF | Net R | Without best |
+|---|---|---:|---:|---:|---:|
+| Futures IS 2020-2023 | K5_1D_RISING | 83 | 1.78 | +1.239 | +1.026 |
+| Futures OOS 2024-2026 | K5_1D_RISING | 57 | 0.91 | -0.100 | -0.223 |
+| Futures IS 2020-2023 | K10_WEEK_ABOVE_RISING | 122 | 1.72 | +1.725 | +1.496 |
+| Futures OOS 2024-2026 | K10_WEEK_ABOVE_RISING | 96 | 0.95 | -0.080 | -0.205 |
+| Spot IS 2019-2023 | K5_1D_RISING | 109 | 1.54 | +1.229 | +1.019 |
+| Spot OOS 2024-2026 | K5_1D_RISING | 57 | 0.90 | -0.100 | -0.221 |
+| Spot IS 2019-2023 | K10_WEEK_ABOVE_RISING | 160 | 1.58 | +2.017 | +1.791 |
+| Spot OOS 2024-2026 | K10_WEEK_ABOVE_RISING | 96 | 0.95 | -0.078 | -0.201 |
+
+Decision before Claude review: both new modes are `REJECTED_FOR_LIVE`; their full-sample edge does not survive the recent OOS window. `K10_1D_RISING` remains the more defensible research lead because its OOS split was positive, though still not live-ready.
+
+Reproduce the new IS/OOS rows exactly:
+
+```bash
+cd /Users/lap16116/BTC_PC/btc-dashboard
+for window in \
+  '2020-01-01T00:00:00Z 2024-01-01T00:00:00Z' \
+  '2024-01-01T00:00:00Z 2026-07-12T00:00:00Z'; do
+  set -- ${(s: :)window}
+  STOCHRSI_TRADE_START=$1 STOCHRSI_TRADE_END=$2 \
+  STOCHRSI_EXIT_MODE=TIME STOCHRSI_STOP_ATR=2 STOCHRSI_TARGET_ATR=4 STOCHRSI_MAX_HOLD=48 \
+  npx --yes tsx@4.23.1 tools/backtest-4h-early-entry-sweep-7y.ts \
+  | rg '^(4H early|K5_1D_RISING:|K10_WEEK_ABOVE_RISING:)'
+done
+
+for window in \
+  '2019-01-01T00:00:00Z 2024-01-01T00:00:00Z' \
+  '2024-01-01T00:00:00Z 2026-07-12T00:00:00Z'; do
+  set -- ${(s: :)window}
+  STOCHRSI_HOURLY=.cache/binance-spot-btcusdt-1h-full.json \
+  STOCHRSI_TRADE_START=$1 STOCHRSI_TRADE_END=$2 \
+  STOCHRSI_EXIT_MODE=TIME STOCHRSI_STOP_ATR=2 STOCHRSI_TARGET_ATR=4 STOCHRSI_MAX_HOLD=48 \
+  npx --yes tsx@4.23.1 tools/backtest-4h-early-entry-sweep-7y.ts \
+  | rg '^(4H early|K5_1D_RISING:|K10_WEEK_ABOVE_RISING:)'
+done
+```
+
+The exact input-cache hashes for these rows are:
+
+```text
+futures .cache/binance-futures-btcusdt-1h-7y.json  f738aefc1304fda8bb871cb919fc00b8c2b98ac0be23cb05e94c22158bd000a7
+spot    .cache/binance-spot-btcusdt-1h-full.json   4fcd971d0c665ba4f93783984f6d7e6e1fbd99f074067d9808cf388f65a87de1
+```
+
+## Focused Claude audit: overnight threshold/context expansion
+
+Claude audited the threshold helper, K5/K10 modes, weekly/ATR context, exact-fill integration, and the new IS/OOS evidence. Findings:
+
+- `PASS`: K5/K10 threshold mapping, completed-bar and HTF alignment, ATR lookback, weekly EMA/price-location semantics, and exact-fill integration.
+- `CONDITIONAL`: same-bar SL-before-TP and rapid-rearm behavior are explicit conservative/sensitivity-tested assumptions; the K30 label was misleading and has now been corrected to a real K<30 threshold.
+- `CONDITIONAL`: reproducibility was incomplete before this section; the exact split commands and actual futures/spot hashes are now recorded above.
+- `REJECT`: `K5_1D_RISING` and `K10_WEEK_ABOVE_RISING` for live. Both have PF below 1 in OOS on futures and spot.
+
+Claude confirms `K10_1D_RISING` remains the strongest surviving research lead, but it is also not live-ready because its OOS window is short/regime-limited and 2025 is negative across the tested geometry set.
+
 ### K10_1D_RISING exit-geometry sensitivity
 
 The early candidate was also tested without changing its entry or context, using three fixed `TIME` exit geometries:
