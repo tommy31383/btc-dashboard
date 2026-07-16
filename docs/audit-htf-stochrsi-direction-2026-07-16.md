@@ -390,3 +390,9 @@ The early candidate was also tested without changing its entry or context, using
 | 2 / 4 ATR, 48 bars | Spot 2017-2026 | 253 | 1.35 | +1.855 | +1.645 | 0.396 |
 
 The sign is stable across all six exact-fill replays and the best-trade concentration is moderate. However, this is still not live authorization: 2022 is negative in every geometry, recent OOS is short, and no production-order replay or risk-sizing validation has been performed.
+
+## Final heartbeat and completion evidence
+
+The scheduled research runner completed at `2026-07-16 22:00:06 +07` after 52 heartbeat iterations. It ran the configured futures/spot exact-fill sweeps, the 1.5/3 ATR stress lane, the 2020-2023 IS and 2024-2026 OOS split, and the current-cache sanity lane. The process exited normally; no live server, order, arming, or deployment command was executed.
+
+Final decision: `RESEARCH_ONLY`. `K10_1D_RISING` is the strongest early-entry research lead, but Claude's bounded audits reject live promotion because the recent OOS is regime-limited, negative years remain, and production-order/risk-sizing validation is still absent. `K20_2W_RISING` remains weaker and near noise-level on futures IS.
