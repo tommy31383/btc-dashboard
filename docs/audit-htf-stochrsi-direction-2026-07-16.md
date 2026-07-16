@@ -364,3 +364,14 @@ The missing `K10_1D_RISING` futures split was then run:
 | K10_1D_RISING | OOS 2024-2026 | 80 | 1.16 | +0.211 | +0.086 | 0.344 |
 
 This makes the candidate more interesting than `K20_2W_RISING`, but it still has a small and regime-sensitive OOS sample, with 2025 negative. It remains `RESEARCH_ONLY`, not a live entry rule.
+
+### Cross-asset split for K10_1D_RISING
+
+To answer Claude's cross-asset gap, the same exact-fill replay was run on the longer spot cache using the comparable split (`2019-2023` IS and `2024-2026` OOS):
+
+| Dataset/window | Trades | PF | Net R | Without best | Max DD R |
+|---|---:|---:|---:|---:|---:|
+| Spot IS 2019-2023 | 139 | 1.40 | +1.163 | +0.953 | 0.396 |
+| Spot OOS 2024-2026 | 80 | 1.16 | +0.208 | +0.084 | 0.335 |
+
+The futures and spot OOS numbers are close, which is useful structural confirmation, but both OOS windows contain only the same recent regime and 2025 is negative. This strengthens the candidate as a research lead, not as live authorization.
