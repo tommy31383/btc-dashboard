@@ -1,8 +1,22 @@
 # 📚 MASTER INDEX — Research & Lesson-learn (BTC bot)
 
-Cập nhật 2026-06-04. Catalog toàn bộ doc 2 repo (`btc-dashboard/docs/` + `btc-trader-server/docs/`).
+Cập nhật 2026-07-16. Catalog toàn bộ doc 2 repo (`btc-dashboard/docs/` + `btc-trader-server/docs/`).
 Phân loại: 🧭 Method/Framework · 🔬 Research · 📊 Rule-dev · 🐻 Bear/Regime · 🔁 Loop · 🛠️ Audit/Deploy · 📅 Session.
 **[D]** = btc-dashboard/docs · **[S]** = btc-trader-server/docs.
+
+## CURRENT SOURCE OF TRUTH
+
+Đọc trước các report cũ:
+
+| Doc | Nội dung |
+|---|---|
+| [S] `../../btc-trader-server/AGENTS.md` | Runtime v0.4.128, active engines, invariants, deploy/review rules. |
+| [S] `../../btc-trader-server/docs/LIVE_RULES_SPEC_FOR_REVIEW.md` | External-review packet; old replay table is labelled historical. |
+| [S] `../../btc-trader-server/docs/research-decision-registry.md` | Durable research verdicts and provenance. |
+| [S] `../../btc-trader-server/docs/KNOWLEDGE_AUDIT_2026-07-16.md` | Source hierarchy, stale-doc findings, and remaining gaps. |
+| [S] `../../btc-trader-server/docs/deep-entry-expectancy-audit-2026-07-16.md` | Latest BTC4h expectancy audit; no live promotion. |
+
+Files under `archive/` and dated session summaries are historical records, not current runtime truth.
 
 ---
 
